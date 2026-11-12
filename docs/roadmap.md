@@ -270,10 +270,10 @@ Each field was checked on 12 November with a real IRSA query, each image's own W
 |---|---|---|---|---|---|
 | 1 | **Asteroid: (1) Ceres**, V 8.7, moving 36″/h | follows Ceres; 7.44, −7.83 on MJD 61023.69 | 125 exposures contain it, MJD 61023.7–61041.6 (11–29 Dec 2025) | 124 of 125 have a reference within 0.25 bandwidths, mostly from the June–July 2026 pass, about 194 days later | **Pass** |
 | 2 | **Interstellar comet 3I/ATLAS**, model magnitude 15.3, moving 152″/h | follows the comet; 173.81, +2.82 on MJD 61017.01 | 98 exposures contain it, MJD 61017.0–61024.0 (7–14 Dec 2025) | 94 have a reference within 0.5 bandwidths, 49 within 0.25, some only a day apart | **Pass** on coverage; brightness is a model value and it may be too faint to detect |
-| 3 | **Moving star: Barnard's Star**, 10.4″ per year | 269.4463, +4.7671 (Aug 2025) | 364 over three passes | 29 matched groups, 15 of them spanning all three passes; for example 1.017 µm on MJD 60919.1, 61110.6 and 61277.8 | **Pass**, but the star is saturated: fine to look at, not to measure |
+| 3 | **Moving star: Barnard's Star**, 10.4″ per year | 269.4463, +4.7671 (Aug 2025) | 353 contain it, over three passes | 29 matched groups, 15 of them spanning all three passes; for example 1.017 µm on MJD 60919.1, 61110.6 and 61277.8 | **Pass**, but the star is saturated (OVERFLOW flag on its core pixels) and moves only 1.7 pixels a year: fine to look at, not to measure |
 | 4 | **Planet X search region**, on the Brown & Batygin band, Galactic latitude −40° | 51.0, +6.0 | 339 over three passes (Aug 2025, Feb 2026, Aug 2026) | 45 matched groups, 36 spanning three passes; for example 0.82 µm on MJD 60894.9, 61082.3 and 61260.5 | **Pass** |
-| 5 | Backup moving star: **Kapteyn's Star**, 8.7″ per year | 77.919, −45.018 | 359 over three passes | 48 matched groups, 41 spanning three passes | **Pass** on coverage; saturation not checked |
-| 6 | Backup moving star: **Teegarden's Star**, 5.1″ per year, fainter | 43.270, +16.864 | 330, MJD 60889–61270 | not computed | Coverage only |
+| 5 | Backup moving star: **Kapteyn's Star**, 8.7″ per year | 77.919, −45.018 | 351 over three passes | 48 matched groups, 41 spanning three passes | **Pass** on coverage; saturation not checked |
+| 6 | Backup moving star: **Teegarden's Star**, 5.1″ per year, fainter | 43.270, +16.864 | 326 over three passes | 40 matched groups, but only 8 of them at 0.75–2.4 µm | Coverage passes; saturation flags not checked |
 
 Example evidence rows:
 
@@ -302,9 +302,9 @@ Each took 40–100 s. Mover positions come from Horizons with `CENTER='@-163182'
 
 **Not settled:**
 
-- **Ceres may saturate** at V 8.7. Backups with the same method: (7) Iris (V 10.2, quadrature 4 Dec 2025 near RA 161.5, Dec +2.3; images exist, containment not finished), (2) Pallas, (15) Eunomia. Every Ceres frame also contains fainter known asteroids, which the JPL check will name.
+- **Ceres saturates slightly**: 1–3 core pixels carry the OVERFLOW flag, so its position is usable but its brightness is not. Backups with the same method: (7) Iris (V 10.2; 144 exposures contain it, MJD 61004–61026; reference matching not finished), (2) Pallas, (15) Eunomia. Every Ceres frame also contains fainter known asteroids, which the JPL check will name.
 - **No unsaturated moving star is confirmed yet.** Teegarden's Star is the candidate; check its flags in P5. If none works, Barnard's Star stays as a visual-only stop on the tour.
-- **3I/ATLAS detectability.** It is the best story of the five, but at magnitude 15–17 it is near the noise in a single exposure. Brighter comets (C/2025 K1, C/2025 R2) were being checked when the probe stopped. If it can't be detected, the comet stop is dropped and the tour has three fields.
+- **3I/ATLAS detectability.** It is the best story of the five, but at magnitude 15–17 it is near the noise in a single exposure. Brighter by JPL's model: C/2025 K1 (about 12.5, 16–21 Nov 2025; images exist, not analysed) and C/2025 R2 (about 11, but no images found). If it can't be detected, the comet stop is dropped and the tour has three fields.
 - The ecliptic-pole deep field was not checked.
 
 ## 5. Practice prototype (13 November)
