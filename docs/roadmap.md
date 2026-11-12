@@ -40,17 +40,21 @@ Four findings from the probes shape everything below.
 | Should | **S4. Planet X pair search** on the search-region field: look for a source that appears in one pass and reappears at the parallax-shifted position in the next; report the result, expected to be none | a real null result |
 | Cut | All-sky index, ML ranking, shift-and-stack search, LLM-written summaries, accounts, reporting candidates to the MPC, CWAVE calibration files | none wins a judging criterion in 48 h |
 
-The should-haves are built in the order S0, S3, S1, S2, S4, and only after checkpoint C4.
+S0 comes first among the should-haves, straight after checkpoint C3 instead of waiting for C4, because four live competitors already let a judge type in any position. Then S3, S1, S2, S4.
 
 ### How we beat the strongest three
 
 | Competitor | Their strength | Where we win |
 |---|---|---|
-| **Driftnet** | Full detect, link, vet, JPL pipeline; live site | Many of its 596 candidates have `known_object_checked: false`; ours all list every check run. It never states the flux gap to Planet Nine; we make it interactive. It sidesteps wavelength; we match per source. Its UI is dense; ours is a guided tour. |
-| **Muninn** | Reads FITS in the browser; says plainly it can't find Planet Nine | It has no public URL. It matches by band only; we match by wavelength at the source's pixel. It quotes one depth, 17.60 AB; we measure depth per image and per detector, and its number matches only our 3.8–4.4 µm detector. |
-| **spherex-timelapse** | Sky-wide index; recovers Pluto | No Planet X angle, no star or glitch labels, partial wavelength handling. We don't try to match its all-sky coverage. |
+| **Driftnet** | The one to beat: detect, link, vet and JPL checks over 656 sky tiles and 620 objects, per-pixel wavelength pairing, an injection test, a guided tour, an AI guide, and a live site | No moving-star label (no Gaia proper motion in its code). Its Planet X answer is a fixed table for one Neptune-sized planet, one albedo and one band; ours is interactive, per detector, with albedo presets and measured depth. It compares images; we measure each source in a matched reference and publish the false-alarm rate. Every one of our labels lists the checks it passed. Its images are pre-saved; ours load live from NASA. It is ahead on breadth and polish, and it exists today |
+| **Muninn** | Reads NASA's files live in the browser; measures depth per field (16.7–18.0 AB by detector) and says plainly it can't find Planet Nine | Still no public URL. It matches by band only; we match by wavelength at the source. Expert interface with no tour. No moving-star label. A real threat if it deploys |
+| **spherex-timelapse** | Live site, search anywhere, index of about 1.29M images rebuilt weekly, live pixels from NASA | No Planet X angle and no moving-star label. It looks up per-pixel wavelength for spectra, but its blink is not wavelength-matched. Explore mode (S0) is our answer to its coverage |
 
-We lose on code volume, and on breadth unless S0 ships. The labelled tour is the part that must not fail in front of a judge, so it never waits on a slow service.
+Two more to watch, found on the 13 November re-check: **Unavailable4u/spherex-blink** (live, 20 real pre-saved fields, a tour, but manual mover checks and no depth) and **SPHEREx-Blink-3.0** (catalogue labels that include proper motion and a parallax search for Planet X, but its public site shows synthetic data only).
+
+**What is still ours alone.** No single feature is unique any more: live NASA pixels, a tour, wavelength matching, JPL checks and a stated Planet X depth each exist somewhere. Nobody has the interactive calculator against measured per-image depth, the measured-in-a-matched-reference method with a published false-alarm rate, or all four labels together on a public tour of real fields. The pitch leads with the calculator for that reason.
+
+**How we could still lose.** Competitors are live now and ours is a plan. Driftnet looks richer in the first 30 seconds. If the unexplained-dot count (P4) or the brightness measurement fails, the tour is mostly "known asteroid" and "glitch" on four fields. So: get one real labelled field and the calculator deployed as early as possible and keep it live.
 
 ## 2. Architecture
 
