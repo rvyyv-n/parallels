@@ -50,7 +50,7 @@ Research and planning:
 - [x] Demo sky fields chosen and checked against IRSA
 - [x] Roadmap: scope, architecture, method, event plan
 
-Practice prototype (13 November, throwaway):
+Prototype (13 November, in this repo):
 
 - [ ] P1 Fetch a field from S3 fast enough
 - [ ] P2 Recover a known asteroid end to end

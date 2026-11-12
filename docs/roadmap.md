@@ -13,7 +13,7 @@ How to read the evidence tags:
 Four findings from the probes shape everything below.
 
 1. **IRSA publishes no per-image depth.** `spherex.plane.metrics_maglimit` exists but is NULL in all 1,607,635 rows [measured]. We compute depth ourselves from each image's VARIANCE and PSF. Our numbers for one field: 18.3–18.8 AB per visit at 0.75–3.8 µm, 17.4–17.6 at 3.8–4.4 µm, 16.8–17.1 at 4.4–5.0 µm.
-2. **A browser can't call IRSA or JPL.** Neither sends CORS headers, IRSA table queries take 20–150 s, and JPL's policy forbids embedding its APIs in a website [measured]. The site runs on pre-computed files. Only S3 allows cross-origin reads.
+2. **A browser can read NASA's image archive directly, but not IRSA's search or JPL.** The S3 archive allows cross-origin reads. IRSA and JPL send no CORS headers, IRSA table queries take 20–150 s (server queueing, so event day won't be faster), and JPL's policy forbids embedding its APIs in a website [measured]. So the site loads its pixels live from NASA, and the slow lookups are done ahead or go through a small caching proxy.
 3. **Subtracting two images pixel by pixel doesn't work well enough.** Even at matched wavelength, every star leaves a residual of 0.2–0.3 × its peak signal-to-noise, because SPHEREx's 6.15″ pixels undersample the PSF [measured on 6 pairs]. The detector is therefore forced PSF photometry in the matched reference frame; the difference image is for display.
 4. **Planet Nine is 3–7 magnitudes too faint per visit**, not 3–5. With a realistic methane-dark albedo it's 5–7. The calculator is a sensitivity tool ("how far out could SPHEREx have seen *this* planet?"). It can't honestly claim an exclusion map, so the pitch line "which parts of the predicted region it rules out" has to go (see [open decisions](#open-decisions)).
 
@@ -31,15 +31,16 @@ Four findings from the probes shape everything below.
 | **Must** | **M2. Matched-wavelength blink**: science frame, reference frame and difference, with both wavelengths, the mismatch in bandwidths, and both dates on screen | wavelength-matched comparison |
 | **Must** | **M3. Every dot labelled**: known asteroid/comet, moving star, glitch or unexplained, each with an evidence card and the list of checks it went through; a per-field tally ("41 changes: 3 asteroids, 1 moving star, 35 glitches, 2 unexplained") | an explanation for every dot |
 | **Must** | **M4. Planet X calculator**, in the browser: size or mass, distance, albedo preset → predicted brightness per SPHEREx band against our measured depth, and the maximum distance at which it would be seen | honest, interactive Planet X answer |
+| **Must** | **M6. Live pixels from NASA**: every image on screen is read from NASA's public archive in the visitor's browser as they watch, with a "live from NASA" badge; a saved copy takes over if the archive doesn't answer | real data, visibly real |
 | **Must** | **M5. Honesty layer**: a "how we know" page with the method, the validation results, the limits, and what is uncertain | credibility with judges |
+| Should | **S0. Explore any position, live**: type coordinates or click the sky; a small proxy asks IRSA which images cover it (about a minute, with progress shown), the browser pulls the pixels from NASA and blinks a matched pair; known asteroids come from IMCCE SkyBoT. No star or depth labels in this mode, and the page says so | the most impressive thing a judge can try themselves |
 | Should | **S1. Depth along the predicted Planet Nine band**: about 20 sample points, showing the reach for the chosen planet at each | "where could it hide" |
 | Should | **S2. Injection test** on one field: fake sources added and recovered, giving a measured detection rate | answers Driftnet's "Limits" page |
 | Should | **S3. Track view**: the asteroid's linked detections drawn over JPL's predicted path | makes "known asteroid" visible |
 | Should | **S4. Planet X pair search** on the search-region field: look for a source that appears in one pass and reappears at the parallax-shifted position in the next; report the result, expected to be none | a real null result |
-| Cut | Live "explore any sky position" mode | 8–10 h, no Gaia or depth, depends on a slow third party |
 | Cut | All-sky index, ML ranking, shift-and-stack search, LLM-written summaries, accounts, reporting candidates to the MPC, CWAVE calibration files | none wins a judging criterion in 48 h |
 
-The should-haves are built in the order S3, S1, S2, S4, and only after checkpoint C4.
+The should-haves are built in the order S0, S3, S1, S2, S4, and only after checkpoint C4.
 
 ### How we beat the strongest three
 
@@ -49,7 +50,7 @@ The should-haves are built in the order S3, S1, S2, S4, and only after checkpoin
 | **Muninn** | Reads FITS in the browser; says plainly it can't find Planet Nine | It has no public URL. It matches by band only; we match by wavelength at the source's pixel. It quotes one depth, 17.60 AB; we measure depth per image and per detector, and its number matches only our 3.8–4.4 µm detector. |
 | **spherex-timelapse** | Sky-wide index; recovers Pluto | No Planet X angle, no star or glitch labels, partial wavelength handling. We don't try to match its all-sky coverage. |
 
-We lose on breadth (four fields against the whole sky) and on code volume. That is deliberate: judges click a link and watch a short video.
+We lose on code volume, and on breadth unless S0 ships. The labelled tour is the part that must not fail in front of a judge, so it never waits on a slow service.
 
 ## 2. Architecture
 
@@ -63,24 +64,28 @@ fields.yaml
   → detect    per-exposure detection, forced PSF photometry in the reference
   → label     FLAGS → Gaia DR3 → JPL SBIdent → JPL Horizons → unexplained
   → depth     5σ point-source limit per image
-  → emit      site/public/data/fields/<id>/{manifest.json, stack.f32, flags.u8, thumb.png}
+  → emit      site/public/data/fields/<id>/{manifest.json, fallback.f32, flags.u8, thumb.png}
   → check     schema check + validation tests → git push → host builds the site
 ```
 
 | Choice | Decision | Reason | Rejected |
 |---|---|---|---|
-| Backend | **None.** A Python pipeline runs on our laptops during the event and writes static files | Judges never wait on IRSA or JPL; IRSA's 20–150 s exceeds any free function timeout | Serverless proxy |
+| Pixels | **Live from NASA's S3 archive, in the browser.** The manifest gives each exposure's S3 URL, byte range and placement; the browser fetches about 1 MB per frame | Real NASA data, visibly live, and S3 is fast (about 1 s) and allows it | Serving only our own copies (kept as the fallback) |
+| Search, labels, measurements | **Pre-computed** by a Python pipeline on our laptops during the event | IRSA takes 20–150 s and JPL forbids browser use; a judge shouldn't wait on either | Doing these live on the tour |
+| Backend | **One small Vercel function**, used only by explore mode (S0), proxying IRSA's image search with a cache | The only way a browser can reach IRSA | A general backend |
 | Front end | **Vite + React + TypeScript**, single page, hash routes | Claude writes it reliably; nothing to configure | Next.js (server rendering adds nothing) |
-| Image rendering | **Canvas 2D** from raw float32 arrays, stretched in JS; SVG overlay for markers | A 128×128 cutout redraws in under 1 ms, so stretch and difference are live and hover shows true values | WebGL (overkill); baked PNGs (no live difference, no real values) |
-| Cutout format | One `stack.f32` per field (epoch × y × x, already on a common north-up grid) plus a `uint8` flag-category mask | Small, trivially parsed | FITS in the browser |
-| Hosting | **Vercel hobby**, connected to the GitHub repo | Reachable from this PC, no workflow file to write, preview URL per branch | GitHub Pages (fallback: needs a workflow file); Cloudflare Pages (untested from this PC) |
+| Image rendering | **Canvas 2D** from raw float32 arrays, stretched in JS; SVG overlay for markers. Each frame is drawn through the rotation and shift stored in the manifest, so frames from different passes line up | A 128×128 cutout redraws in under 1 ms, so stretch and blink are live and hover shows true values | WebGL (overkill); baked PNGs (no real values) |
+| Fallback copy | One `fallback.f32` per field (the same cutouts, saved by the pipeline) plus a `uint8` flag-category mask | If S3 is slow or down the tour still works, and the badge changes to "saved copy" | No fallback |
+| Hosting | **Vercel hobby** on the lead builder's account, connected to the GitHub repo | Reachable from this PC, no workflow file to write, preview URL per branch, and it runs the S0 function | GitHub Pages (fallback for the static part only); Cloudflare Pages (untested from this PC) |
 | Data location | In the repo under `site/public/data` | About 30 MB for four or five fields | Object storage |
 | Pixel access | S3 byte-range reads (`astropy.io.fits.open(url, use_fsspec=True)` and `.section`) | Skips the 4.9 MB PSF cube that every IRSA cutout carries; about 1 s per range | IRSA cutout service (4–13 s, 5 MB, intermittent 503): the fallback |
 | Known objects | JPL SBIdent with the spacecraft position, then Horizons | Authoritative, and exact for SPHEREx's orbit | IMCCE SkyBoT (geocentric only): the fallback |
 
-**Pre-computed:** image lists, S3 keys, cutouts, wavelengths, detections, labels and evidence, per-image depth, the depth table and solar magnitudes for the calculator, the Planet Nine band.
+**Live in the browser:** the image pixels (S3 byte ranges), the stretch and blink, and the calculator's arithmetic. Reflected light falls as distance⁻⁴, so the maximum distance is a closed formula. In explore mode also the image search (through the proxy) and SkyBoT.
 
-**Live:** only the calculator's arithmetic, in the browser. Reflected light falls as distance⁻⁴, so the maximum distance is a closed formula.
+**Pre-computed:** image lists, S3 keys and byte ranges, frame placement, wavelengths, detections, labels and evidence, per-image depth, the depth table and solar magnitudes for the calculator, the Planet Nine band, and the fallback copies.
+
+The S3 response hides its `Content-Range` header from scripts, so the browser can't discover file layout by itself; that is why byte ranges come from the manifest (tour) or from reading the fixed-size FITS headers in order (explore mode).
 
 **Caching and manners.** Every network result is cached on disk, keyed by a hash of the request, so a rerun costs nothing. IRSA TAP queries run one at a time, all started in the first hour. JPL calls go through a single worker: one request at a time, a gap of at least 1 s, a descriptive User-Agent, never from the browser [JPL fair-use policy].
 
@@ -108,7 +113,7 @@ Manifest sketch:
  "tour":[{"epochs":["e03","e17"],"focus":"d12","text":"…"}]}
 ```
 
-Unverified: Vercel's current free-tier limits, and whether `use_fsspec` range reads perform as expected on this PC. Both are checked in the practice build and in the first hour.
+Unverified: Vercel's current free-tier limits, in particular whether a hobby function may run long enough for a 20–150 s IRSA query (if not, S0 uses IRSA's asynchronous job interface and polls); whether `use_fsspec` range reads perform as expected on this PC; and S3 reads from a real browser (tested with curl only). All three are checked in the prototype.
 
 ## 3. Science method
 
@@ -307,9 +312,13 @@ Each took 40–100 s. Mover positions come from Horizons with `CENTER='@-163182'
 - **3I/ATLAS detectability.** It is the best story of the five, but at magnitude 15–17 it is near the noise in a single exposure. Brighter by JPL's model: C/2025 K1 (about 12.5, 16–21 Nov 2025; images exist, not analysed) and C/2025 R2 (about 11, but no images found). If it can't be detected, the comet stop is dropped and the tour has three fields.
 - The ecliptic-pole deep field was not checked.
 
-## 5. Practice prototype (13 November)
+## 5. Prototype (13 November)
 
-One day. Throwaway code in a separate folder outside the event repo; nothing is reused. The aim is to hit each surprise once before the clock is running. Record findings as notes in `docs/research/`.
+The prototype is a full attempt at the best version of this idea, built in this repo (to be renamed; the event repo takes the name `dotcatcher`). It is kept, public, and disclosed. The event build is still typed fresh in the new repo, following this roadmap, with no files copied across [assumed: this is what we agreed at the start; say if that changed].
+
+**Rule risk, stated once.** The rule as we read it second-hand says teams may not begin work before the event. A few risky-part tests are easy to defend; a complete prototype rebuilt during the event is much harder, even with disclosure. The safest move is to ask the local organisers before submitting. The disclosure in §6 is written to describe a full prototype accurately.
+
+One day is not enough for everything, so build in the order below and then continue down the event checkpoints (C0–C4 in §6). The first seven steps are the ones that can surprise us. Record findings as notes in `docs/research/`.
 
 Already settled by the 12 Nov probes, so not repeated: the wavelength recipe, the spacecraft-position frame, the depth formula, the star-residual problem and the forced-photometry fix.
 
@@ -323,31 +332,31 @@ Already settled by the 12 Nov probes, so not repeated: the wavelength recipe, th
 | P6 | **Blink display.** Rotated frames on one grid | Lanczos-3 resample of a matched pair; float stack drawn on a canvas | Gaia stars land within 0.3 pixels of the peaks; empty-sky difference noise is 0.9–1.15σ | Show frames side by side instead of blinking |
 | P7 | **Comet.** Extended, so PSF photometry may misbehave | Run detect on one comet exposure | Detected and matched to Horizons within 2 pixels | Label by position only; describe it as fuzzy |
 
-Stop when the day ends, wherever that is. P1–P4 matter most.
+After P7, add **P8**: read one frame's pixels from S3 in a real browser and draw it rotated into place (pass: under 3 s per frame, stars line up with the saved copy), and **P9**: the IRSA proxy on Vercel (pass: an answer or a polling job within the function's time limit). Then follow C0–C4. P1–P4 and P8 matter most.
 
 ## 6. Event build
 
 **Timing assumption.** T+0 is kick-off, taken as Saturday 14 November 09:00 local. The plan submits at **T+36** (Sunday 21:00), which is safe whether the window is a full 48 hours or closes at Sunday midnight. Confirm the real deadline and the demo format on the event page; we couldn't load it.
 
-**Roles.** *Site* owns `site/`. *Data* owns `pipeline/`. Each drives one Claude session in their own folder. Both own `contract/`; a change there needs both of us. Commit and push after every working change. Claude also reviews at each checkpoint, using a separate session that hasn't seen the code.
+**Roles.** The lead builder owns the repo (`rvyyv-n/dotcatcher`, shared with the second builder), the Vercel project and the final calls. Suggested split: the lead takes *Data*, the riskier half, and the second builder takes *Site*. *Site* owns `site/`. *Data* owns `pipeline/`. Each drives one Claude session in their own folder. Both own `contract/`; a change there needs both of us. Commit and push after every working change. Claude also reviews at each checkpoint, using a separate session that hasn't seen the code.
 
 | Time | Site | Data | Checkpoint |
 |---|---|---|---|
 | T+0–1 | New public repo, Vite scaffold, first Vercel deploy. Agree `contract/schema.ts` and the mock field | Start every IRSA TAP and Gaia query for all fields in the background. Agree the contract | **C0:** a live URL showing the mock field |
-| T+1–4 | Blink viewer on the mock: float stack, stretch, science / reference / difference, markers | Fetch stage, wavelength (with the check value as a test), matched references | **C1 (T+4):** wavelength test green; one real field's frames render on the live site |
+| T+1–4 | Blink viewer on the mock: frames fetched from S3 by byte range, drawn rotated into place, stretch, science / reference / difference, markers | Fetch stage, wavelength (with the check value as a test), matched references | **C1 (T+4):** wavelength test green; one real field's frames load live from NASA on the deployed site |
 | T+4–9 | Evidence cards, label filter, per-field tally, tour shell | Detection, forced photometry, new / vanished / changed, glitch labels | **C2 (T+9):** asteroid field live with detections and glitch labels; static-star false-change rate under 1% |
 | T+9–13 | Planet X calculator with unit tests against the §3.6 table | JPL queue (SBIdent, Horizons), Gaia propagation, depth per image | **C3 (T+13):** asteroid within 1 pixel of Horizons and labelled; calculator matches the table; depth is 17–19 AB |
 | T+13–15 | Tour copy, first pass | Start the batch run of all fields; it stops on any failed validation check | Decide which should-haves survive |
 | T+15–22 | Sleep | Sleep | The batch only fetches and computes; nobody changes code unattended |
 | T+22–26 | Landing page, tour flow, "how we know" page | Fix batch failures, remaining fields, depth table for the calculator | **C4 (T+26):** all fields live and labelled; calculator on real depth; full click-through works on a phone |
-| T+26–30 | S3 track view; polish | S1 band depth, then S2 injection test, then S4 pair search | Stop starting new things at T+29 |
+| T+26–30 | S0 explore mode (page and S3 reader), then S3 track view | S0 proxy function, then S1 band depth, S2 injection test, S4 pair search | Stop starting new things at T+29 |
 | **T+30** | **Feature freeze** | **Feature freeze** | From here: fixes only |
 | T+30–33 | Record the demo video; test in a clean browser | Write-up: description, data sources, disclosure, AI-use statement; README | Unfinished features are removed from the site, not left half-working |
 | T+33–36 | Edit the video, upload | Final validation run, numbers on the "how we know" page | **Submit at T+36** |
 | T+36–38 | Buffer | Buffer | Check the submitted links from another device |
 | T+38–48 | Only if the window is still open: fixes, no features | | |
 
-**If we're behind.** At C2: drop the comet field. At C3: drop all should-haves and Gaia parallax. At C4: ship the fields that pass validation, even if that is two.
+**If we're behind.** At C1: serve the saved copies and add live loading later. At C2: drop the comet field. At C3: drop all should-haves and Gaia parallax. At C4: ship the fields that pass validation, even if that is two.
 
 **Checks that run on every push** (pipeline `pytest`, site `vitest`, `npm run check-data`):
 
@@ -367,7 +376,7 @@ Space Apps has in past years asked for a 30-second video or a short slide deck [
 |---|---|---|
 | 0–5 | Landing page, real sky | "NASA's SPHEREx photographs the whole sky again and again. Between visits, some dots move." |
 | 5–13 | Asteroid field blinking; the label card opens | "Dotcatcher compares only images taken at the same wavelength, then explains each change. This one is the asteroid, three arcseconds from where JPL says it should be." |
-| 13–19 | Tally and an unexplained card | "Asteroid, moving star, glitch, or unexplained. Every dot shows the checks it went through." |
+| 13–19 | Tally and an unexplained card; the "live from NASA" badge as a new frame loads | "Asteroid, moving star, glitch, or unexplained. Every dot shows the checks it went through, on images loading straight from NASA's archive." |
 | 19–27 | Calculator: slider pulled outward until the planet drops below the depth line | "Could SPHEREx see Planet X? Pick a planet. A Neptune out to about 360 times the Earth–Sun distance, yes. The predicted Planet Nine, no: it's twenty times too faint." |
 | 27–30 | URL | "Every moving dot, explained. Real data, open source." |
 
@@ -377,13 +386,15 @@ Space Apps has in past years asked for a 30-second video or a short slide deck [
 
 For the submission, edited to match what we actually did:
 
-> Before the event we researched the challenge: we surveyed other teams' public repositories, read the SPHEREx data documentation, and ran test queries against IRSA, JPL and Gaia to learn how the services behave. We chose our demo sky fields and wrote a plan. On 13 November we also built a small practice prototype of the riskiest technical steps to learn from. None of that practice code is in this submission; everything in this repository was written during the event. Our research notes and the practice project are public at github.com/rvyyv-n/nasa-project. We used Claude (Anthropic) as a coding assistant during the event and for the research beforehand. Data: SPHEREx Level 2 images (NASA/JPL-Caltech, via NASA/IPAC IRSA), JPL Small-Body Identification and Horizons, ESA Gaia DR3.
+> Before the event we researched the challenge: we surveyed other teams' public repositories, read the SPHEREx data documentation, and ran test queries against IRSA, JPL and Gaia to learn how the services behave. We chose our demo sky fields and wrote a detailed plan. On 13 November we also built a working prototype of the idea to learn from. We did not copy files from it: everything in this repository was written during the event, following our plan. The prototype, the plan and our research notes are public at [prototype repo URL] so you can compare them. We used Claude (Anthropic) as a coding assistant during the event and for the research beforehand. Data: SPHEREx Level 2 images (NASA/JPL-Caltech, via NASA/IPAC IRSA), JPL Small-Body Identification and Horizons, ESA Gaia DR3.
 
 ## 7. Risks and fallbacks
 
 | Risk | Sign | Fallback |
 |---|---|---|
 | IRSA TAP slow or down | Queries over 5 minutes, or errors | All queries start at T+0 and are cached. Image lists can also come from listing the S3 bucket by week. The site never calls IRSA |
+| S3 slow or unreachable from a visitor's network | A frame takes over 5 s | The viewer switches to the saved copy and the badge says so |
+| Explore mode (S0) waits too long on IRSA | Over 2 minutes | Show progress and a "try a tour field" link; cache every answer; if the function limit is too short, poll an IRSA async job |
 | IRSA cutout service returns 503 | About half of first attempts on 12 Nov | Not on the main path (we read S3). When used, retry after 3 s |
 | S3 range reads slow | Over 5 s per exposure | Download whole files (14 s, 70 MB each) for the few exposures a field needs |
 | Wavelength matching finds no partner | Source marked "unmatched" | Relax to 0.5 bandwidths, then the any-wavelength static test (§3.2), and label the pair "approximate" on screen |
@@ -394,14 +405,14 @@ For the submission, edited to match what we actually did:
 | Gaia unavailable | TAP errors | IRSA's Gaia copy is primary already; VizieR as a second source (untested) |
 | Vercel problem on the day | Deploy fails | GitHub Pages from the same repo |
 | A demo object is saturated or on a detector edge | OVERFLOW flags; pixel within 20 of the edge | Each field in §4 lists a backup |
-| The pre-event rule is stricter than we think | Organisers say no practice build | The disclosure states exactly what we did; the practice code is separate and unused |
+| The pre-event rule is stricter than we think | Organisers object to a full prototype | Ask them before submitting. The disclosure states exactly what we did and the prototype repo is public; the worst case is disqualification, which a smaller practice build would make less likely |
 | One of us is unavailable | | The contract and mock let either side continue alone; cut to M1–M4 on two fields |
 
 ## Open decisions
 
 1. **Pitch wording.** The data can't support "which parts of the predicted region SPHEREx rules out". Proposed: "…and a Planet X calculator shows how far out SPHEREx could have seen any planet you choose."
-2. **Who takes Site and who takes Data.**
-3. **Hosting account.** Whose Vercel account, or GitHub Pages instead.
-4. **Event repo.** A new public repo under `rvyyv-n` on the day; name to choose. This repo stays as the disclosed practice project.
+2. **Who takes Site and who takes Data.** Suggested: the lead takes Data.
+3. **New name for this prototype repo**, since the event repo takes `dotcatcher`. The disclosure needs its URL.
+4. **Whether to ask the organisers about the full prototype** before submitting (see §5).
 5. **The real submission deadline and demo format.** Someone needs to read the event page from a device that can load it.
-6. **Should-have order.** We put the track view first and the pair search last. If the Planet X story matters more to you than polish, swap S4 ahead of S2.
+6. **Should-have order.** Explore mode is first, then the track view, with the pair search last. If the Planet X story matters more to you than polish, swap S4 ahead of S2.
