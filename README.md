@@ -38,17 +38,42 @@ Dotcatcher finds those dots and tells you what each one is.
 
 ## Progress
 
+The full plan is in [`docs/roadmap.md`](docs/roadmap.md).
+
+Research and planning:
+
 - [x] Survey of 22 competing team projects
 - [x] SPHEREx image search through IRSA tested
-- [ ] Image cutouts and per-pixel wavelengths
-- [ ] Known-object checks (JPL, Gaia)
-- [ ] Planet X detectability numbers
-- [ ] Demo sky fields chosen
+- [x] Image access, per-pixel wavelengths and image depth probed
+- [x] Known-object services probed (JPL SBIdent and Horizons, Gaia)
+- [x] Planet X detectability numbers
+- [x] Demo sky fields chosen and checked against IRSA
+- [x] Roadmap: scope, architecture, method, event plan
+
+Practice prototype (13 November, throwaway):
+
+- [ ] P1 Fetch a field from S3 fast enough
+- [ ] P2 Recover a known asteroid end to end
+- [ ] P3 JPL SBIdent with the spacecraft position
+- [ ] P4 Count unexplained dots in a clean and a crowded field
+- [ ] P5 Measure a moving star's shift against Gaia
+- [ ] P6 Blink two rotated frames on one grid
+- [ ] P7 Detect a comet
+
+Event build (14–15 November, new repo):
+
+- [ ] C0 Live URL with the mock field
+- [ ] C1 Real frames on the site, wavelength test passing
+- [ ] C2 Asteroid field with detections and glitch labels
+- [ ] C3 Asteroid labelled from JPL, calculator and depth working
+- [ ] C4 All fields live and labelled
+- [ ] Feature freeze, demo video, submission
 
 ## Repository layout
 
 ```
 assets/            logo
+docs/roadmap.md    the plan: scope, architecture, method, event schedule
 docs/research/     what we've learned so far
 requirements.txt   Python dependencies
 ```
