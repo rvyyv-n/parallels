@@ -15,9 +15,13 @@ Four findings from the probes shape everything below.
 1. **IRSA publishes no per-image depth.** `spherex.plane.metrics_maglimit` exists but is NULL in all 1,607,635 rows [measured]. We compute depth ourselves from each image's VARIANCE and PSF. Our numbers for one field: 18.3–18.8 AB per visit at 0.75–3.8 µm, 17.4–17.6 at 3.8–4.4 µm, 16.8–17.1 at 4.4–5.0 µm.
 2. **A browser can read NASA's image archive directly, but not IRSA's search or JPL.** The S3 archive allows cross-origin reads. IRSA and JPL send no CORS headers, IRSA table queries take 20–150 s (server queueing, so event day won't be faster), and JPL's policy forbids embedding its APIs in a website [measured]. So the site loads its pixels live from NASA, and the slow lookups are done ahead or go through a small caching proxy.
 3. **Subtracting two images pixel by pixel doesn't work well enough.** Even at matched wavelength, every star leaves a residual of 0.2–0.3 × its peak signal-to-noise, because SPHEREx's 6.15″ pixels undersample the PSF [measured on 6 pairs]. The detector is therefore forced PSF photometry in the matched reference frame; the difference image is for display.
-4. **Planet Nine is 3–7 magnitudes too faint per visit**, not 3–5. With a realistic methane-dark albedo it's 5–7. The calculator is a sensitivity tool ("how far out could SPHEREx have seen *this* planet?"). It can't honestly claim an exclusion map, so the pitch line "which parts of the predicted region it rules out" has to go (see [open decisions](#open-decisions)).
+4. **Planet Nine is 3–7 magnitudes too faint per visit**, not 3–5. With a realistic methane-dark albedo it's 5–7. The calculator is a sensitivity tool ("how far out could SPHEREx have seen *this* planet?"). It can't honestly claim an exclusion map, so the pitch no longer claims to show which parts of the predicted region are ruled out.
 
 ## 1. Product scope
+
+**Pitch.**
+
+> *"Every moving dot, explained. And how far out could SPHEREx see your Planet X?"* A public site on live NASA images. It compares each patch of sky only between visits at the same wavelength, then labels every change as known asteroid, moving star, glitch or **unexplained**. A Planet X calculator lets you build a planet and see whether SPHEREx could have spotted it.
 
 **What it is.** A public website on real SPHEREx data: *every moving dot, explained*. A visitor walks through four patches of sky. In each one they blink between two visits taken at the same wavelength, see what changed, and read why: known asteroid, moving star, glitch, or unexplained. Then they try to hide a planet from SPHEREx and see how far out it would have to be.
 
@@ -267,7 +271,6 @@ Ranked by how much it could change what we show.
 5. **Depth away from the one field measured**, and source confusion.
 6. **PSF model error** at high signal-to-noise, about 3% of flux; covered by the 10% floor in χ.
 7. **SBIdent's time scale** is undocumented; the error is at most 1.5″.
-8. **Demo format and deadline.** Read second-hand; confirm on the event page.
 
 ## 4. Demo fields
 
@@ -340,7 +343,7 @@ After P7, add **P8**: read one frame's pixels from S3 in a real browser and draw
 
 **Starting point.** Hour 0 begins by bringing the prototype into the new repo, so each checkpoint below is first a check that the carried-over part still passes, then work on whatever the prototype didn't reach. Time saved moves the should-haves earlier; the freeze and submission times don't move.
 
-**Timing assumption.** T+0 is kick-off, taken as Saturday 14 November 09:00 local. The plan submits at **T+36** (Sunday 21:00), which is safe whether the window is a full 48 hours or closes at Sunday midnight. Confirm the real deadline and the demo format on the event page; we couldn't load it.
+**Timing assumption.** T+0 is kick-off, taken as Saturday 14 November 09:00 local. The plan submits at **T+36** (Sunday 21:00), which is safe whether the window is a full 48 hours or closes at Sunday midnight. The lead builder confirms the event follows the same format as past years.
 
 **Roles.** The lead builder owns the repo (`rvyyv-n/dotcatcher`), the Vercel project and every decision, and works through one Claude orchestrator session (Fable). The orchestrator runs two workers side by side, *Site* in `site/` and *Data* in `pipeline/`, keeps `contract/` consistent between them, checks each worker's result against the tests before committing it, and brings the lead only decisions and checkpoint results. The reviewer builds nothing. At each checkpoint the reviewer clicks through the deployed site on a phone and a laptop, tries to break it, checks the numbers on screen against the validation results, and reads the tour text as a newcomer. Problems go to the lead as a short list, most serious first. A change to `contract/` goes through the orchestrator, never straight from a worker.
 
@@ -374,7 +377,7 @@ Workers are sized to the task: routine edits and test runs go to cheaper models,
 
 ### Demo script
 
-Space Apps has in past years asked for a 30-second video or a short slide deck [assumed for 2026; confirm]. We record a 30-second cut and a 2-minute walkthrough.
+Space Apps asks for a 30-second video or a short slide deck, the same as in past years. We record a 30-second cut and a 2-minute walkthrough.
 
 **30 seconds**
 
@@ -407,8 +410,11 @@ Space Apps has in past years asked for a 30-second video or a short slide deck [
 | A demo object is saturated or on a detector edge | OVERFLOW flags; pixel within 20 of the edge | Each field in §4 lists a backup |
 | The lead is overloaded or the reviewer is unavailable | Checkpoints slipping by more than an hour | Pause the Site session and finish Data first; a fresh Claude session does the checkpoint click-through if the reviewer can't; cut to M1–M4 on two fields |
 
-## Open decisions
+## Decisions made
 
-1. **Pitch wording.** The data can't support "which parts of the predicted region SPHEREx rules out". Proposed: "…and a Planet X calculator shows how far out SPHEREx could have seen any planet you choose."
-2. **The real submission deadline and demo format.** Someone needs to read the event page from a device that can load it.
-3. **Should-have order.** Explore mode is first, then the track view, with the pair search last. If the Planet X story matters more to you than polish, swap S4 ahead of S2.
+- **Pitch:** leads with the labels and the Planet X calculator together (§1).
+- **Roles:** the lead builder directs everything through one orchestrator; the reviewer tests at checkpoints.
+- **Hosting:** the lead builder's Vercel account.
+- **Repos:** the event repo is `dotcatcher`; this prototype repo keeps its name for now.
+- **Deadline and demo format:** the same as past years.
+- **Extras:** explore mode first, then the track view, band depth, injection test, pair search.
