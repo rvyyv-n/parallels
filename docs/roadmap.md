@@ -42,9 +42,12 @@ Four findings from the probes shape everything below.
 | Should | **S2. Injection test** on one field: fake sources added and recovered, giving a measured detection rate | answers Driftnet's "Limits" page |
 | Should | **S3. Track view**: the asteroid's linked detections drawn over JPL's predicted path | makes "known asteroid" visible |
 | Should | **S4. Planet X pair search** on the search-region field: look for a source that appears in one pass and reappears at the parallax-shifted position in the next; report the result, expected to be none | a real null result |
+| Should | **S5. Sky globe** as the landing page: a 3D sky you can spin, with the tour stops as pins, the predicted Planet Nine band drawn on it, and a click anywhere opening explore mode | first-impression polish; matches Driftnet's globe and gives S0 and S1 a home |
+| Should | **S6. Orbit view**: the solar system from above with the asteroid's or comet's orbit, where it was when SPHEREx saw it, and how far out a Planet X would sit by comparison | makes the labels and the distances tangible |
+| Should | **S7. Guide you can ask**: a chat helper that explains what is on screen in plain words, answering only from the numbers and evidence already on the page | matches Driftnet's AI guide. Needs a paid model key held by the Vercel function, and a spending cap |
 | Cut | All-sky index, ML ranking, shift-and-stack search, LLM-written summaries, accounts, reporting candidates to the MPC, CWAVE calibration files | none wins a judging criterion in 48 h |
 
-S0 comes first among the should-haves, straight after checkpoint C3 instead of waiting for C4, because four live competitors already let a judge type in any position. Then S3, S1, S2, S4.
+S0 comes first among the should-haves, straight after checkpoint C3 instead of waiting for C4, because four live competitors already let a judge type in any position. Then S5 (the globe, since it is the first thing a judge sees), S3, S6, S1, S2, S7, S4. None of these starts until the must-haves pass their checks: a polished shell around labels that are wrong loses to Driftnet on trust as well.
 
 ### How we beat the strongest three
 
@@ -417,4 +420,4 @@ Space Apps asks for a 30-second video or a short slide deck, the same as in past
 - **Hosting:** the lead builder's Vercel account.
 - **Repos:** the event repo is `dotcatcher`; this prototype repo keeps its name for now.
 - **Deadline and demo format:** the same as past years.
-- **Extras:** explore mode first, then the track view, band depth, injection test, pair search.
+- **Extras:** explore mode first, then the sky globe, track view, orbit view, band depth, injection test, the ask-a-guide helper, pair search.
