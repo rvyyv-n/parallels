@@ -21,6 +21,15 @@ What competitor repos show about getting and using SPHEREx data. Unverified unti
 - Muninn measured a 5σ depth of 17.60 AB per visit.
 - SPHEREx-Blink-3.0 says about V 17, 3–5 magnitudes short of a Planet Nine-like body (predicted V 22–25).
 
+## Verified by our probes (2026-11-12)
+
+- IRSA TAP base URL for pyvo: `https://irsa.ipac.caltech.edu/TAP`. Tables: `spherex.obscore`, `spherex.observation`, `spherex.plane`, `spherex.artifact`, `spherex.provenance_input`.
+- Cone/point searches must use the geography column `poly`, not `s_region` (varchar; fails with `st_covers ... does not exist`): `where contains(point('ICRS', ra, dec), o.poly) = 1`.
+- `spherex.plane` has per-image depth: `metrics_maglimit`, `metrics_fluxdensitylimit`, plus `quality_flag`. Usable for a real per-field depth map in the Planet X calculator. Joins to obscore on `obs_publisher_did`.
+- Barnard's Star (RA 269.452, Dec +4.6934): 364 images across `spherex_qr2` and `spherex_qr3`, all six detectors D1–D6, MJD 60902.9–61305.6 (about 13 months). Query took about 20 s.
+- Each exposure appears once per detector. `obs_id` like `2025W33_2C_0321_1`; detector bands: D3 1.63–2.435 µm, D6 4.412–5.01 µm.
+- `access_url` is a datalink: `https://irsa.ipac.caltech.edu/datalink/links/spherex?ID=ivo://irsa.ipac/spherex_qr2?<obs_id>/<detector>`.
+
 ## From this PC
 
 On 2026-11-12, IRSA, JPL SSD API, the ESA Gaia archive, GitHub, Vercel and GitHub Pages all connect. spaceappschallenge.org fails TLS verification.
