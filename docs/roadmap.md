@@ -89,7 +89,7 @@ The S3 response hides its `Content-Range` header from scripts, so the browser ca
 
 **Caching and manners.** Every network result is cached on disk, keyed by a hash of the request, so a rerun costs nothing. IRSA TAP queries run one at a time, all started in the first hour. JPL calls go through a single worker: one request at a time, a gap of at least 1 s, a descriptive User-Agent, never from the browser [JPL fair-use policy].
 
-**The seam between the two of us.** `contract/schema.ts` (zod) defines the files above, and `contract/mock/` holds a hand-built fake field (a few stars, one moving dot, one glitch). Both are agreed in the first hour. After that the site is built against the mock and the pipeline's only obligation is that `npm run check-data` passes.
+**The seam between the two streams.** `contract/schema.ts` (zod) defines the files above, and `contract/mock/` holds a hand-built fake field (a few stars, one moving dot, one glitch). Both are fixed in the first hour. After that the site is built against the mock and the pipeline's only obligation is that `npm run check-data` passes.
 
 ```
 contract/   schema.ts, mock/
@@ -338,11 +338,13 @@ After P7, add **P8**: read one frame's pixels from S3 in a real browser and draw
 
 **Timing assumption.** T+0 is kick-off, taken as Saturday 14 November 09:00 local. The plan submits at **T+36** (Sunday 21:00), which is safe whether the window is a full 48 hours or closes at Sunday midnight. Confirm the real deadline and the demo format on the event page; we couldn't load it.
 
-**Roles.** The lead builder owns the repo (`rvyyv-n/dotcatcher`, shared with the second builder), the Vercel project and the final calls. Suggested split: the lead takes *Data*, the riskier half, and the second builder takes *Site*. *Site* owns `site/`. *Data* owns `pipeline/`. Each drives one Claude session in their own folder. Both own `contract/`; a change there needs both of us. Commit and push after every working change. Claude also reviews at each checkpoint, using a separate session that hasn't seen the code.
+**Roles.** The lead builder owns the repo (`rvyyv-n/dotcatcher`), the Vercel project and every decision, and directs both streams of work: a *Site* Claude session in `site/` and a *Data* Claude session in `pipeline/`, running side by side. The reviewer builds nothing. At each checkpoint the reviewer clicks through the deployed site on a phone and a laptop, tries to break it, checks the numbers on screen against the validation results, and reads the tour text as a newcomer. Problems go to the lead as a short list, most serious first. A change to `contract/` is made in one session and the other is told before it continues.
 
-| Time | Site | Data | Checkpoint |
+One person steering two sessions is the bottleneck. When both need attention, Data goes first, because Site can keep working against the mock. Commit and push after every working change. Claude also reviews at each checkpoint, using a separate session that hasn't seen the code.
+
+| Time | Site session | Data session | Checkpoint (reviewer tests here) |
 |---|---|---|---|
-| T+0–1 | New public repo, Vite scaffold, first Vercel deploy. Agree `contract/schema.ts` and the mock field | Start every IRSA TAP and Gaia query for all fields in the background. Agree the contract | **C0:** a live URL showing the mock field |
+| T+0–1 | New public repo, Vite scaffold, first Vercel deploy. Write `contract/schema.ts` and the mock field | Start every IRSA TAP and Gaia query for all fields in the background | **C0:** a live URL showing the mock field |
 | T+1–4 | Blink viewer on the mock: frames fetched from S3 by byte range, drawn rotated into place, stretch, science / reference / difference, markers | Fetch stage, wavelength (with the check value as a test), matched references | **C1 (T+4):** wavelength test green; one real field's frames load live from NASA on the deployed site |
 | T+4–9 | Evidence cards, label filter, per-field tally, tour shell | Detection, forced photometry, new / vanished / changed, glitch labels | **C2 (T+9):** asteroid field live with detections and glitch labels; static-star false-change rate under 1% |
 | T+9–13 | Planet X calculator with unit tests against the §3.6 table | JPL queue (SBIdent, Horizons), Gaia propagation, depth per image | **C3 (T+13):** asteroid within 1 pixel of Horizons and labelled; calculator matches the table; depth is 17–19 AB |
@@ -351,7 +353,7 @@ After P7, add **P8**: read one frame's pixels from S3 in a real browser and draw
 | T+22–26 | Landing page, tour flow, "how we know" page | Fix batch failures, remaining fields, depth table for the calculator | **C4 (T+26):** all fields live and labelled; calculator on real depth; full click-through works on a phone |
 | T+26–30 | S0 explore mode (page and S3 reader), then S3 track view | S0 proxy function, then S1 band depth, S2 injection test, S4 pair search | Stop starting new things at T+29 |
 | **T+30** | **Feature freeze** | **Feature freeze** | From here: fixes only |
-| T+30–33 | Record the demo video; test in a clean browser | Write-up: description, data sources, disclosure, AI-use statement; README | Unfinished features are removed from the site, not left half-working |
+| T+30–33 | Record the demo video; the reviewer tests in a clean browser | Write-up: description, data sources, disclosure, AI-use statement; README | Unfinished features are removed from the site, not left half-working |
 | T+33–36 | Edit the video, upload | Final validation run, numbers on the "how we know" page | **Submit at T+36** |
 | T+36–38 | Buffer | Buffer | Check the submitted links from another device |
 | T+38–48 | Only if the window is still open: fixes, no features | | |
@@ -406,13 +408,12 @@ For the submission, edited to match what we actually did:
 | Vercel problem on the day | Deploy fails | GitHub Pages from the same repo |
 | A demo object is saturated or on a detector edge | OVERFLOW flags; pixel within 20 of the edge | Each field in §4 lists a backup |
 | The pre-event rule is stricter than we think | Organisers object to a full prototype | Ask them before submitting. The disclosure states exactly what we did and the prototype repo is public; the worst case is disqualification, which a smaller practice build would make less likely |
-| One of us is unavailable | | The contract and mock let either side continue alone; cut to M1–M4 on two fields |
+| The lead is overloaded or the reviewer is unavailable | Checkpoints slipping by more than an hour | Pause the Site session and finish Data first; a fresh Claude session does the checkpoint click-through if the reviewer can't; cut to M1–M4 on two fields |
 
 ## Open decisions
 
 1. **Pitch wording.** The data can't support "which parts of the predicted region SPHEREx rules out". Proposed: "…and a Planet X calculator shows how far out SPHEREx could have seen any planet you choose."
-2. **Who takes Site and who takes Data.** Suggested: the lead takes Data.
-3. **New name for this prototype repo**, since the event repo takes `dotcatcher`. The disclosure needs its URL.
-4. **Whether to ask the organisers about the full prototype** before submitting (see §5).
-5. **The real submission deadline and demo format.** Someone needs to read the event page from a device that can load it.
-6. **Should-have order.** Explore mode is first, then the track view, with the pair search last. If the Planet X story matters more to you than polish, swap S4 ahead of S2.
+2. **New name for this prototype repo**, since the event repo takes `dotcatcher`. The disclosure needs its URL.
+3. **Whether to ask the organisers about the full prototype** before submitting (see §5).
+4. **The real submission deadline and demo format.** Someone needs to read the event page from a device that can load it.
+5. **Should-have order.** Explore mode is first, then the track view, with the pair search last. If the Planet X story matters more to you than polish, swap S4 ahead of S2.
