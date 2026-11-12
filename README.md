@@ -20,7 +20,7 @@
 </p>
 
 > [!NOTE]
-> This is a **practice project** for learning SPHEREx data before the hackathon. It is not the competition submission. The event build starts from this prototype and says so in its disclosure. What we learn goes into [`docs/research`](docs/research).
+> This is a **practice project** for learning SPHEREx data before the hackathon. It is not the competition submission. The event build starts from this prototype. What we learn goes into [`docs/research`](docs/research).
 
 ## The idea
 

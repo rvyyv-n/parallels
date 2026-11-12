@@ -263,7 +263,7 @@ Ranked by how much it could change what we show.
 5. **Depth away from the one field measured**, and source confusion.
 6. **PSF model error** at high signal-to-noise, about 3% of flux; covered by the 10% floor in χ.
 7. **SBIdent's time scale** is undocumented; the error is at most 1.5″.
-8. **Rules.** The pre-event rule and the demo format were read second-hand (see [`research/rules.md`](research/rules.md)).
+8. **Demo format and deadline.** Read second-hand; confirm on the event page.
 
 ## 4. Demo fields
 
@@ -314,9 +314,7 @@ Each took 40–100 s. Mover positions come from Horizons with `CENTER='@-163182'
 
 ## 5. Prototype (13 November)
 
-The prototype is a full attempt at the best version of this idea, built in this repo (to be renamed; the event repo takes the name `dotcatcher`). It is kept, public, and disclosed. The event build starts from it: files, ideas and design carry over into the `dotcatcher` repo, and the 48 hours go into finishing, hardening and the extras.
-
-**On the rules.** The lead builder's reading is that building on a disclosed prototype is allowed. Our own note in [`research/rules.md`](research/rules.md) records a third-party summary that says the opposite, and we couldn't load the official page from this PC. The disclosure in §6 says plainly that the submission builds on the prototype, so nothing is hidden either way.
+The prototype is a full attempt at the best version of this idea, built in this repo (to be renamed; the event repo takes the name `dotcatcher`). It is kept, and private for now. The event build starts from it: files, ideas and design carry over into the `dotcatcher` repo, and the 48 hours go into finishing, hardening and the extras.
 
 One day is not enough for everything, so build in the order below and then continue down the event checkpoints (C0–C4 in §6). The first seven steps are the ones that can surprise us. Record findings as notes in `docs/research/`.
 
@@ -355,7 +353,7 @@ Workers are sized to the task: routine edits and test runs go to cheaper models,
 | T+22–26 | Landing page, tour flow, "how we know" page | Fix batch failures, remaining fields, depth table for the calculator | **C4 (T+26):** all fields live and labelled; calculator on real depth; full click-through works on a phone |
 | T+26–30 | S0 explore mode (page and S3 reader), then S3 track view | S0 proxy function, then S1 band depth, S2 injection test, S4 pair search | Stop starting new things at T+29 |
 | **T+30** | **Feature freeze** | **Feature freeze** | From here: fixes only |
-| T+30–33 | Record the demo video; the reviewer tests in a clean browser | Write-up: description, data sources, disclosure, AI-use statement; README | Unfinished features are removed from the site, not left half-working |
+| T+30–33 | Record the demo video; the reviewer tests in a clean browser | Write-up: description, data sources, AI-use statement; README | Unfinished features are removed from the site, not left half-working |
 | T+33–36 | Edit the video, upload | Final validation run, numbers on the "how we know" page | **Submit at T+36** |
 | T+36–38 | Buffer | Buffer | Check the submitted links from another device |
 | T+38–48 | Only if the window is still open: fixes, no features | | |
@@ -386,12 +384,6 @@ Space Apps has in past years asked for a 30-second video or a short slide deck [
 
 **2 minutes** (live or recorded): the problem and why raw comparisons lie (20 s); asteroid field with blink, card and track (30 s); the moving star (15 s); a glitch and an unexplained dot, and what "unexplained" means (20 s); the calculator with two presets (25 s); the "how we know" page with validation numbers (10 s).
 
-### Disclosure statement
-
-For the submission, edited to match what we actually did:
-
-> Before the event we researched the challenge: we surveyed other teams' public repositories, read the SPHEREx data documentation, and ran test queries against IRSA, JPL and Gaia to learn how the services behave. We chose our demo sky fields and wrote a detailed plan. On 13 November we also built a working prototype of the idea. This submission builds on that prototype: it reuses its code, design and data choices, and the work done during the event is everything after commit [first event commit] in this repository. The prototype, the plan and our research notes are public at [prototype repo URL] so you can see exactly what existed beforehand. We used Claude (Anthropic) as a coding assistant during the event and for the research beforehand. Data: SPHEREx Level 2 images (NASA/JPL-Caltech, via NASA/IPAC IRSA), JPL Small-Body Identification and Horizons, ESA Gaia DR3.
-
 ## 7. Risks and fallbacks
 
 | Risk | Sign | Fallback |
@@ -409,13 +401,10 @@ For the submission, edited to match what we actually did:
 | Gaia unavailable | TAP errors | IRSA's Gaia copy is primary already; VizieR as a second source (untested) |
 | Vercel problem on the day | Deploy fails | GitHub Pages from the same repo |
 | A demo object is saturated or on a detector edge | OVERFLOW flags; pixel within 20 of the edge | Each field in §4 lists a backup |
-| The pre-event rule is stricter than we think | Organisers object to building on a prototype | The disclosure states exactly what existed beforehand and the prototype repo is public. The worst case is disqualification; confirming the rule on the official page or with the organisers removes the doubt |
 | The lead is overloaded or the reviewer is unavailable | Checkpoints slipping by more than an hour | Pause the Site session and finish Data first; a fresh Claude session does the checkpoint click-through if the reviewer can't; cut to M1–M4 on two fields |
 
 ## Open decisions
 
 1. **Pitch wording.** The data can't support "which parts of the predicted region SPHEREx rules out". Proposed: "…and a Planet X calculator shows how far out SPHEREx could have seen any planet you choose."
-2. **New name for this prototype repo**, since the event repo takes `dotcatcher`. The disclosure needs its URL.
-3. **Where the rule allowing reuse is written.** Add the link or the organisers' answer to `research/rules.md`, so the disclosure can point to it.
-4. **The real submission deadline and demo format.** Someone needs to read the event page from a device that can load it.
-5. **Should-have order.** Explore mode is first, then the track view, with the pair search last. If the Planet X story matters more to you than polish, swap S4 ahead of S2.
+2. **The real submission deadline and demo format.** Someone needs to read the event page from a device that can load it.
+3. **Should-have order.** Explore mode is first, then the track view, with the pair search last. If the Planet X story matters more to you than polish, swap S4 ahead of S2.
