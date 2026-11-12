@@ -314,9 +314,9 @@ Each took 40–100 s. Mover positions come from Horizons with `CENTER='@-163182'
 
 ## 5. Prototype (13 November)
 
-The prototype is a full attempt at the best version of this idea, built in this repo (to be renamed; the event repo takes the name `dotcatcher`). It is kept, public, and disclosed. The event build is still typed fresh in the new repo, following this roadmap, with no files copied across [assumed: this is what we agreed at the start; say if that changed].
+The prototype is a full attempt at the best version of this idea, built in this repo (to be renamed; the event repo takes the name `dotcatcher`). It is kept, public, and disclosed. The event build starts from it: files, ideas and design carry over into the `dotcatcher` repo, and the 48 hours go into finishing, hardening and the extras.
 
-**Rule risk, stated once.** The rule as we read it second-hand says teams may not begin work before the event. A few risky-part tests are easy to defend; a complete prototype rebuilt during the event is much harder, even with disclosure. The safest move is to ask the local organisers before submitting. The disclosure in §6 is written to describe a full prototype accurately.
+**On the rules.** The lead builder's reading is that building on a disclosed prototype is allowed. Our own note in [`research/rules.md`](research/rules.md) records a third-party summary that says the opposite, and we couldn't load the official page from this PC. The disclosure in §6 says plainly that the submission builds on the prototype, so nothing is hidden either way.
 
 One day is not enough for everything, so build in the order below and then continue down the event checkpoints (C0–C4 in §6). The first seven steps are the ones that can surprise us. Record findings as notes in `docs/research/`.
 
@@ -336,11 +336,13 @@ After P7, add **P8**: read one frame's pixels from S3 in a real browser and draw
 
 ## 6. Event build
 
+**Starting point.** Hour 0 begins by bringing the prototype into the new repo, so each checkpoint below is first a check that the carried-over part still passes, then work on whatever the prototype didn't reach. Time saved moves the should-haves earlier; the freeze and submission times don't move.
+
 **Timing assumption.** T+0 is kick-off, taken as Saturday 14 November 09:00 local. The plan submits at **T+36** (Sunday 21:00), which is safe whether the window is a full 48 hours or closes at Sunday midnight. Confirm the real deadline and the demo format on the event page; we couldn't load it.
 
-**Roles.** The lead builder owns the repo (`rvyyv-n/dotcatcher`), the Vercel project and every decision, and directs both streams of work: a *Site* Claude session in `site/` and a *Data* Claude session in `pipeline/`, running side by side. The reviewer builds nothing. At each checkpoint the reviewer clicks through the deployed site on a phone and a laptop, tries to break it, checks the numbers on screen against the validation results, and reads the tour text as a newcomer. Problems go to the lead as a short list, most serious first. A change to `contract/` is made in one session and the other is told before it continues.
+**Roles.** The lead builder owns the repo (`rvyyv-n/dotcatcher`), the Vercel project and every decision, and works through one Claude orchestrator session (Fable). The orchestrator runs two workers side by side, *Site* in `site/` and *Data* in `pipeline/`, keeps `contract/` consistent between them, checks each worker's result against the tests before committing it, and brings the lead only decisions and checkpoint results. The reviewer builds nothing. At each checkpoint the reviewer clicks through the deployed site on a phone and a laptop, tries to break it, checks the numbers on screen against the validation results, and reads the tour text as a newcomer. Problems go to the lead as a short list, most serious first. A change to `contract/` goes through the orchestrator, never straight from a worker.
 
-One person steering two sessions is the bottleneck. When both need attention, Data goes first, because Site can keep working against the mock. Commit and push after every working change. Claude also reviews at each checkpoint, using a separate session that hasn't seen the code.
+Workers are sized to the task: routine edits and test runs go to cheaper models, and the hard parts (detection, labelling, the browser S3 reader) get the stronger ones. When both workers are blocked, Data goes first, because Site can keep working against the mock. Commit and push after every working change. Claude also reviews at each checkpoint, using a separate session that hasn't seen the code.
 
 | Time | Site session | Data session | Checkpoint (reviewer tests here) |
 |---|---|---|---|
@@ -388,7 +390,7 @@ Space Apps has in past years asked for a 30-second video or a short slide deck [
 
 For the submission, edited to match what we actually did:
 
-> Before the event we researched the challenge: we surveyed other teams' public repositories, read the SPHEREx data documentation, and ran test queries against IRSA, JPL and Gaia to learn how the services behave. We chose our demo sky fields and wrote a detailed plan. On 13 November we also built a working prototype of the idea to learn from. We did not copy files from it: everything in this repository was written during the event, following our plan. The prototype, the plan and our research notes are public at [prototype repo URL] so you can compare them. We used Claude (Anthropic) as a coding assistant during the event and for the research beforehand. Data: SPHEREx Level 2 images (NASA/JPL-Caltech, via NASA/IPAC IRSA), JPL Small-Body Identification and Horizons, ESA Gaia DR3.
+> Before the event we researched the challenge: we surveyed other teams' public repositories, read the SPHEREx data documentation, and ran test queries against IRSA, JPL and Gaia to learn how the services behave. We chose our demo sky fields and wrote a detailed plan. On 13 November we also built a working prototype of the idea. This submission builds on that prototype: it reuses its code, design and data choices, and the work done during the event is everything after commit [first event commit] in this repository. The prototype, the plan and our research notes are public at [prototype repo URL] so you can see exactly what existed beforehand. We used Claude (Anthropic) as a coding assistant during the event and for the research beforehand. Data: SPHEREx Level 2 images (NASA/JPL-Caltech, via NASA/IPAC IRSA), JPL Small-Body Identification and Horizons, ESA Gaia DR3.
 
 ## 7. Risks and fallbacks
 
@@ -407,13 +409,13 @@ For the submission, edited to match what we actually did:
 | Gaia unavailable | TAP errors | IRSA's Gaia copy is primary already; VizieR as a second source (untested) |
 | Vercel problem on the day | Deploy fails | GitHub Pages from the same repo |
 | A demo object is saturated or on a detector edge | OVERFLOW flags; pixel within 20 of the edge | Each field in §4 lists a backup |
-| The pre-event rule is stricter than we think | Organisers object to a full prototype | Ask them before submitting. The disclosure states exactly what we did and the prototype repo is public; the worst case is disqualification, which a smaller practice build would make less likely |
+| The pre-event rule is stricter than we think | Organisers object to building on a prototype | The disclosure states exactly what existed beforehand and the prototype repo is public. The worst case is disqualification; confirming the rule on the official page or with the organisers removes the doubt |
 | The lead is overloaded or the reviewer is unavailable | Checkpoints slipping by more than an hour | Pause the Site session and finish Data first; a fresh Claude session does the checkpoint click-through if the reviewer can't; cut to M1–M4 on two fields |
 
 ## Open decisions
 
 1. **Pitch wording.** The data can't support "which parts of the predicted region SPHEREx rules out". Proposed: "…and a Planet X calculator shows how far out SPHEREx could have seen any planet you choose."
 2. **New name for this prototype repo**, since the event repo takes `dotcatcher`. The disclosure needs its URL.
-3. **Whether to ask the organisers about the full prototype** before submitting (see §5).
+3. **Where the rule allowing reuse is written.** Add the link or the organisers' answer to `research/rules.md`, so the disclosure can point to it.
 4. **The real submission deadline and demo format.** Someone needs to read the event page from a device that can load it.
 5. **Should-have order.** Explore mode is first, then the track view, with the pair search last. If the Planet X story matters more to you than polish, swap S4 ahead of S2.
