@@ -1,6 +1,6 @@
 # SPHEREx practice
 
-Practice project for learning SPHEREx data before NASA Space Apps 2026. **Not a competition submission.** No code from here goes into the event build; lessons learned go into the research notes.
+Practice project for learning SPHEREx data before NASA Space Apps 2026 (Planet X and SPHEREx challenge). **Not a competition submission.** No code from here goes into the event build; lessons learned go into [docs/research](docs/research).
 
 ## Setup
 
