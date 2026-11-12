@@ -1,0 +1,5 @@
+astropy==8.0.2
+astroquery==0.4.11
+numpy==2.5.4
+pyvo==1.10.0
+requests==2.34.2
