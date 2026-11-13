@@ -71,10 +71,8 @@ At least one NASA source must appear in the final project. The provided sources 
 
 ## 4. Roles
 
-- **We build it together.** Both of us write code, work with data and make decisions as a team.
-- **Everyone follows the build.** Each of us knows what's being built, what changed and why, so either of us can explain any part to the judges. Share what you're working on before you start, and say what changed when you finish.
 - **At each checkpoint, both of us test the live site** on a phone and a laptop, try to break it, check the numbers on screen against the source data, and read the text as a newcomer would.
-- **Claude** builds under our direction; see [CLAUDE.md](CLAUDE.md).
+- **Claude** builds and polishes the project; see [CLAUDE.md](CLAUDE.md).
 
 ## 5. Working rhythm
 
