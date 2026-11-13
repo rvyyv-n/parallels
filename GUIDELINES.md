@@ -25,13 +25,13 @@ Source: the Space Apps [Participant FAQ](https://www.spaceappschallenge.org/reso
 - Anything AI made has to be labelled where judges can see it:
   - images and video: a visible watermark;
   - audio: a note in the description and file metadata;
-  - code and data: a note in the description and metadata. We do this in the README's "How we used AI" section.
-- Nothing AI-generated may use or change NASA branding: no NASA logos, flags or mission insignia.
+  - code and data: a note in the description and metadata.
 - The form's AI question is **not shown to judges**; they only see what's in the project. So the AI note goes in the README, on the site, and in the project page's description.
+- Nothing AI-generated may use or change NASA branding: no NASA logos, flags or mission insignia.
 
 **Other**
 - No photos, video, voices or likenesses of anyone under 18.
-- Before submitting we tick "Terms and Conditions" and "Confirm All Work is Original".
+- Follow the [Space Apps Terms and Conditions](https://www.spaceappschallenge.org/legal/). Be kind; report harassment to the Local Lead or the Space Apps organising team.
 - Recommended: request a FortiGuard web-filter classification for our site so judges' networks don't block it.
 
 **Judging:** each of the five criteria (**Impact, Creativity, Validity, Relevance, Presentation**) is scored 1–5, with no weighting given. Relevance wants NASA data "as a core component … rather than a superficial addition". Local judges pick Global Nominees (3 Dec 2026), Global Judges pick Finalists (17 Dec), and NASA leaders give ten awards (26 Jan 2027). The demo counts, but "the majority of judges' evaluation will be based on your project submission". Details: [docs/judging-notes.md](docs/judging-notes.md).
@@ -41,9 +41,8 @@ Source: the Space Apps [Participant FAQ](https://www.spaceappschallenge.org/reso
 The challenge says this outright, and it's also how we'll stand out:
 
 - **Every match explains itself:** what is similar, how similar (a number with its data source), and where the analogy breaks down.
-- **Never invent a value.** If data is missing, show it as missing and lower our confidence; don't guess.
+- **Never invent a value.** Every number on screen traces back to a named dataset. If data is missing, show it as missing and lower our confidence.
 - **Say what Earth can't copy:** low gravity, the Moon's vacuum, Mars's thin air, space radiation.
-- **Every number on screen traces back to a named dataset.**
 - **Aim for places nobody uses yet.** Antarctica, Atacama, Iceland and Hawaii are fine to compare against, but they shouldn't be our headline.
 - **Test the method on places we already know.** Before trusting a new find, check that known analogs (Atacama, Haughton Crater, Antarctica's Dry Valleys) score high and an ordinary place scores low. Show that check on the site.
 
@@ -64,11 +63,11 @@ The challenge says this outright, and it's also how we'll stand out:
 | Earth (Europe) | [ESA Open Science Catalog](https://opensciencedata.esa.int/) | Catalogue of open geoscience datasets |
 | Earth (Japan) | [JAXA G-Portal](https://gportal.jaxa.jp/gpr/index/index) | Japanese satellite data: rain, snow, vegetation and more |
 
-At least one NASA source must appear in the final project. The provided sources come first; we add others only where they fill a real gap.
+**NASA data does the main scoring work.** Partner data (Canada, Europe, Japan) fills gaps and is credited in its own form field. We add sources beyond this table only where they fill a real gap.
 
 - Open data only. Follow each source's terms and credit it.
 - Cache downloads and keep request rates polite. Raw data stays out of git (see `.gitignore`); commit only small processed files the site needs.
-- Keep a short note of where each dataset came from and how we used it.
+- List each dataset's source, licence and how we used it in the README.
 
 ## 4. What the plan must settle
 
@@ -78,34 +77,31 @@ At least one NASA source must appear in the final project. The provided sources 
 - Hosting that keeps working untouched until 26 January 2027: nothing to restart, no keys that expire, no paid service without a spending cap. Pre-computed results on a static site are the safe default.
 - A fallback for each risky part, and the hour we switch to it.
 
-## 5. Roles
+## 5. The project page and demo
 
-- **At each checkpoint, both of us test the live site** on a phone and a laptop, try to break it, check the numbers on screen against the source data, read the text as a newcomer would, and check that a newcomer can get a result in under a minute without help.
+- **The page is most of the score.** Lead with the result, then answer the form's questions: what we built, how it meets the challenge, why it matters.
+- Paste in images: the map, and one match showing what's similar and where it breaks.
+- In the NASA Data field, list every dataset by name, with a link and what we used it for.
+- A visible "where the analogy breaks" and "how we checked it" part. None of the 2025 winners had one, and our challenge asks for it.
+- **Demo:** a video under 30 s (aim for 28 s) of the real product, not slides. The product is on screen from the first second. Captions follow the official timing: team (0:00), challenge (0:02), name and tagline (0:05), how it works with NASA data (0:10), the future (0:20–0:30). Burn in the English captions so it works on mute. No music, or music whose licence we list.
+
+## 6. Working together
+
 - **Claude** builds and polishes the project; see [CLAUDE.md](CLAUDE.md).
-
-## 6. Working rhythm
-
-- **Keep it working.** Commit and push after every change that works, so any step can be undone.
-- **Checkpoints:** the live site is deployed and reviewed at each one. The roadmap sets the times.
+- **Keep it working.** Commit and push to `research` after every change that works, so any step can be undone.
+- **Checkpoints** (the roadmap sets the times): the live site is deployed, and both of us test it on a phone and a laptop. Try to break it, check the numbers on screen against the source data, read the text as a newcomer would, and check that a newcomer can get a result in under a minute without help.
 - **Feature freeze: Sunday 18:00.** After that, only fixes, the demo and the project page.
 - **Submit a first complete draft by Saturday night**, then improve it. Final submission by **Sunday 21:00**, three hours before the deadline.
 - If something has been stuck for an hour, cut it or switch to the planned fallback.
 
-## 7. Code of conduct
-
-Follow the [Space Apps Terms and Conditions](https://www.spaceappschallenge.org/legal/). Be kind. Report harassment to the Local Lead or the Space Apps organising team.
-
-## 8. Before we click "Submit for Judging"
+## 7. Before we click "Submit for Judging"
 
 - [ ] Every required field is filled in, in English
-- [ ] Demo is ≤ 30 s or ≤ 7 slides, publicly viewable
+- [ ] Demo is ≤ 30 s (checked on the uploaded file) or ≤ 7 slides, publicly viewable
 - [ ] Final project link opens in a private window, with no login
-- [ ] NASA data is named; every other source is listed
-- [ ] AI use is described; AI images are watermarked; no NASA branding in AI output
-- [ ] AI note visible on the project page and the site
-- [ ] NASA datasets named, with links
+- [ ] NASA datasets named, with links; every other source listed
 - [ ] Images pasted on the page, including a "where it breaks" example
-- [ ] Demo length checked on the uploaded file
+- [ ] AI note visible on the project page and the site; AI images watermarked; no NASA branding in AI output
 - [ ] Site needs no upkeep until 26 Jan 2027; submitted version tagged
 - [ ] No under-18 likenesses
-- [ ] Both checkboxes ticked; the success banner shows after submitting
+- [ ] "Terms and Conditions" and "Confirm All Work is Original" ticked; the success banner shows after submitting

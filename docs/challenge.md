@@ -52,11 +52,9 @@ A **dating app for planets**. Give it a Moon or Mars location, and it shows you 
 - Caves, lava tubes and other underground spaces
 - How easy it is to land, drive, navigate or build there
 
-## Data (all free)
+## Data
 
-- **Earth:** NASA Earthdata Search and Worldview, for satellite pictures and measurements.
-- **Moon:** NASA's Lunar Reconnaissance Orbiter, including its laser height maps (LOLA) and temperature maps of the poles (Diviner).
-- **Mars:** NASA's Planetary Data System, the archive for orbiter and rover data.
+All free. The full list NASA provides is in [GUIDELINES.md](../GUIDELINES.md#3-data).
 
 ## Who it's for
 
