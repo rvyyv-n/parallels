@@ -55,7 +55,7 @@
   .row.ms .t small { font-weight: 400; }
   .row.now { position: relative; }
   .row.now::before { content: ""; position: absolute; left: -14px; top: 10px; bottom: 10px; width: 3px; background: var(--accent); }
-  .tag { font-family: Bahnschrift, sans-serif; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; margin-left: 8px; }
+  .tag { font-family: Bahnschrift, sans-serif; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; margin-left: 8px; white-space: nowrap; }
   .tag.now { color: var(--accent); }
   .tag.done { color: var(--faint); }
   .repeat { grid-column: 3; color: var(--soft); font-size: 14px; }
@@ -95,8 +95,8 @@
   <div class="col">
     <div class="head"><span class="n">01</span><h2>Plan</h2><span class="when">Before the event</span></div>
     <div class="row"><span class="i">1</span><span class="o claude">Claude</span><span class="t">Research the challenge and how it's judged<span class="tag done">done</span></span></div>
-    <div class="row now"><span class="i">2</span><span class="o team">Team</span><span class="t">Give the core idea<span class="tag now">we are here</span><small>The idea has to be ours: official AI rule</small></span></div>
-    <div class="row"><span class="i">3</span><span class="o both">Both</span><span class="t">Questions and answers until the plan is final</span></div>
+    <div class="row"><span class="i">2</span><span class="o team">Team</span><span class="t">Give the core idea<span class="tag done">done</span><small>The idea has to be ours: official AI rule</small></span></div>
+    <div class="row now"><span class="i">3</span><span class="o both">Both</span><span class="t">Questions and answers until the plan is final<span class="tag now">we are here</span></span></div>
     <div class="row"><span class="i">4</span><span class="o claude">Claude</span><span class="t">Write the spec: features, tech stack, roadmap<small>The team signs it off</small></span></div>
   </div>
 
