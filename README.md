@@ -6,8 +6,17 @@
 
 Our challenge: **Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars**. The work lives in [`analogs/`](analogs); start with [the idea](analogs/theidea.md).
 
-| Folder | What's in it |
+| Folder or file | What's in it |
 |---|---|
 | [`analogs/`](analogs) | The chosen challenge |
 | [`retired/`](retired) | Earlier candidates we didn't pick: [Planet X and SPHEREx](retired/spherex) and [Lunar Landing Site Navigator](retired/lunar) |
+| [`GUIDELINES.md`](GUIDELINES.md) | Competition rules and how we work |
 | `assets/` | The project logo |
+
+## How we used AI
+
+We use Claude (Anthropic) to help research and build. The idea and design decisions are ours. [AI-USE.md](AI-USE.md) logs what AI produced and where.
+
+## Licence
+
+[MIT](LICENSE)
