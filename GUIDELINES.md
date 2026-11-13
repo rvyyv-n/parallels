@@ -4,7 +4,7 @@ How we work on our NASA Space Apps 2026 entry. Section 1 is the official rules a
 
 ## 1. Official rules we must meet
 
-Source: the Space Apps [Participant FAQ](https://www.spaceappschallenge.org/resources/participant-faqs/) and [Project Submission Guide](https://www.spaceappschallenge.org/resources/project-submission-guide/), read 2026-11-13. Check them again on the day; if they differ from this list, the official pages win.
+Source: the Space Apps [Participant FAQ](https://www.spaceappschallenge.org/resources/participant-faqs/), [Project Submission Guide](https://www.spaceappschallenge.org/resources/project-submission-guide/) and [Judging & Awards Guide](https://www.spaceappschallenge.org/resources/judging-awards-guide/), read 2026-11-13. Check them again on the day; if they differ from this list, the official pages win.
 
 **Timing**
 - Submission opens **Saturday 14 November, 9:00** and closes **Sunday 15 November, 23:59**, both in our Local Event's time zone. Anything saved after the deadline isn't judged.
@@ -27,14 +27,14 @@ Source: the Space Apps [Participant FAQ](https://www.spaceappschallenge.org/reso
   - audio: a note in the description and file metadata;
   - code and data: a note in the description and metadata. We do this in the README's "How we used AI" section.
 - Nothing AI-generated may use or change NASA branding: no NASA logos, flags or mission insignia.
-- The submission form asks how we used AI. We answer it from the README section.
+- The form's AI question is **not shown to judges**; they only see what's in the project. So the AI note goes in the README, on the site, and in the project page's description.
 
 **Other**
 - No photos, video, voices or likenesses of anyone under 18.
 - Before submitting we tick "Terms and Conditions" and "Confirm All Work is Original".
 - Recommended: request a FortiGuard web-filter classification for our site so judges' networks don't block it.
 
-**Judging:** five criteria: **Impact, Creativity, Validity, Relevance, Presentation**. A strong demo mainly raises Presentation; most of the score comes from the project page itself.
+**Judging:** each of the five criteria (**Impact, Creativity, Validity, Relevance, Presentation**) is scored 1–5, with no weighting given. Relevance wants NASA data "as a core component … rather than a superficial addition". Local judges pick Global Nominees (3 Dec 2026), Global Judges pick Finalists (17 Dec), and NASA leaders give ten awards (26 Jan 2027). The demo counts, but "the majority of judges' evaluation will be based on your project submission". Details: [docs/judging-notes.md](docs/judging-notes.md).
 
 ## 2. Doing the science honestly
 
@@ -45,6 +45,7 @@ The challenge says this outright, and it's also how we'll stand out:
 - **Say what Earth can't copy:** low gravity, the Moon's vacuum, Mars's thin air, space radiation.
 - **Every number on screen traces back to a named dataset.**
 - **Aim for places nobody uses yet.** Antarctica, Atacama, Iceland and Hawaii are fine to compare against, but they shouldn't be our headline.
+- **Test the method on places we already know.** Before trusting a new find, check that known analogs (Atacama, Haughton Crater, Antarctica's Dry Valleys) score high and an ordinary place scores low. Show that check on the site.
 
 ## 3. Data
 
@@ -69,12 +70,20 @@ At least one NASA source must appear in the final project. The provided sources 
 - Cache downloads and keep request rates polite. Raw data stays out of git (see `.gitignore`); commit only small processed files the site needs.
 - Keep a short note of where each dataset came from and how we used it.
 
-## 4. Roles
+## 4. What the plan must settle
 
-- **At each checkpoint, both of us test the live site** on a phone and a laptop, try to break it, check the numbers on screen against the source data, and read the text as a newcomer would.
+- A name, a short tagline, and one sentence a judge could repeat.
+- One main flow a newcomer finishes in under a minute without help. Everything else is extra.
+- The awards we aim at (Best Use of Science, Best Use of Data, Best Mission Concept) and what on the page makes each case.
+- Hosting that keeps working untouched until 26 January 2027: nothing to restart, no keys that expire, no paid service without a spending cap. Pre-computed results on a static site are the safe default.
+- A fallback for each risky part, and the hour we switch to it.
+
+## 5. Roles
+
+- **At each checkpoint, both of us test the live site** on a phone and a laptop, try to break it, check the numbers on screen against the source data, read the text as a newcomer would, and check that a newcomer can get a result in under a minute without help.
 - **Claude** builds and polishes the project; see [CLAUDE.md](CLAUDE.md).
 
-## 5. Working rhythm
+## 6. Working rhythm
 
 - **Keep it working.** Commit and push after every change that works, so any step can be undone.
 - **Checkpoints:** the live site is deployed and reviewed at each one. The roadmap sets the times.
@@ -82,16 +91,21 @@ At least one NASA source must appear in the final project. The provided sources 
 - **Submit a first complete draft by Saturday night**, then improve it. Final submission by **Sunday 21:00**, three hours before the deadline.
 - If something has been stuck for an hour, cut it or switch to the planned fallback.
 
-## 6. Code of conduct
+## 7. Code of conduct
 
 Follow the [Space Apps Terms and Conditions](https://www.spaceappschallenge.org/legal/). Be kind. Report harassment to the Local Lead or the Space Apps organising team.
 
-## 7. Before we click "Submit for Judging"
+## 8. Before we click "Submit for Judging"
 
 - [ ] Every required field is filled in, in English
 - [ ] Demo is ≤ 30 s or ≤ 7 slides, publicly viewable
 - [ ] Final project link opens in a private window, with no login
 - [ ] NASA data is named; every other source is listed
 - [ ] AI use is described; AI images are watermarked; no NASA branding in AI output
+- [ ] AI note visible on the project page and the site
+- [ ] NASA datasets named, with links
+- [ ] Images pasted on the page, including a "where it breaks" example
+- [ ] Demo length checked on the uploaded file
+- [ ] Site needs no upkeep until 26 Jan 2027; submitted version tagged
 - [ ] No under-18 likenesses
 - [ ] Both checkboxes ticked; the success banner shows after submitting
