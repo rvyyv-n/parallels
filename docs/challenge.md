@@ -1,4 +1,4 @@
-# Earth Analogs for Moon and Mars: the idea
+# Earth Analogs for Moon and Mars: the challenge
 
 Official challenge page: https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/
 
