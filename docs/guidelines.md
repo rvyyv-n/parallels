@@ -34,7 +34,7 @@ Source: the Space Apps [Participant FAQ](https://www.spaceappschallenge.org/reso
 - Follow the [Space Apps Terms and Conditions](https://www.spaceappschallenge.org/legal/). Be kind; report harassment to the Local Lead or the Space Apps organising team.
 - Recommended: request a FortiGuard web-filter classification for our site so judges' networks don't block it.
 
-**Judging:** each of the five criteria (**Impact, Creativity, Validity, Relevance, Presentation**) is scored 1–5, with no weighting given. Relevance wants NASA data "as a core component … rather than a superficial addition". Local judges pick Global Nominees (3 Dec 2026), Global Judges pick Finalists (17 Dec), and NASA leaders give ten awards (26 Jan 2027). The demo counts, but "the majority of judges' evaluation will be based on your project submission". Details: [docs/judging-notes.md](docs/judging-notes.md).
+**Judging:** each of the five criteria (**Impact, Creativity, Validity, Relevance, Presentation**) is scored 1–5, with no weighting given. Relevance wants NASA data "as a core component … rather than a superficial addition". Local judges pick Global Nominees (3 Dec 2026), Global Judges pick Finalists (17 Dec), and NASA leaders give ten awards (26 Jan 2027). The demo counts, but "the majority of judges' evaluation will be based on your project submission". Details: [judging-notes.md](judging-notes.md).
 
 ## 2. Doing the science honestly
 
@@ -87,7 +87,7 @@ The challenge says this outright, and it's also how we'll stand out:
 
 ## 6. Working together
 
-- **Claude** builds and polishes the project; see [CLAUDE.md](CLAUDE.md).
+- **Claude** builds and polishes the project; see [CLAUDE.md](../CLAUDE.md).
 - **Keep it working.** Commit and push to `research` after every change that works, so any step can be undone.
 - **Checkpoints** (the roadmap sets the times): the live site is deployed, and both of us test it on a phone and a laptop. Try to break it, check the numbers on screen against the source data, read the text as a newcomer would, and check that a newcomer can get a result in under a minute without help.
 - **Feature freeze: Sunday 18:00.** After that, only fixes, the demo and the project page.

@@ -54,7 +54,7 @@ A **dating app for planets**. Give it a Moon or Mars location, and it shows you 
 
 ## Data
 
-All free. The full list NASA provides is in [GUIDELINES.md](../GUIDELINES.md#3-data).
+All free. The full list NASA provides is in [guidelines.md](guidelines.md#3-data).
 
 ## Who it's for
 

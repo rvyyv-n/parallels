@@ -1,6 +1,6 @@
 # How Space Apps is judged, and what wins
 
-Research notes from 2026-11-13. The rules we act on are in [GUIDELINES.md](../GUIDELINES.md); this file keeps the evidence behind them.
+Research notes from 2026-11-13. The rules we act on are in [guidelines.md](guidelines.md); this file keeps the evidence behind them.
 
 ## What the official pages say
 

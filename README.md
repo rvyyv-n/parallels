@@ -6,9 +6,10 @@ Our NASA Space Apps 2026 entry for [Identify Earth Locations that Analog the Per
 
 ## What's here
 
+- [docs/workflow.png](docs/workflow.png): our workflow at a glance; start here.
 - [docs/challenge.md](docs/challenge.md): the challenge in plain words.
 - [docs/judging-notes.md](docs/judging-notes.md): how Space Apps is judged and what past winners did.
-- [GUIDELINES.md](GUIDELINES.md): how we work, the official rules and our submission checklist.
+- [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
 - [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.
 - `retired/`: earlier challenge ideas, kept for reference.
 
