@@ -48,7 +48,24 @@ The challenge says this outright, and it's also how we'll stand out:
 
 ## 3. Data
 
-- Open data only, from NASA and partner agencies first. Follow each source's terms and credit it.
+**Start with the data NASA provides for this challenge** (the Resources tab on the [challenge page](https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/), read 2026-11-13; NASA may add more before the event):
+
+| For | Source | What it gives us |
+|---|---|---|
+| Earth | [NASA Earthdata Search](https://search.earthdata.nasa.gov/) | NASA's main portal for Earth science data |
+| Earth | [NASA Worldview](https://worldview.earthdata.nasa.gov/) | Browse NASA satellite imagery interactively |
+| Moon and Mars | [NASA Planetary Data System (PDS)](https://pds.nasa.gov/) | NASA's archive of orbiter, lander and rover data |
+| Moon | [Lunar Reconnaissance Orbiter (LRO)](https://pds-geosciences.wustl.edu/missions/lro/) | Moon images (LROC), height maps (LOLA), ice hints (LEND, Mini-RF) |
+| Moon | [LRO Diviner](https://pds-geosciences.wustl.edu/missions/lro/diviner.htm) | Moon surface temperatures, especially at the poles |
+| Earth (Canada) | [RADARSAT Constellation Mission](https://donnees-data.asc-csa.gc.ca/en/dataset/rcm), [RADARSAT-1](https://donnees-data.asc-csa.gc.ca/en/dataset/radarsat1) | Radar images that see through cloud and darkness: ice, terrain |
+| Earth (Canada) | [SAR Python tutorial](https://github.com/asc-csa/Synthetic_Aperture_Radar_Tutorial) | How to open and view radar images |
+| Earth (Europe) | [Copernicus Data Space](https://dataspace.copernicus.eu/) | Sentinel satellite data for land, ocean and air |
+| Earth (Europe) | [ESA Open Science Catalog](https://opensciencedata.esa.int/) | Catalogue of open geoscience datasets |
+| Earth (Japan) | [JAXA G-Portal](https://gportal.jaxa.jp/gpr/index/index) | Japanese satellite data: rain, snow, vegetation and more |
+
+At least one NASA source must appear in the final project. The provided sources come first; we add others only where they fill a real gap.
+
+- Open data only. Follow each source's terms and credit it.
 - Cache downloads and keep request rates polite. Raw data stays out of git (see `.gitignore`); commit only small processed files the site needs.
 - Keep a short note of where each dataset came from and how we used it.
 
