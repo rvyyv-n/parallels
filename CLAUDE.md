@@ -27,5 +27,5 @@ Our NASA Space Apps 2026 entry for **Identify Earth Locations that Analog the Pe
 
 ## Quirks of this PC
 
-- spaceappschallenge.org fails TLS checks here, and WebFetch fails too. `curl -sk` works; the page text is in the embedded Next.js data as escaped HTML (`003c` for `<`).
+- spaceappschallenge.org fails TLS checks here, and WebFetch fails too. `curl -sk` works; the page text is in the embedded Next.js data as escaped HTML (`\u003c` for `<`).
 - IRSA, JPL, the Gaia archive, GitHub and Vercel all work normally.
