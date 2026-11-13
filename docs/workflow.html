@@ -13,7 +13,7 @@
     --accent: #c4471f;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 1600px; height: 1036px; }
+  html, body { width: 1600px; height: 1020px; }
   body {
     background: var(--paper);
     color: var(--ink);
@@ -36,13 +36,13 @@
   .both { color: var(--soft); }
   .dia { display: inline-block; width: 8px; height: 8px; background: var(--ink); transform: rotate(45deg); margin: 0 3px 1px; }
 
-  .cols { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr 1fr; }
   .col { padding: 22px 30px 0 0; position: relative; }
   .col + .col { padding-left: 30px; border-left: 1px solid var(--rule); }
   .head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
   .head .n { font-family: Bahnschrift, sans-serif; font-weight: 300; font-size: 40px; line-height: 1; color: var(--faint); }
   .head h2 { font-family: Bahnschrift, sans-serif; font-weight: 600; font-size: 24px; }
-  .head .when { margin-left: auto; color: var(--soft); font-size: 14.5px; }
+  .head .when { margin-left: auto; color: var(--soft); font-size: 14.5px; white-space: nowrap; }
 
   .row { display: grid; grid-template-columns: 22px 70px 1fr; column-gap: 8px; padding: 11px 0; border-top: 1px solid var(--rule); align-items: baseline; }
   .row:first-of-type { border-top: none; }
@@ -63,7 +63,7 @@
   .foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--soft); }
   .foot b { color: var(--ink); font-weight: 600; }
 
-  .lower { display: grid; grid-template-columns: 1.3fr 1fr .8fr; margin-top: 30px; border-top: 2px solid var(--ink); }
+  .lower { display: grid; grid-template-columns: 1fr 1fr 1fr; margin-top: 30px; border-top: 2px solid var(--ink); }
   .lower section { padding: 20px 30px 0 0; }
   .lower section + section { padding-left: 30px; border-left: 1px solid var(--rule); }
   .lower h3 { font-family: Bahnschrift, sans-serif; font-weight: 600; font-size: 19px; margin-bottom: 10px; }
@@ -87,7 +87,7 @@
   </div>
   <div class="key">
     <span class="caps">Who</span><div><span class="caps team">Team</span> &nbsp; <span class="caps claude">Claude</span> &nbsp; <span class="caps both">Both</span></div>
-    <span class="caps">Dates</span><div><span class="dia"></span> official date, Local Event time</div>
+    <span class="caps">Dates</span><div><span class="dia"></span> milestone, Local Event time</div>
   </div>
 </div>
 
@@ -101,28 +101,20 @@
   </div>
 
   <div class="col">
-    <div class="head"><span class="n">02</span><h2>Build</h2><span class="when">Saturday 14 Nov</span></div>
+    <div class="head"><span class="n">02</span><h2>Day 1</h2><span class="when">Saturday 14 Nov</span></div>
     <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">09:00</span><span class="t">Submission opens</span></div>
     <div class="row"><span class="i">5</span><span class="o claude">Claude</span><span class="t">Build in small steps<small>Each working step is saved, so any change can be undone</small></span></div>
     <div class="row"><span class="i">6</span><span class="o team">Team</span><span class="t">Checkpoint: test the live site on a phone and a laptop<small>Try to break it, check the numbers against the data, and see if a newcomer gets a result in under a minute</small></span></div>
-    <div class="row" style="border-top:none;padding-top:0"><span></span><span></span><span class="repeat">Repeat 5 and 6 until the freeze</span></div>
+    <div class="row" style="border-top:none;padding-top:0"><span></span><span></span><span class="repeat">Repeat 5 and 6 through both days</span></div>
     <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">Night</span><span class="t">First complete draft submitted</span></div>
   </div>
 
   <div class="col">
-    <div class="head"><span class="n">03</span><h2>Finish</h2><span class="when">Sunday 15 Nov</span></div>
-    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">18:00</span><span class="t">Feature freeze</span></div>
-    <div class="row"><span class="i">7</span><span class="o both">Both</span><span class="t">Fixes only, plus the 30&#8209;second demo video and the project page<small>The project page carries most of the score</small></span></div>
-    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">21:00</span><span class="t">Final submission<small>Three hours before the 23:59 deadline</small></span></div>
-    <p class="foot">Before submitting, we go through the checklist in <code>docs/guidelines.md</code>.</p>
-  </div>
-
-  <div class="col">
-    <div class="head"><span class="n">04</span><h2>Judging</h2><span class="when">Dec 2026 – Jan 2027</span></div>
-    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">3 Dec</span><span class="t">Global Nominees<small>Picked by local judges</small></span></div>
-    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">17 Dec</span><span class="t">Global Finalists<small>Picked by global judges</small></span></div>
-    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">26 Jan</span><span class="t">Global Winners, ten awards<small>Given by NASA and partner&#8209;agency leaders</small></span></div>
-    <p class="foot"><b>The site stays online, unchanged, until then.</b> Judges open it weeks after the event.</p>
+    <div class="head"><span class="n">03</span><h2>Day 2</h2><span class="when">Sunday 15 Nov</span></div>
+    <div class="row"><span class="i">7</span><span class="o claude">Claude</span><span class="t">Keep building: features, bug fixes, improvements<small>Checkpoints carry on as on day 1</small></span></div>
+    <div class="row"><span class="i">8</span><span class="o both">Both</span><span class="t">Present it: the 30&#8209;second demo video and the project page<small>The project page carries most of the score</small></span></div>
+    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">21:59</span><span class="t">Final submission, at the latest<small>As early as we can, and at least two hours before the 23:59 deadline</small></span></div>
+    <p class="foot">Before submitting, we go through the checklist in <code>docs/guidelines.md</code>. The site then stays online, unchanged, until the results on 26 January 2027.</p>
   </div>
 </div>
 
@@ -134,7 +126,6 @@
       <li>Every number comes from a named dataset. Missing data stays missing; we never guess.</li>
       <li>NASA data does the main work.</li>
       <li>We check the method on known analog sites first: Atacama, Haughton Crater, the Dry Valleys.</li>
-      <li>AI use is labelled where judges can see it.</li>
     </ul>
   </section>
   <section>

@@ -26,7 +26,7 @@ Source: the Space Apps [Participant FAQ](https://www.spaceappschallenge.org/reso
   - images and video: a visible watermark;
   - audio: a note in the description and file metadata;
   - code and data: a note in the description and metadata.
-- The form's AI question is **not shown to judges**; they only see what's in the project. So the AI note goes in the README, on the site, and in the project page's description.
+- The form's AI question is **not shown to judges**, so we note AI use once where it fits: the site's footer, the project description and the README. We don't repeat it elsewhere.
 - Nothing AI-generated may use or change NASA branding: no NASA logos, flags or mission insignia.
 
 **Other**
@@ -90,8 +90,8 @@ The challenge says this outright, and it's also how we'll stand out:
 - **Claude** builds and polishes the project; see [CLAUDE.md](../CLAUDE.md).
 - **Keep it working.** Commit and push to `research` after every change that works, so any step can be undone.
 - **Checkpoints** (the roadmap sets the times): the live site is deployed, and both of us test it on a phone and a laptop. Try to break it, check the numbers on screen against the source data, read the text as a newcomer would, and check that a newcomer can get a result in under a minute without help.
-- **Feature freeze: Sunday 18:00.** After that, only fixes, the demo and the project page.
-- **Submit a first complete draft by Saturday night**, then improve it. Final submission by **Sunday 21:00**, three hours before the deadline.
+- **Day 2 (Sunday)** keeps building (features, bug fixes, improvements) alongside the presenting: the demo video and the project page.
+- **Submit a first complete draft by Saturday night**, then improve it. Final submission as early as we can, and by **Sunday 21:59** at the latest, two hours before the deadline.
 - If something has been stuck for an hour, cut it or switch to the planned fallback.
 
 ## 7. Before we click "Submit for Judging"
@@ -101,7 +101,7 @@ The challenge says this outright, and it's also how we'll stand out:
 - [ ] Final project link opens in a private window, with no login
 - [ ] NASA datasets named, with links; every other source listed
 - [ ] Images pasted on the page, including a "where it breaks" example
-- [ ] AI note visible on the project page and the site; AI images watermarked; no NASA branding in AI output
+- [ ] AI note in the site footer and the project description; AI images watermarked; no NASA branding in AI output
 - [ ] Site needs no upkeep until 26 Jan 2027; submitted version tagged
 - [ ] No under-18 likenesses
 - [ ] "Terms and Conditions" and "Confirm All Work is Original" ticked; the success banner shows after submitting
