@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="../assets/logo.svg" width="112" alt="Dotcatcher logo: a ring catching a drifting dot">
+  <img src="../../assets/logo.svg" width="112" alt="Dotcatcher logo: a ring catching a drifting dot">
 </p>
 
 <h1 align="center">Dotcatcher</h1>
