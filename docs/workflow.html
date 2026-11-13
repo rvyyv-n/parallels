@@ -2,225 +2,157 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>How our Space Apps 2026 entry works</title>
+<title>Earth analogs for the Moon and Mars: team workflow</title>
 <style>
   :root {
-    --ink: #151a2e;
-    --muted: #586078;
-    --paper: #f5f3ee;
-    --card: #ffffff;
-    --line: #d9d5cc;
-    --team: #c97a12;
-    --team-bg: #fdf0da;
-    --ai: #4b4fc9;
-    --ai-bg: #ebebfc;
-    --both: #16877a;
-    --both-bg: #dcf2ee;
-    --done: #2f8a4a;
+    --ink: #16161a;
+    --soft: #55555e;
+    --faint: #8b8b93;
+    --rule: #cfcdc6;
+    --paper: #f7f6f2;
+    --accent: #c4471f;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 1600px; height: 1040px; }
+  html, body { width: 1600px; height: 1036px; }
   body {
-    font-family: "Segoe UI", system-ui, sans-serif;
-    color: var(--ink);
     background: var(--paper);
+    color: var(--ink);
+    font: 16px/1.4 "Segoe UI", sans-serif;
+    padding: 52px 64px 0;
     -webkit-font-smoothing: antialiased;
   }
+  .d { font-family: Bahnschrift, "Segoe UI", sans-serif; }
+  .caps { font-family: Bahnschrift, sans-serif; font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase; }
 
-  header {
-    position: relative;
-    height: 168px;
-    padding: 30px 48px 0;
-    background: radial-gradient(circle at 85% 30%, #26306a 0, #0e1430 55%);
-    color: #fff;
-    overflow: hidden;
-  }
-  .kicker { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: #aab3e0; font-weight: 600; }
-  h1 { font-size: 40px; font-weight: 700; margin-top: 6px; letter-spacing: -.01em; }
-  .goal { font-size: 18px; color: #d6dbf5; margin-top: 8px; max-width: 980px; }
-  .planets { position: absolute; right: 64px; top: 22px; display: flex; align-items: center; gap: 34px; }
-  .planet { border-radius: 50%; position: relative; }
-  .moon { width: 64px; height: 64px; background: radial-gradient(circle at 35% 35%, #e9e9ee, #8d8f9c 70%); }
-  .earth { width: 96px; height: 96px; background: radial-gradient(circle at 35% 35%, #7fc4ff, #1f5fae 60%, #123a73); }
-  .earth::after { content: ""; position: absolute; inset: 22px 30px 34px 18px; border-radius: 45% 55% 40% 60%; background: #3d9a5a; opacity: .85; }
-  .mars { width: 52px; height: 52px; background: radial-gradient(circle at 35% 35%, #f19a6b, #b5432a 70%); }
-  .pl { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .pl .slot { height: 96px; display: grid; place-items: center; }
-  .pl span { font-size: 12px; color: #aab3e0; }
+  .top { display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 22px; border-bottom: 2px solid var(--ink); }
+  .eyebrow { color: var(--soft); }
+  h1 { font-family: Bahnschrift, sans-serif; font-weight: 600; font-size: 46px; letter-spacing: -.01em; line-height: 1.05; margin-top: 10px; }
+  .goal { margin-top: 12px; font-size: 18px; color: var(--soft); max-width: 860px; }
+  .key { display: grid; grid-template-columns: auto auto; gap: 6px 14px; align-items: baseline; text-align: left; }
+  .key > .caps { color: var(--faint); }
+  .key div { font-size: 14.5px; color: var(--soft); }
+  .team { color: var(--accent); }
+  .claude { color: var(--ink); }
+  .both { color: var(--soft); }
+  .dia { display: inline-block; width: 8px; height: 8px; background: var(--ink); transform: rotate(45deg); margin: 0 3px 1px; }
 
-  .legend { display: flex; gap: 22px; align-items: center; padding: 16px 48px 0; font-size: 15px; color: var(--muted); }
-  .legend b { color: var(--ink); font-weight: 600; margin-right: 4px; }
-  .chip { display: inline-flex; align-items: center; gap: 8px; }
-  .dot { width: 14px; height: 14px; border-radius: 4px; border: 2px solid; }
-  .dot.team { background: var(--team-bg); border-color: var(--team); }
-  .dot.ai { background: var(--ai-bg); border-color: var(--ai); }
-  .dot.both { background: var(--both-bg); border-color: var(--both); }
-  .diamond { width: 12px; height: 12px; background: var(--ink); transform: rotate(45deg); margin: 0 2px; }
-  .legend .tz { margin-left: auto; font-size: 14px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .col { padding: 22px 30px 0 0; position: relative; }
+  .col + .col { padding-left: 30px; border-left: 1px solid var(--rule); }
+  .head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+  .head .n { font-family: Bahnschrift, sans-serif; font-weight: 300; font-size: 40px; line-height: 1; color: var(--faint); }
+  .head h2 { font-family: Bahnschrift, sans-serif; font-weight: 600; font-size: 24px; }
+  .head .when { margin-left: auto; color: var(--soft); font-size: 14.5px; }
 
-  .flow { display: grid; grid-template-columns: 1fr 44px 1fr 44px 1fr 44px 1fr; padding: 14px 48px 0; align-items: stretch; }
-  .phase { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 16px 18px; display: flex; flex-direction: column; }
-  .phase-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
-  .num { width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 700; font-size: 16px; display: grid; place-items: center; flex: none; align-self: center; }
-  .phase h2 { font-size: 22px; font-weight: 700; }
-  .when { font-size: 14px; color: var(--muted); margin-left: auto; text-align: right; }
-  .between { display: grid; place-items: center; }
-  .between svg { width: 34px; height: 34px; }
+  .row { display: grid; grid-template-columns: 22px 70px 1fr; column-gap: 8px; padding: 11px 0; border-top: 1px solid var(--rule); align-items: baseline; }
+  .row:first-of-type { border-top: none; }
+  .row .i { font-family: Bahnschrift, sans-serif; color: var(--faint); font-size: 15px; }
+  .row .o { font-family: Bahnschrift, sans-serif; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+  .row .t { font-size: 16px; }
+  .row .t small { display: block; color: var(--soft); font-size: 14px; margin-top: 2px; }
+  .row.ms .o { font-size: 16px; letter-spacing: 0; text-transform: none; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .row.ms .t { font-weight: 600; }
+  .row.ms .t small { font-weight: 400; }
+  .row.now { position: relative; }
+  .row.now::before { content: ""; position: absolute; left: -14px; top: 10px; bottom: 10px; width: 3px; background: var(--accent); }
+  .tag { font-family: Bahnschrift, sans-serif; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; margin-left: 8px; }
+  .tag.now { color: var(--accent); }
+  .tag.done { color: var(--faint); }
+  .repeat { grid-column: 3; color: var(--soft); font-size: 14px; }
+  .repeat::before { content: "↻ "; color: var(--ink); }
+  .foot { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--rule); font-size: 14px; color: var(--soft); }
+  .foot b { color: var(--ink); font-weight: 600; }
 
-  .step { border-radius: 11px; border: 2px solid; padding: 10px 12px; font-size: 15.5px; line-height: 1.35; position: relative; }
-  .step.team { background: var(--team-bg); border-color: var(--team); }
-  .step.ai { background: var(--ai-bg); border-color: var(--ai); }
-  .step.both { background: var(--both-bg); border-color: var(--both); }
-  .step small { display: block; font-size: 13.5px; color: var(--muted); margin-top: 3px; line-height: 1.35; }
-  .step .who { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; display: block; margin-bottom: 2px; }
-  .step.team .who { color: var(--team); }
-  .step.ai .who { color: var(--ai); }
-  .step.both .who { color: var(--both); }
-  .done-tag { position: absolute; top: 9px; right: 10px; font-size: 12px; font-weight: 700; color: var(--done); background: #e2f3e7; border-radius: 99px; padding: 2px 8px; }
-  .here { outline: 4px solid rgba(201,122,18,.28); outline-offset: 3px; }
-  .here-tag { position: absolute; top: -12px; right: 10px; background: var(--team); color: #fff; font-size: 12px; font-weight: 700; border-radius: 99px; padding: 3px 10px; letter-spacing: .03em; }
+  .lower { display: grid; grid-template-columns: 1.3fr 1fr .8fr; margin-top: 30px; border-top: 2px solid var(--ink); }
+  .lower section { padding: 20px 30px 0 0; }
+  .lower section + section { padding-left: 30px; border-left: 1px solid var(--rule); }
+  .lower h3 { font-family: Bahnschrift, sans-serif; font-weight: 600; font-size: 19px; margin-bottom: 10px; }
+  .lower ol, .lower ul { list-style: none; }
+  .lower li { font-size: 15px; padding: 4px 0 4px 20px; position: relative; }
+  .lower li::before { content: "—"; position: absolute; left: 0; color: var(--faint); }
+  .lower p { font-size: 15px; margin-bottom: 8px; }
+  .lower p.soft { color: var(--soft); }
+  code { font-family: "Cascadia Mono", Consolas, monospace; font-size: 13.5px; }
 
-  .down { height: 20px; display: grid; place-items: center; }
-  .down::before { content: ""; width: 2px; height: 12px; background: #9aa0b4; }
-  .down::after { content: ""; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #9aa0b4; margin-top: -3px; }
-  .down { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-  .ms { display: flex; align-items: center; gap: 10px; background: var(--ink); color: #fff; border-radius: 10px; padding: 9px 12px; font-size: 15px; line-height: 1.3; }
-  .ms .diamond { background: #ffd27a; flex: none; }
-  .ms b { font-weight: 700; }
-  .ms span.sub { display: block; color: #c5cae0; font-size: 13px; }
-
-  .loop-wrap { position: relative; padding-right: 30px; }
-  .loop { position: absolute; right: 4px; top: 24px; bottom: 30px; width: 20px; border: 2px dashed #9aa0b4; border-left: none; border-radius: 0 14px 14px 0; }
-  .loop::before { content: ""; position: absolute; top: -7px; left: -6px; border-right: 9px solid #9aa0b4; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
-  .loop-label { position: absolute; right: -30px; top: 50%; transform: translateY(-50%) rotate(90deg); font-size: 12px; font-weight: 700; color: var(--muted); background: var(--card); padding: 0 5px; white-space: nowrap; letter-spacing: .05em; }
-
-  .note { margin-top: auto; padding-top: 12px; font-size: 14px; color: var(--muted); line-height: 1.4; }
-  .note b { color: var(--ink); }
-
-  .cards { display: grid; grid-template-columns: 1.25fr 1fr .85fr; gap: 20px; padding: 18px 48px 0; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 20px 16px; }
-  .card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-  .card ul { list-style: none; }
-  .card li { font-size: 15px; line-height: 1.4; padding-left: 20px; position: relative; margin-bottom: 5px; }
-  .card li::before { content: ""; position: absolute; left: 3px; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--both); }
-  .crit { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; }
-  .crit span { font-size: 14px; font-weight: 600; border: 1.5px solid var(--ink); border-radius: 99px; padding: 3px 11px; }
-  .card p { font-size: 15px; line-height: 1.4; margin-bottom: 7px; }
-  .card p.small { font-size: 14px; color: var(--muted); }
-  .file { font-family: Consolas, "Cascadia Mono", monospace; font-size: 14px; background: #f0eee8; border-radius: 5px; padding: 1px 6px; }
-  .reads li::before { background: var(--ai); }
-
-  footer { display: flex; justify-content: space-between; padding: 12px 48px 0; font-size: 13px; color: var(--muted); }
-  .wm { font-weight: 700; color: var(--ink); border: 1.5px solid var(--ink); border-radius: 99px; padding: 2px 10px; }
+  .bottom { margin-top: 26px; font-size: 13px; color: var(--faint); }
 </style>
 </head>
 <body>
-<header>
-  <div class="kicker">NASA Space Apps Challenge 2026 · 14–15 November</div>
-  <h1>Earth analogs for the Moon and Mars</h1>
-  <p class="goal">Find places on Earth that resemble Moon and Mars base sites, so crews can practise there first, and say honestly how close each match is and where it breaks down.</p>
-  <div class="planets">
-    <div class="pl"><div class="slot"><div class="planet moon"></div></div><span>Moon</span></div>
-    <div class="pl"><div class="slot"><div class="planet earth"></div></div><span>Earth</span></div>
-    <div class="pl"><div class="slot"><div class="planet mars"></div></div><span>Mars</span></div>
-  </div>
-</header>
 
-<div class="legend">
-  <b>Who does it:</b>
-  <span class="chip"><span class="dot team"></span>Team</span>
-  <span class="chip"><span class="dot ai"></span>Claude (our AI build assistant)</span>
-  <span class="chip"><span class="dot both"></span>Team + Claude</span>
-  <span class="chip"><span class="diamond"></span>Official date</span>
-  <span class="tz">Event times are in our Local Event's time zone</span>
+<div class="top">
+  <div>
+    <div class="caps eyebrow">NASA Space Apps Challenge 2026 · 14–15 November · Team workflow</div>
+    <h1>Earth analogs for the Moon and Mars</h1>
+    <p class="goal">Find places on Earth that resemble Moon and Mars base sites, so crews can practise there first, and say honestly how close each match is and where it breaks down.</p>
+  </div>
+  <div class="key">
+    <span class="caps">Who</span><div><span class="caps team">Team</span> &nbsp; <span class="caps claude">Claude</span> &nbsp; <span class="caps both">Both</span></div>
+    <span class="caps">Dates</span><div><span class="dia"></span> official date, Local Event time</div>
+  </div>
 </div>
 
-<section class="flow">
-  <div class="phase">
-    <div class="phase-head"><span class="num">1</span><h2>Plan</h2><span class="when">Before the event</span></div>
-    <div class="step ai"><span class="who">Claude</span>Research the challenge, the rules and how judging works<span class="done-tag">✓ Done</span></div>
-    <div class="down"></div>
-    <div class="step team here"><span class="here-tag">WE ARE HERE</span><span class="who">Team</span>Give the core idea<small>The idea has to come from us: official AI rule</small></div>
-    <div class="down"></div>
-    <div class="step both"><span class="who">Team + Claude</span>Questions and answers until the plan is final</div>
-    <div class="down"></div>
-    <div class="step ai"><span class="who">Claude · team approves</span>Write the spec: what we build, the tech stack and the roadmap</div>
+<div class="cols">
+  <div class="col">
+    <div class="head"><span class="n">01</span><h2>Plan</h2><span class="when">Before the event</span></div>
+    <div class="row"><span class="i">1</span><span class="o claude">Claude</span><span class="t">Research the challenge and how it's judged<span class="tag done">done</span></span></div>
+    <div class="row now"><span class="i">2</span><span class="o team">Team</span><span class="t">Give the core idea<span class="tag now">we are here</span><small>The idea has to be ours: official AI rule</small></span></div>
+    <div class="row"><span class="i">3</span><span class="o both">Both</span><span class="t">Questions and answers until the plan is final</span></div>
+    <div class="row"><span class="i">4</span><span class="o claude">Claude</span><span class="t">Write the spec: features, tech stack, roadmap<small>The team signs it off</small></span></div>
   </div>
 
-  <div class="between"><svg viewBox="0 0 34 34"><path d="M6 17h20M19 9l8 8-8 8" fill="none" stroke="#151a2e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-
-  <div class="phase">
-    <div class="phase-head"><span class="num">2</span><h2>Build</h2><span class="when">Saturday 14 Nov</span></div>
-    <div class="ms"><span class="diamond"></span><div><b>9:00</b> Submission opens</div></div>
-    <div class="down"></div>
-    <div class="loop-wrap">
-      <div class="step ai"><span class="who">Claude</span>Build in small steps<small>Every working step is saved, so any change can be undone</small></div>
-      <div class="down"></div>
-      <div class="step team"><span class="who">Team</span>Checkpoint: test the live site on a phone and a laptop<small>Try to break it · check numbers against the data · can a newcomer get a result in under a minute?</small></div>
-      <div class="loop"></div>
-      <span class="loop-label">FIX &amp; REPEAT</span>
-    </div>
-    <div class="down"></div>
-    <div class="ms"><span class="diamond"></span><div><b>Saturday night</b> First complete draft submitted</div></div>
+  <div class="col">
+    <div class="head"><span class="n">02</span><h2>Build</h2><span class="when">Saturday 14 Nov</span></div>
+    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">09:00</span><span class="t">Submission opens</span></div>
+    <div class="row"><span class="i">5</span><span class="o claude">Claude</span><span class="t">Build in small steps<small>Each working step is saved, so any change can be undone</small></span></div>
+    <div class="row"><span class="i">6</span><span class="o team">Team</span><span class="t">Checkpoint: test the live site on a phone and a laptop<small>Try to break it, check the numbers against the data, and see if a newcomer gets a result in under a minute</small></span></div>
+    <div class="row" style="border-top:none;padding-top:0"><span></span><span></span><span class="repeat">Repeat 5 and 6 until the freeze</span></div>
+    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">Night</span><span class="t">First complete draft submitted</span></div>
   </div>
 
-  <div class="between"><svg viewBox="0 0 34 34"><path d="M6 17h20M19 9l8 8-8 8" fill="none" stroke="#151a2e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-
-  <div class="phase">
-    <div class="phase-head"><span class="num">3</span><h2>Finish</h2><span class="when">Sunday 15 Nov</span></div>
-    <div class="ms"><span class="diamond"></span><div><b>18:00</b> Feature freeze</div></div>
-    <div class="down"></div>
-    <div class="step both"><span class="who">Team + Claude</span>Only fixes from here, plus the 30-second demo video and the project page<small>The project page carries most of the score</small></div>
-    <div class="down"></div>
-    <div class="ms"><span class="diamond"></span><div><b>21:00</b> Final submission<span class="sub">Three hours of margin: the deadline is 23:59</span></div></div>
-    <p class="note"><b>Before we click submit,</b> we go through the checklist in <span class="file">docs/guidelines.md</span>.</p>
+  <div class="col">
+    <div class="head"><span class="n">03</span><h2>Finish</h2><span class="when">Sunday 15 Nov</span></div>
+    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">18:00</span><span class="t">Feature freeze</span></div>
+    <div class="row"><span class="i">7</span><span class="o both">Both</span><span class="t">Fixes only, plus the 30&#8209;second demo video and the project page<small>The project page carries most of the score</small></span></div>
+    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">21:00</span><span class="t">Final submission<small>Three hours before the 23:59 deadline</small></span></div>
+    <p class="foot">Before submitting, we go through the checklist in <code>docs/guidelines.md</code>.</p>
   </div>
 
-  <div class="between"><svg viewBox="0 0 34 34"><path d="M6 17h20M19 9l8 8-8 8" fill="none" stroke="#151a2e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-
-  <div class="phase">
-    <div class="phase-head"><span class="num">4</span><h2>Judging</h2><span class="when">Dec 2026 – Jan 2027</span></div>
-    <div class="ms"><span class="diamond"></span><div><b>3 Dec</b> Global Nominees<span class="sub">Picked by local judges</span></div></div>
-    <div class="down"></div>
-    <div class="ms"><span class="diamond"></span><div><b>17 Dec</b> Global Finalists<span class="sub">Picked by global judges</span></div></div>
-    <div class="down"></div>
-    <div class="ms"><span class="diamond"></span><div><b>26 Jan 2027</b> Global Winners<span class="sub">Ten awards, given by NASA and partner&#8209;agency leaders</span></div></div>
-    <p class="note"><b>Our site stays online, unchanged, until then.</b> Judges open it weeks after the event.</p>
+  <div class="col">
+    <div class="head"><span class="n">04</span><h2>Judging</h2><span class="when">Dec 2026 – Jan 2027</span></div>
+    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">3 Dec</span><span class="t">Global Nominees<small>Picked by local judges</small></span></div>
+    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">17 Dec</span><span class="t">Global Finalists<small>Picked by global judges</small></span></div>
+    <div class="row ms"><span class="i"><span class="dia"></span></span><span class="o">26 Jan</span><span class="t">Global Winners, ten awards<small>Given by NASA and partner&#8209;agency leaders</small></span></div>
+    <p class="foot"><b>The site stays online, unchanged, until then.</b> Judges open it weeks after the event.</p>
   </div>
-</section>
+</div>
 
-<section class="cards">
-  <div class="card">
+<div class="lower">
+  <section>
     <h3>Rules we never break</h3>
     <ul>
       <li>Every match says what's similar, how similar, and where it breaks down.</li>
-      <li>Every number comes from a named dataset. Missing data shows as missing; we never guess.</li>
+      <li>Every number comes from a named dataset. Missing data stays missing; we never guess.</li>
       <li>NASA data does the main work.</li>
-      <li>We test our method on known analog sites first (Atacama, Haughton Crater, the Dry Valleys).</li>
+      <li>We check the method on known analog sites first: Atacama, Haughton Crater, the Dry Valleys.</li>
       <li>AI use is labelled where judges can see it.</li>
     </ul>
-  </div>
-  <div class="card">
+  </section>
+  <section>
     <h3>How we're judged</h3>
-    <p class="small">Five criteria, each scored 1 to 5:</p>
-    <div class="crit"><span>Impact</span><span>Creativity</span><span>Validity</span><span>Relevance</span><span>Presentation</span></div>
-    <p>Most of the score comes from our project page. The 30-second demo mainly lifts Presentation.</p>
-    <p class="small"><b style="color:var(--ink)">Awards we're aiming for:</b> Best Use of Science · Best Use of Data · Best Mission Concept</p>
-  </div>
-  <div class="card">
-    <h3>Read more in our repo</h3>
-    <ul class="reads">
-      <li><span class="file">docs/challenge.md</span><br>the challenge in plain words</li>
-      <li><span class="file">docs/guidelines.md</span><br>rules, data and the submission checklist</li>
-      <li><span class="file">docs/judging-notes.md</span><br>how judging works, past winners</li>
+    <p>Impact, Creativity, Validity, Relevance and Presentation, each scored 1 to 5.</p>
+    <p class="soft">Most of the score comes from the project page. The 30&#8209;second demo mainly lifts Presentation.</p>
+    <p class="soft">Aiming for Best Use of Science, Best Use of Data and Best Mission Concept.</p>
+  </section>
+  <section>
+    <h3>Read more</h3>
+    <ul>
+      <li><code>docs/challenge.md</code><br><span style="color:var(--soft)">the challenge in plain words</span></li>
+      <li><code>docs/guidelines.md</code><br><span style="color:var(--soft)">rules, data, submission checklist</span></li>
+      <li><code>docs/judging-notes.md</code><br><span style="color:var(--soft)">judging and past winners</span></li>
     </ul>
-  </div>
-</section>
+  </section>
+</div>
 
-<footer>
-  <span>Updated 13 November 2026</span>
-  <span class="wm">Made with AI (Claude)</span>
-</footer>
+<div class="bottom">Updated 13 November 2026</div>
 </body>
 </html>
