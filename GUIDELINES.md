@@ -25,9 +25,9 @@ Source: the Space Apps [Participant FAQ](https://www.spaceappschallenge.org/reso
 - Anything AI made has to be labelled where judges can see it:
   - images and video: a visible watermark;
   - audio: a note in the description and file metadata;
-  - code and data: a note in the description and metadata. We do this in the README and [AI-USE.md](AI-USE.md).
+  - code and data: a note in the description and metadata. We do this in the README's "How we used AI" section.
 - Nothing AI-generated may use or change NASA branding: no NASA logos, flags or mission insignia.
-- The submission form asks how we used AI. We answer it from AI-USE.md.
+- The submission form asks how we used AI. We answer it from the README section.
 
 **Other**
 - No photos, video, voices or likenesses of anyone under 18.
@@ -71,9 +71,10 @@ At least one NASA source must appear in the final project. The provided sources 
 
 ## 4. Roles
 
-- **Lead builder:** owns the repo, hosting and every decision.
-- **Reviewer:** builds nothing. At each checkpoint they open the live site on a phone and a laptop, try to break it, compare numbers on screen with the source data, and read the text as a newcomer would. They report problems to the lead as a short list, most serious first.
-- **Claude:** builds under the lead's direction; see [CLAUDE.md](CLAUDE.md).
+- **We build it together.** Both of us write code, work with data and make decisions as a team.
+- **Everyone follows the build.** Each of us knows what's being built, what changed and why, so either of us can explain any part to the judges. Share what you're working on before you start, and say what changed when you finish.
+- **At each checkpoint, both of us test the live site** on a phone and a laptop, try to break it, check the numbers on screen against the source data, and read the text as a newcomer would.
+- **Claude** builds under our direction; see [CLAUDE.md](CLAUDE.md).
 
 ## 5. Working rhythm
 

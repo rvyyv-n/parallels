@@ -8,7 +8,6 @@ Our NASA Space Apps 2026 entry for **Identify Earth Locations that Analog the Pe
 
 - `analogs/`: the project. Start with `analogs/theidea.md`.
 - `retired/`: earlier candidate challenges. Reference only; don't edit or build on them.
-- `AI-USE.md`: the log of what AI did, required by the competition.
 
 ## Not decided yet
 
@@ -17,9 +16,10 @@ Our NASA Space Apps 2026 entry for **Identify Earth Locations that Analog the Pe
 
 ## How Claude works here
 
-- **One orchestrator, two workers** for the build: a lead session directs a website worker and a data worker. It checks each result against tests before committing, and brings the lead builder only decisions and checkpoint results. We'll adjust this once the roadmap is done.
+- **One orchestrator, two workers** for the build: a lead session directs a website worker and a data worker. It checks each result against tests before committing, and brings the team only decisions and checkpoint results, in plain words both teammates can follow. We'll adjust this once the roadmap is done.
 - **The solution idea belongs to the team** (official AI rule). Claude researches, explains, lists options with trade-offs and builds what's chosen. It doesn't pick the core approach. When an idea comes from Claude rather than the team, say so.
-- **Log AI work in `AI-USE.md`** whenever Claude writes code, data, text or images that ship: one line saying what and where. This replaces the global "no AI attribution" rule for this repo only. Still no `Co-Authored-By` trailers or "Generated with" footers in commits or PRs; the label lives in AI-USE.md and the README.
+- **Keep the README's "How we used AI" section accurate** as Claude's role grows; the competition requires it. This replaces the global "no AI attribution" rule for this repo only. Still no `Co-Authored-By` trailers or "Generated with" footers in commits or PRs.
+- **Joint build:** both teammates build and must be able to follow every change. Explain each change in a way either of them can pick up.
 - **No AI images with NASA branding**, and every AI image or video gets a visible watermark.
 - **Every number has a source.** Never fill missing data with a guess; mark it missing.
 - **Plain language** in chat and user-facing text; exact values belong in technical docs.

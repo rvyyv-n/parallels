@@ -15,7 +15,7 @@ Our challenge: **Identify Earth Locations that Analog the Permanent Moon Base Lo
 
 ## How we used AI
 
-We use Claude (Anthropic) to help research and build. The idea and design decisions are ours. [AI-USE.md](AI-USE.md) logs what AI produced and where.
+We use Claude (Anthropic) to help research and build. The idea and design decisions are ours.
 
 ## Licence
 
