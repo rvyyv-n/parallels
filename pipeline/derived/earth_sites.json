@@ -1,0 +1,1879 @@
+{
+ "generated": "2026-11-14",
+ "sources": {
+  "climate": {
+   "name": "NASA POWER climatology (MERRA-2 and CERES SYN1deg), 2001-2025",
+   "url": "https://power.larc.nasa.gov/api/temporal/climatology/point"
+  },
+  "terrain": {
+   "name": "Copernicus DEM GLO-90 (ESA, on AWS Open Data)",
+   "url": "https://copernicus-dem-90m.s3.amazonaws.com/"
+  },
+  "sun": {
+   "name": "Computed from latitude (solar declination model)",
+   "url": null
+  }
+ },
+ "sites": [
+  {
+   "id": "mistastin-crater",
+   "values": {
+    "t_min_c": -46.56,
+    "t_max_c": 25.69,
+    "daily_range_c": 8.39,
+    "seasonal_swing_c": 72.25,
+    "frozen_months": 8,
+    "precip_mm_day": 2.6,
+    "rh_pct": 92.59,
+    "wind_ms": 5.94,
+    "sun_kwh_m2_day": 3.0089,
+    "noon_sun_deg": 34.12,
+    "lit_share": 0.5,
+    "elevation_m": 334.5,
+    "terrain_240": {
+     "slope_median_deg": 0.0,
+     "slope_p90_deg": 1.61,
+     "share_under_10": 1.0,
+     "share_under_5": 0.994,
+     "relief_m": 21.3
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.0,
+     "slope_p90_deg": 1.65,
+     "share_under_10": 1.0,
+     "share_under_5": 0.99,
+     "relief_m": 20.9
+    }
+   }
+  },
+  {
+   "id": "haughton-crater-devon-island",
+   "values": {
+    "t_min_c": -48.55,
+    "t_max_c": 16.81,
+    "daily_range_c": 4.64,
+    "seasonal_swing_c": 65.36,
+    "frozen_months": 9,
+    "precip_mm_day": 0.85,
+    "rh_pct": 94.36,
+    "wind_ms": 4.11,
+    "sun_kwh_m2_day": 2.3155,
+    "noon_sun_deg": 16.28,
+    "lit_share": 0.5,
+    "elevation_m": 155.5,
+    "terrain_240": {
+     "slope_median_deg": 2.35,
+     "slope_p90_deg": 5.91,
+     "share_under_10": 0.979,
+     "share_under_5": 0.853,
+     "relief_m": 108.2
+    },
+    "terrain_200": {
+     "slope_median_deg": 2.62,
+     "slope_p90_deg": 6.54,
+     "share_under_10": 0.968,
+     "share_under_5": 0.814,
+     "relief_m": 106.2
+    }
+   }
+  },
+  {
+   "id": "lofoten",
+   "values": {
+    "t_min_c": -7.83,
+    "t_max_c": 22.29,
+    "daily_range_c": 1.94,
+    "seasonal_swing_c": 30.12,
+    "frozen_months": 0,
+    "precip_mm_day": 3.01,
+    "rh_pct": 81.19,
+    "wind_ms": 6.96,
+    "sun_kwh_m2_day": 2.0114,
+    "noon_sun_deg": 22.02,
+    "lit_share": 0.5,
+    "elevation_m": 165.5,
+    "terrain_240": {
+     "slope_median_deg": 18.62,
+     "slope_p90_deg": 33.24,
+     "share_under_10": 0.215,
+     "share_under_5": 0.085,
+     "relief_m": 504.8
+    },
+    "terrain_200": {
+     "slope_median_deg": 20.01,
+     "slope_p90_deg": 35.85,
+     "share_under_10": 0.214,
+     "share_under_5": 0.084,
+     "relief_m": 509.7
+    }
+   }
+  },
+  {
+   "id": "black-point-lava-flow",
+   "values": {
+    "t_min_c": -16.02,
+    "t_max_c": 40.98,
+    "daily_range_c": 15.45,
+    "seasonal_swing_c": 57.0,
+    "frozen_months": 0,
+    "precip_mm_day": 0.93,
+    "rh_pct": 41.85,
+    "wind_ms": 3.74,
+    "sun_kwh_m2_day": 5.5637,
+    "noon_sun_deg": 54.3,
+    "lit_share": 0.5,
+    "elevation_m": 1518.2,
+    "terrain_240": {
+     "slope_median_deg": 1.1,
+     "slope_p90_deg": 6.1,
+     "share_under_10": 0.982,
+     "share_under_5": 0.866,
+     "relief_m": 259.8
+    },
+    "terrain_200": {
+     "slope_median_deg": 1.11,
+     "slope_p90_deg": 6.15,
+     "share_under_10": 0.978,
+     "share_under_5": 0.861,
+     "relief_m": 259.9
+    }
+   }
+  },
+  {
+   "id": "cinder-lake-crater-field",
+   "values": {
+    "t_min_c": -16.02,
+    "t_max_c": 40.98,
+    "daily_range_c": 15.45,
+    "seasonal_swing_c": 57.0,
+    "frozen_months": 0,
+    "precip_mm_day": 0.93,
+    "rh_pct": 41.85,
+    "wind_ms": 3.74,
+    "sun_kwh_m2_day": 5.5637,
+    "noon_sun_deg": 54.7,
+    "lit_share": 0.5,
+    "elevation_m": 2015.3,
+    "terrain_240": {
+     "slope_median_deg": 3.3,
+     "slope_p90_deg": 11.5,
+     "share_under_10": 0.856,
+     "share_under_5": 0.66,
+     "relief_m": 364.1
+    },
+    "terrain_200": {
+     "slope_median_deg": 3.49,
+     "slope_p90_deg": 12.4,
+     "share_under_10": 0.842,
+     "share_under_5": 0.646,
+     "relief_m": 366.0
+    }
+   }
+  },
+  {
+   "id": "meteor-crater",
+   "values": {
+    "t_min_c": -22.36,
+    "t_max_c": 37.83,
+    "daily_range_c": 14.49,
+    "seasonal_swing_c": 60.19,
+    "frozen_months": 0,
+    "precip_mm_day": 1.14,
+    "rh_pct": 47.71,
+    "wind_ms": 3.9,
+    "sun_kwh_m2_day": 5.5637,
+    "noon_sun_deg": 54.97,
+    "lit_share": 0.5,
+    "elevation_m": 1674.2,
+    "terrain_240": {
+     "slope_median_deg": 0.75,
+     "slope_p90_deg": 1.54,
+     "share_under_10": 0.99,
+     "share_under_5": 0.985,
+     "relief_m": 85.1
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.78,
+     "slope_p90_deg": 1.62,
+     "share_under_10": 0.989,
+     "share_under_5": 0.986,
+     "relief_m": 85.5
+    }
+   }
+  },
+  {
+   "id": "kilbourne-hole",
+   "values": {
+    "t_min_c": -13.61,
+    "t_max_c": 42.55,
+    "daily_range_c": 15.04,
+    "seasonal_swing_c": 56.16,
+    "frozen_months": 0,
+    "precip_mm_day": 0.63,
+    "rh_pct": 39.08,
+    "wind_ms": 4.0,
+    "sun_kwh_m2_day": 5.8987,
+    "noon_sun_deg": 58.03,
+    "lit_share": 0.5,
+    "elevation_m": 1278.3,
+    "terrain_240": {
+     "slope_median_deg": 0.45,
+     "slope_p90_deg": 1.61,
+     "share_under_10": 0.992,
+     "share_under_5": 0.963,
+     "relief_m": 45.0
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.52,
+     "slope_p90_deg": 2.96,
+     "share_under_10": 0.949,
+     "share_under_5": 0.922,
+     "relief_m": 71.2
+    }
+   }
+  },
+  {
+   "id": "sedan-crater",
+   "values": {
+    "t_min_c": -12.11,
+    "t_max_c": 41.62,
+    "daily_range_c": 13.91,
+    "seasonal_swing_c": 53.73,
+    "frozen_months": 0,
+    "precip_mm_day": 0.37,
+    "rh_pct": 34.29,
+    "wind_ms": 4.02,
+    "sun_kwh_m2_day": 5.5673,
+    "noon_sun_deg": 52.82,
+    "lit_share": 0.5,
+    "elevation_m": 1377.7,
+    "terrain_240": {
+     "slope_median_deg": 2.11,
+     "slope_p90_deg": 9.48,
+     "share_under_10": 0.908,
+     "share_under_5": 0.744,
+     "relief_m": 354.0
+    },
+    "terrain_200": {
+     "slope_median_deg": 2.17,
+     "slope_p90_deg": 10.01,
+     "share_under_10": 0.9,
+     "share_under_5": 0.743,
+     "relief_m": 360.1
+    }
+   }
+  },
+  {
+   "id": "sudbury",
+   "values": {
+    "t_min_c": -43.46,
+    "t_max_c": 36.55,
+    "daily_range_c": 10.43,
+    "seasonal_swing_c": 80.01,
+    "frozen_months": 5,
+    "precip_mm_day": 2.24,
+    "rh_pct": 83.88,
+    "wind_ms": 2.64,
+    "sun_kwh_m2_day": 3.516,
+    "noon_sun_deg": 43.4,
+    "lit_share": 0.5,
+    "elevation_m": 276.7,
+    "terrain_240": {
+     "slope_median_deg": 0.39,
+     "slope_p90_deg": 2.13,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 32.6
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.44,
+     "slope_p90_deg": 2.51,
+     "share_under_10": 1.0,
+     "share_under_5": 0.996,
+     "relief_m": 33.4
+    }
+   }
+  },
+  {
+   "id": "ries-crater",
+   "values": {
+    "t_min_c": -19.07,
+    "t_max_c": 36.32,
+    "daily_range_c": 9.0,
+    "seasonal_swing_c": 55.39,
+    "frozen_months": 3,
+    "precip_mm_day": 2.05,
+    "rh_pct": 81.27,
+    "wind_ms": 3.95,
+    "sun_kwh_m2_day": 3.2539,
+    "noon_sun_deg": 41.12,
+    "lit_share": 0.5,
+    "elevation_m": 418.9,
+    "terrain_240": {
+     "slope_median_deg": 0.38,
+     "slope_p90_deg": 0.88,
+     "share_under_10": 1.0,
+     "share_under_5": 0.999,
+     "relief_m": 19.5
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.41,
+     "slope_p90_deg": 1.03,
+     "share_under_10": 1.0,
+     "share_under_5": 0.997,
+     "relief_m": 19.8
+    }
+   }
+  },
+  {
+   "id": "lanzarote",
+   "values": {
+    "t_min_c": 13.0,
+    "t_max_c": 28.47,
+    "daily_range_c": 2.35,
+    "seasonal_swing_c": 15.47,
+    "frozen_months": 0,
+    "precip_mm_day": 0.3,
+    "rh_pct": 78.06,
+    "wind_ms": 6.45,
+    "sun_kwh_m2_day": 5.1655,
+    "noon_sun_deg": 60.84,
+    "lit_share": 0.5,
+    "elevation_m": 157.3,
+    "terrain_240": {
+     "slope_median_deg": 4.31,
+     "slope_p90_deg": 13.89,
+     "share_under_10": 0.796,
+     "share_under_5": 0.583,
+     "relief_m": 388.8
+    },
+    "terrain_200": {
+     "slope_median_deg": 4.24,
+     "slope_p90_deg": 15.24,
+     "share_under_10": 0.781,
+     "share_under_5": 0.569,
+     "relief_m": 389.7
+    }
+   }
+  },
+  {
+   "id": "mauna-kea",
+   "values": {
+    "t_min_c": 12.75,
+    "t_max_c": 28.67,
+    "daily_range_c": 5.2,
+    "seasonal_swing_c": 15.92,
+    "frozen_months": 0,
+    "precip_mm_day": 4.41,
+    "rh_pct": 82.05,
+    "wind_ms": 4.83,
+    "sun_kwh_m2_day": 5.28,
+    "noon_sun_deg": 69.34,
+    "lit_share": 0.5,
+    "elevation_m": 3213.3,
+    "terrain_240": {
+     "slope_median_deg": 11.22,
+     "slope_p90_deg": 18.15,
+     "share_under_10": 0.425,
+     "share_under_5": 0.057,
+     "relief_m": 1792.6
+    },
+    "terrain_200": {
+     "slope_median_deg": 11.57,
+     "slope_p90_deg": 18.67,
+     "share_under_10": 0.406,
+     "share_under_5": 0.059,
+     "relief_m": 1789.7
+    }
+   }
+  },
+  {
+   "id": "askja",
+   "values": {
+    "t_min_c": -23.83,
+    "t_max_c": 10.31,
+    "daily_range_c": 4.1,
+    "seasonal_swing_c": 34.14,
+    "frozen_months": 8,
+    "precip_mm_day": 2.36,
+    "rh_pct": 94.09,
+    "wind_ms": 6.3,
+    "sun_kwh_m2_day": 2.4878,
+    "noon_sun_deg": 24.95,
+    "lit_share": 0.5,
+    "elevation_m": 1138.7,
+    "terrain_240": {
+     "slope_median_deg": 3.47,
+     "slope_p90_deg": 14.64,
+     "share_under_10": 0.794,
+     "share_under_5": 0.587,
+     "relief_m": 318.7
+    },
+    "terrain_200": {
+     "slope_median_deg": 3.37,
+     "slope_p90_deg": 15.49,
+     "share_under_10": 0.775,
+     "share_under_5": 0.583,
+     "relief_m": 314.9
+    }
+   }
+  },
+  {
+   "id": "etna",
+   "values": {
+    "t_min_c": -0.22,
+    "t_max_c": 39.87,
+    "daily_range_c": 6.85,
+    "seasonal_swing_c": 40.09,
+    "frozen_months": 0,
+    "precip_mm_day": 1.72,
+    "rh_pct": 72.5,
+    "wind_ms": 4.12,
+    "sun_kwh_m2_day": 4.681,
+    "noon_sun_deg": 52.25,
+    "lit_share": 0.5,
+    "elevation_m": 2104.5,
+    "terrain_240": {
+     "slope_median_deg": 14.37,
+     "slope_p90_deg": 25.16,
+     "share_under_10": 0.263,
+     "share_under_5": 0.023,
+     "relief_m": 1303.2
+    },
+    "terrain_200": {
+     "slope_median_deg": 14.56,
+     "slope_p90_deg": 25.64,
+     "share_under_10": 0.264,
+     "share_under_5": 0.022,
+     "relief_m": 1303.5
+    }
+   }
+  },
+  {
+   "id": "teide",
+   "values": {
+    "t_min_c": 13.5,
+    "t_max_c": 29.22,
+    "daily_range_c": 2.24,
+    "seasonal_swing_c": 15.72,
+    "frozen_months": 0,
+    "precip_mm_day": 0.68,
+    "rh_pct": 77.2,
+    "wind_ms": 5.75,
+    "sun_kwh_m2_day": 5.2154,
+    "noon_sun_deg": 61.74,
+    "lit_share": 0.5,
+    "elevation_m": 2256.2,
+    "terrain_240": {
+     "slope_median_deg": 10.98,
+     "slope_p90_deg": 27.98,
+     "share_under_10": 0.471,
+     "share_under_5": 0.246,
+     "relief_m": 1128.7
+    },
+    "terrain_200": {
+     "slope_median_deg": 11.44,
+     "slope_p90_deg": 28.66,
+     "share_under_10": 0.454,
+     "share_under_5": 0.222,
+     "relief_m": 1139.3
+    }
+   }
+  },
+  {
+   "id": "yungay-atacama",
+   "values": {
+    "t_min_c": -0.64,
+    "t_max_c": 32.93,
+    "daily_range_c": 14.74,
+    "seasonal_swing_c": 33.57,
+    "frozen_months": 0,
+    "precip_mm_day": 0.02,
+    "rh_pct": 44.09,
+    "wind_ms": 3.03,
+    "sun_kwh_m2_day": 5.9551,
+    "noon_sun_deg": 65.9,
+    "lit_share": 0.5,
+    "elevation_m": 1100.6,
+    "terrain_240": {
+     "slope_median_deg": 3.78,
+     "slope_p90_deg": 9.87,
+     "share_under_10": 0.903,
+     "share_under_5": 0.626,
+     "relief_m": 282.7
+    },
+    "terrain_200": {
+     "slope_median_deg": 4.05,
+     "slope_p90_deg": 11.89,
+     "share_under_10": 0.845,
+     "share_under_5": 0.578,
+     "relief_m": 290.2
+    }
+   }
+  },
+  {
+   "id": "mcmurdo-dry-valleys",
+   "values": {
+    "t_min_c": -49.62,
+    "t_max_c": -2.2,
+    "daily_range_c": 5.23,
+    "seasonal_swing_c": 47.42,
+    "frozen_months": 12,
+    "precip_mm_day": 0.2,
+    "rh_pct": 81.74,
+    "wind_ms": 6.07,
+    "sun_kwh_m2_day": 2.9993,
+    "noon_sun_deg": 14.82,
+    "lit_share": 0.5,
+    "elevation_m": 752.6,
+    "terrain_240": {
+     "slope_median_deg": 15.15,
+     "slope_p90_deg": 29.31,
+     "share_under_10": 0.31,
+     "share_under_5": 0.147,
+     "relief_m": 1263.2
+    },
+    "terrain_200": {
+     "slope_median_deg": 15.42,
+     "slope_p90_deg": 30.5,
+     "share_under_10": 0.312,
+     "share_under_5": 0.156,
+     "relief_m": 1270.4
+    }
+   }
+  },
+  {
+   "id": "gypsum-hill-axel-heiberg",
+   "values": {
+    "t_min_c": -50.46,
+    "t_max_c": 11.39,
+    "daily_range_c": 4.13,
+    "seasonal_swing_c": 61.85,
+    "frozen_months": 11,
+    "precip_mm_day": 0.82,
+    "rh_pct": 93.09,
+    "wind_ms": 2.67,
+    "sun_kwh_m2_day": 2.5373,
+    "noon_sun_deg": 13.54,
+    "lit_share": 0.5,
+    "elevation_m": 225.6,
+    "terrain_240": {
+     "slope_median_deg": 9.06,
+     "slope_p90_deg": 19.42,
+     "share_under_10": 0.554,
+     "share_under_5": 0.299,
+     "relief_m": 720.7
+    },
+    "terrain_200": {
+     "slope_median_deg": 9.28,
+     "slope_p90_deg": 20.32,
+     "share_under_10": 0.533,
+     "share_under_5": 0.295,
+     "relief_m": 720.5
+    }
+   }
+  },
+  {
+   "id": "bockfjorden-svalbard",
+   "values": {
+    "t_min_c": -40.09,
+    "t_max_c": 11.85,
+    "daily_range_c": 3.57,
+    "seasonal_swing_c": 51.94,
+    "frozen_months": 10,
+    "precip_mm_day": 1.82,
+    "rh_pct": 94.8,
+    "wind_ms": 4.4,
+    "sun_kwh_m2_day": 2.0894,
+    "noon_sun_deg": 13.52,
+    "lit_share": 0.5,
+    "elevation_m": 325.4,
+    "terrain_240": {
+     "slope_median_deg": 14.87,
+     "slope_p90_deg": 29.8,
+     "share_under_10": 0.354,
+     "share_under_5": 0.176,
+     "relief_m": 803.1
+    },
+    "terrain_200": {
+     "slope_median_deg": 15.43,
+     "slope_p90_deg": 31.72,
+     "share_under_10": 0.359,
+     "share_under_5": 0.18,
+     "relief_m": 795.6
+    }
+   }
+  },
+  {
+   "id": "rio-tinto",
+   "values": {
+    "t_min_c": -4.61,
+    "t_max_c": 46.26,
+    "daily_range_c": 13.45,
+    "seasonal_swing_c": 50.87,
+    "frozen_months": 0,
+    "precip_mm_day": 1.28,
+    "rh_pct": 62.53,
+    "wind_ms": 3.61,
+    "sun_kwh_m2_day": 5.0191,
+    "noon_sun_deg": 52.6,
+    "lit_share": 0.5,
+    "elevation_m": 77.0,
+    "terrain_240": {
+     "slope_median_deg": 1.18,
+     "slope_p90_deg": 2.82,
+     "share_under_10": 1.0,
+     "share_under_5": 0.997,
+     "relief_m": 94.0
+    },
+    "terrain_200": {
+     "slope_median_deg": 1.25,
+     "slope_p90_deg": 2.95,
+     "share_under_10": 1.0,
+     "share_under_5": 0.992,
+     "relief_m": 94.4
+    }
+   }
+  },
+  {
+   "id": "mdrs-utah",
+   "values": {
+    "t_min_c": -19.96,
+    "t_max_c": 41.12,
+    "daily_range_c": 13.64,
+    "seasonal_swing_c": 61.08,
+    "frozen_months": 2,
+    "precip_mm_day": 0.66,
+    "rh_pct": 43.14,
+    "wind_ms": 3.56,
+    "sun_kwh_m2_day": 5.2874,
+    "noon_sun_deg": 51.59,
+    "lit_share": 0.5,
+    "elevation_m": 1381.2,
+    "terrain_240": {
+     "slope_median_deg": 1.74,
+     "slope_p90_deg": 5.46,
+     "share_under_10": 0.985,
+     "share_under_5": 0.884,
+     "relief_m": 170.2
+    },
+    "terrain_200": {
+     "slope_median_deg": 1.79,
+     "slope_p90_deg": 6.0,
+     "share_under_10": 0.975,
+     "share_under_5": 0.858,
+     "relief_m": 169.7
+    }
+   }
+  },
+  {
+   "id": "qaidam-dalangtan",
+   "values": {
+    "t_min_c": -24.0,
+    "t_max_c": 34.76,
+    "daily_range_c": 13.27,
+    "seasonal_swing_c": 58.76,
+    "frozen_months": 4,
+    "precip_mm_day": 0.17,
+    "rh_pct": 28.26,
+    "wind_ms": 4.04,
+    "sun_kwh_m2_day": 5.4329,
+    "noon_sun_deg": 52.73,
+    "lit_share": 0.5,
+    "elevation_m": 2695.6,
+    "terrain_240": {
+     "slope_median_deg": 0.2,
+     "slope_p90_deg": 0.39,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 24.2
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.21,
+     "slope_p90_deg": 0.43,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 24.2
+    }
+   }
+  },
+  {
+   "id": "tso-kar",
+   "values": {
+    "t_min_c": -40.01,
+    "t_max_c": 20.99,
+    "daily_range_c": 12.91,
+    "seasonal_swing_c": 61.0,
+    "frozen_months": 8,
+    "precip_mm_day": 0.62,
+    "rh_pct": 56.53,
+    "wind_ms": 3.37,
+    "sun_kwh_m2_day": 4.9075,
+    "noon_sun_deg": 56.7,
+    "lit_share": 0.5,
+    "elevation_m": 4555.6,
+    "terrain_240": {
+     "slope_median_deg": 1.16,
+     "slope_p90_deg": 17.08,
+     "share_under_10": 0.741,
+     "share_under_5": 0.647,
+     "relief_m": 484.9
+    },
+    "terrain_200": {
+     "slope_median_deg": 1.18,
+     "slope_p90_deg": 17.7,
+     "share_under_10": 0.736,
+     "share_under_5": 0.65,
+     "relief_m": 483.9
+    }
+   }
+  },
+  {
+   "id": "puga-valley",
+   "values": {
+    "t_min_c": -37.68,
+    "t_max_c": 19.76,
+    "daily_range_c": 12.71,
+    "seasonal_swing_c": 57.44,
+    "frozen_months": 8,
+    "precip_mm_day": 0.85,
+    "rh_pct": 61.63,
+    "wind_ms": 3.61,
+    "sun_kwh_m2_day": 5.2846,
+    "noon_sun_deg": 56.78,
+    "lit_share": 0.5,
+    "elevation_m": 4844.4,
+    "terrain_240": {
+     "slope_median_deg": 13.9,
+     "slope_p90_deg": 24.91,
+     "share_under_10": 0.285,
+     "share_under_5": 0.116,
+     "relief_m": 866.5
+    },
+    "terrain_200": {
+     "slope_median_deg": 14.4,
+     "slope_p90_deg": 25.67,
+     "share_under_10": 0.28,
+     "share_under_5": 0.118,
+     "relief_m": 867.8
+    }
+   }
+  },
+  {
+   "id": "kangerlussuaq",
+   "values": {
+    "t_min_c": -40.67,
+    "t_max_c": 20.68,
+    "daily_range_c": 7.4,
+    "seasonal_swing_c": 61.35,
+    "frozen_months": 8,
+    "precip_mm_day": 1.14,
+    "rh_pct": 80.98,
+    "wind_ms": 3.61,
+    "sun_kwh_m2_day": 2.5697,
+    "noon_sun_deg": 23.02,
+    "lit_share": 0.5,
+    "elevation_m": 166.2,
+    "terrain_240": {
+     "slope_median_deg": 6.47,
+     "slope_p90_deg": 16.09,
+     "share_under_10": 0.682,
+     "share_under_5": 0.411,
+     "relief_m": 439.8
+    },
+    "terrain_200": {
+     "slope_median_deg": 6.96,
+     "slope_p90_deg": 16.8,
+     "share_under_10": 0.663,
+     "share_under_5": 0.398,
+     "relief_m": 446.7
+    }
+   }
+  },
+  {
+   "id": "makgadikgadi",
+   "values": {
+    "t_min_c": 1.44,
+    "t_max_c": 42.43,
+    "daily_range_c": 15.03,
+    "seasonal_swing_c": 40.99,
+    "frozen_months": 0,
+    "precip_mm_day": 1.16,
+    "rh_pct": 41.53,
+    "wind_ms": 4.07,
+    "sun_kwh_m2_day": 6.0192,
+    "noon_sun_deg": 68.73,
+    "lit_share": 0.5,
+    "elevation_m": 901.6,
+    "terrain_240": {
+     "slope_median_deg": 0.01,
+     "slope_p90_deg": 0.02,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 1.8
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.01,
+     "slope_p90_deg": 0.02,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 1.8
+    }
+   }
+  },
+  {
+   "id": "pavilion-lake",
+   "values": {
+    "t_min_c": -35.98,
+    "t_max_c": 32.45,
+    "daily_range_c": 10.76,
+    "seasonal_swing_c": 68.43,
+    "frozen_months": 5,
+    "precip_mm_day": 1.38,
+    "rh_pct": 77.69,
+    "wind_ms": 1.66,
+    "sun_kwh_m2_day": 3.5383,
+    "noon_sun_deg": 39.13,
+    "lit_share": 0.5,
+    "elevation_m": 1281.0,
+    "terrain_240": {
+     "slope_median_deg": 11.27,
+     "slope_p90_deg": 28.79,
+     "share_under_10": 0.438,
+     "share_under_5": 0.144,
+     "relief_m": 1048.2
+    },
+    "terrain_200": {
+     "slope_median_deg": 11.78,
+     "slope_p90_deg": 30.51,
+     "share_under_10": 0.421,
+     "share_under_5": 0.144,
+     "relief_m": 1055.5
+    }
+   }
+  },
+  {
+   "id": "laguna-de-tirez",
+   "values": {
+    "t_min_c": -7.98,
+    "t_max_c": 42.03,
+    "daily_range_c": 13.1,
+    "seasonal_swing_c": 50.01,
+    "frozen_months": 0,
+    "precip_mm_day": 1.05,
+    "rh_pct": 60.67,
+    "wind_ms": 3.78,
+    "sun_kwh_m2_day": 4.9042,
+    "noon_sun_deg": 50.46,
+    "lit_share": 0.5,
+    "elevation_m": 666.2,
+    "terrain_240": {
+     "slope_median_deg": 0.63,
+     "slope_p90_deg": 1.26,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 39.1
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.68,
+     "slope_p90_deg": 1.39,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 39.2
+    }
+   }
+  },
+  {
+   "id": "spotted-lake",
+   "values": {
+    "t_min_c": -35.2,
+    "t_max_c": 36.79,
+    "daily_range_c": 11.93,
+    "seasonal_swing_c": 71.99,
+    "frozen_months": 4,
+    "precip_mm_day": 1.09,
+    "rh_pct": 71.27,
+    "wind_ms": 1.82,
+    "sun_kwh_m2_day": 3.5731,
+    "noon_sun_deg": 40.92,
+    "lit_share": 0.5,
+    "elevation_m": 632.8,
+    "terrain_240": {
+     "slope_median_deg": 10.59,
+     "slope_p90_deg": 21.88,
+     "share_under_10": 0.477,
+     "share_under_5": 0.261,
+     "relief_m": 843.5
+    },
+    "terrain_200": {
+     "slope_median_deg": 10.73,
+     "slope_p90_deg": 22.77,
+     "share_under_10": 0.464,
+     "share_under_5": 0.259,
+     "relief_m": 840.5
+    }
+   }
+  },
+  {
+   "id": "salar-de-pajonales",
+   "values": {
+    "t_min_c": -16.99,
+    "t_max_c": 23.51,
+    "daily_range_c": 15.22,
+    "seasonal_swing_c": 40.5,
+    "frozen_months": 3,
+    "precip_mm_day": 0.37,
+    "rh_pct": 29.41,
+    "wind_ms": 4.48,
+    "sun_kwh_m2_day": 7.1165,
+    "noon_sun_deg": 64.86,
+    "lit_share": 0.5,
+    "elevation_m": 3534.2,
+    "terrain_240": {
+     "slope_median_deg": 0.07,
+     "slope_p90_deg": 3.9,
+     "share_under_10": 0.952,
+     "share_under_5": 0.911,
+     "relief_m": 81.3
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.08,
+     "slope_p90_deg": 3.72,
+     "share_under_10": 0.945,
+     "share_under_5": 0.911,
+     "relief_m": 79.1
+    }
+   }
+  },
+  {
+   "id": "gros-morne",
+   "values": {
+    "t_min_c": -29.92,
+    "t_max_c": 27.74,
+    "daily_range_c": 7.74,
+    "seasonal_swing_c": 57.66,
+    "frozen_months": 6,
+    "precip_mm_day": 3.76,
+    "rh_pct": 90.92,
+    "wind_ms": 2.83,
+    "sun_kwh_m2_day": 2.9621,
+    "noon_sun_deg": 40.38,
+    "lit_share": 0.5,
+    "elevation_m": 601.5,
+    "terrain_240": {
+     "slope_median_deg": 7.93,
+     "slope_p90_deg": 31.52,
+     "share_under_10": 0.566,
+     "share_under_5": 0.321,
+     "relief_m": 581.2
+    },
+    "terrain_200": {
+     "slope_median_deg": 8.21,
+     "slope_p90_deg": 32.99,
+     "share_under_10": 0.56,
+     "share_under_5": 0.305,
+     "relief_m": 583.4
+    }
+   }
+  },
+  {
+   "id": "argentine-puna",
+   "values": {
+    "t_min_c": -21.94,
+    "t_max_c": 20.89,
+    "daily_range_c": 15.31,
+    "seasonal_swing_c": 42.83,
+    "frozen_months": 4,
+    "precip_mm_day": 2.1,
+    "rh_pct": 46.89,
+    "wind_ms": 5.1,
+    "sun_kwh_m2_day": 6.5714,
+    "noon_sun_deg": 64.0,
+    "lit_share": 0.5,
+    "elevation_m": 4756.6,
+    "terrain_240": {
+     "slope_median_deg": 4.46,
+     "slope_p90_deg": 17.17,
+     "share_under_10": 0.706,
+     "share_under_5": 0.535,
+     "relief_m": 863.8
+    },
+    "terrain_200": {
+     "slope_median_deg": 4.47,
+     "slope_p90_deg": 18.3,
+     "share_under_10": 0.699,
+     "share_under_5": 0.53,
+     "relief_m": 844.8
+    }
+   }
+  },
+  {
+   "id": "death-valley",
+   "values": {
+    "t_min_c": -6.16,
+    "t_max_c": 46.22,
+    "daily_range_c": 14.65,
+    "seasonal_swing_c": 52.38,
+    "frozen_months": 0,
+    "precip_mm_day": 0.34,
+    "rh_pct": 29.33,
+    "wind_ms": 2.97,
+    "sun_kwh_m2_day": 5.7024,
+    "noon_sun_deg": 53.5,
+    "lit_share": 0.5,
+    "elevation_m": 79.7,
+    "terrain_240": {
+     "slope_median_deg": 4.92,
+     "slope_p90_deg": 23.85,
+     "share_under_10": 0.628,
+     "share_under_5": 0.504,
+     "relief_m": 1036.7
+    },
+    "terrain_200": {
+     "slope_median_deg": 4.91,
+     "slope_p90_deg": 25.26,
+     "share_under_10": 0.622,
+     "share_under_5": 0.506,
+     "relief_m": 1041.1
+    }
+   }
+  },
+  {
+   "id": "craters-of-the-moon",
+   "values": {
+    "t_min_c": -32.62,
+    "t_max_c": 36.91,
+    "daily_range_c": 12.35,
+    "seasonal_swing_c": 69.53,
+    "frozen_months": 5,
+    "precip_mm_day": 1.14,
+    "rh_pct": 59.83,
+    "wind_ms": 3.37,
+    "sun_kwh_m2_day": 4.5494,
+    "noon_sun_deg": 46.58,
+    "lit_share": 0.5,
+    "elevation_m": 1733.9,
+    "terrain_240": {
+     "slope_median_deg": 0.9,
+     "slope_p90_deg": 4.14,
+     "share_under_10": 0.988,
+     "share_under_5": 0.927,
+     "relief_m": 135.0
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.95,
+     "slope_p90_deg": 4.62,
+     "share_under_10": 0.982,
+     "share_under_5": 0.913,
+     "relief_m": 134.5
+    }
+   }
+  },
+  {
+   "id": "kilauea-iki",
+   "values": {
+    "t_min_c": 15.34,
+    "t_max_c": 29.05,
+    "daily_range_c": 3.71,
+    "seasonal_swing_c": 13.71,
+    "frozen_months": 0,
+    "precip_mm_day": 6.3,
+    "rh_pct": 83.25,
+    "wind_ms": 5.01,
+    "sun_kwh_m2_day": 5.28,
+    "noon_sun_deg": 69.6,
+    "lit_share": 0.5,
+    "elevation_m": 984.1,
+    "terrain_240": {
+     "slope_median_deg": 2.65,
+     "slope_p90_deg": 4.33,
+     "share_under_10": 0.989,
+     "share_under_5": 0.954,
+     "relief_m": 349.3
+    },
+    "terrain_200": {
+     "slope_median_deg": 2.68,
+     "slope_p90_deg": 4.44,
+     "share_under_10": 0.986,
+     "share_under_5": 0.941,
+     "relief_m": 345.9
+    }
+   }
+  },
+  {
+   "id": "bletterbach",
+   "values": {
+    "t_min_c": -31.47,
+    "t_max_c": 28.11,
+    "daily_range_c": 9.98,
+    "seasonal_swing_c": 59.58,
+    "frozen_months": 5,
+    "precip_mm_day": 2.54,
+    "rh_pct": 80.59,
+    "wind_ms": 1.44,
+    "sun_kwh_m2_day": 3.5669,
+    "noon_sun_deg": 43.65,
+    "lit_share": 0.5,
+    "elevation_m": 1567.2,
+    "terrain_240": {
+     "slope_median_deg": 14.11,
+     "slope_p90_deg": 26.24,
+     "share_under_10": 0.278,
+     "share_under_5": 0.059,
+     "relief_m": 877.3
+    },
+    "terrain_200": {
+     "slope_median_deg": 14.83,
+     "slope_p90_deg": 28.14,
+     "share_under_10": 0.259,
+     "share_under_5": 0.053,
+     "relief_m": 883.9
+    }
+   }
+  },
+  {
+   "id": "chill-ice-lava-tube",
+   "values": {
+    "t_min_c": -23.28,
+    "t_max_c": 22.59,
+    "daily_range_c": 5.76,
+    "seasonal_swing_c": 45.87,
+    "frozen_months": 7,
+    "precip_mm_day": 3.4,
+    "rh_pct": 89.92,
+    "wind_ms": 5.78,
+    "sun_kwh_m2_day": 2.2601,
+    "noon_sun_deg": 25.21,
+    "lit_share": 0.5,
+    "elevation_m": 379.0,
+    "terrain_240": {
+     "slope_median_deg": 1.35,
+     "slope_p90_deg": 9.75,
+     "share_under_10": 0.906,
+     "share_under_5": 0.779,
+     "relief_m": 286.3
+    },
+    "terrain_200": {
+     "slope_median_deg": 1.58,
+     "slope_p90_deg": 12.1,
+     "share_under_10": 0.861,
+     "share_under_5": 0.74,
+     "relief_m": 317.6
+    }
+   }
+  },
+  {
+   "id": "iowa-corn-belt",
+   "values": {
+    "t_min_c": -35.47,
+    "t_max_c": 42.12,
+    "daily_range_c": 11.1,
+    "seasonal_swing_c": 77.59,
+    "frozen_months": 3,
+    "precip_mm_day": 2.37,
+    "rh_pct": 74.97,
+    "wind_ms": 4.87,
+    "sun_kwh_m2_day": 4.0337,
+    "noon_sun_deg": 48.0,
+    "lit_share": 0.5,
+    "elevation_m": 295.8,
+    "terrain_240": {
+     "slope_median_deg": 0.4,
+     "slope_p90_deg": 1.05,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 29.9
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.43,
+     "slope_p90_deg": 1.2,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 30.7
+    }
+   }
+  },
+  {
+   "id": "beauce",
+   "values": {
+    "t_min_c": -12.07,
+    "t_max_c": 40.59,
+    "daily_range_c": 9.4,
+    "seasonal_swing_c": 52.66,
+    "frozen_months": 0,
+    "precip_mm_day": 1.82,
+    "rh_pct": 80.92,
+    "wind_ms": 4.29,
+    "sun_kwh_m2_day": 3.3094,
+    "noon_sun_deg": 41.8,
+    "lit_share": 0.5,
+    "elevation_m": 134.7,
+    "terrain_240": {
+     "slope_median_deg": 0.42,
+     "slope_p90_deg": 1.08,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 17.6
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.49,
+     "slope_p90_deg": 1.28,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 17.8
+    }
+   }
+  },
+  {
+   "id": "pampas",
+   "values": {
+    "t_min_c": -5.14,
+    "t_max_c": 41.66,
+    "daily_range_c": 12.54,
+    "seasonal_swing_c": 46.8,
+    "frozen_months": 0,
+    "precip_mm_day": 3.01,
+    "rh_pct": 70.98,
+    "wind_ms": 4.08,
+    "sun_kwh_m2_day": 4.8209,
+    "noon_sun_deg": 55.0,
+    "lit_share": 0.5,
+    "elevation_m": 68.4,
+    "terrain_240": {
+     "slope_median_deg": 0.1,
+     "slope_p90_deg": 0.37,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 6.9
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.11,
+     "slope_p90_deg": 0.41,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 6.7
+    }
+   }
+  },
+  {
+   "id": "central-ukraine",
+   "values": {
+    "t_min_c": -33.15,
+    "t_max_c": 38.21,
+    "daily_range_c": 8.81,
+    "seasonal_swing_c": 71.36,
+    "frozen_months": 3,
+    "precip_mm_day": 1.56,
+    "rh_pct": 75.78,
+    "wind_ms": 4.36,
+    "sun_kwh_m2_day": 3.4603,
+    "noon_sun_deg": 40.5,
+    "lit_share": 0.5,
+    "elevation_m": 79.0,
+    "terrain_240": {
+     "slope_median_deg": 0.13,
+     "slope_p90_deg": 1.77,
+     "share_under_10": 1.0,
+     "share_under_5": 0.99,
+     "relief_m": 53.8
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.15,
+     "slope_p90_deg": 1.95,
+     "share_under_10": 1.0,
+     "share_under_5": 0.987,
+     "relief_m": 53.1
+    }
+   }
+  },
+  {
+   "id": "amazon-near-manaus",
+   "values": {
+    "t_min_c": 21.16,
+    "t_max_c": 40.73,
+    "daily_range_c": 5.05,
+    "seasonal_swing_c": 19.57,
+    "frozen_months": 0,
+    "precip_mm_day": 5.36,
+    "rh_pct": 83.49,
+    "wind_ms": 1.22,
+    "sun_kwh_m2_day": 4.6546,
+    "noon_sun_deg": 74.96,
+    "lit_share": 0.5,
+    "elevation_m": 63.8,
+    "terrain_240": {
+     "slope_median_deg": 2.12,
+     "slope_p90_deg": 3.82,
+     "share_under_10": 1.0,
+     "share_under_5": 0.988,
+     "relief_m": 55.6
+    },
+    "terrain_200": {
+     "slope_median_deg": 2.44,
+     "slope_p90_deg": 4.58,
+     "share_under_10": 1.0,
+     "share_under_5": 0.938,
+     "relief_m": 57.1
+    }
+   }
+  },
+  {
+   "id": "congo-basin",
+   "values": {
+    "t_min_c": 16.14,
+    "t_max_c": 39.71,
+    "daily_range_c": 7.35,
+    "seasonal_swing_c": 23.57,
+    "frozen_months": 0,
+    "precip_mm_day": 4.64,
+    "rh_pct": 84.72,
+    "wind_ms": 0.68,
+    "sun_kwh_m2_day": 4.7126,
+    "noon_sun_deg": 75.07,
+    "lit_share": 0.5,
+    "elevation_m": 434.3,
+    "terrain_240": {
+     "slope_median_deg": 1.13,
+     "slope_p90_deg": 2.02,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 30.0
+    },
+    "terrain_200": {
+     "slope_median_deg": 1.35,
+     "slope_p90_deg": 2.47,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 31.6
+    }
+   }
+  },
+  {
+   "id": "central-borneo",
+   "values": {
+    "t_min_c": 15.9,
+    "t_max_c": 28.68,
+    "daily_range_c": 5.84,
+    "seasonal_swing_c": 12.78,
+    "frozen_months": 0,
+    "precip_mm_day": 10.17,
+    "rh_pct": 91.36,
+    "wind_ms": 0.65,
+    "sun_kwh_m2_day": 4.8838,
+    "noon_sun_deg": 75.06,
+    "lit_share": 0.5,
+    "elevation_m": 924.0,
+    "terrain_240": {
+     "slope_median_deg": 14.33,
+     "slope_p90_deg": 21.61,
+     "share_under_10": 0.229,
+     "share_under_5": 0.049,
+     "relief_m": 785.1
+    },
+    "terrain_200": {
+     "slope_median_deg": 15.49,
+     "slope_p90_deg": 23.35,
+     "share_under_10": 0.19,
+     "share_under_5": 0.04,
+     "relief_m": 793.4
+    }
+   }
+  },
+  {
+   "id": "pantanal",
+   "values": {
+    "t_min_c": 5.97,
+    "t_max_c": 45.44,
+    "daily_range_c": 11.28,
+    "seasonal_swing_c": 39.47,
+    "frozen_months": 0,
+    "precip_mm_day": 2.81,
+    "rh_pct": 60.03,
+    "wind_ms": 1.43,
+    "sun_kwh_m2_day": 5.2027,
+    "noon_sun_deg": 70.68,
+    "lit_share": 0.5,
+    "elevation_m": 108.4,
+    "terrain_240": {
+     "slope_median_deg": 0.52,
+     "slope_p90_deg": 1.4,
+     "share_under_10": 0.952,
+     "share_under_5": 0.952,
+     "relief_m": 14.9
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.67,
+     "slope_p90_deg": 1.54,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 15.1
+    }
+   }
+  },
+  {
+   "id": "flevoland",
+   "values": {
+    "t_min_c": -15.83,
+    "t_max_c": 33.79,
+    "daily_range_c": 6.93,
+    "seasonal_swing_c": 49.62,
+    "frozen_months": 0,
+    "precip_mm_day": 2.19,
+    "rh_pct": 84.67,
+    "wind_ms": 5.0,
+    "sun_kwh_m2_day": 2.9705,
+    "noon_sun_deg": 37.5,
+    "lit_share": 0.5,
+    "elevation_m": -3.6,
+    "terrain_240": {
+     "slope_median_deg": 0.16,
+     "slope_p90_deg": 0.78,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 8.2
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.22,
+     "slope_p90_deg": 1.17,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 9.2
+    }
+   }
+  },
+  {
+   "id": "ganges-plain-near-dhaka",
+   "values": {
+    "t_min_c": 3.29,
+    "t_max_c": 43.15,
+    "daily_range_c": 9.39,
+    "seasonal_swing_c": 39.86,
+    "frozen_months": 0,
+    "precip_mm_day": 5.31,
+    "rh_pct": 73.72,
+    "wind_ms": 2.9,
+    "sun_kwh_m2_day": 4.3666,
+    "noon_sun_deg": 66.0,
+    "lit_share": 0.5,
+    "elevation_m": 9.0,
+    "terrain_240": {
+     "slope_median_deg": 0.29,
+     "slope_p90_deg": 0.62,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 6.5
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.38,
+     "slope_p90_deg": 0.89,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 7.4
+    }
+   }
+  },
+  {
+   "id": "waikato",
+   "values": {
+    "t_min_c": 1.08,
+    "t_max_c": 29.49,
+    "daily_range_c": 6.74,
+    "seasonal_swing_c": 28.41,
+    "frozen_months": 0,
+    "precip_mm_day": 3.07,
+    "rh_pct": 81.06,
+    "wind_ms": 5.2,
+    "sun_kwh_m2_day": 4.11,
+    "noon_sun_deg": 52.2,
+    "lit_share": 0.5,
+    "elevation_m": 41.9,
+    "terrain_240": {
+     "slope_median_deg": 0.37,
+     "slope_p90_deg": 1.94,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 19.4
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.4,
+     "slope_p90_deg": 2.3,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 19.3
+    }
+   }
+  },
+  {
+   "id": "kampala",
+   "values": {
+    "t_min_c": 12.49,
+    "t_max_c": 37.93,
+    "daily_range_c": 9.03,
+    "seasonal_swing_c": 25.44,
+    "frozen_months": 0,
+    "precip_mm_day": 3.82,
+    "rh_pct": 74.11,
+    "wind_ms": 2.33,
+    "sun_kwh_m2_day": 5.3402,
+    "noon_sun_deg": 75.08,
+    "lit_share": 0.5,
+    "elevation_m": 1178.5,
+    "terrain_240": {
+     "slope_median_deg": 3.5,
+     "slope_p90_deg": 6.19,
+     "share_under_10": 0.994,
+     "share_under_5": 0.779,
+     "relief_m": 101.6
+    },
+    "terrain_200": {
+     "slope_median_deg": 3.79,
+     "slope_p90_deg": 6.49,
+     "share_under_10": 0.984,
+     "share_under_5": 0.728,
+     "relief_m": 102.5
+    }
+   }
+  },
+  {
+   "id": "grand-erg-oriental",
+   "values": {
+    "t_min_c": -2.65,
+    "t_max_c": 48.51,
+    "daily_range_c": 14.17,
+    "seasonal_swing_c": 51.16,
+    "frozen_months": 0,
+    "precip_mm_day": 0.11,
+    "rh_pct": 33.43,
+    "wind_ms": 4.26,
+    "sun_kwh_m2_day": 5.993,
+    "noon_sun_deg": 59.5,
+    "lit_share": 0.5,
+    "elevation_m": 209.1,
+    "terrain_240": {
+     "slope_median_deg": 1.47,
+     "slope_p90_deg": 2.89,
+     "share_under_10": 1.0,
+     "share_under_5": 0.992,
+     "relief_m": 35.5
+    },
+    "terrain_200": {
+     "slope_median_deg": 1.61,
+     "slope_p90_deg": 3.16,
+     "share_under_10": 1.0,
+     "share_under_5": 0.986,
+     "relief_m": 35.9
+    }
+   }
+  },
+  {
+   "id": "thar",
+   "values": {
+    "t_min_c": 1.28,
+    "t_max_c": 47.55,
+    "daily_range_c": 13.7,
+    "seasonal_swing_c": 46.27,
+    "frozen_months": 0,
+    "precip_mm_day": 0.73,
+    "rh_pct": 34.52,
+    "wind_ms": 3.71,
+    "sun_kwh_m2_day": 5.665,
+    "noon_sun_deg": 63.0,
+    "lit_share": 0.5,
+    "elevation_m": 213.8,
+    "terrain_240": {
+     "slope_median_deg": 0.69,
+     "slope_p90_deg": 1.65,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 40.3
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.73,
+     "slope_p90_deg": 1.8,
+     "share_under_10": 1.0,
+     "share_under_5": 0.998,
+     "relief_m": 40.9
+    }
+   }
+  },
+  {
+   "id": "rub-al-khali",
+   "values": {
+    "t_min_c": 2.43,
+    "t_max_c": 48.54,
+    "daily_range_c": 14.33,
+    "seasonal_swing_c": 46.11,
+    "frozen_months": 0,
+    "precip_mm_day": 0.03,
+    "rh_pct": 23.85,
+    "wind_ms": 3.9,
+    "sun_kwh_m2_day": 6.4718,
+    "noon_sun_deg": 69.2,
+    "lit_share": 0.5,
+    "elevation_m": 274.6,
+    "terrain_240": {
+     "slope_median_deg": 0.88,
+     "slope_p90_deg": 1.73,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 17.8
+    },
+    "terrain_200": {
+     "slope_median_deg": 1.1,
+     "slope_p90_deg": 2.14,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 19.3
+    }
+   }
+  },
+  {
+   "id": "simpson-desert",
+   "values": {
+    "t_min_c": 0.83,
+    "t_max_c": 48.55,
+    "daily_range_c": 15.0,
+    "seasonal_swing_c": 47.72,
+    "frozen_months": 0,
+    "precip_mm_day": 0.51,
+    "rh_pct": 33.52,
+    "wind_ms": 4.4,
+    "sun_kwh_m2_day": 6.3031,
+    "noon_sun_deg": 65.0,
+    "lit_share": 0.5,
+    "elevation_m": 120.7,
+    "terrain_240": {
+     "slope_median_deg": 0.68,
+     "slope_p90_deg": 1.45,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 19.0
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.86,
+     "slope_p90_deg": 1.8,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 19.6
+    }
+   }
+  },
+  {
+   "id": "great-victoria-desert",
+   "values": {
+    "t_min_c": 0.64,
+    "t_max_c": 48.99,
+    "daily_range_c": 15.62,
+    "seasonal_swing_c": 48.35,
+    "frozen_months": 0,
+    "precip_mm_day": 0.53,
+    "rh_pct": 42.8,
+    "wind_ms": 4.9,
+    "sun_kwh_m2_day": 5.8258,
+    "noon_sun_deg": 61.0,
+    "lit_share": 0.5,
+    "elevation_m": 225.2,
+    "terrain_240": {
+     "slope_median_deg": 0.31,
+     "slope_p90_deg": 0.76,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 15.1
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.39,
+     "slope_p90_deg": 0.88,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 15.4
+    }
+   }
+  },
+  {
+   "id": "kalahari",
+   "values": {
+    "t_min_c": -1.85,
+    "t_max_c": 41.31,
+    "daily_range_c": 15.46,
+    "seasonal_swing_c": 43.16,
+    "frozen_months": 0,
+    "precip_mm_day": 1.19,
+    "rh_pct": 38.16,
+    "wind_ms": 3.81,
+    "sun_kwh_m2_day": 6.0893,
+    "noon_sun_deg": 66.96,
+    "lit_share": 0.5,
+    "elevation_m": 1167.9,
+    "terrain_240": {
+     "slope_median_deg": 0.11,
+     "slope_p90_deg": 0.27,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 16.1
+    },
+    "terrain_200": {
+     "slope_median_deg": 0.12,
+     "slope_p90_deg": 0.32,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 16.0
+    }
+   }
+  },
+  {
+   "id": "nain-anorthosite-massif",
+   "values": {
+    "t_min_c": -41.03,
+    "t_max_c": 25.42,
+    "daily_range_c": 7.58,
+    "seasonal_swing_c": 66.45,
+    "frozen_months": 6,
+    "precip_mm_day": 2.55,
+    "rh_pct": 89.96,
+    "wind_ms": 5.72,
+    "sun_kwh_m2_day": 2.7629,
+    "noon_sun_deg": 33.5,
+    "lit_share": 0.5,
+    "elevation_m": 82.0,
+    "terrain_240": {
+     "slope_median_deg": 6.67,
+     "slope_p90_deg": 14.12,
+     "share_under_10": 0.72,
+     "share_under_5": 0.352,
+     "relief_m": 220.9
+    },
+    "terrain_200": {
+     "slope_median_deg": 7.26,
+     "slope_p90_deg": 15.22,
+     "share_under_10": 0.69,
+     "share_under_5": 0.333,
+     "relief_m": 220.8
+    }
+   }
+  },
+  {
+   "id": "manicouagan-crater",
+   "values": {
+    "t_min_c": -50.03,
+    "t_max_c": 28.84,
+    "daily_range_c": 9.1,
+    "seasonal_swing_c": 78.87,
+    "frozen_months": 6,
+    "precip_mm_day": 2.84,
+    "rh_pct": 90.41,
+    "wind_ms": 2.79,
+    "sun_kwh_m2_day": 3.1042,
+    "noon_sun_deg": 38.6,
+    "lit_share": 0.5,
+    "elevation_m": 544.9,
+    "terrain_240": {
+     "slope_median_deg": 2.83,
+     "slope_p90_deg": 10.39,
+     "share_under_10": 0.892,
+     "share_under_5": 0.703,
+     "relief_m": 405.4
+    },
+    "terrain_200": {
+     "slope_median_deg": 3.0,
+     "slope_p90_deg": 10.84,
+     "share_under_10": 0.884,
+     "share_under_5": 0.683,
+     "relief_m": 406.7
+    }
+   }
+  },
+  {
+   "id": "lut-desert-kaluts",
+   "values": {
+    "t_min_c": -4.83,
+    "t_max_c": 51.8,
+    "daily_range_c": 15.59,
+    "seasonal_swing_c": 56.63,
+    "frozen_months": 0,
+    "precip_mm_day": 0.22,
+    "rh_pct": 21.88,
+    "wind_ms": 4.06,
+    "sun_kwh_m2_day": 5.9362,
+    "noon_sun_deg": 59.6,
+    "lit_share": 0.5,
+    "elevation_m": 274.0,
+    "terrain_240": {
+     "slope_median_deg": 2.59,
+     "slope_p90_deg": 7.01,
+     "share_under_10": 0.98,
+     "share_under_5": 0.804,
+     "relief_m": 200.2
+    },
+    "terrain_200": {
+     "slope_median_deg": 2.75,
+     "slope_p90_deg": 7.39,
+     "share_under_10": 0.961,
+     "share_under_5": 0.774,
+     "relief_m": 200.9
+    }
+   }
+  },
+  {
+   "id": "umm-jirsan-lava-tube-harrat-khaybar",
+   "values": {
+    "t_min_c": -5.75,
+    "t_max_c": 43.76,
+    "daily_range_c": 15.8,
+    "seasonal_swing_c": 49.51,
+    "frozen_months": 0,
+    "precip_mm_day": 0.07,
+    "rh_pct": 26.16,
+    "wind_ms": 5.06,
+    "sun_kwh_m2_day": 6.2054,
+    "noon_sun_deg": 64.3,
+    "lit_share": 0.5,
+    "elevation_m": 1551.9,
+    "terrain_240": {
+     "slope_median_deg": 2.78,
+     "slope_p90_deg": 8.58,
+     "share_under_10": 0.917,
+     "share_under_5": 0.8,
+     "relief_m": 481.6
+    },
+    "terrain_200": {
+     "slope_median_deg": 2.81,
+     "slope_p90_deg": 8.88,
+     "share_under_10": 0.912,
+     "share_under_5": 0.795,
+     "relief_m": 480.1
+    }
+   }
+  },
+  {
+   "id": "emi-koussi-tibesti",
+   "values": {
+    "t_min_c": -1.52,
+    "t_max_c": 40.6,
+    "daily_range_c": 15.1,
+    "seasonal_swing_c": 42.12,
+    "frozen_months": 0,
+    "precip_mm_day": 0.04,
+    "rh_pct": 21.91,
+    "wind_ms": 4.38,
+    "sun_kwh_m2_day": 6.7397,
+    "noon_sun_deg": 69.33,
+    "lit_share": 0.5,
+    "elevation_m": 2748.4,
+    "terrain_240": {
+     "slope_median_deg": 9.16,
+     "slope_p90_deg": 17.59,
+     "share_under_10": 0.585,
+     "share_under_5": 0.143,
+     "relief_m": 1123.3
+    },
+    "terrain_200": {
+     "slope_median_deg": 9.39,
+     "slope_p90_deg": 18.9,
+     "share_under_10": 0.557,
+     "share_under_5": 0.146,
+     "relief_m": 1114.0
+    }
+   }
+  }
+ ]
+}
