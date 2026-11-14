@@ -1166,7 +1166,7 @@
     "dci": {
      "value": 0.971,
      "source": "TES dust cover index, Ruff & Christensen 2002",
-     "url": "http://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
+     "url": "https://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
      "kind": "computed",
      "note": "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free."
     },
@@ -1265,7 +1265,7 @@
     "dci": {
      "value": 0.935,
      "source": "TES dust cover index, Ruff & Christensen 2002",
-     "url": "http://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
+     "url": "https://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
      "kind": "computed",
      "note": "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free."
     },
@@ -1359,7 +1359,7 @@
     "dci": {
      "value": 0.959,
      "source": "TES dust cover index, Ruff & Christensen 2002",
-     "url": "http://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
+     "url": "https://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
      "kind": "computed",
      "note": "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free."
     },
@@ -1458,7 +1458,7 @@
     "dci": {
      "value": 0.965,
      "source": "TES dust cover index, Ruff & Christensen 2002",
-     "url": "http://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
+     "url": "https://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
      "kind": "computed",
      "note": "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free."
     },
@@ -1552,7 +1552,7 @@
     "dci": {
      "value": 0.938,
      "source": "TES dust cover index, Ruff & Christensen 2002",
-     "url": "http://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
+     "url": "https://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
      "kind": "computed",
      "note": "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free."
     },
