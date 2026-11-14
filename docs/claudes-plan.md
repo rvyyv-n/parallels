@@ -275,7 +275,7 @@ The full lists of test places are in appendix A.
 - **Tests:**
     - pytest for the pipeline: the scoring rule on hand-made cases, plus the data checks in section 6;
     - Playwright for the main flow and every link.
-- **Hosting:** GitHub Pages needs a public repo on a free account. Vercel's free plan works from our private repo, but it's for non-commercial use only and pauses a site for 30 days if it goes over the limits. **Recommendation:** make the repo public before submission, serve from GitHub Pages and keep Vercel as a mirror.
+- **Hosting:** Vercel's free plan, deploying from the repo on every push. It's for non-commercial use only and pauses a site for 30 days if it goes over the limits. GitHub Pages (needs a public repo) is the fallback, and we can move to it at the very end.
 - **Lasting until 26 January 2027:**
     - no keys, no server, no live data calls;
     - GIBS tiles are the only live dependency, so a static background image ships as a fallback;
@@ -311,7 +311,7 @@ Times are in our Local Event's time zone.
 | Python packages won't install here | uv or Miniforge; failing that, run the pipeline on the laptop | Friday night |
 | Earthdata login or downloads fail | POWER, Copernicus and the planetary files only (no login); rock from GLiM | Saturday 10:00 |
 | SWIM site stays down | NASA image PIA26045 plus SHARAD and Odyssey GRS | Saturday 10:00 |
-| Hosting: Pages needs a public repo | Vercel free plan from the private repo | Saturday 12:00 |
+| Vercel limits or pause | move to GitHub Pages (public repo) | Saturday 12:00 |
 | Rock trait unworkable | drop it from the score and keep it as an explanation | Saturday 14:00 |
 | Map library trouble | static map image plus a clickable list | Saturday 15:00 |
 | Validation fails | publish the honest result and the reasons, never hidden. It's still more than any rival shows. | write-up by Saturday 16:00 |
@@ -349,8 +349,7 @@ Times are in our Local Event's time zone.
 
 ## 11. Open questions for the team
 
-- [ ] Our Local Event's time zone sets every switch time above. The Challenge Guide comes from Cedar College with Karachi sponsors, so probably Pakistan time (UTC+5): confirm.
-- [ ] Do we make the repo public before submission (for GitHub Pages), or use Vercel?
+- [x] Hosting: Vercel for now, GitHub Pages only if needed at the very end.
 - [ ] Who makes the free NASA Earthdata account, and when?
 
 ## Appendix A. Test places
