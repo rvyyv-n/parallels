@@ -12,20 +12,22 @@ A fully working site **today, Saturday 14 November 2026**, at the Vercel project
 
 Today covers roadmap steps 1–6: the first complete draft goes in on Saturday night.
 
+**Ambition.** No limits on design or innovation: build something spectacular that stands out from every rival. Two things are fixed: the science and data follow our docs (the plans, the data we checked, the honesty rules in [guidelines §2](guidelines.md#2-doing-the-science-honestly)), and everything follows best practice (accessible, fast on a phone, tested, no fragile live dependencies). Being easy to use comes first: ambition never costs a newcomer their result in under a minute.
+
 ## 2. Before you build
 
 Four gates, in this order. Don't write build code until the user has said yes to gates 1 and 2.
 
 ### Gate 1. Setup questions and your approach
 
-- Ask the user what you need to know to start: for example, the production URL, where the Earthdata login lives on this machine, how they want to be reached for approvals, and any limits on time, models or cost.
+- Ask the user what you need to know to start: for example, the production URL, how they want to be reached for approvals, and any limits on time, models or cost.
 - Recommend how you'll run the build: tools, which models do which work, how you split it (for example a pipeline track, a site track and a checking track), and how each piece gets tested before it's committed.
 
 ### Gate 2. Research and a UI design
 
 - **Rivals:** start from the three in [plan §1](claudes-plan.md#1-rivals), then scan the other public repos for this challenge (at least 22 on 13 November) and similar tools (for example NASA Moon Trek and Mars Trek, and climate-analog finders). Note what each does well and what confuses a newcomer.
 - **Our earlier draft:** `main` already holds a working prototype analog finder (`pipeline/` and `site/`, with the main flow and validation chart; screenshots in `docs/screenshots/`). v1 builds on it: keep what works, replace what doesn't.
-- **Recommend one UI design** that:
+- **Recommend one UI design**, as ambitious as it can be while staying clear, that:
   - is easy to understand at a glance;
   - gets a newcomer to a result in under a minute without help;
   - has good onboarding (the first screen explains itself, with no tutorial wall);
@@ -111,7 +113,7 @@ Plus, per cell: coordinates, terrain type, cluster, how hard it is to get there,
 
 ## 8. Data and machine
 
-- **The user has a NASA Earthdata account.** Use it through `earthaccess`; never print, copy or commit the login. If login or downloads fail, switch to the no-login fallback in [plan §9](claudes-plan.md#9-risks-and-fallbacks) by its switch time.
+- **The user has a NASA Earthdata account,** saved in `~/.netrc` on this PC. Use it through `earthaccess`; never print, copy or commit the login. If login or downloads fail, switch to the no-login fallback in [plan §9](claudes-plan.md#9-risks-and-fallbacks) by its switch time.
 - **Installed:** Python 3.13 with uv; Node 24 with npm. Not installed: the Vercel CLI.
 - **Stack and tests:** [plan §7](claudes-plan.md#7-tech-stack-and-hosting): pipeline in `pipeline/`, raw downloads in `data/` (gitignored), site in `site/`, pytest and Playwright.
 - **Fallback switch times** in [plan §9](claudes-plan.md#9-risks-and-fallbacks) apply as written. If something has been stuck for an hour, cut it or switch.
