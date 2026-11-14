@@ -2,7 +2,9 @@
 
 Build notes for the [team plan](team-plan.md): rivals, method, data, checks, stack, roadmap and fallbacks. Written by Claude on 13 November 2026 and aligned with our local [Challenge Guide](challenge-guide.pdf) on 14 November. Where this file and the team plan differ, the team plan wins.
 
-This is the plan from before the build. What version 1 ships (its targets, data, method and limits) is in the [README](../README.md). Where the two differ, the README has the current state.
+Sections 1 and 3–6 are the plan from before the version 1 build. They describe the data that version 2 still uses, and they don't change. What version 1 ships (its targets, data, method and limits) is in the [README](../README.md); where the two differ, the README has the current state.
+
+Version 2 is a new site on the same data. Sections 2 and 7–10 are the version 2 plan, written on Sunday 15 November at 03:00. They are kept in step with the site as it is built.
 
 ## 1. Rivals
 
@@ -21,25 +23,41 @@ Where we can beat them:
 3. **Rank by "Earth rank", show the real gap.** Nowhere on Earth is as cold as a lunar crater, so we rank places by how far toward the target they get. Next to that rank we always show the real gap in units, e.g. how far the coldest month falls short of −248 °C.
 4. **A headline that fills a real gap.** The Moon's south pole is pale anorthosite highland rock ([Lemelin et al. 2022](https://api.crossref.org/works/10.3847/PSJ/ac532c)), but most lunar analogs in use are dark basalt. Mistastin crater, where Artemis crews trained, is the exception ([NASA, LPSC 2024](https://ntrs.nasa.gov/api/citations/20230018695/downloads/LPSC2024_Evans_draft2.pdf)). We headline a highland stand-in only if NASA data alone ranks it high (section 5).
 
-## 2. The main flow
+## 2. What the site does
 
-The first version was planned with **two targets: the Moon's south pole and Jezero crater on Mars.** Arcadia Planitia (buried ice) came next, then the rest of section 5. Version 1 shipped with six; see the README's [Status](../README.md#status).
+**The sentence:** no place on Earth copies a Moon or Mars base whole, but for each part of a base there is a best place on Earth to practise. The site shows where it matches and where it doesn't. Everything on screen serves that sentence.
 
-1. **Open the site.** The map already shows the headline find for the Moon's south pole, with its scorecard open.
-2. **Pick a target and a mission filter** (rover mobility, life support, habitat structure). The map colours all land by match, and a list shows the top 10 spots with their coordinates and terrain type. A "rarely used" badge marks spots more than 100 km from every known analog site in our list.
-3. **Click a spot.** The scorecard opens:
-    - each trait as a bar of Earth rank, with the real Earth and target values (and their datasets and resolution) as the main figure beside it;
-    - an "Earth can't copy" block for gravity, air, radiation and magnetic shield;
-    - the site's best months to test, freeze–thaw months and rainy months;
-    - one line on what to test there;
-    - Earth and target images.
-4. **"How we checked it"** shows the validation chart (section 6).
+**Main flow (a result in two clicks):**
 
-That's two clicks to a result, well under a minute. Users can also filter by terrain type and set the weights by hand.
+1. **Open the site.** The globe and the picker are on screen. The Moon's south pole is selected, and its headline find is featured: the Sistan and Baluchestan region of Iran, more than 100 km from every known analog site in our list.
+2. **Pick a target and a mission filter** (rover mobility, life support, habitat structure). The globe colours Earth by match. Five distinct best places appear, each at least about 300 km from the others, with coordinates and terrain type.
+3. **Open a place.** Its match card shows:
+    - what is similar and what is different, in real units, Earth against the target;
+    - what Earth can't copy: gravity, air and radiation;
+    - its best months to test, its freeze–thaw months and its rainy months;
+    - what to test there.
 
-**Extras,** only once that flow works:
-- more targets;
-- a stability badge (section 6).
+    Every number links to its dataset.
+4. **"How we checked it":** one chart of known analogs against ordinary places and plain deserts, with the honest result: the method passes 10 of 15 checks, not all of them.
+
+**Guided flow:** a short walk-through for first visits, which anyone can start again. The demo video records it.
+
+**"For judges" view:** the six benchmarks in the guide's words, the seven questions with our answers, every dataset with its link and licence, "Not in this version", and the AI note. The manifest already holds the benchmarks, the questions and the "Not in this version" text.
+
+**Extra, outside the main flow:** an "Adjust weights" panel, because the team plan lets users set the weights by hand. It combines the pre-computed challenge scores with the user's weights by the method's own rule (section 3). No new data is made.
+
+**The guide's benchmarks on screen:**
+
+| # | Benchmark | Where a judge sees it |
+|---|---|---|
+| 1 | At least 3 open archives | The dataset link on every number, and the full list in "For judges" |
+| 2 | At least 4 terrain types | A terrain-type tag on each place, and a terrain filter |
+| 3 | Dashboard with rankings, coordinates and data details | The globe, the top-5 list and the match card |
+| 4 | Weighting and clustering | Mission filters on the main screen; clustering explained in "For judges" |
+| 5 | Seasons | Best, freeze–thaw and rainy months on each match card |
+| 6 | Mission filters | The picker |
+
+**Targets without a headline:** only the Moon's south pole and Jezero have one in the data. The other four lead with their top place, without a headline badge.
 
 What's next, after the event: a reverse mode (click any place on Earth and see its closest target).
 
@@ -157,7 +175,7 @@ Every dataset below was checked on 13 November: the files answered, or NASA's da
 | [Obu et al. 2018 permafrost](https://doi.org/10.1594/PANGAEA.888600) | cross-check of the frozen-ground rule, Northern Hemisphere, if time allows | CC-BY 3.0 |
 | Anorthosite massifs, lava tubes, impact craters | labels | from papers. The Earth Impact Database site looks dead, and no global lava-tube map exists. |
 
-**Totals:** about 2 GB, and one free NASA Earthdata account unlocks all of it. Without that account, POWER, Copernicus and the planetary files still cover most traits (section 9).
+**Totals:** about 2 GB, and one free NASA Earthdata account unlocks all of it. Without that account, POWER, Copernicus and the planetary files still cover most traits.
 
 **Known gaps:**
 - Radiation has never been measured at the Moon's south pole, or anywhere on Mars's surface except Gale. We label stand-in values as such.
@@ -224,7 +242,7 @@ These are places to test, not results. All coordinates are rough and get checked
 
 **Antarctica** is left out of headlines because it's the analog everyone already uses and access is tightly controlled. It still appears on the map, and in the validation.
 
-We pick the headline on Saturday evening from the results. If none clears the bar, the validation becomes the headline (section 9).
+Headlines were picked from the version 1 results. Two targets have one: the Moon's south pole and Jezero.
 
 **Rock is a weak link for the Moon.** At 0.5°, GLiM only tells us "plutonic rock", not "anorthosite". Earth anorthosite also differs from lunar anorthosite in age and calcium content. The scorecard says both plainly.
 
@@ -266,55 +284,42 @@ The full lists of test places, with positions and sources, are in `pipeline/site
 - The aridity index puts Yungay below 0.05 and the Iowa corn belt above 0.65.
 - The computed Artemis values agree with published ones (ridge lit about 92%; shadowed floors below 110 K).
 
-## 7. Tech stack and hosting
+## 7. Build and hosting
 
-- **Pipeline:** Python 3.13 with the packages pinned in `pyproject.toml` and `uv.lock`, in `pipeline/`. Raw downloads go in `data/` (already gitignored). Outputs are small files in `dataset/`. A 0.5° land grid is about 75,000 cells, so the traits plus the scores for each mission filter come to under a few MB per target.
-- **Site:** every score, for every mission filter, is pre-computed into its own file, so the browser never recalculates anything.
+- **Pipeline:** Python 3.13 with the packages pinned in `pyproject.toml` and `uv.lock`, in `pipeline/`. Raw downloads go in `data/` (gitignored). Outputs are the files in `dataset/`. Version 2 doesn't change the pipeline or the data.
+- **Site:** a static site in `site/`. It takes `dataset/` in at build time, without committing a second copy, and uses the types in `dataset/contract.ts`. The browser selects, groups and displays only what is already computed. Grouping neighbouring results into distinct places is display, not new data.
 - **Tests:**
-    - pytest for the pipeline: the scoring rule on hand-made cases, plus the data checks in section 6;
-    - browser tests for the main flow and every link.
-- **Hosting:** Vercel's free plan, deploying from the repo on every push. It's for non-commercial use only and pauses a site for 30 days if it goes over the limits. GitHub Pages (needs a public repo) is the fallback, and we can move to it at the very end.
+    - pytest for the pipeline (unchanged);
+    - Playwright for the word and click budgets, the 390 px layout, keyboard use, reduced motion, and every data and link check.
+- **Hosting:** Vercel. Version 1 stays live and untouched. Version 2 gets a preview link first; a public version 2 link is the team's call.
 - **Lasting until 26 January 2027:**
-    - no keys, no server, no live data calls;
+    - no keys, no server, and no live calls except map tiles, which have a bundled fallback image;
     - we tag the submitted version and request a FortiGuard classification after deploying.
 
 ## 8. Roadmap
 
-Steps in order, each with its check. Clock times appear only where our guidelines ask for them: the fallback switch times in section 9, a first draft on Saturday night, and the final submission by Sunday 21:59.
+Sunday 15 November, in our Local Event's time zone. Times before the freeze are targets; the builder sets the switch from building to polishing.
 
-1. **Before the event: accounts, setup and downloads.** We make a free Earthdata account, install the Python packages and download every file in section 4.
-    → verify: a download check lists every file and its size.
-2. **Earth trait grid and target values** for the south pole and Jezero.
-    → verify: five random cells match the POWER point API; the Artemis values agree with published ones.
-3. **Scoring, terrain types, seasons and the validation run.** The weights (per mission filter), terrain thresholds and the held-out split are committed first.
-    → verify: the section 6 pass marks are met, or the failure is written up honestly.
-4. **Real data in the site.**
-    → verify: **Checkpoint 1.** Both of us test on a phone and a laptop, and a newcomer gets a result in under a minute.
-5. **Zoom stage and headline.**
-    → verify: the headline clears the section 5 bar, and its scorecard shows every trait or an honest "no data".
-6. **First complete draft submitted (Saturday night).**
-    → verify: every form field is filled in, and the site link opens in a private window.
-7. **Sunday: extras, demo and page.** Arcadia and more targets, the stability badge, the 28-second video and the page images.
-    → verify: **Checkpoint 2.** Same tests as Checkpoint 1, plus the numbers on screen are checked against the source files.
-8. **Final submission by 21:59.**
-    → verify: every box in guidelines section 7 is ticked, and the success banner shows.
+| By | Step | Check |
+|---|---|---|
+| 04:00 | Questions to the team, this plan, a direction screenshot | the team says yes |
+| while waiting | Data loading, distinct-places grouping, test suite | grouping tests pass; no two of the top 5 are within 300 km |
+| 09:00 | Main flow on a preview link | **Checkpoint 1:** phone and laptop, a result in two clicks |
+| 13:00 | Match cards, the "How we checked it" chart, "For judges", guided flow | every number traces to a dataset |
+| build done | Polish only from here | budgets pass |
+| 18:00 | **Feature freeze** | **Checkpoint 2:** a fresh model, shown only screenshots, says what the site found and where one match breaks |
+| 18:00–21:00 | Demo video, project page, final README and plan update, the team compares version 1 and version 2, repo rename | every box in guidelines section 7 |
+| 21:59 | Final submission | the success banner shows |
 
 ## 9. Risks and fallbacks
 
-Times are in our Local Event's time zone.
-
 | Risk | Fallback | Switch by |
 |---|---|---|
-| Python packages won't install here | uv or Miniforge; failing that, run the pipeline on the laptop | Friday night |
-| Earthdata login or downloads fail | POWER, Copernicus and the planetary files only (no login); rock from GLiM | Saturday 10:00 |
-| SWIM site stays down | NASA image PIA26045 plus Odyssey GRS | Saturday 10:00 |
-| Vercel limits or pause | move to GitHub Pages (public repo) | Saturday 12:00 |
-| Rock trait unworkable | drop it from the score and keep it as an explanation | Saturday 14:00 |
-| Validation fails | publish the honest result and the reasons, never hidden. It's still more than any rival shows. | write-up by Saturday 16:00 |
-| Moon ranking is all polar ice | already handled: GLiM's ice class scores low on rock, and headlines exclude Antarctica | built in |
-| Zoom stage too slow | ship the 0.5° screen; headline at cell level with imagery | Saturday 20:00 |
-| No headline clears the bar | headline the validation: "it finds the analogs NASA uses, and ranks these next" | Saturday 22:00 |
-| Video fails | 7 slides or fewer | Sunday 18:00 |
+| Globe too slow on a phone | a flat map on phones | 11:00 |
+| Map tiles fail | the bundled image | built in |
+| Preview link needs a login | a second Vercel project (team's call) | 13:00 |
+| Version 2 not ready, or not better | submit version 1's link | the team's call at the end |
+| Video fails | 7 slides or fewer | 20:00 |
 
 ## 10. Awards, project page and demo
 
@@ -327,19 +332,19 @@ Times are in our Local Event's time zone.
 | Best Mission Concept | mission filters and the headline's test plan: what to test there, in which months, and how it helps the first crewed south-pole landing |
 
 **Project page:**
-- Lead with the headline image and the validation chart, then answer the form's questions.
-- Paste in three images: the map, the headline scorecard with its "where it breaks" block, and the validation chart.
+- Lead with the headline and the "How we checked it" chart, then answer the form's questions.
+- Paste in three images from version 2: the globe, a match card with its "where it breaks" part, and the "How we checked it" chart.
 - The NASA Data field and the AI note follow [guidelines §1 and §5](guidelines.md).
 
-**Demo (28 seconds):** the product is on screen from the first frame, captions are burned in, and there's no music.
+**Demo (28 seconds):** a screen recording of the guided flow, with captions burned in, in the official timing. Motion graphics go on top of the recording only, and the product is on screen from the first frame. No music, or music whose licence we list. If AI makes any of the graphics, the video carries a visible "Made with AI assistance" mark.
 
 | Time | On screen | Caption |
 |---|---|---|
-| 0:00 | site loads on the map | team name |
-| 0:02 | map | the challenge |
-| 0:05 | map | name and tagline |
-| 0:10 | pick a target, the map lights up, click the headline, scorecard | how it works, and which NASA data does the work |
-| 0:20 | validation chart, then zoom out | what's next: more targets, finer data, field checks |
+| 0:00 | the site opens on the globe | team name |
+| 0:02 | globe | the challenge |
+| 0:05 | globe | name and tagline |
+| 0:10 | pick a target, the globe lights up, open the headline's match card | how it works, and which NASA data does the work |
+| 0:20 | "How we checked it" chart, then zoom out | what's next: more targets, finer data, field checks |
 
 ## Appendix A. Test places
 

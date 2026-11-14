@@ -17,10 +17,10 @@ Version 1 does not pass every check. It passes 1 of its 4 first checks. In the f
 ## What's here
 
 - [docs/workflow.png](docs/workflow.png): our workflow at a glance; start here.
-- [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, the main brief.
+- [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, a key brief.
 - [docs/challenge.md](docs/challenge.md): the challenge in plain words, and how we meet the guide's six objectives and answer its seven questions.
 - [docs/team-plan.md](docs/team-plan.md): what we're building.
-- [docs/claudes-plan.md](docs/claudes-plan.md): the build plan from before v1: rivals, method, data, checks and roadmap, and the data checks made before the build.
+- [docs/claudes-plan.md](docs/claudes-plan.md): Claude's plan: rivals, method, data and checks from before v1, and the v2 site plan, roadmap and fallbacks.
 - [docs/judging-notes.md](docs/judging-notes.md): how Space Apps is judged and what past winners did.
 - [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
 - [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.
