@@ -8,6 +8,7 @@ import { BODY, card, isIce, placeName, terrainOf } from "./card";
 import { NAV, sections, wire } from "./sections";
 import { esc, latlon, num, reduced, score100, webgl } from "./format";
 import { colour, gradient } from "./ramp";
+import { logo } from "./logo";
 import type { TargetGlobe } from "./globe3d";
 
 interface State {
@@ -21,7 +22,7 @@ interface State {
 
 const TEXTURE = { moon: "img/moon.jpg", mars: "img/mars.jpg" };
 const AI_NOTE =
-  "How we used AI: the idea and the key design decisions are our team's. Claude (Anthropic) helped research the challenge, write our planning documents, and write and test the code and data pipeline. We check its work at each checkpoint.";
+  "How we used AI: the idea and the key design decisions are our team's. Claude (Anthropic) helped research the challenge, write our planning documents, and write and test the code and data pipeline. Our logo was drawn with AI. We check its work at each checkpoint.";
 
 const app = document.getElementById("app")!;
 const $ = <T extends HTMLElement>(s: string) => app.querySelector<T>(s)!;
@@ -76,7 +77,7 @@ function shell(m: Manifest) {
     ${m.sample ? `<p class="sample" role="note"><b>Sample data.</b> Every number on this page is a made-up test value while the real data is processed. Nothing here is a result yet.</p>` : ""}
     <header class="top">
       <a class="skip" href="#ledger-h">Skip to results</a>
-      <a class="wordmark" href="#explore" aria-label="Parallels, back to the top">Parallels</a>
+      <a class="brand" href="#explore" aria-label="Parallels, back to the top">${logo()}<span class="wordmark">Parallels</span></a>
       <p class="tagline">Earth's closest parallels to every part of a Moon or Mars base.</p>
       <nav aria-label="Sections"><ul>${NAV.map(([id, name]) => `<li><a href="#${id}">${esc(name)}</a></li>`).join("")}</ul></nav>
     </header>
@@ -136,7 +137,7 @@ function shell(m: Manifest) {
       <div id="sections"></div>
     </main>
     <footer class="foot">
-      <p class="wordmark small">Parallels</p>
+      <p class="brand">${logo()}<span class="wordmark small">Parallels</span></p>
       <p>NASA Space Apps Challenge 2026 entry: Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars. Data generated ${esc(m.generated)}.</p>
       <p class="ai">${esc(AI_NOTE)}</p>
       <p class="small muted">No NASA logos or insignia are used. Imagery credits are in the Data section.</p>
@@ -148,7 +149,7 @@ async function main() {
   let d: Data;
   let s: State;
   const fail = (e: unknown) => {
-    app.innerHTML = `<div class="boot"><b>PARALLELS</b></div><p class="fatal" role="alert">The data files could not be loaded (${esc((e as Error).message)}). Please check your connection and reload the page.</p>`;
+    app.innerHTML = `<div class="boot"><img src="${import.meta.env.BASE_URL}favicon.svg" width="28" height="28" alt=""><b>PARALLELS</b></div><p class="fatal" role="alert">The data files could not be loaded (${esc((e as Error).message)}). Please check your connection and reload the page.</p>`;
   };
   try {
     const mf = await manifest();
@@ -330,6 +331,7 @@ async function main() {
     const t: Target = target();
     cols = await targetCols(d.base, t);
     if (s.hand) s.hand = Object.fromEntries(m.challenges[t.body].map((c) => [c.id, s.hand![c.id] ?? 0]));
+    for (const el of app.querySelectorAll<SVGElement>(".logo")) el.dataset.body = t.body;
     renderFilters();
     renderSliders();
     caption();

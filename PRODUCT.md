@@ -37,7 +37,7 @@ A discovery tool, not a list of famous sites: every land cell is scored, and eve
 - Targets in v1: the Moon's south pole (with the nine Artemis III regions) and Jezero crater. More Mars sites later.
 - Only what both sides can measure is scored; the rest appears as labels marked "not scored" with the reason.
 - While `manifest.sample` is true, a banner says every number is a made-up test value.
-- No NASA logos, flags or insignia. No AI-made images. Typeset wordmark only. AI-use note in the footer.
+- No NASA logos, flags or insignia. No AI-made images except the logo (three circles cut by shared parallels, drawn with AI and named in the footer's AI note), which sits beside the typeset wordmark; a cyan parallel runs through the Moon or Mars circle to match the chosen target. AI-use note in the footer.
 - Lasts untouched until 26 January 2027: no keys, no server; GIBS tiles are the only live call and a bundled Blue Marble image sits under them.
 
 ## Evidence on Hand
