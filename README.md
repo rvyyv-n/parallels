@@ -138,13 +138,16 @@ These images are shown, not scored.
 | [Blue Marble: Shaded Relief and Bathymetry](https://nasa-gibs.github.io/gibs-api-docs/) | NASA Earth Observatory via NASA GIBS | NASA open data, no restrictions | Earth globe background. We bundle a copy as `site/public/img/blue-marble.jpg`. It takes over if the live tile service is down. |
 | [CGI Moon Kit: LROC colour map with filled poles](https://svs.gsfc.nasa.gov/4720) | NASA Scientific Visualization Studio (LRO data) | Public domain (NASA) | Surface of the 3D Moon globe (`site/public/img/moon.jpg`). |
 | [Viking MDIM 2.1 global colour mosaic](https://trek.nasa.gov/mars/) | NASA / USGS Astrogeology, via NASA Mars Trek tiles | Public domain (NASA / USGS) | Surface of the 3D Mars globe (`site/public/img/mars.jpg`). |
+| [Landsat WELD true colour, global annual mosaic](https://nasa-gibs.github.io/gibs-api-docs/) | NASA / USGS Landsat, via NASA GIBS | NASA open data, no restrictions | Earth side of the close-up in each match (live tiles), over Blue Marble. Display only, not scored. |
+| [LOLA south-pole shaded relief, 87.5° S to the pole](https://trek.nasa.gov/moon/) | NASA LRO LOLA, via NASA Moon Trek tiles | Public domain (NASA) | Moon side of the close-up in each match (live tiles). Shaded relief from laser altimetry, not a photo. Display only, not scored. |
 
 ### Code libraries
 
 | Library | Licence | Use |
 |---|---|---|
 | [MapLibre GL JS](https://maplibre.org/) | BSD-3-Clause | Earth globe and map |
-| [three.js](https://threejs.org/) | MIT | 3D Moon and Mars globes |
+| [three.js](https://threejs.org/) | MIT | 3D Earth, Moon and Mars in the intro |
+| [Lucide icons](https://lucide.dev/) | ISC | Icons in the match view |
 | [Vite](https://vite.dev/) and TypeScript | MIT / Apache-2.0 | Building the site |
 | Playwright | Apache-2.0 | Site tests |
 | numpy, scipy, pandas, xarray, zarr, fsspec, s3fs, aiohttp, netCDF4, h5netcdf, rasterio (GDAL), pyproj, pyshp, requests, earthaccess, pyhdf, pytest | Open-source licences, set by each package | Data pipeline and its tests (see `pyproject.toml`) |
