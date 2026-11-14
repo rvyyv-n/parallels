@@ -1,8 +1,12 @@
-# Earth analogs for the Moon and Mars
+<img src="assets/logo.svg" width="96" alt="Parallels logo">
+
+# Parallels
+
+**Earth's closest parallels to every part of a Moon or Mars base.**
 
 Our NASA Space Apps 2026 entry for [Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars](https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/). Event: 14–15 November 2026.
 
-**Status:** waiting for the team's idea. The plan, name and tech stack come next.
+**Status:** the idea ([docs/team-plan.md](docs/team-plan.md)) and the name are set. The tech stack and roadmap come next.
 
 ## What's here
 
@@ -15,7 +19,7 @@ Our NASA Space Apps 2026 entry for [Identify Earth Locations that Analog the Per
 
 ## How we used AI
 
-The core idea and the key design decisions come from our team. We use Claude (Anthropic) to research the challenge and the judging rules, write our planning documents and, during the event, write and test the code. We check its work at each checkpoint. Any AI-made image or video carries a visible watermark.
+The core idea and the key design decisions come from our team. We use Claude (Anthropic) to research the challenge and the judging rules, write our planning documents and, during the event, write and test the code. We check its work at each checkpoint. Claude suggested a list of names and we picked Parallels. Claude also drew the logo, which is labelled here and in the file's metadata. Any other AI-made image or video carries a visible watermark.
 
 ## Data
 
