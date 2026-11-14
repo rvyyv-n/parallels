@@ -51,15 +51,15 @@ TRAITS = {
         "label": "Frozen months a year",
         "unit": "months",
         "digits": 0,
-        "plain": "Months when the average temperature stays below 0 °C, so ground ice can last.",
-        "earth": ("frozen_months",),
+        "plain": "Months when the ground's average temperature stays below 0 °C, so ground ice can last.",
+        "earth": ("frozen_months_surface",),
         "target": "frozen_months",
     },
     "ground_ice": {
-        "label": "Ice in the ground",
+        "label": "Water in the ground",
         "unit": "% by weight",
         "digits": 1,
-        "plain": "How much water ice sits in the top metre of soil.",
+        "plain": "How much water the top metre of ground holds, as ice or bound in minerals.",
         "sample": {"earth": (0, 30), "moon": (2, 9), "mars": (5, 40)},
         "target_real": "weh_pct",
     },
@@ -78,19 +78,19 @@ TRAITS = {
         "sample": {"earth": (0, 50), "mars": (0, 40)},
     },
     "cold": {
-        "label": "Coldest temperature",
+        "label": "Coldest ground temperature",
         "unit": "°C",
         "digits": 0,
-        "plain": "The coldest the surface gets in a year.",
-        "earth": ("t_min_c",),
+        "plain": "The coldest the ground surface gets in a year. Both sides are ground temperatures, not air.",
+        "earth": ("ts_min_c",),
         "target": "t_min_c",
     },
     "season_swing": {
         "label": "Yearly temperature swing",
         "unit": "°C",
         "digits": 0,
-        "plain": "Gap between the hottest and coldest temperatures of the year.",
-        "earth": ("seasonal_swing_c",),
+        "plain": "Gap between the hottest and coldest ground temperatures of the year.",
+        "earth": ("ts_seasonal_swing_c",),
         "target": "season_swing_c",
     },
     "day_swing": {
@@ -98,7 +98,7 @@ TRAITS = {
         "unit": "°C",
         "digits": 0,
         "plain": "How much the temperature drops from day to night.",
-        "earth": ("daily_range_c",),
+        "earth": ("ts_daily_range_c", "daily_range_c"),
         "target": "daily_swing_c",
     },
     "dry": {
@@ -117,12 +117,23 @@ TRAITS = {
         "earth": ("noon_sun_deg",),
         "target": "noon_sun_deg",
     },
-    "dust_days": {
-        "label": "Dust-lifting days",
-        "unit": "days/yr",
+    "dust_haze": {
+        "label": "Dust in the air",
+        "unit": "optical depth",
+        "digits": 2,
+        "plain": "How hazy the air is with lifted dust, as optical depth. Compared by how much dust the wind lifts, not by wind speed, because Mars air is about 1% as thick as Earth's. Earth's value counts all airborne particles, not only dust.",
+        "earth": ("aod_550",),
+        "target": "dust_tau",
+        "sample": {"mars": (0.3, 0.9)},
+    },
+    "bare": {
+        "label": "Bare ground",
+        "unit": "%",
+        "scale": 100,
         "digits": 0,
-        "plain": "Days a year when wind lifts dust. Compared by how often dust moves, not by wind speed, because Mars air is about 1% as thick as Earth's.",
-        "sample": {"earth": (0, 120), "mars": (10, 150)},
+        "plain": "Share of the 10 km patch that is barren rock, sand or soil with no plants, from NASA's MODIS land-cover map. The Moon and Mars are entirely bare.",
+        "earth": ("bare_share",),
+        "target": "bare_share",
     },
 }
 
@@ -136,6 +147,7 @@ SURFACE = {
         {"name": "Ruggedness", "why": "rover drives and stable construction", "traits": ["slope", "relief"]},
         {"name": "Ground strength", "why": "load from buildings and landers", "traits": ["strength"]},
         {"name": "Landing safety", "why": "slope and rocks under a lander", "traits": ["safe10", "rocks"]},
+        {"name": "Bare ground", "why": "driving and building on open rock and soil, not plants", "traits": ["bare"]},
     ],
 }
 
@@ -199,6 +211,8 @@ CHALLENGES = {
             "parts": [
                 {"name": "Long flat ground", "why": "pads, solar farms, roads, a railgun", "traits": ["flat5", "safe10", "slope"]},
             ],
+            "ideal": {"flat5": 1, "safe10": 1, "slope": 0},
+            "ideal_note": "Scored against ideal flat ground (all of it under 5°), not against the region's own terrain, because a steep region still needs flat strips nearby.",
         },
         {
             "id": "dust",
@@ -245,7 +259,7 @@ CHALLENGES = {
             "question": "Where can teams practise with wind, dust storms and dust cover?",
             "only": "Mars only",
             "parts": [
-                {"name": "Dust lifting", "why": "surface work, habitats and design", "traits": ["dust_days"]},
+                {"name": "Dust lifting", "why": "surface work, habitats and design", "traits": ["dust_haze", "bare"]},
             ],
             "unscored": [
                 {
@@ -263,7 +277,7 @@ CHALLENGES = {
             "only": "Mars only",
             "built_from": "Built on the hydrated-minerals data, plus dryness and cold.",
             "parts": [
-                {"name": "Places that preserve life's traces", "why": "water-made minerals in dry, cold ground", "traits": ["hydrated", "dry", "cold"]},
+                {"name": "Places that preserve life's traces", "why": "water-made minerals in dry, cold, bare ground", "traits": ["hydrated", "dry", "cold", "bare"]},
             ],
         },
     ],

@@ -49,27 +49,27 @@
     "frozen_months_surface": 8,
     "soil_wetness": 0.81,
     "aod_550": 0.1,
-    "noon_sun_deg": 34.12,
+    "noon_sun_deg": 34.11,
     "lit_share": 0.5,
     "elevation_m": 334.5,
     "terrain_240": {
      "slope_median_deg": 0.0,
-     "slope_p90_deg": 1.61,
+     "slope_p90_deg": 1.8,
      "share_under_10": 1.0,
      "share_under_5": 0.994,
-     "relief_m": 21.3
+     "relief_m": 30.3
     },
     "terrain_200": {
      "slope_median_deg": 0.0,
-     "slope_p90_deg": 1.65,
+     "slope_p90_deg": 2.05,
      "share_under_10": 1.0,
-     "share_under_5": 0.99,
-     "relief_m": 20.9
+     "share_under_5": 0.988,
+     "relief_m": 30.2
     },
     "bare_share": 0.0,
     "ice_share": 0.0,
     "land_cover_main": "Water Bodies",
-    "ndvi_max": 0.362
+    "ndvi_max": 0.429
    }
   },
   {
@@ -175,27 +175,27 @@
     "frozen_months_surface": 0,
     "soil_wetness": 0.35,
     "aod_550": 0.07,
-    "noon_sun_deg": 54.3,
+    "noon_sun_deg": 54.32,
     "lit_share": 0.5,
-    "elevation_m": 1518.2,
+    "elevation_m": 1444.9,
     "terrain_240": {
-     "slope_median_deg": 1.1,
-     "slope_p90_deg": 6.1,
-     "share_under_10": 0.982,
-     "share_under_5": 0.866,
-     "relief_m": 259.8
+     "slope_median_deg": 1.57,
+     "slope_p90_deg": 6.84,
+     "share_under_10": 0.977,
+     "share_under_5": 0.824,
+     "relief_m": 274.5
     },
     "terrain_200": {
-     "slope_median_deg": 1.11,
-     "slope_p90_deg": 6.15,
-     "share_under_10": 0.978,
-     "share_under_5": 0.861,
-     "relief_m": 259.9
+     "slope_median_deg": 1.61,
+     "slope_p90_deg": 7.08,
+     "share_under_10": 0.975,
+     "share_under_5": 0.806,
+     "relief_m": 273.3
     },
-    "bare_share": 0.116,
+    "bare_share": 0.156,
     "ice_share": 0.0,
     "land_cover_main": "Open Shrublands",
-    "ndvi_max": 0.146
+    "ndvi_max": 0.151
    }
   },
   {
@@ -217,27 +217,27 @@
     "frozen_months_surface": 0,
     "soil_wetness": 0.35,
     "aod_550": 0.07,
-    "noon_sun_deg": 54.7,
+    "noon_sun_deg": 54.69,
     "lit_share": 0.5,
-    "elevation_m": 2015.3,
+    "elevation_m": 2054.1,
     "terrain_240": {
-     "slope_median_deg": 3.3,
-     "slope_p90_deg": 11.5,
-     "share_under_10": 0.856,
-     "share_under_5": 0.66,
-     "relief_m": 364.1
+     "slope_median_deg": 2.2,
+     "slope_p90_deg": 9.95,
+     "share_under_10": 0.901,
+     "share_under_5": 0.754,
+     "relief_m": 266.8
     },
     "terrain_200": {
-     "slope_median_deg": 3.49,
-     "slope_p90_deg": 12.4,
-     "share_under_10": 0.842,
-     "share_under_5": 0.646,
-     "relief_m": 366.0
+     "slope_median_deg": 2.25,
+     "slope_p90_deg": 10.86,
+     "share_under_10": 0.883,
+     "share_under_5": 0.746,
+     "relief_m": 265.1
     },
-    "bare_share": 0.019,
+    "bare_share": 0.051,
     "ice_share": 0.0,
-    "land_cover_main": "Open Shrublands",
-    "ndvi_max": 0.343
+    "land_cover_main": "Grasslands",
+    "ndvi_max": 0.323
    }
   },
   {
@@ -461,35 +461,35 @@
     "precip_mm_day": 0.3,
     "rh_pct": 78.06,
     "wind_ms": 6.45,
-    "sun_kwh_m2_day": 5.1655,
+    "sun_kwh_m2_day": 5.2526,
     "ts_min_c": 15.41,
     "ts_max_c": 31.46,
     "ts_seasonal_swing_c": 16.05,
     "ts_daily_range_c": 4.49,
     "frozen_months_surface": 0,
     "soil_wetness": 0.28,
-    "aod_550": 0.22,
-    "noon_sun_deg": 60.84,
+    "aod_550": 0.27,
+    "noon_sun_deg": 61.01,
     "lit_share": 0.5,
-    "elevation_m": 157.3,
+    "elevation_m": 155.5,
     "terrain_240": {
-     "slope_median_deg": 4.31,
-     "slope_p90_deg": 13.89,
-     "share_under_10": 0.796,
-     "share_under_5": 0.583,
-     "relief_m": 388.8
+     "slope_median_deg": 2.5,
+     "slope_p90_deg": 5.93,
+     "share_under_10": 0.963,
+     "share_under_5": 0.867,
+     "relief_m": 281.9
     },
     "terrain_200": {
-     "slope_median_deg": 4.24,
-     "slope_p90_deg": 15.24,
-     "share_under_10": 0.781,
-     "share_under_5": 0.569,
-     "relief_m": 389.7
+     "slope_median_deg": 2.55,
+     "slope_p90_deg": 6.95,
+     "share_under_10": 0.944,
+     "share_under_5": 0.85,
+     "relief_m": 281.7
     },
-    "bare_share": 0.333,
+    "bare_share": 0.968,
     "ice_share": 0.0,
-    "land_cover_main": "Grasslands",
-    "ndvi_max": 0.222
+    "land_cover_main": "Barren",
+    "ndvi_max": 0.092
    }
   },
   {
@@ -511,27 +511,27 @@
     "frozen_months_surface": 0,
     "soil_wetness": 0.65,
     "aod_550": 0.1,
-    "noon_sun_deg": 69.34,
+    "noon_sun_deg": 69.32,
     "lit_share": 0.5,
-    "elevation_m": 3213.3,
+    "elevation_m": 3606.2,
     "terrain_240": {
-     "slope_median_deg": 11.22,
-     "slope_p90_deg": 18.15,
-     "share_under_10": 0.425,
-     "share_under_5": 0.057,
-     "relief_m": 1792.6
+     "slope_median_deg": 10.22,
+     "slope_p90_deg": 16.15,
+     "share_under_10": 0.477,
+     "share_under_5": 0.035,
+     "relief_m": 859.0
     },
     "terrain_200": {
-     "slope_median_deg": 11.57,
-     "slope_p90_deg": 18.67,
-     "share_under_10": 0.406,
-     "share_under_5": 0.059,
-     "relief_m": 1789.7
+     "slope_median_deg": 10.42,
+     "slope_p90_deg": 16.65,
+     "share_under_10": 0.464,
+     "share_under_5": 0.036,
+     "relief_m": 858.9
     },
-    "bare_share": 0.608,
+    "bare_share": 0.942,
     "ice_share": 0.0,
     "land_cover_main": "Barren",
-    "ndvi_max": 0.193
+    "ndvi_max": 0.07
    }
   },
   {
@@ -671,35 +671,35 @@
     "precip_mm_day": 0.02,
     "rh_pct": 44.09,
     "wind_ms": 3.03,
-    "sun_kwh_m2_day": 5.9551,
+    "sun_kwh_m2_day": 7.2058,
     "ts_min_c": -2.44,
     "ts_max_c": 45.22,
     "ts_seasonal_swing_c": 47.66,
     "ts_daily_range_c": 28.59,
     "frozen_months_surface": 0,
     "soil_wetness": 0.1,
-    "aod_550": 0.06,
-    "noon_sun_deg": 65.9,
+    "aod_550": 0.04,
+    "noon_sun_deg": 65.92,
     "lit_share": 0.5,
-    "elevation_m": 1100.6,
+    "elevation_m": 1032.5,
     "terrain_240": {
-     "slope_median_deg": 3.78,
-     "slope_p90_deg": 9.87,
-     "share_under_10": 0.903,
-     "share_under_5": 0.626,
-     "relief_m": 282.7
+     "slope_median_deg": 3.06,
+     "slope_p90_deg": 9.37,
+     "share_under_10": 0.918,
+     "share_under_5": 0.686,
+     "relief_m": 274.4
     },
     "terrain_200": {
-     "slope_median_deg": 4.05,
-     "slope_p90_deg": 11.89,
-     "share_under_10": 0.845,
-     "share_under_5": 0.578,
-     "relief_m": 290.2
+     "slope_median_deg": 3.35,
+     "slope_p90_deg": 11.71,
+     "share_under_10": 0.864,
+     "share_under_5": 0.655,
+     "relief_m": 274.9
     },
     "bare_share": 1.0,
     "ice_share": 0.0,
     "land_cover_main": "Barren",
-    "ndvi_max": 0.103
+    "ndvi_max": 0.1
    }
   },
   {
@@ -831,43 +831,43 @@
   {
    "id": "rio-tinto",
    "values": {
-    "t_min_c": -4.61,
-    "t_max_c": 46.26,
-    "daily_range_c": 13.45,
-    "seasonal_swing_c": 50.87,
+    "t_min_c": -4.53,
+    "t_max_c": 45.03,
+    "daily_range_c": 12.91,
+    "seasonal_swing_c": 49.56,
     "frozen_months": 0,
-    "precip_mm_day": 1.28,
-    "rh_pct": 62.53,
-    "wind_ms": 3.61,
+    "precip_mm_day": 1.24,
+    "rh_pct": 63.87,
+    "wind_ms": 3.87,
     "sun_kwh_m2_day": 5.0191,
-    "ts_min_c": -5.44,
-    "ts_max_c": 55.53,
-    "ts_seasonal_swing_c": 60.97,
-    "ts_daily_range_c": 18.89,
+    "ts_min_c": -4.95,
+    "ts_max_c": 54.21,
+    "ts_seasonal_swing_c": 59.16,
+    "ts_daily_range_c": 17.95,
     "frozen_months_surface": 0,
-    "soil_wetness": 0.51,
+    "soil_wetness": 0.47,
     "aod_550": 0.16,
-    "noon_sun_deg": 52.6,
+    "noon_sun_deg": 52.32,
     "lit_share": 0.5,
-    "elevation_m": 77.0,
+    "elevation_m": 349.9,
     "terrain_240": {
-     "slope_median_deg": 1.18,
-     "slope_p90_deg": 2.82,
-     "share_under_10": 1.0,
-     "share_under_5": 0.997,
-     "relief_m": 94.0
+     "slope_median_deg": 4.12,
+     "slope_p90_deg": 8.38,
+     "share_under_10": 0.948,
+     "share_under_5": 0.644,
+     "relief_m": 189.9
     },
     "terrain_200": {
-     "slope_median_deg": 1.25,
-     "slope_p90_deg": 2.95,
-     "share_under_10": 1.0,
-     "share_under_5": 0.992,
-     "relief_m": 94.4
+     "slope_median_deg": 4.39,
+     "slope_p90_deg": 9.23,
+     "share_under_10": 0.92,
+     "share_under_5": 0.582,
+     "relief_m": 191.5
     },
-    "bare_share": 0.0,
+    "bare_share": 0.016,
     "ice_share": 0.0,
-    "land_cover_main": "Croplands",
-    "ndvi_max": 0.445
+    "land_cover_main": "Savannas",
+    "ndvi_max": 0.54
    }
   },
   {
@@ -915,43 +915,43 @@
   {
    "id": "qaidam-dalangtan",
    "values": {
-    "t_min_c": -24.0,
-    "t_max_c": 34.76,
-    "daily_range_c": 13.27,
-    "seasonal_swing_c": 58.76,
-    "frozen_months": 4,
-    "precip_mm_day": 0.17,
-    "rh_pct": 28.26,
-    "wind_ms": 4.04,
-    "sun_kwh_m2_day": 5.4329,
-    "ts_min_c": -27.47,
-    "ts_max_c": 52.77,
-    "ts_seasonal_swing_c": 80.24,
-    "ts_daily_range_c": 25.28,
-    "frozen_months_surface": 4,
-    "soil_wetness": 0.26,
-    "aod_550": 0.21,
-    "noon_sun_deg": 52.73,
+    "t_min_c": -26.99,
+    "t_max_c": 33.17,
+    "daily_range_c": 13.35,
+    "seasonal_swing_c": 60.16,
+    "frozen_months": 5,
+    "precip_mm_day": 0.11,
+    "rh_pct": 33.18,
+    "wind_ms": 3.46,
+    "sun_kwh_m2_day": 5.1864,
+    "ts_min_c": -29.68,
+    "ts_max_c": 49.48,
+    "ts_seasonal_swing_c": 79.16,
+    "ts_daily_range_c": 25.8,
+    "frozen_months_surface": 5,
+    "soil_wetness": 0.18,
+    "aod_550": 0.27,
+    "noon_sun_deg": 51.67,
     "lit_share": 0.5,
-    "elevation_m": 2695.6,
+    "elevation_m": 2745.1,
     "terrain_240": {
-     "slope_median_deg": 0.2,
-     "slope_p90_deg": 0.39,
+     "slope_median_deg": 0.27,
+     "slope_p90_deg": 1.64,
      "share_under_10": 1.0,
-     "share_under_5": 1.0,
-     "relief_m": 24.2
+     "share_under_5": 0.981,
+     "relief_m": 74.7
     },
     "terrain_200": {
-     "slope_median_deg": 0.21,
-     "slope_p90_deg": 0.43,
+     "slope_median_deg": 0.28,
+     "slope_p90_deg": 1.74,
      "share_under_10": 1.0,
-     "share_under_5": 1.0,
-     "relief_m": 24.2
+     "share_under_5": 0.98,
+     "relief_m": 74.4
     },
     "bare_share": 1.0,
     "ice_share": 0.0,
     "land_cover_main": "Barren",
-    "ndvi_max": 0.06
+    "ndvi_max": 0.051
    }
   },
   {
@@ -1293,43 +1293,43 @@
   {
    "id": "gros-morne",
    "values": {
-    "t_min_c": -29.92,
-    "t_max_c": 27.74,
-    "daily_range_c": 7.74,
-    "seasonal_swing_c": 57.66,
-    "frozen_months": 6,
-    "precip_mm_day": 3.76,
-    "rh_pct": 90.92,
-    "wind_ms": 2.83,
+    "t_min_c": -23.9,
+    "t_max_c": 23.57,
+    "daily_range_c": 4.75,
+    "seasonal_swing_c": 47.47,
+    "frozen_months": 5,
+    "precip_mm_day": 3.73,
+    "rh_pct": 88.14,
+    "wind_ms": 4.72,
     "sun_kwh_m2_day": 2.9621,
-    "ts_min_c": -35.37,
-    "ts_max_c": 27.52,
-    "ts_seasonal_swing_c": 62.89,
-    "ts_daily_range_c": 8.09,
-    "frozen_months_surface": 6,
+    "ts_min_c": -26.06,
+    "ts_max_c": 22.84,
+    "ts_seasonal_swing_c": 48.9,
+    "ts_daily_range_c": 4.04,
+    "frozen_months_surface": 5,
     "soil_wetness": 0.87,
     "aod_550": 0.13,
-    "noon_sun_deg": 40.38,
+    "noon_sun_deg": 40.56,
     "lit_share": 0.5,
-    "elevation_m": 601.5,
+    "elevation_m": 488.7,
     "terrain_240": {
-     "slope_median_deg": 7.93,
-     "slope_p90_deg": 31.52,
-     "share_under_10": 0.566,
-     "share_under_5": 0.321,
-     "relief_m": 581.2
+     "slope_median_deg": 7.43,
+     "slope_p90_deg": 24.33,
+     "share_under_10": 0.613,
+     "share_under_5": 0.349,
+     "relief_m": 672.0
     },
     "terrain_200": {
-     "slope_median_deg": 8.21,
-     "slope_p90_deg": 32.99,
-     "share_under_10": 0.56,
-     "share_under_5": 0.305,
-     "relief_m": 583.4
+     "slope_median_deg": 7.49,
+     "slope_p90_deg": 25.63,
+     "share_under_10": 0.6,
+     "share_under_5": 0.341,
+     "relief_m": 670.5
     },
-    "bare_share": 0.0,
+    "bare_share": 0.027,
     "ice_share": 0.0,
-    "land_cover_main": "Savannas",
-    "ndvi_max": 0.754
+    "land_cover_main": "Grasslands",
+    "ndvi_max": 0.487
    }
   },
   {
@@ -1377,43 +1377,43 @@
   {
    "id": "death-valley",
    "values": {
-    "t_min_c": -6.16,
-    "t_max_c": 46.22,
-    "daily_range_c": 14.65,
-    "seasonal_swing_c": 52.38,
+    "t_min_c": -5.71,
+    "t_max_c": 46.72,
+    "daily_range_c": 14.73,
+    "seasonal_swing_c": 52.43,
     "frozen_months": 0,
-    "precip_mm_day": 0.34,
-    "rh_pct": 29.33,
-    "wind_ms": 2.97,
+    "precip_mm_day": 0.38,
+    "rh_pct": 31.09,
+    "wind_ms": 3.02,
     "sun_kwh_m2_day": 5.7024,
-    "ts_min_c": -8.42,
-    "ts_max_c": 59.22,
-    "ts_seasonal_swing_c": 67.64,
-    "ts_daily_range_c": 25.67,
+    "ts_min_c": -9.05,
+    "ts_max_c": 60.72,
+    "ts_seasonal_swing_c": 69.77,
+    "ts_daily_range_c": 25.86,
     "frozen_months_surface": 0,
-    "soil_wetness": 0.23,
+    "soil_wetness": 0.24,
     "aod_550": 0.09,
-    "noon_sun_deg": 53.5,
+    "noon_sun_deg": 53.75,
     "lit_share": 0.5,
-    "elevation_m": 79.7,
+    "elevation_m": -84.9,
     "terrain_240": {
-     "slope_median_deg": 4.92,
-     "slope_p90_deg": 23.85,
-     "share_under_10": 0.628,
-     "share_under_5": 0.504,
-     "relief_m": 1036.7
+     "slope_median_deg": 0.02,
+     "slope_p90_deg": 10.27,
+     "share_under_10": 0.899,
+     "share_under_5": 0.847,
+     "relief_m": 270.3
     },
     "terrain_200": {
-     "slope_median_deg": 4.91,
-     "slope_p90_deg": 25.26,
-     "share_under_10": 0.622,
-     "share_under_5": 0.506,
-     "relief_m": 1041.1
+     "slope_median_deg": 0.03,
+     "slope_p90_deg": 10.03,
+     "share_under_10": 0.9,
+     "share_under_5": 0.846,
+     "relief_m": 261.0
     },
-    "bare_share": 0.779,
+    "bare_share": 0.989,
     "ice_share": 0.0,
     "land_cover_main": "Barren",
-    "ndvi_max": 0.094
+    "ndvi_max": 0.086
    }
   },
   {
@@ -1435,27 +1435,27 @@
     "frozen_months_surface": 5,
     "soil_wetness": 0.48,
     "aod_550": 0.09,
-    "noon_sun_deg": 46.58,
+    "noon_sun_deg": 46.54,
     "lit_share": 0.5,
-    "elevation_m": 1733.9,
+    "elevation_m": 1778.8,
     "terrain_240": {
-     "slope_median_deg": 0.9,
-     "slope_p90_deg": 4.14,
-     "share_under_10": 0.988,
-     "share_under_5": 0.927,
-     "relief_m": 135.0
+     "slope_median_deg": 1.44,
+     "slope_p90_deg": 15.14,
+     "share_under_10": 0.795,
+     "share_under_5": 0.682,
+     "relief_m": 458.4
     },
     "terrain_200": {
-     "slope_median_deg": 0.95,
-     "slope_p90_deg": 4.62,
-     "share_under_10": 0.982,
-     "share_under_5": 0.913,
-     "relief_m": 134.5
+     "slope_median_deg": 1.49,
+     "slope_p90_deg": 16.21,
+     "share_under_10": 0.778,
+     "share_under_5": 0.673,
+     "relief_m": 459.7
     },
-    "bare_share": 0.629,
+    "bare_share": 0.323,
     "ice_share": 0.0,
-    "land_cover_main": "Barren",
-    "ndvi_max": 0.191
+    "land_cover_main": "Grasslands",
+    "ndvi_max": 0.284
    }
   },
   {
@@ -1477,27 +1477,27 @@
     "frozen_months_surface": 0,
     "soil_wetness": 0.67,
     "aod_550": 0.1,
-    "noon_sun_deg": 69.6,
+    "noon_sun_deg": 69.58,
     "lit_share": 0.5,
-    "elevation_m": 984.1,
+    "elevation_m": 1096.4,
     "terrain_240": {
-     "slope_median_deg": 2.65,
-     "slope_p90_deg": 4.33,
-     "share_under_10": 0.989,
-     "share_under_5": 0.954,
-     "relief_m": 349.3
+     "slope_median_deg": 2.28,
+     "slope_p90_deg": 4.37,
+     "share_under_10": 0.972,
+     "share_under_5": 0.918,
+     "relief_m": 231.0
     },
     "terrain_200": {
-     "slope_median_deg": 2.68,
-     "slope_p90_deg": 4.44,
-     "share_under_10": 0.986,
-     "share_under_5": 0.941,
-     "relief_m": 345.9
+     "slope_median_deg": 2.33,
+     "slope_p90_deg": 4.46,
+     "share_under_10": 0.963,
+     "share_under_5": 0.916,
+     "relief_m": 230.0
     },
-    "bare_share": 0.171,
+    "bare_share": 0.199,
     "ice_share": 0.0,
     "land_cover_main": "Evergreen Broadleaf Forests",
-    "ndvi_max": 0.618
+    "ndvi_max": 0.656
    }
   },
   {
@@ -1713,85 +1713,85 @@
   {
    "id": "central-ukraine",
    "values": {
-    "t_min_c": -33.15,
-    "t_max_c": 38.21,
-    "daily_range_c": 8.81,
-    "seasonal_swing_c": 71.36,
+    "t_min_c": -32.76,
+    "t_max_c": 39.5,
+    "daily_range_c": 10.19,
+    "seasonal_swing_c": 72.26,
     "frozen_months": 3,
-    "precip_mm_day": 1.56,
-    "rh_pct": 75.78,
-    "wind_ms": 4.36,
-    "sun_kwh_m2_day": 3.4603,
-    "ts_min_c": -38.56,
-    "ts_max_c": 40.97,
-    "ts_seasonal_swing_c": 79.53,
-    "ts_daily_range_c": 10.85,
+    "precip_mm_day": 1.4,
+    "rh_pct": 73.78,
+    "wind_ms": 4.3,
+    "sun_kwh_m2_day": 3.5496,
+    "ts_min_c": -34.81,
+    "ts_max_c": 44.77,
+    "ts_seasonal_swing_c": 79.58,
+    "ts_daily_range_c": 13.52,
     "frozen_months_surface": 3,
     "soil_wetness": 0.48,
     "aod_550": 0.28,
-    "noon_sun_deg": 40.5,
+    "noon_sun_deg": 41.5,
     "lit_share": 0.5,
-    "elevation_m": 79.0,
+    "elevation_m": 156.2,
     "terrain_240": {
-     "slope_median_deg": 0.13,
-     "slope_p90_deg": 1.77,
+     "slope_median_deg": 1.12,
+     "slope_p90_deg": 2.76,
      "share_under_10": 1.0,
-     "share_under_5": 0.99,
-     "relief_m": 53.8
+     "share_under_5": 0.999,
+     "relief_m": 73.7
     },
     "terrain_200": {
-     "slope_median_deg": 0.15,
-     "slope_p90_deg": 1.95,
+     "slope_median_deg": 1.18,
+     "slope_p90_deg": 3.03,
      "share_under_10": 1.0,
-     "share_under_5": 0.987,
-     "relief_m": 53.1
+     "share_under_5": 0.997,
+     "relief_m": 74.4
     },
-    "bare_share": 0.007,
+    "bare_share": 0.0,
     "ice_share": 0.0,
-    "land_cover_main": "Water Bodies",
-    "ndvi_max": 0.49
+    "land_cover_main": "Croplands",
+    "ndvi_max": 0.596
    }
   },
   {
    "id": "amazon-near-manaus",
    "values": {
-    "t_min_c": 21.16,
-    "t_max_c": 40.73,
-    "daily_range_c": 5.05,
-    "seasonal_swing_c": 19.57,
+    "t_min_c": 19.24,
+    "t_max_c": 41.85,
+    "daily_range_c": 6.59,
+    "seasonal_swing_c": 22.61,
     "frozen_months": 0,
-    "precip_mm_day": 5.36,
-    "rh_pct": 83.49,
-    "wind_ms": 1.22,
-    "sun_kwh_m2_day": 4.6546,
-    "ts_min_c": 22.98,
-    "ts_max_c": 39.92,
-    "ts_seasonal_swing_c": 16.94,
-    "ts_daily_range_c": 4.88,
+    "precip_mm_day": 5.43,
+    "rh_pct": 87.06,
+    "wind_ms": 0.8,
+    "sun_kwh_m2_day": 4.6332,
+    "ts_min_c": 19.22,
+    "ts_max_c": 41.73,
+    "ts_seasonal_swing_c": 22.51,
+    "ts_daily_range_c": 6.81,
     "frozen_months_surface": 0,
-    "soil_wetness": 0.74,
+    "soil_wetness": 0.78,
     "aod_550": 0.35,
-    "noon_sun_deg": 74.96,
+    "noon_sun_deg": 74.99,
     "lit_share": 0.5,
-    "elevation_m": 63.8,
+    "elevation_m": 90.7,
     "terrain_240": {
-     "slope_median_deg": 2.12,
-     "slope_p90_deg": 3.82,
+     "slope_median_deg": 2.52,
+     "slope_p90_deg": 4.68,
      "share_under_10": 1.0,
-     "share_under_5": 0.988,
-     "relief_m": 55.6
+     "share_under_5": 0.936,
+     "relief_m": 55.8
     },
     "terrain_200": {
-     "slope_median_deg": 2.44,
-     "slope_p90_deg": 4.58,
+     "slope_median_deg": 2.96,
+     "slope_p90_deg": 5.68,
      "share_under_10": 1.0,
-     "share_under_5": 0.938,
-     "relief_m": 57.1
+     "share_under_5": 0.827,
+     "relief_m": 57.5
     },
     "bare_share": 0.0,
     "ice_share": 0.0,
-    "land_cover_main": "Urban and Built-up Lands",
-    "ndvi_max": 0.518
+    "land_cover_main": "Evergreen Broadleaf Forests",
+    "ndvi_max": 0.838
    }
   },
   {
@@ -1939,27 +1939,27 @@
     "frozen_months_surface": 0,
     "soil_wetness": 0.59,
     "aod_550": 0.29,
-    "noon_sun_deg": 37.5,
+    "noon_sun_deg": 37.45,
     "lit_share": 0.5,
-    "elevation_m": -3.6,
+    "elevation_m": -4.3,
     "terrain_240": {
-     "slope_median_deg": 0.16,
-     "slope_p90_deg": 0.78,
+     "slope_median_deg": 0.06,
+     "slope_p90_deg": 0.46,
      "share_under_10": 1.0,
      "share_under_5": 1.0,
-     "relief_m": 8.2
+     "relief_m": 4.8
     },
     "terrain_200": {
-     "slope_median_deg": 0.22,
-     "slope_p90_deg": 1.17,
+     "slope_median_deg": 0.07,
+     "slope_p90_deg": 0.64,
      "share_under_10": 1.0,
      "share_under_5": 1.0,
-     "relief_m": 9.2
+     "relief_m": 5.0
     },
     "bare_share": 0.0,
     "ice_share": 0.0,
     "land_cover_main": "Croplands",
-    "ndvi_max": 0.674
+    "ndvi_max": 0.641
    }
   },
   {
@@ -2007,43 +2007,43 @@
   {
    "id": "waikato",
    "values": {
-    "t_min_c": 1.08,
-    "t_max_c": 29.49,
-    "daily_range_c": 6.74,
-    "seasonal_swing_c": 28.41,
+    "t_min_c": -1.17,
+    "t_max_c": 30.1,
+    "daily_range_c": 8.33,
+    "seasonal_swing_c": 31.27,
     "frozen_months": 0,
-    "precip_mm_day": 3.07,
-    "rh_pct": 81.06,
-    "wind_ms": 5.2,
+    "precip_mm_day": 3.0,
+    "rh_pct": 81.08,
+    "wind_ms": 3.88,
     "sun_kwh_m2_day": 4.11,
-    "ts_min_c": 1.22,
-    "ts_max_c": 35.02,
-    "ts_seasonal_swing_c": 33.8,
-    "ts_daily_range_c": 9.9,
+    "ts_min_c": -0.76,
+    "ts_max_c": 33.45,
+    "ts_seasonal_swing_c": 34.21,
+    "ts_daily_range_c": 10.65,
     "frozen_months_surface": 0,
-    "soil_wetness": 0.81,
+    "soil_wetness": 0.77,
     "aod_550": 0.08,
-    "noon_sun_deg": 52.2,
+    "noon_sun_deg": 52.3,
     "lit_share": 0.5,
-    "elevation_m": 41.9,
+    "elevation_m": 43.4,
     "terrain_240": {
-     "slope_median_deg": 0.37,
-     "slope_p90_deg": 1.94,
-     "share_under_10": 1.0,
-     "share_under_5": 1.0,
-     "relief_m": 19.4
+     "slope_median_deg": 1.49,
+     "slope_p90_deg": 6.21,
+     "share_under_10": 0.985,
+     "share_under_5": 0.845,
+     "relief_m": 129.0
     },
     "terrain_200": {
-     "slope_median_deg": 0.4,
-     "slope_p90_deg": 2.3,
-     "share_under_10": 1.0,
-     "share_under_5": 1.0,
-     "relief_m": 19.3
+     "slope_median_deg": 1.66,
+     "slope_p90_deg": 6.68,
+     "share_under_10": 0.975,
+     "share_under_5": 0.832,
+     "relief_m": 127.6
     },
     "bare_share": 0.0,
     "ice_share": 0.0,
-    "land_cover_main": "Urban and Built-up Lands",
-    "ndvi_max": 0.687
+    "land_cover_main": "Grasslands",
+    "ndvi_max": 0.833
    }
   },
   {
@@ -2427,43 +2427,43 @@
   {
    "id": "lut-desert-kaluts",
    "values": {
-    "t_min_c": -4.83,
-    "t_max_c": 51.8,
-    "daily_range_c": 15.59,
-    "seasonal_swing_c": 56.63,
+    "t_min_c": -5.45,
+    "t_max_c": 51.76,
+    "daily_range_c": 14.83,
+    "seasonal_swing_c": 57.21,
     "frozen_months": 0,
-    "precip_mm_day": 0.22,
-    "rh_pct": 21.88,
-    "wind_ms": 4.06,
+    "precip_mm_day": 0.23,
+    "rh_pct": 21.47,
+    "wind_ms": 3.77,
     "sun_kwh_m2_day": 5.9362,
-    "ts_min_c": -6.68,
-    "ts_max_c": 68.3,
-    "ts_seasonal_swing_c": 74.98,
-    "ts_daily_range_c": 27.41,
+    "ts_min_c": -6.81,
+    "ts_max_c": 65.13,
+    "ts_seasonal_swing_c": 71.94,
+    "ts_daily_range_c": 25.7,
     "frozen_months_surface": 0,
     "soil_wetness": 0.16,
     "aod_550": 0.3,
-    "noon_sun_deg": 59.6,
+    "noon_sun_deg": 59.47,
     "lit_share": 0.5,
-    "elevation_m": 274.0,
+    "elevation_m": 341.4,
     "terrain_240": {
-     "slope_median_deg": 2.59,
-     "slope_p90_deg": 7.01,
-     "share_under_10": 0.98,
-     "share_under_5": 0.804,
-     "relief_m": 200.2
+     "slope_median_deg": 2.04,
+     "slope_p90_deg": 4.19,
+     "share_under_10": 1.0,
+     "share_under_5": 0.952,
+     "relief_m": 42.8
     },
     "terrain_200": {
-     "slope_median_deg": 2.75,
-     "slope_p90_deg": 7.39,
-     "share_under_10": 0.961,
-     "share_under_5": 0.774,
-     "relief_m": 200.9
+     "slope_median_deg": 2.34,
+     "slope_p90_deg": 4.89,
+     "share_under_10": 1.0,
+     "share_under_5": 0.908,
+     "relief_m": 43.1
     },
     "bare_share": 1.0,
     "ice_share": 0.0,
     "land_cover_main": "Barren",
-    "ndvi_max": 0.079
+    "ndvi_max": 0.08
    }
   },
   {
@@ -2485,27 +2485,27 @@
     "frozen_months_surface": 0,
     "soil_wetness": 0.1,
     "aod_550": 0.3,
-    "noon_sun_deg": 64.3,
+    "noon_sun_deg": 64.41,
     "lit_share": 0.5,
-    "elevation_m": 1551.9,
+    "elevation_m": 1176.3,
     "terrain_240": {
-     "slope_median_deg": 2.78,
-     "slope_p90_deg": 8.58,
-     "share_under_10": 0.917,
-     "share_under_5": 0.8,
-     "relief_m": 481.6
+     "slope_median_deg": 0.81,
+     "slope_p90_deg": 1.86,
+     "share_under_10": 1.0,
+     "share_under_5": 0.999,
+     "relief_m": 119.0
     },
     "terrain_200": {
-     "slope_median_deg": 2.81,
-     "slope_p90_deg": 8.88,
-     "share_under_10": 0.912,
-     "share_under_5": 0.795,
-     "relief_m": 480.1
+     "slope_median_deg": 0.83,
+     "slope_p90_deg": 1.98,
+     "share_under_10": 1.0,
+     "share_under_5": 0.998,
+     "relief_m": 118.7
     },
-    "bare_share": 1.0,
+    "bare_share": 0.998,
     "ice_share": 0.0,
     "land_cover_main": "Barren",
-    "ndvi_max": 0.049
+    "ndvi_max": 0.097
    }
   },
   {
@@ -2527,69 +2527,69 @@
     "frozen_months_surface": 0,
     "soil_wetness": 0.08,
     "aod_550": 0.29,
-    "noon_sun_deg": 69.33,
+    "noon_sun_deg": 69.34,
     "lit_share": 0.5,
-    "elevation_m": 2748.4,
+    "elevation_m": 2970.4,
     "terrain_240": {
-     "slope_median_deg": 9.16,
-     "slope_p90_deg": 17.59,
-     "share_under_10": 0.585,
-     "share_under_5": 0.143,
-     "relief_m": 1123.3
+     "slope_median_deg": 8.79,
+     "slope_p90_deg": 19.43,
+     "share_under_10": 0.595,
+     "share_under_5": 0.234,
+     "relief_m": 859.8
     },
     "terrain_200": {
-     "slope_median_deg": 9.39,
-     "slope_p90_deg": 18.9,
-     "share_under_10": 0.557,
-     "share_under_5": 0.146,
-     "relief_m": 1114.0
+     "slope_median_deg": 8.94,
+     "slope_p90_deg": 20.3,
+     "share_under_10": 0.579,
+     "share_under_5": 0.241,
+     "relief_m": 854.0
     },
-    "bare_share": 1.0,
+    "bare_share": 0.998,
     "ice_share": 0.0,
     "land_cover_main": "Barren",
-    "ndvi_max": 0.145
+    "ndvi_max": 0.163
    }
   },
   {
    "id": "yakutsk-taiga",
    "values": {
-    "t_min_c": -57.2,
-    "t_max_c": 37.29,
-    "daily_range_c": 8.89,
-    "seasonal_swing_c": 94.49,
+    "t_min_c": -57.48,
+    "t_max_c": 37.06,
+    "daily_range_c": 9.01,
+    "seasonal_swing_c": 94.54,
     "frozen_months": 7,
-    "precip_mm_day": 1.08,
-    "rh_pct": 85.12,
-    "wind_ms": 2.1,
+    "precip_mm_day": 1.15,
+    "rh_pct": 86.07,
+    "wind_ms": 2.18,
     "sun_kwh_m2_day": 2.8824,
-    "ts_min_c": -60.83,
-    "ts_max_c": 36.9,
-    "ts_seasonal_swing_c": 97.73,
-    "ts_daily_range_c": 10.19,
+    "ts_min_c": -60.8,
+    "ts_max_c": 37.08,
+    "ts_seasonal_swing_c": 97.88,
+    "ts_daily_range_c": 10.25,
     "frozen_months_surface": 7,
-    "soil_wetness": 0.57,
+    "soil_wetness": 0.61,
     "aod_550": 0.12,
     "noon_sun_deg": 28.0,
     "lit_share": 0.5,
-    "elevation_m": 97.1,
+    "elevation_m": 240.2,
     "terrain_240": {
-     "slope_median_deg": 0.29,
-     "slope_p90_deg": 0.78,
-     "share_under_10": 0.997,
-     "share_under_5": 0.99,
-     "relief_m": 15.2
+     "slope_median_deg": 0.42,
+     "slope_p90_deg": 1.27,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 46.9
     },
     "terrain_200": {
-     "slope_median_deg": 0.35,
-     "slope_p90_deg": 0.98,
-     "share_under_10": 0.997,
-     "share_under_5": 0.99,
-     "relief_m": 15.8
+     "slope_median_deg": 0.46,
+     "slope_p90_deg": 1.34,
+     "share_under_10": 1.0,
+     "share_under_5": 1.0,
+     "relief_m": 47.6
     },
-    "bare_share": 0.005,
+    "bare_share": 0.0,
     "ice_share": 0.0,
     "land_cover_main": "Savannas",
-    "ndvi_max": 0.557
+    "ndvi_max": 0.663
    }
   },
   {

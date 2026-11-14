@@ -114,3 +114,34 @@ def test_moon_values_agree_with_published():
     assert shadowed
     assert all(v["t_min_coldest_k"]["value"] < 110 for v in shadowed)
     assert all(v["t_min_k"]["value"] < 110 for v in shadowed)
+
+
+@needs_output
+def test_mars_ground_and_dust_values():
+    mars = {t["name"]: t["values"] for t in targets() if t["body"] == "mars"}
+    assert len(mars) == 5
+    for name, v in mars.items():
+        for k in ("t_min_ground_c", "daily_ground_swing_c", "dust_tau", "weh_pct"):
+            assert k in v and v[k].get("note"), (name, k)
+        t = v["t_min_ground_c"]["value"]
+        assert t is None or -150 <= t <= 30, name
+        s = v["daily_ground_swing_c"]["value"]
+        assert s is None or 0 < s <= 180, name
+        d = v["dust_tau"]["value"]
+        assert d is None or 0 <= d <= 5, name
+    assert mars["Gale"]["t_min_ground_c"]["value"] == -103
+    for name in ("Arcadia Planitia", "Deuteronilus Mensae", "Arsia Mons caves"):
+        assert mars[name]["t_min_ground_c"]["value"] is None
+        assert "no surface measurement" in mars[name]["t_min_ground_c"]["note"].lower()
+    assert "ice" in mars["Arcadia Planitia"]["weh_pct"]["note"]
+    assert "minerals" in mars["Gale"]["weh_pct"]["note"]
+
+
+def test_every_earth_site_has_a_coord_source():
+    sites = json.loads((OUT.parent.parent / "sites.json").read_text(encoding="utf-8"))
+    assert len({s["id"] for s in sites}) == len(sites)
+    for s in sites:
+        assert s["coord_source"].startswith("https://"), s["id"]
+        assert -90 <= s["lat"] <= 90 and -180 <= s["lon"] <= 180, s["id"]
+        if s["coords_estimate"]:
+            assert s.get("coord_note"), s["id"]

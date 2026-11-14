@@ -39,7 +39,7 @@ def test_team_plan_sub_points_are_covered():
 
 
 def test_mars_dust_is_compared_by_lifting_not_speed():
-    assert "not by wind speed" in TRAITS["dust_days"]["plain"]
+    assert "not by wind speed" in TRAITS["dust_haze"]["plain"]
 
 
 def test_targets_are_the_chosen_fourteen(app):
@@ -56,7 +56,7 @@ def test_every_real_target_value_names_its_source(app):
 
 
 def test_sample_traits_are_always_flagged(app):
-    sample_only = [k for k, t in TRAITS.items() if "sample" in t and "target_real" not in t]
+    sample_only = [k for k, t in TRAITS.items() if "earth" not in t]
     for s in app["sites"]:
         for body, vals in s["values"].items():
             for k in sample_only:
@@ -91,3 +91,36 @@ def test_rankings_are_sorted_and_bounded(app):
 def test_output_is_small_enough_for_phones():
     assert build.OUT.stat().st_size < 900_000
     json.loads(build.OUT.read_text(encoding="utf-8"))
+
+
+def test_industrial_sites_reward_flat_ground_even_for_steep_targets(app):
+    malapert = next(t for t in app["targets"] if t["name"] == "Malapert Massif")
+    assert malapert["values"]["flat5"]["value"] < 0.3
+    sites = {s["id"]: s for s in app["sites"]}
+    for row in app["results"][malapert["id"]]["industrial"][:5]:
+        assert sites[row["site"]]["values"]["moon"]["flat5"]["value"] >= 0.9
+
+
+def test_missing_real_value_is_not_replaced_by_a_sample():
+    vals = build.with_samples("x", "moon", {"slope": None})
+    assert vals["slope"] == {"value": None, "sample": False, "missing": True}
+    assert vals["strength"]["sample"]
+
+
+def test_challenge_with_only_sample_inputs_is_a_preview():
+    c = {"parts": [{"traits": ["strength", "rocks"]}]}
+    assert build.is_preview(c, {"strength": {"sample": True}, "rocks": {"sample": True}})
+    c = {"parts": [{"traits": ["strength", "slope"]}]}
+    assert not build.is_preview(c, {"strength": {"sample": True}, "slope": {"sample": False}})
+
+
+def test_validation_reports_the_held_out_half_and_first_run(app):
+    for v in app["validation"].values():
+        assert any(c["label"].startswith("Held-out half") for c in v["checks"])
+        assert v["firstRun"]
+        assert "industrial" not in v["challenges"]
+
+
+def test_mars_dust_is_scored_on_real_earth_data():
+    assert "earth" in TRAITS["dust_haze"]
+    assert "earth" in TRAITS["bare"]
