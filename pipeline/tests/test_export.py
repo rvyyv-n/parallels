@@ -59,7 +59,7 @@ LABEL = {"id": S, "name": S, "kind": enum("known_analog", "cave", "ordinary", "p
 PLACE = {"id": S, "name": S, "lat": N, "lon": N, "group": S, "challenge": opt(S), "cell": null(I), "score": null(N), "land_rank": null(N), "best_target": opt(S), "held_out": B, "blind": B, "note": opt(S)}
 CHECK = {"name": S, "pass_mark": N, "result": null(N), "passed": null(B), "n_pairs": I, "held_out_only": opt(null(N)), "blind_only": opt(null(N))}
 TEST = {"id": S, "title": S, "body": enum("moon", "mars"), "plain": S, "groups": [{"id": S, "name": S, "plain": S}], "places": [PLACE], "checks": [CHECK], "misses": [{"place": S, "why": S}]}
-VALIDATION = {"weights_commit": S, "summary": opt(S), "not_blind_note": S, "prototype_runs": [{"date": S, "result": S}], "tests": [TEST], "second_run": opt({"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}]}), "third_run": opt({"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}], "method_change": S, "adopted": B, "adoption_rule": S}), "stability": opt(S), "data_checks": [{"name": S, "result": S, "passed": B}]}
+VALIDATION = {"weights_commit": S, "summary": opt(S), "not_blind_note": S, "prototype_runs": [{"date": S, "result": S}], "tests": [TEST], "second_run": opt({"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}]}), "third_run": opt({"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}], "method_change": S, "adopted": B, "adoption_rule": S}), "more_runs": opt([{"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}], "method_change": S, "adopted": B, "adoption_rule": S}]), "stability": opt(S), "data_checks": [{"name": S, "result": S, "passed": B}]}
 
 KINDS = {
     S: lambda v: isinstance(v, str),
@@ -105,7 +105,7 @@ def stub(tmp_path_factory):
     stages, metas = synthetic()
     sites = json.loads(SITES.read_text(encoding="utf8"))
     targets, extra = load_targets()
-    cells, scored, _ = export(stages, metas, targets, extra, sites, load_points(CAVES), load_config(), "abc123", True, out)
+    cells, scored, _, _ = export(stages, metas, targets, extra, sites, load_points(CAVES), load_config(), "abc123", True, out)
     load = lambda name: json.loads((out / name).read_text(encoding="utf8"))
     return out, cells, scored, load("manifest.json"), load("labels.json"), load("validation.json")
 
@@ -213,13 +213,24 @@ def test_stub_with_method_11_matches_contract(tmp_path):
     stages, metas = synthetic()
     sites = json.loads(SITES.read_text(encoding="utf8"))
     targets, extra = load_targets()
-    export(stages, metas, targets, extra, sites, load_points(CAVES), load_config(), "abc", True, tmp_path, load_config(method="1.1"), "def")
+    export(stages, metas, targets, extra, sites, load_points(CAVES), load_config(), "abc", True, tmp_path, [("1.1", load_config(method="1.1"), "def"), ("1.2", load_config(method="1.2"), "ghi")])
     m = json.loads((tmp_path / "manifest.json").read_text(encoding="utf8"))
     v = json.loads((tmp_path / "validation.json").read_text(encoding="utf8"))
     assert conform(m, MANIFEST) == [] and conform(v, VALIDATION) == []
     tr = v["third_run"]
     assert tr["config_commit"] == "def" and len(tr["tests"]) == 5
-    assert m["method_version"] == ("1.1" if tr["adopted"] else "1.0")
-    mars = next(t for t in m["challenges"]["mars"] if t["id"] == "surface")
-    ids = {t["id"] for t in mars["traits"]}
-    assert ("volcanic_rock" in ids) == tr["adopted"]
+    assert len(v["more_runs"]) == 1 and v["more_runs"][0]["config_commit"] == "ghi"
+    assert v["stability"]
+    assert sum(t["default"] for t in m["targets"]) == 2 and len(m["targets"]) == 6
+
+
+def test_published_datasets_and_traits_are_complete():
+    path = OUT / "manifest.json"
+    if not path.exists():
+        pytest.skip("no exported files")
+    m = json.loads(path.read_text(encoding="utf8"))
+    for d in m["datasets"]:
+        assert all(d.get(k) for k in ("name", "agency", "licence", "used_for", "archive")), d["id"]
+        assert d["url"] or d["agency"] == "computed", d["id"]
+    for t in m["traits"]:
+        assert all(t.get(k) for k in ("earth_stat", "earth_dataset", "earth_resolution", "plain")), t["id"]

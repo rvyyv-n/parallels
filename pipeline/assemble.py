@@ -16,12 +16,15 @@ PERCENT = ("safe10_240", "flat5_240", "safe10_200", "flat5_200", "bare_share", "
 
 
 def load_config(path=CONFIG, method=None):
-    cfg = json.loads(Path(path).read_text(encoding="utf8"))
+    path = Path(path)
     if method is None:
-        return cfg
-    over = json.loads((Path(path).parent / f"v{method}.json").read_text(encoding="utf8"))
-    for body, chs in over["trait_weights"].items():
+        return json.loads(path.read_text(encoding="utf8"))
+    over = json.loads((path.parent / f"v{method}.json").read_text(encoding="utf8"))
+    parent = over["inherits"].split(":")[0].split(",")[0].strip()
+    cfg = load_config(path) if parent == path.name else load_config(path, parent[1:-5])
+    for body, chs in over.get("trait_weights", {}).items():
         cfg["trait_weights"][body].update(chs)
+    cfg["scoring"].update(over.get("scoring", {}))
     for k in ("version", "why", "rule", "parts", "adoption_rule", "plan_notes"):
         if k in over:
             cfg[k] = over[k]

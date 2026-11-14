@@ -154,3 +154,19 @@ def test_config_11_weights_follow_its_parts_and_v1_is_untouched():
     assert new["trait_weights"]["moon"]["industrial"] == base["trait_weights"]["moon"]["industrial"]
     assert new["filter_weights"] == base["filter_weights"] and new["validation"] == base["validation"]
     assert new["version"] == "v1.1" and "adoption_rule" in new
+
+
+def test_no_tie_credit_ranks_by_land_strictly_further():
+    r = earth_rank([0, 10, 20], 0, np.ones(3), ties="none")
+    assert list(r) == pytest.approx([2 / 3, 1 / 3, 0])
+    r = earth_rank([5, 5, 9], 0, np.ones(3), ties="none")
+    assert r[0] == pytest.approx(1 / 3) and r[2] == 0
+
+
+def test_config_chain_12_on_11_on_10():
+    from pipeline.assemble import load_config
+    base, v11, v12 = load_config(), load_config(method="1.1"), load_config(method="1.2")
+    assert "ties" not in base["scoring"] and "ties" not in v11["scoring"]
+    assert v12["scoring"]["ties"] == "none" and v12["scoring"]["floor"] == base["scoring"]["floor"]
+    assert v12["trait_weights"] == v11["trait_weights"] and v12["version"] == "v1.2"
+    assert v12["validation"] == base["validation"] and v12["filter_weights"] == base["filter_weights"]

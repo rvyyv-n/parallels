@@ -401,7 +401,7 @@ def base_name(name):
     return name.split(" (too few sites")[0]
 
 
-def beside(tests_new, tests_old, prefix):
+def beside(tests_new, tests_old, prefix, old_name="1.0", new_name="1.1"):
     old = {(t["body"], base_name(c["name"])): c for t in tests_old for c in t["checks"]}
     pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
     out = []
@@ -410,8 +410,8 @@ def beside(tests_new, tests_old, prefix):
         for c in t["checks"]:
             o = old.get((t["body"], base_name(c["name"])))
             if o:
-                lines.append(f"{base_name(c['name'])}: version 1.0 {pct(o['result'])} (held-out {pct(o['held_out_only'])}), version 1.1 {pct(c['result'])} (held-out {pct(c['held_out_only'])}).")
-        out.append(dict(t, id=f"{prefix}-{t['id']}", plain=t["plain"] + " Beside version 1.0: " + " ".join(lines)))
+                lines.append(f"{base_name(c['name'])}: version {old_name} {pct(o['result'])} (held-out {pct(o['held_out_only'])}), version {new_name} {pct(c['result'])} (held-out {pct(c['held_out_only'])}).")
+        out.append(dict(t, id=f"{prefix}-{t['id']}", plain=t["plain"] + f" Beside version {old_name}: " + " ".join(lines)))
     return out
 
 
@@ -443,6 +443,46 @@ def third_run(val_old, val_new, cfg, commit):
         "config_commit": commit,
         "summary": summary,
         "tests": beside(val_new["tests"], val_old["tests"], "third") + beside(sn["tests"], so["tests"], "third"),
+        "unchecked": sn["unchecked"],
+        "method_change": cfg["why"],
+        "adopted": ok,
+        "adoption_rule": cfg["adoption_rule"],
+    }
+
+
+ORDINALS = {3: "third", 4: "fourth", 5: "fifth"}
+
+
+def later_run(val_old, val_new, cfg, commit, n, old_name, new_name, shown_name, change):
+    so, sn = val_old["second_run"], val_new["second_run"]
+    ok = adopt(so, sn)
+    pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
+    held = "; ".join(
+        f"{b.capitalize()} {pct(pooled(sn, b)['held_out_only'])} against {pct(pooled(so, b)['held_out_only'])} for version {old_name}"
+        for b in ("moon", "mars")
+    )
+    checks = [c for t in val_new["tests"] + sn["tests"] for c in t["checks"] if c["passed"] is not None]
+    passed = sum(bool(c["passed"]) for c in checks)
+    word = ORDINALS[n]
+    summary = (
+        f"A {word} run tried method version {new_name} ({change}): "
+        f"{passed} of {len(checks)} checks with enough sites pass"
+        + (f", so version {new_name} does not pass in full either. " if passed < len(checks) else ". ")
+        + f"On the held-out half, pooled against ordinary places: {held}. "
+        + (f"By the rule fixed before the run, version {new_name} is adopted and the map shows it." if ok else f"By the rule fixed before the run, version {new_name} is not adopted and the map keeps version {shown_name}.")
+        + " This is the last method version judged on these test places: they have now been used four times, so no further change will be judged on them."
+    )
+    return {
+        "title": f"{word.capitalize()} run: method version {new_name}",
+        "plain": (
+            f"This run repeats the first run's four checks and the second run's challenge-by-challenge checks under version {new_name}, "
+            f"each beside its version {old_name} figure, and applies an adoption rule fixed before the run. The change was prompted by a "
+            "test place's result, so this run is not independent proof."
+        ),
+        "designed_after_first_run": True,
+        "config_commit": commit,
+        "summary": summary,
+        "tests": beside(val_new["tests"], val_old["tests"], word, old_name, new_name) + beside(sn["tests"], so["tests"], word, old_name, new_name),
         "unchecked": sn["unchecked"],
         "method_change": cfg["why"],
         "adopted": ok,

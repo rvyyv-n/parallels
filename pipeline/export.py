@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from scipy import ndimage
 
-from pipeline import validate
+from pipeline import publish, validate
 from pipeline.assemble import DERIVED, ROOT, SHAPE, build, grid_lat, grid_lon, known_analogs, load_config, load_points, load_stage, terrain_rules
 from pipeline.score import RULE, score_target, target_value, yearround_rule
 from pipeline.traits import BODIES, CANT_COPY, CHALLENGES, FILTERS, INPUTS, NOT_IN_VERSION, TERRAIN_TYPES, TRAITS
@@ -57,10 +57,10 @@ CONSTANT_DATASETS = [
     {"id": "computed", "name": "Computed by us from the datasets named on each value", "agency": "computed", "url": None, "licence": "Same as the source data", "used_for": "Ideal values, ranks and scores"},
     {"id": "nasa-fact-sheets", "name": "NASA planetary fact sheets (NSSDCA)", "agency": "NASA", "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/", "licence": "Public domain (NASA)", "used_for": "Gravity, air and the plain facts behind the dryness and bare-ground targets", "archive": "NASA NSSDCA"},
     {"id": "nasa-moon-composition", "name": "NASA Science: the Moon's composition", "agency": "NASA", "url": "https://science.nasa.gov/moon/composition/", "licence": "Public domain (NASA)", "used_for": "The south pole's pale highland rock", "archive": "NASA Science"},
-    {"id": "mars-jezero-minerals", "name": "Jezero crater minerals: Horgan et al. 2020 (Icarus) and Scheller et al. 2022 (Science)", "agency": "other", "url": "https://doi.org/10.1126/science.abo5204", "licence": "Cited published result", "used_for": "Which mineral groups are reported at Jezero"},
-    {"id": "farley-2022", "name": "Farley et al. 2022, aqueously altered igneous rocks sampled on the floor of Jezero crater (Science)", "agency": "other", "url": "https://doi.org/10.1126/science.abo2196", "licence": "Cited published result", "used_for": "Mars's basalt crust and Jezero's igneous crater floor, the target for the volcanic rock trait"},
-    {"id": "mars-gale-minerals", "name": "Gale crater minerals: Rampe et al. 2020 (Geochemistry)", "agency": "other", "url": "https://doi.org/10.1016/j.chemer.2020.125605", "licence": "Cited published result", "used_for": "Which mineral groups are reported at Gale"},
-    {"id": "golombek-2020", "name": "Golombek et al. 2020, Mars landing-site thermal inertia rule", "agency": "other", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502", "licence": "Cited published result", "used_for": "The ground-strength label on Mars"},
+    {"id": "mars-jezero-minerals", "name": "Jezero crater minerals: Horgan et al. 2020 (Icarus) and Scheller et al. 2022 (Science)", "agency": "other", "url": "https://doi.org/10.1126/science.abo5204", "licence": "Cited published result", "archive": "published paper", "used_for": "Which mineral groups are reported at Jezero"},
+    {"id": "farley-2022", "name": "Farley et al. 2022, aqueously altered igneous rocks sampled on the floor of Jezero crater (Science)", "agency": "other", "url": "https://doi.org/10.1126/science.abo2196", "licence": "Cited published result", "archive": "published paper", "used_for": "Mars's basalt crust and Jezero's igneous crater floor, the target for the volcanic rock trait"},
+    {"id": "mars-gale-minerals", "name": "Gale crater minerals: Rampe et al. 2020 (Geochemistry)", "agency": "other", "url": "https://doi.org/10.1016/j.chemer.2020.125605", "licence": "Cited published result", "archive": "published paper", "used_for": "Which mineral groups are reported at Gale"},
+    {"id": "golombek-2020", "name": "Golombek et al. 2020, Mars landing-site thermal inertia rule", "agency": "other", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502", "licence": "Cited published result", "archive": "published paper", "used_for": "The ground-strength label on Mars"},
 ]
 
 
@@ -215,7 +215,7 @@ def shown_values(target):
     return out
 
 
-def target_entry(target, scored, binfile):
+def target_entry(target, scored, binfile, default=True):
     e = {
         "id": target["id"],
         "body": target["body"],
@@ -224,7 +224,7 @@ def target_entry(target, scored, binfile):
         "lat": target["lat"],
         "lon": target["lon"],
         "anchor_note": target.get("anchor_note", ""),
-        "default": True,
+        "default": default,
         "bin": binfile,
         "values": scored["values"],
         "shown": shown_values(target),
@@ -249,11 +249,12 @@ def score_values(region, body, tid):
     return out
 
 
-def target_bin(path, n, scored):
+def target_bin(path, n, scored, extra=None):
     cols = [(f"rank:{k}", v, "u8", 0.004, 0) for k, v in scored["ranks"].items()]
     cols += [(f"ch:{k}", v, "u8", 0.004, 0) for k, v in scored["challenges"].items()]
     cols += [(f"cov:{k}", v * 100, "u8", 1, 0) for k, v in scored["coverage"].items()]
     cols += [(f"score:{k}", v, "u16", 0.0001, 0) for k, v in scored["scores"].items()]
+    cols += [(k, v, "u8", 1, 0) for k, v in (extra or {}).items()]
     return write_bin(path, n, cols)
 
 
@@ -274,13 +275,29 @@ def used_datasets(datasets, metas, entries):
     return [d for d in datasets if d["id"] in used]
 
 
+MAIN_ARCHIVES = [
+    ("NASA PDS Geosciences Node", "Moon and Mars maps"),
+    ("USGS Astrogeology", "the Mars height map"),
+    ("NASA POWER on AWS Open Data", "Earth climate"),
+    ("Copernicus Data Space / AWS Open Data", "Earth heights, ESA"),
+    ("NASA PGDA (Goddard)", "Moon sunlight and shadow"),
+]
+
+
 def benchmarks(datasets, cfg):
-    archives = sorted({d["archive"] for d in datasets if d.get("archive") and d["archive"] not in ("computed", "published paper")})
+    main = [a for a, _ in MAIN_ARCHIVES]
+    seen = {d["archive"] for d in datasets if d.get("archive")}
+    used = [f"{a} ({what})" for a, what in MAIN_ARCHIVES if a in seen]
+    earthdata = "NASA Earthdata (LP DAAC)"
+    if earthdata in seen:
+        used = [u.replace("NASA POWER on AWS Open Data (Earth climate)", "NASA POWER and NASA Earthdata (Earth climate, land cover and minerals)") for u in used]
+    others = sorted(seen - set(main) - {"computed", "published paper", earthdata})
+    five = f"{len(used)} main open archives feed the scores: " + ", ".join(used) + "."
     return [
-        {"n": 1, "guide_words": "Cross-domain data: at least 3 distinct open data archives (e.g. NASA PDS, USGS, Landsat/Sentinel)", "how": f"Data comes from {len(archives)} open archives: " + ", ".join(archives) + ".", "where": "The data list at the foot of the page names every dataset with a link."},
+        {"n": 1, "guide_words": "Cross-domain data: at least 3 distinct open data archives (e.g. NASA PDS, USGS, Landsat/Sentinel)", "how": five + (" Also used: " + ", ".join(others) + ", and values cited from published papers." if others else ""), "where": "The data list at the foot of the page names every dataset with a link."},
         {"n": 2, "guide_words": "Geographical scope: map and index at least 4 terrain types: arid basins, high-altitude volcanic fields, salt flats, caves", "how": "Every land cell is tagged arid basin, high-altitude volcanic field, salt flat, frozen ground or cave by rules worked out from the data, shown with each type.", "where": "The terrain-type filter on the map."},
         {"n": 3, "guide_words": "Useful output: web dashboard with similarity rankings, coordinates and data details on the map", "how": "A world map coloured by match, a ranked list with latitude and longitude, and a scorecard giving each value with its dataset and resolution.", "where": "The map, the ranked list and the scorecard."},
-        {"n": 4, "guide_words": "Multi-variable scoring: weighting and clustering; thermal inertia, minerals, aridity", "how": "Weighted trait and challenge scores; k-means clusters checked against the terrain types; minerals (NASA EMIT) and aridity are scored. Thermal inertia is not in this version: Mars has a map, but Earth's side needs a checked conversion.", "where": "The scorecard and the \"How we checked it\" section."},
+        {"n": 4, "guide_words": "Multi-variable scoring: weighting and clustering; thermal inertia, minerals, aridity", "how": "Weighted trait and challenge scores; k-means clusters checked against the terrain types; minerals (NASA EMIT) and aridity are scored. Thermal inertia is shown for Mars as a label (NASA TES map), not scored: Earth's side needs a checked conversion first.", "where": "The scorecard and the \"How we checked it\" section."},
         {"n": 5, "guide_words": "Seasons: monsoons and freeze-thaw cycles in the matching", "how": "Each place shows its best months, freeze-thaw months and rainy months. " + yearround_rule(cfg["scoring"]["yearround_share"]), "where": "The scorecard's seasons strip and the year-round switch."},
         {"n": 6, "guide_words": "Mission filters: filters for rover mobility, life support or habitat-structure testing", "how": "Three mission filters reweight the challenges, and the weights can also be set by hand.", "where": "The mission picker next to the target picker."},
     ]
@@ -344,20 +361,43 @@ def label_points(sites, caves):
     return out
 
 
+KNOWN_COMMITS = {"1.1": "7661981"}
+CHANGES = {
+    "1.1": "each part of a challenge counts equally, the traits inside a part share its weight, and Mars has a volcanic rock trait",
+    "1.2": "it also ranks each trait by the share of land strictly further from the target, with no credit for ties",
+}
+
+
 def method_name(cfg):
-    return "1.1" if cfg.get("version") == "v1.1" else "1.0"
+    return cfg.get("version", "v1")[1:] if cfg.get("version", "v1") != "v1" else "1.0"
 
 
-def method_note(name, third):
-    if third is None:
+def method_note(name, runs):
+    if not runs:
         return f"The map shows method version {name}."
-    if third["adopted"]:
-        return ("The map shows method version 1.1: each part of a challenge counts equally, the traits inside a part share its weight, "
-                "and Mars has a volcanic rock trait. It replaced version 1.0 by a rule fixed before it was run; see the third validation run.")
-    return "The map shows method version 1.0. Version 1.1 was tried and not adopted, by a rule fixed before it was run; see the third validation run."
+    tried = [r["title"].split("version ")[-1] for r in runs]
+    if name == "1.0":
+        return "The map shows method version 1.0. Versions " + ", ".join(tried) + " were tried and not adopted, by rules fixed before each was run; see the validation runs."
+    steps = [v for v in ("1.1", "1.2") if v <= name]
+    text = f"The map shows method version {name}: " + "; ".join(CHANGES[v] for v in steps) + "."
+    left = [v for v in tried if v not in steps]
+    text += " Each version replaced the one before by a rule fixed before it was run; see the validation runs."
+    if left:
+        text += " Version " + ", ".join(left) + " was tried and not adopted."
+    return text
 
 
-def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sample, out=OUT, method_cfg=None, method_commit="uncommitted"):
+def chain(method):
+    out = []
+    while method:
+        out.insert(0, method)
+        over = json.loads((ROOT / "pipeline" / "config" / f"v{method}.json").read_text(encoding="utf8"))
+        parent = over["inherits"].split(":")[0].split(",")[0].strip()
+        method = None if parent == "v1.json" else parent[1:-5]
+    return out
+
+
+def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sample, out=OUT, methods=()):
     out.mkdir(parents=True, exist_ok=True)
     cells, info = build(stages, metas, sites, caves, cfg)
     n = len(cells["lat"])
@@ -365,23 +405,48 @@ def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sa
     by_id = {t["id"]: t for t in targets}
     scored = {tid: score_target(cells, by_id[tid], cfg) for tid in cfg["default_targets"]}
     val = validate.run(cells, scored, sites, cfg, commit)
-    if method_cfg is not None:
-        scored_new = {tid: score_target(cells, by_id[tid], method_cfg) for tid in cfg["default_targets"]}
-        val_new = validate.run(cells, scored_new, sites, method_cfg, commit, with_misses=True)
-        val["third_run"] = validate.third_run(val, val_new, method_cfg, method_commit)
-        val["summary"] += " " + val["third_run"]["summary"]
-        if val["third_run"]["adopted"]:
-            cfg, scored = method_cfg, scored_new
-    entries = []
+    prev_val, prev_name, runs = val, "1.0", []
+    for k, (name, mcfg, mcommit) in enumerate(methods):
+        scored_new = {tid: score_target(cells, by_id[tid], mcfg) for tid in cfg["default_targets"]}
+        val_new = validate.run(cells, scored_new, sites, mcfg, commit, with_misses=True)
+        if k == 0:
+            run = validate.third_run(prev_val, val_new, mcfg, mcommit)
+            val["third_run"] = run
+        else:
+            run = validate.later_run(prev_val, val_new, mcfg, mcommit, k + 3, prev_name, name, method_name(cfg), CHANGES[name].replace("it also ranks", "ranking"))
+            val.setdefault("more_runs", []).append(run)
+        val["summary"] += " " + run["summary"]
+        runs.append(run)
+        if run["adopted"]:
+            cfg, scored = mcfg, scored_new
+        prev_val, prev_name = val_new, name
+    regions = metas.get("climate", {}).get("regions", [])
+    stab, sentences, heads = {}, [], {}
     for tid in cfg["default_targets"]:
-        binfile = target_bin(out / f"target-{tid}.bin", n, scored[tid])
-        entries.append(target_entry(by_id[tid], scored[tid], binfile))
+        t = by_id[tid]
+        stab[tid] = publish.stability(scored[tid], cfg, t["body"])
+        sentences.append(publish.stability_sentence(t, stab[tid]))
+        heads[tid] = publish.headline(cells, scored[tid], cfg, t, regions, FILTERS[0]["id"], cfg["rare_km"])
+    val["stability"] = " ".join(sentences)
+    entries = []
+    for t in targets:
+        tid = t["id"]
+        if tid in cfg["default_targets"]:
+            extra = {f"stable:{f}": publish.stable_column(n, r) for f, r in stab[tid].items()}
+            binfile = target_bin(out / f"target-{tid}.bin", n, scored[tid], extra)
+            e = target_entry(t, scored[tid], binfile, True)
+            if heads[tid][0]:
+                e["headline"] = heads[tid][0]
+            entries.append(e)
+        elif t["body"] == "mars":
+            s = score_target(cells, t, cfg)
+            entries.append(target_entry(t, s, target_bin(out / f"target-{tid}.bin", n, s), False))
     datasets = used_datasets(merge_datasets(metas, extra_datasets), metas, entries)
     rules = terrain_rules(cfg)
     manifest = {
         "version": 1,
         "method_version": method_name(cfg),
-        "method_note": method_note(method_name(cfg), val.get("third_run")),
+        "method_note": method_note(method_name(cfg), runs),
         "generated": datetime.date.today().isoformat(),
         "sample": sample,
         "grid": grid | {"res_deg": 0.5, "land_rule": cfg["land_rule"]["plain"]},
@@ -402,7 +467,7 @@ def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sa
     write_json(out / "manifest.json", manifest)
     write_json(out / "labels.json", label_points(sites, caves))
     write_json(out / "validation.json", val)
-    return cells, scored, info
+    return cells, scored, info, heads
 
 
 def smooth(rng, sigma):
@@ -486,11 +551,12 @@ def main():
     ap.add_argument("--stub", action="store_true")
     ap.add_argument("--weights-commit", default="uncommitted")
     ap.add_argument("--out", default=str(OUT))
-    ap.add_argument("--method", help="also run a newer method version, e.g. 1.1, as the third validation run")
-    ap.add_argument("--method-commit", default="uncommitted")
+    ap.add_argument("--method", help="also run newer method versions up to this one (e.g. 1.2 runs 1.1 then 1.2) as further validation runs")
+    ap.add_argument("--method-commit", default="uncommitted", help="commit that fixed the config of the last method version")
     args = ap.parse_args()
     cfg = load_config()
-    method_cfg = load_config(method=args.method) if args.method else None
+    names = chain(args.method) if args.method else []
+    methods = [(m, load_config(method=m), args.method_commit if m == args.method else KNOWN_COMMITS[m]) for m in names]
     sites = json.loads(SITES.read_text(encoding="utf8"))
     caves = load_points(CAVES)
     out = Path(args.out)
@@ -504,12 +570,16 @@ def main():
             stages[name], metas[name] = load_stage(name, DERIVED)
         targets, extra = load_targets()
         commit = args.weights_commit
-    cells, scored, info = export(stages, metas, targets, extra, sites, caves, cfg, commit, args.stub, out, method_cfg, args.method_commit)
+    cells, scored, info, heads = export(stages, metas, targets, extra, sites, caves, cfg, commit, args.stub, out, methods)
     if info["missing"]:
         print("missing input columns:", ", ".join(info["missing"]))
     for f in sorted(out.iterdir()):
         print(f"{f.name}: {f.stat().st_size:,} bytes")
     print(validate.summary(json.loads((out / "validation.json").read_text(encoding="utf8"))))
+    for tid, (h, runners) in heads.items():
+        print(f"headline {tid}: " + (f"{h['title']} | {h['why']}" if h else "no cell clears the bar"))
+        for r in runners:
+            print(f"   runner-up: {r['title']} | {r['why'][:160]}")
 
 
 if __name__ == "__main__":

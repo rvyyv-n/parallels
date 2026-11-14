@@ -570,15 +570,16 @@ CANT_COPY = [
 ]
 
 NOT_IN_VERSION = [
-    ("Thermal inertia (Mars)", "The Mars map (TES) is ready, but turning Earth's day-night temperatures into the same units needs a checked conversion. Planned next."),
-    ("UV", "Earth's strongest UV, on high dry ground, still falls far short of Mars's unshielded surface. Planned as a shown gap, not a score."),
+    ("Thermal inertia scoring", "Mars thermal inertia (NASA TES) is shown as a label, not scored: turning Earth's day-night temperatures into the same units needs a checked conversion. The Moon has only a Moon-wide average; its map stops at 70° latitude."),
+    ("UV", "Not scored or shown: Earth's strongest UV, on high dry ground, still falls far short of Mars's unshielded surface."),
     ("How hard it is to get there", "Not asked for by the challenge; left out to keep the first version focused."),
     ("Zoom to one valley or crater", "The map works on half-degree cells (about 50 km). Picking the best valley or crater inside a cell is the next step."),
-    ("More targets", "This version scores the Moon's south pole and Jezero crater. Other Mars sites, such as Gale and Arcadia Planitia, come next."),
-    ("Stability check", "Re-running the scores with 1,000 random weight sets to see which top matches hold up is planned."),
+    ("More targets as defaults", "The Moon's south pole and Jezero crater are the default targets and the only ones checked against the test places. Gale, Arcadia Planitia, Deuteronilus Mensae and the Arsia Mons caves are scored too, but not validated; a challenge a target has too few values for shows no data."),
+    ("The nine Artemis regions as separate targets", "Their values are shown under the Moon's south pole, whose target is their median; they are not scored as nine separate maps."),
     ("Reverse mode", "Clicking any place on Earth to see its closest Moon or Mars target is an idea for later."),
     ("Mars ice maps (SWIM)", "They show how far datasets agree that ice is there, and Earth has nothing to compare, so they can only be a label."),
     ("Martian valley networks", "Ancient river landscapes are a good analog idea, but there is no global Earth layer to score them yet."),
+    ("Lunar pits", "The LROC lunar pit atlas was not checked; Moon caves are not listed."),
 ]
 
 

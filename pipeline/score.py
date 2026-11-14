@@ -24,7 +24,7 @@ def yearround_rule(share):
     )
 
 
-def earth_rank(values, target, area):
+def earth_rank(values, target, area, ties="half"):
     v = np.asarray(values, float)
     out = np.full(v.shape, np.nan)
     ok = np.isfinite(v)
@@ -35,7 +35,7 @@ def earth_rank(values, target, area):
     a = np.bincount(inv, weights=np.asarray(area, float)[ok], minlength=len(u))
     total = a.sum()
     further = total - np.cumsum(a)
-    out[ok] = (further[inv] + 0.5 * a[inv]) / total
+    out[ok] = (further[inv] + (0.5 * a[inv] if ties == "half" else 0.0)) / total
     return out
 
 
@@ -133,6 +133,7 @@ def score_target(cells, target, cfg):
     sc = cfg["scoring"]
     opts = dict(floor=sc["floor"], missing=sc["missing_rank"])
     tw = cfg["trait_weights"][body]
+    ties = sc.get("ties", "half")
     used = {k for c in tw.values() for k in c}
     unweighted = {k for c in CHALLENGES[body] for k in c["traits"]} - used
     values, ranks = {}, {}
@@ -144,18 +145,18 @@ def score_target(cells, target, cfg):
             continue
         values[t["id"]] = tv
         goal = 1.0 if t["id"] == "minerals" else tv["value"]
-        ranks[t["id"]] = earth_rank(earth_values(cells, t, body, target), goal, cells["area"])
+        ranks[t["id"]] = earth_rank(earth_values(cells, t, body, target), goal, cells["area"], ties)
     ch, cov = {}, {}
     for c in CHALLENGES[body]:
         w = {k: tw[c["id"]][k][0] for k in c["traits"] if k in ranks and k in tw.get(c["id"], {})}
         if w:
             ch[c["id"]], cov[c["id"]] = challenge({k: ranks[k] for k in w}, w, **opts)
-    usable_rank = earth_rank(cells["usable"], 12.0, cells["area"])
+    usable_rank = earth_rank(cells["usable"], 12.0, cells["area"], ties)
     scores = {}
     for f in FILTERS:
         w = {k: v[0] for k, v in cfg["filter_weights"][f["id"]][body].items() if k in ch}
-        s = overall(ch, cov, w, min_share=sc["min_weight_with_data"], **opts)
+        s = overall(ch, cov, w, min_share=sc["min_weight_with_data"], **opts) if w else np.full(len(cells["area"]), np.nan)
         scores[f["id"]] = s
         scores[f["id"] + ":yr"] = yearround(s, usable_rank, sc["yearround_share"], sc["floor"], sc["missing_rank"])
-    equal = overall(ch, cov, {k: 1.0 for k in ch}, min_share=sc["min_weight_with_data"], **opts)
+    equal = overall(ch, cov, {k: 1.0 for k in ch}, min_share=sc["min_weight_with_data"], **opts) if ch else np.full(len(cells["area"]), np.nan)
     return {"values": values, "ranks": ranks, "challenges": ch, "coverage": cov, "scores": scores, "equal": equal, "usable_rank": usable_rank}
