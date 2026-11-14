@@ -141,8 +141,17 @@ test("sample banner shows only for sample data", async ({ page }) => {
 test("validation shows the first run, then later runs when present", async ({ page, request }) => {
   const v = await (await request.get("/data/validation.json")).json();
   await ready(page);
-  const checks = v.tests.flatMap((t: { checks: unknown[] }) => t.checks).length;
-  await expect(page.locator("#checked .v-checks").first().locator("tbody tr")).toHaveCount(checks);
+  const count = (r: { tests: { checks: unknown[] }[] }) => r.tests.flatMap((t) => t.checks).length;
+  await expect(page.locator("#first-run .v-checks tbody tr")).toHaveCount(count(v));
+  const later = [v.third_run, ...(v.more_runs ?? [])].filter(Boolean);
+  const now = [...later].reverse().find((r) => r.adopted);
+  if (now) {
+    const id = now === v.third_run ? "third-run" : `run-${[v.second_run, v.third_run].filter(Boolean).length + 2 + (v.more_runs ?? []).indexOf(now)}`;
+    await expect(page.locator(".current-box + div .v-checks").first().locator("tbody tr")).toHaveCount(count(now));
+    await expect(page.locator(`#${id}`)).toContainText(now.title);
+    await expect(page.locator(".current-box")).toContainText(now.title.match(/method version ([\d.]+)/i)?.[1] ?? now.title);
+  }
+  for (const [i, r] of (v.more_runs ?? []).entries()) await expect(page.locator(`#run-${[v.second_run, v.third_run].filter(Boolean).length + 2 + i}`)).toContainText(r.title);
   await expect(page.locator("#second-run")).toHaveCount(v.second_run ? 1 : 0);
   await expect(page.locator("#third-run")).toHaveCount(v.third_run ? 1 : 0);
   const base = v.second_run ?? { title: "Run", plain: "", designed_after_first_run: true, config_commit: "x", summary: "", tests: v.tests, unchecked: [] };

@@ -1,3 +1,4 @@
+import "./sections.css";
 import type { Manifest, Validation, ValidationTest } from "./contract";
 import { esc, num } from "./format";
 
@@ -118,9 +119,12 @@ function checksTable(tests: ValidationTest[]) {
   <p class="small muted">A result is the share of pairs where the first group's place ranks higher than the second's (a pair with exactly equal scores counts as half). "Held-out half" uses only the analogs set aside in a fixed split; "blind sites" uses only analogs never scored before this run.</p>`;
 }
 
+const judged = (tests: ValidationTest[]) => tests.flatMap((t) => t.checks).filter((c) => c.passed != null);
+const passCount = (tests: ValidationTest[]) => judged(tests).filter((c) => c.passed).length;
+
 function verdict(tests: ValidationTest[], summary?: string) {
-  const all = tests.flatMap((t) => t.checks);
-  const passed = all.filter((c) => c.passed).length;
+  const all = judged(tests);
+  const passed = passCount(tests);
   return `<div class="verdict${passed === all.length ? " ok" : ""}">
     <p class="v-count-big"><b>${num(passed)} of ${num(all.length)}</b> checks passed</p>
     ${summary ? `<p class="v-summary">${esc(summary)}</p>` : ""}
@@ -128,6 +132,10 @@ function verdict(tests: ValidationTest[], summary?: string) {
 }
 
 type Later = NonNullable<Validation["second_run"]> & Partial<Pick<NonNullable<Validation["third_run"]>, "method_change" | "adopted" | "adoption_rule">>;
+
+type Run = { id: string; title: string; adopted?: boolean; tests: ValidationTest[]; body: string };
+
+const methodOf = (title: string) => title.match(/method version ([\d.]+)/i)?.[1];
 
 function later(r: Later, id: string, m: Manifest) {
   const extra = [
@@ -147,11 +155,8 @@ function later(r: Later, id: string, m: Manifest) {
     </div>`;
 }
 
-function checked(v: Validation | null, m: Manifest) {
-  if (!v) return `<p>The validation file is missing from this build, so no check results are shown.</p>`;
-  const s = v.second_run;
-  const v3 = v.third_run;
-  return `<p class="lede">If the method works, places NASA already trusts should score higher than ordinary farmland, and higher than big deserts that are dry but not analogs. The pass marks were set in our plan before any data came in.</p>
+function first(v: Validation, m: Manifest) {
+  return `<div class="run-first" id="first-run">
     <h3 class="run-h">First run</h3>
     ${verdict(v.tests, v.summary)}
     ${checksTable(v.tests)}
@@ -159,13 +164,47 @@ function checked(v: Validation | null, m: Manifest) {
       v.prototype_runs.length ? ` Earlier prototype runs: ${v.prototype_runs.map((r) => `${esc(r.date)}, ${esc(r.result)}`).join("; ")}.` : ""
     } Weights and pass marks fixed at commit ${esc(v.weights_commit)}.</p>
     <div class="v-tests">${v.tests.map((t) => test(t, m)).join("")}</div>
+  </div>`;
+}
+
+function runs(v: Validation, m: Manifest): Run[] {
+  const out: Run[] = [{ id: "first-run", title: "First run", tests: v.tests, body: first(v, m) }];
+  if (v.second_run) out.push({ id: "second-run", title: v.second_run.title, tests: v.second_run.tests, body: later(v.second_run, "second-run", m) });
+  if (v.third_run) out.push({ id: "third-run", title: v.third_run.title, adopted: v.third_run.adopted, tests: v.third_run.tests, body: later(v.third_run, "third-run", m) });
+  for (const r of v.more_runs ?? []) {
+    const id = `run-${out.length + 1}`;
+    out.push({ id, title: r.title, adopted: r.adopted, tests: r.tests, body: later(r, id, m) });
+  }
+  return out;
+}
+
+function history(all: Run[], now: Run) {
+  return `<div class="scroll-x"><table class="data run-hist"><thead><tr><th scope="col">Run</th><th scope="col">Method</th><th scope="col">Checks passed</th><th scope="col">Used now</th></tr></thead><tbody>${all
+    .map((r, i) => {
+      const v = methodOf(r.title);
+      return `<tr${r === now ? ' class="now"' : ""}><th scope="row"><a href="#${r.id}">Run ${num(i + 1)}</a></th><td>${v ? `version ${esc(v)}` : esc(r.title)}</td><td class="n">${num(passCount(r.tests))} of ${num(judged(r.tests).length)}</td><td>${r === now ? "Yes" : "No"}</td></tr>`;
+    })
+    .join("")}</tbody></table></div>`;
+}
+
+function checked(v: Validation | null, m: Manifest) {
+  if (!v) return `<p>The validation file is missing from this build, so no check results are shown.</p>`;
+  const all = runs(v, m);
+  const now = [...all].reverse().find((r) => r.adopted) ?? all[0];
+  const ver = m.method_version ?? methodOf(now.title);
+  const earlier = all.filter((r) => r !== now);
+  return `<p class="lede">If the method works, places NASA already trusts should score higher than ordinary farmland, and higher than big deserts that are dry but not analogs. The pass marks were set in our plan before any data came in.</p>
+    <div class="current-box">
+      <p class="cur-h">${ver ? `Current method: version ${esc(ver)} (the map uses this)` : `Current method: ${esc(now.title)} (the map uses this)`}</p>
+      ${history(all, now)}
+    </div>
+    ${now.body}
+    ${earlier.length ? `<details class="earlier"><summary>Earlier runs (${num(earlier.length)})</summary>${earlier.map((r) => r.body).join("")}</details>` : ""}
     ${v.stability ? `<p>${esc(v.stability)}</p>` : ""}
     <h3>Data checks</h3>
     <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Check</th><th scope="col">Result</th><th scope="col">Outcome</th></tr></thead><tbody>${v.data_checks
       .map((c) => `<tr><th scope="row">${esc(c.name)}</th><td class="n">${esc(c.result)}</td>${outcome(c.passed)}</tr>`)
-      .join("")}</tbody></table></div>
-    ${s ? later(s, "second-run", m) : ""}
-    ${v3 ? later(v3, "third-run", m) : ""}`;
+      .join("")}</tbody></table></div>`;
 }
 
 function terrain(m: Manifest) {

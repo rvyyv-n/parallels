@@ -1,0 +1,54 @@
+.current-box {
+  border: 1px solid var(--signal);
+  border-left-width: 6px;
+  padding: 14px 18px 6px;
+  margin: 18px 0 28px;
+  max-width: 900px;
+}
+
+.cur-h {
+  font: 700 20px/1.2 var(--display);
+  font-stretch: 90%;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+
+.run-hist tr.now th,
+.run-hist tr.now td {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.run-hist td {
+  color: var(--ink-2);
+}
+
+.earlier {
+  margin-top: 36px;
+  border-top: 1px dashed var(--rule-2);
+}
+
+.page-sec details > summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--signal);
+}
+
+.page-sec details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.page-sec details > summary::before {
+  content: "+";
+  font: 700 16px/1 var(--display);
+  width: 14px;
+  flex: none;
+}
+
+.page-sec details[open] > summary::before {
+  content: "\2212";
+}
