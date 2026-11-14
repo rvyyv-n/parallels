@@ -6,7 +6,7 @@ Our NASA Space Apps 2026 entry for **Identify Earth Locations that Analog the Pe
 
 ## Layout
 
-- `docs/`: our rules and working guidelines (`guidelines.md`), the challenge in plain words (`challenge.md`), how judging works (`judging-notes.md`), our workflow chart (`workflow.png`) and, once written, the plan, which sets the tech stack and roadmap.
+- `docs/`: our rules and working guidelines (`guidelines.md`), our local event's Challenge Guide (`challenge-guide.pdf`, the main brief: its six benchmarks and seven questions are what we build to), the challenge in plain words (`challenge.md`), how judging works (`judging-notes.md`), our workflow chart (`workflow.png`) and, once written, the plan, which sets the tech stack and roadmap.
 - `assets/`: logo and other images.
 - `retired/`: earlier candidate challenges. Reference only; don't edit or build on them.
 

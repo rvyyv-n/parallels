@@ -60,6 +60,12 @@ Images (JPG, PNG or GIF up to 10 MB) can be pasted into the page. Videos and doc
   - **0:20 to 0:30:** what it could do in the future.
 - For slides: at most seven, including the title. They should show the project, the user's experience, and how the data makes it possible.
 
+## Our local event's Challenge Guide
+
+Our Local Event (Cedar College) gave us a [Challenge Guide](challenge-guide.pdf) for this challenge. It sets six objectives, each with a target benchmark, and seven questions a solution should answer ([challenge.md](challenge.md#the-six-objectives)).
+
+Local judges pick the Global Nominees, so the guide is probably what they hold our project against first. That's our inference: the official guides don't say what local judges read. It means each benchmark should be easy to spot on the site and the project page, in the guide's own words where they fit (for example "terrain types", "mission filters", "seasonal fluctuations").
+
 ## What past winners did
 
 Sources: the [2025 global winners](https://www.spaceappschallenge.org/2025/meet-the-2025-global-winners/) and their project pages, and the [2022 winners](https://legacy.spaceappschallenge.org/blog/2022-global-winners/). The 2023 and 2024 project pages are no longer public.
