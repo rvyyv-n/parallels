@@ -129,19 +129,27 @@ p {
 }
 
 .wordmark {
-  font: 800 19px/1 var(--display);
-  font-stretch: 125%;
-  letter-spacing: 0.14em;
+  position: relative;
+  font: 800 25px/1 var(--display);
+  font-stretch: 70%;
+  letter-spacing: 0.035em;
   text-transform: uppercase;
   color: var(--ink);
   text-decoration: none;
-  padding: 5px 0 4px;
-  border-top: 1px solid var(--ink);
-  border-bottom: 1px solid var(--ink);
+}
+
+.wordmark::after {
+  content: "";
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  top: calc(50% - 2px);
+  height: 2px;
+  background: var(--space);
 }
 
 .wordmark.small {
-  font-size: 14px;
+  font-size: 18px;
   display: inline-block;
 }
 
