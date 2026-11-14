@@ -152,16 +152,24 @@ test("validation shows the first run, then later runs when present", async ({ pa
   const now = [...later].reverse().find((r) => r.adopted);
   if (now) {
     const id = now === v.third_run ? "third-run" : `run-${[v.second_run, v.third_run].filter(Boolean).length + 2 + (v.more_runs ?? []).indexOf(now)}`;
-    await expect(page.locator(".current-box + div .v-checks").first().locator("tbody tr")).toHaveCount(count(now));
+    await expect(page.locator(".chk-head + div")).toHaveAttribute("id", id);
+    await expect(page.locator(`#${id} .v-checks`).first().locator("tbody tr")).toHaveCount(count(now));
     await expect(page.locator(`#${id}`)).toContainText(now.title);
-    const shown = page.locator(".current-box + div .verdict");
-    await expect(shown.locator(".v-count-big")).toBeVisible();
-    await expect(shown.locator(".v-count-big")).toContainText(`${now.tests.flatMap((t: { checks: { passed: boolean | null }[] }) => t.checks).filter((c: { passed: boolean | null }) => c.passed).length} of ${count(now)}`);
-    for (const c of now.tests.flatMap((t: { checks: { name: string; passed: boolean | null }[] }) => t.checks).filter((c: { passed: boolean | null }) => c.passed === false)) {
-      await expect(shown.locator(".v-fail-list")).toBeVisible();
-      await expect(shown.locator(".v-fail-list")).toContainText(c.name);
+    const big = page.locator(".chk-score .v-count-big");
+    await expect(big).toBeVisible();
+    await expect(big).toContainText(`${now.tests.flatMap((t: { checks: { passed: boolean | null }[] }) => t.checks).filter((c: { passed: boolean | null }) => c.passed).length} of ${count(now)}`);
+    const fails = page.locator(`#${id} .v-fail-list`);
+    const failed = now.tests.flatMap((t: { checks: { name: string; pass_mark: number; passed: boolean | null }[] }) => t.checks).filter((c: { passed: boolean | null }) => c.passed === false);
+    await expect(fails.locator(".cbar")).toHaveCount(failed.length);
+    for (const c of failed) {
+      await expect(fails).toBeVisible();
+      await expect(fails).toContainText(c.name);
+      await expect(fails).toContainText(`against a pass mark of ${Math.round(c.pass_mark * 100)}%`);
     }
+    await expect(fails.locator(".cbar-st").first()).toContainText("Not passed");
     await expect(page.locator(".current-box")).toContainText(now.title.match(/method version ([\d.]+)/i)?.[1] ?? now.title);
+    await expect(page.locator(".run-hist li")).toHaveCount([v.tests, v.second_run, v.third_run, ...(v.more_runs ?? [])].filter(Boolean).length);
+    await expect(page.locator(".run-hist .rh-now")).toContainText("Used now");
   }
   for (const [i, r] of (v.more_runs ?? []).entries()) await expect(page.locator(`#run-${[v.second_run, v.third_run].filter(Boolean).length + 2 + i}`)).toContainText(r.title);
   await expect(page.locator("#second-run")).toHaveCount(v.second_run ? 1 : 0);
@@ -303,4 +311,30 @@ test("a link with a hash to a folded block opens it on load", async ({ page }) =
   await page.goto("/#third-run");
   await expect(page.locator("#third-run")).toBeVisible();
   await expect(page.locator("#third-run")).toBeInViewport();
+});
+
+test("each check of the current run is a bar against its pass mark, failed first and visible", async ({ page, request }) => {
+  type C = { name: string; pass_mark: number; result: number | null; passed: boolean | null };
+  const v = await (await request.get("/data/validation.json")).json();
+  const runs = [v.third_run, ...(v.more_runs ?? [])].filter(Boolean);
+  const now = [...runs].reverse().find((r) => r.adopted) ?? { tests: v.tests };
+  const cs: C[] = now.tests.flatMap((t: { checks: C[] }) => t.checks);
+  const failed = cs.filter((c) => c.passed === false);
+  const passed = cs.filter((c) => c.passed === true);
+  await ready(page);
+  const box = page.locator(".chk-head + div");
+  const bars = box.locator(".verdict > .v-fail-list .cbar");
+  await expect(bars).toHaveCount(failed.length);
+  for (const [i, c] of failed.entries()) {
+    const b = bars.nth(i);
+    await expect(b).toBeVisible();
+    await expect(b.locator(".cbar-st")).toHaveText(/Not passed/);
+    if (c.result != null) expect(await b.locator(".cbar-fill").evaluate((e) => parseFloat((e as HTMLElement).style.width))).toBeCloseTo(c.result * 100, 3);
+    expect(await b.locator(".cbar-mark").evaluate((e) => parseFloat((e as HTMLElement).style.left))).toBeCloseTo(c.pass_mark * 100, 3);
+  }
+  const ok = box.locator(".verdict > .v-passed");
+  await expect(ok.locator("summary")).toContainText(`Passed (${passed.length})`);
+  await ok.locator("summary").click();
+  await expect(ok.locator(".cbar .cbar-st", { hasText: "Passed" })).toHaveCount(passed.length);
+  if (cs.some((c) => c.passed == null)) await expect(box.locator(".not-run")).toBeVisible();
 });

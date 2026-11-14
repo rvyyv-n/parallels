@@ -153,20 +153,33 @@ function checksTable(ts: ValidationTest[], l: string) {
 const judged = (ts: ValidationTest[]) => ts.flatMap((t) => t.checks).filter((c) => c.passed != null);
 const passCount = (ts: ValidationTest[]) => judged(ts).filter((c) => c.passed).length;
 
-function verdict(ts: ValidationTest[], summary?: string) {
+const share = (v: number) => Math.max(0, Math.min(100, v * 100));
+
+function bar(t: ValidationTest, c: Check, same = false) {
+  const st = `${c.passed ? "pass" : "fail"}${same ? " same" : ""}`;
+  const word = c.passed ? '<span class="cbar-st pass"><i aria-hidden="true">\u2713</i> Passed</span>' : '<span class="cbar-st fail"><i aria-hidden="true">\u2715</i> Not passed</span>';
+  const fill = c.result == null ? "" : `<i class="cbar-fill" style="width:${share(c.result)}%"></i>`;
+  return `<li class="cbar ${st}">
+    <p class="cbar-name"><span class="cbar-test">${esc(t.title)}</span>${esc(c.name)}</p>
+    <div class="cbar-track" aria-hidden="true">${fill}<i class="cbar-mark" style="left:${share(c.pass_mark)}%"></i></div>
+    <p class="cbar-num">${word} <span><b>${c.result == null ? "no data" : pct(c.result)}</b> against a pass mark of ${pct(c.pass_mark)}</span></p>
+  </li>`;
+}
+
+function verdict(ts: ValidationTest[], summary?: string, head = true) {
   const all = judged(ts);
   const passed = passCount(ts);
-  const failed = all.filter((c: Check) => c.passed === false);
+  const pairs = (p: boolean) => ts.flatMap((t) => t.checks.filter((c) => c.passed === p).map((c) => ({ t, c })));
+  const failed = pairs(false);
+  const ok = pairs(true);
   return `<div class="verdict${passed === all.length ? " ok" : ""}">
-    <p class="v-count-big"><b>${num(passed)} of ${num(all.length)}</b> checks passed</p>
+    ${head ? `<p class="v-count-big"><b>${num(passed)} of ${num(all.length)}</b> checks passed</p>` : ""}
     ${
       failed.length
-        ? `<p class="v-failed"><b>Not passed:</b></p><ul class="v-fail-list">${failed
-            .map((c) => `<li>${esc(c.name)}: <span class="fail">${pct(c.result)}</span> against a pass mark of ${pct(c.pass_mark)}</li>`)
-            .join("")}</ul>`
+        ? `<p class="v-failed"><b>Not passed (${num(failed.length)})</b></p><ul class="v-fail-list cbars">${failed.map(({ t, c }, i) => bar(t, c, failed[i - 1]?.t === t)).join("")}</ul>`
         : ""
     }
-    ${notRun(ts)}
+    ${ok.length ? fold(`Passed (${num(ok.length)})`, `<ul class="cbars">${ok.map(({ t, c }, i) => bar(t, c, ok[i - 1]?.t === t)).join("")}</ul>`, "v-passed") : ""}
   </div>
   ${summary ? fold("What this run found, in full", `<p class="v-summary">${esc(summary)}</p>`) : ""}`;
 }
@@ -196,7 +209,7 @@ function block(ts: ValidationTest[], m: Manifest, l: string) {
 
 type Later = NonNullable<Validation["second_run"]> & Partial<Pick<NonNullable<Validation["third_run"]>, "method_change" | "adopted" | "adoption_rule">>;
 
-type Run = { id: string; title: string; label: string; adopted?: boolean; tests: ValidationTest[]; body: string };
+type Run = { id: string; title: string; label: string; adopted?: boolean; tests: ValidationTest[]; body: (head: boolean) => string };
 
 const methodOf = (title: string) => title.match(/method version ([\d.]+)/i)?.[1];
 
@@ -205,7 +218,7 @@ const runLabel = (n: number, title: string) => {
   return `Run ${n} · ${v ? `method ${v}` : title}`;
 };
 
-function later(r: Later, id: string, l: string, m: Manifest) {
+function later(r: Later, id: string, l: string, m: Manifest, head: boolean) {
   const extra = [
     r.method_change ? `<p><b>Method change.</b> ${esc(r.method_change)}</p>` : "",
     r.adoption_rule ? `<p><b>Adoption rule.</b> ${esc(r.adoption_rule)}</p>` : "",
@@ -213,83 +226,120 @@ function later(r: Later, id: string, l: string, m: Manifest) {
   ].join("");
   return `<div class="second" id="${id}">
       <h3 class="run-h">${esc(r.title)}</h3>
-      ${verdict(r.tests, r.summary)}
-      <p class="note"><b>Designed after seeing the first run.</b> Its design was chosen knowing the first run's result, so it can't confirm the method the way the first run could. Config fixed at commit ${esc(r.config_commit)}.</p>
+      ${verdict(r.tests, undefined, head)}
+      <div class="run-notes">${notRun(r.tests)}<p class="note"><b>Designed after seeing the first run.</b> Its design was chosen knowing the first run's result, so it can't confirm the method the way the first run could. Config fixed at commit ${esc(r.config_commit)}.</p></div>
+      <div class="folds">
+      ${r.summary ? fold("What this run found, in full", `<p class="v-summary">${esc(r.summary)}</p>`) : ""}
       ${fold(extra ? "What this run changed, and the rule for using it" : "What this run did", `<p>${esc(r.plain)}</p>${extra}`)}
       ${block(r.tests, m, l)}
       ${r.unchecked.length ? fold(`Not checked in this run (${num(r.unchecked.length)})`, `<ul class="plain">${r.unchecked.map((u) => `<li><b>${esc(u.place)}:</b> ${esc(u.why)}</li>`).join("")}</ul>`) : ""}
+      </div>
     </div>`;
 }
 
-function first(v: Validation, l: string, m: Manifest) {
+function first(v: Validation, l: string, m: Manifest, head: boolean) {
   return `<div class="run-first" id="first-run">
     <h3 class="run-h">First run</h3>
-    ${verdict(v.tests, v.summary)}
-    <p class="note"><b>Not a blind first run.</b> ${esc(v.not_blind_note)}${
+    ${verdict(v.tests, undefined, head)}
+    <div class="run-notes">${notRun(v.tests)}<p class="note"><b>Not a blind first run.</b> ${esc(v.not_blind_note)}${
       v.prototype_runs.length ? ` Earlier prototype runs: ${v.prototype_runs.map((r) => `${esc(r.date)}, ${esc(r.result)}`).join("; ")}.` : ""
-    } Weights and pass marks fixed at commit ${esc(v.weights_commit)}.</p>
+    } Weights and pass marks fixed at commit ${esc(v.weights_commit)}.</p></div>
+    <div class="folds">
+    ${v.summary ? fold("What this run found, in full", `<p class="v-summary">${esc(v.summary)}</p>`) : ""}
     ${block(v.tests, m, l)}
+    </div>
   </div>`;
 }
 
 function runs(v: Validation, m: Manifest): Run[] {
   const out: Run[] = [];
-  const add = (id: string, title: string, tests: ValidationTest[], adopted: boolean | undefined, body: (l: string) => string) => {
+  const add = (id: string, title: string, tests: ValidationTest[], adopted: boolean | undefined, body: (l: string, head: boolean) => string) => {
     const l = runLabel(out.length + 1, title);
-    out.push({ id, title, label: l, adopted, tests, body: body(l) });
+    out.push({ id, title, label: l, adopted, tests, body: (head) => body(l, head) });
   };
-  add("first-run", "First run", v.tests, undefined, (l) => first(v, l, m));
+  add("first-run", "First run", v.tests, undefined, (l, h) => first(v, l, m, h));
   const s = v.second_run;
-  if (s) add("second-run", s.title, s.tests, undefined, (l) => later(s, "second-run", l, m));
+  if (s) add("second-run", s.title, s.tests, undefined, (l, h) => later(s, "second-run", l, m, h));
   const t = v.third_run;
-  if (t) add("third-run", t.title, t.tests, t.adopted, (l) => later(t, "third-run", l, m));
+  if (t) add("third-run", t.title, t.tests, t.adopted, (l, h) => later(t, "third-run", l, m, h));
   for (const r of v.more_runs ?? []) {
     const id = `run-${out.length + 1}`;
-    add(id, r.title, r.tests, r.adopted, (l) => later(r, id, l, m));
+    add(id, r.title, r.tests, r.adopted, (l, h) => later(r, id, l, m, h));
   }
   return out;
 }
 
+function meter(passed: number, all: number, cls = "") {
+  const w = all ? (passed / all) * 100 : 0;
+  return `<span class="meter${cls ? ` ${cls}` : ""}" aria-hidden="true"><i style="width:${w}%"></i></span>`;
+}
+
 function runHistory(all: Run[], now: Run) {
-  return `<div class="scroll-x"><table class="data run-hist"><thead><tr><th scope="col">Run</th><th scope="col">Method</th><th scope="col">Checks passed</th><th scope="col">Used now</th></tr></thead><tbody>${all
+  return `<ol class="run-hist">${all
     .map((r, i) => {
       const v = methodOf(r.title);
-      return `<tr${r === now ? ' class="now"' : ""}><th scope="row"><a href="#${r.id}">Run ${num(i + 1)}</a></th><td>${v ? `version ${esc(v)}` : esc(r.title)}</td><td class="n">${num(passCount(r.tests))} of ${num(judged(r.tests).length)}</td><td>${r === now ? "Yes" : "No"}</td></tr>`;
+      const p = passCount(r.tests);
+      const n = judged(r.tests).length;
+      return `<li${r === now ? ' class="rh-now"' : ""}><a href="#${r.id}">
+        <span class="rh-n">Run ${num(i + 1)}</span>
+        <span class="rh-m">${v ? `Method version ${esc(v)}` : esc(r.title)}</span>
+        ${meter(p, n)}
+        <span class="rh-p"><b>${num(p)} of ${num(n)}</b> checks passed</span>
+        <span class="rh-u${r === now ? " on" : ""}">${r === now ? "Used now" : "Not used now"}</span>
+      </a></li>`;
     })
-    .join("")}</tbody></table></div>`;
+    .join("")}</ol>`;
 }
 
 function checked(v: Validation | null, m: Manifest) {
-  if (!v) return `<p>The validation file is missing from this build, so no check results are shown.</p>`;
+  if (!v) return { lede: "", body: `<p>The validation file is missing from this build, so no check results are shown.</p>` };
   const all = runs(v, m);
   const now = [...all].reverse().find((r) => r.adopted) ?? all[0];
   const ver = m.method_version ?? methodOf(now.title);
   const earlier = all.filter((r) => r !== now);
   const dataOk = v.data_checks.filter((c) => c.passed).length;
   const dataBad = v.data_checks.filter((c) => !c.passed);
-  return `<p class="lede">Places NASA already trusts should score higher than ordinary farmland and plain deserts. We set the pass marks before any data came in.</p>
-    <div class="current-box">
-      <p class="cur-h">${ver ? `Current method: version ${esc(ver)} (the map uses this)` : `Current method: ${esc(now.title)} (the map uses this)`}</p>
-      ${runHistory(all, now)}
+  const p = passCount(now.tests);
+  const n = judged(now.tests).length;
+  const off = now.tests.flatMap((t) => t.checks).filter((c) => c.passed == null).length;
+  return {
+    lede: "Places NASA already trusts should score higher than ordinary farmland and plain deserts. We set the pass marks before any data came in.",
+    body: `<div class="chk-head">
+      <div class="chk-score${p === n ? " ok" : ""}">
+        <p class="cur-h">${ver ? `Current method: version ${esc(ver)}` : `Current method: ${esc(now.title)}`} <span>(the map uses this)</span></p>
+        <p class="v-count-big"><b>${num(p)} of ${num(n)}</b> checks passed</p>
+        ${meter(p, n, "big")}
+        <p class="chk-sub">${num(n - p)} not passed${off ? `. ${num(off)} more had too few test sites to judge` : ""}.</p>
+      </div>
+      <div class="current-box">
+        <p class="run-label">Every run</p>
+        ${runHistory(all, now)}
+      </div>
     </div>
-    ${now.body}
-    ${earlier.length ? `<details class="earlier"><summary>Earlier runs (${num(earlier.length)})</summary>${earlier.map((r) => r.body).join("")}</details>` : ""}
+    ${now.body(false)}
+    <div class="folds chk-more">
+    ${earlier.length ? `<details class="earlier"><summary>Earlier runs (${num(earlier.length)})</summary>${earlier.map((r) => r.body(true)).join("")}</details>` : ""}
     ${v.stability ? fold("How stable the top places are", `<p>${esc(v.stability)}</p>`) : ""}
-    ${dataBad.length ? `<p class="v-failed"><b>Data checks not passed:</b> ${dataBad.map((c) => esc(c.name)).join("; ")}</p>` : ""}
     ${fold(
       `Data checks (${num(dataOk)} of ${num(v.data_checks.length)} passed)`,
       `<div class="scroll-x"><table class="data"><thead><tr><th scope="col">Check</th><th scope="col">Result</th><th scope="col">Outcome</th></tr></thead><tbody>${v.data_checks
         .map((c) => `<tr><th scope="row">${esc(c.name)}</th><td class="n">${esc(c.result)}</td>${outcome(c.passed)}</tr>`)
         .join("")}</tbody></table></div>`,
-    )}`;
+    )}
+    </div>
+    ${dataBad.length ? `<p class="v-failed"><b>Data checks not passed:</b> ${dataBad.map((c) => esc(c.name)).join("; ")}</p>` : ""}`,
+  };
 }
 
-const block2 = (id: string, title: string, body: string) => `<details class="ch-block" id="${id}"><summary><span class="cb-t">${title}</span></summary><div class="cb-body">${body}</div></details>`;
+const block2 = (id: string, n: number, title: string, line: string, body: string) =>
+  `<details class="ch-block" id="${id}"><summary><span class="cb-n">${num(n)}</span><span class="cb-tx"><span class="cb-t">${title}</span><span class="cb-s">${line}</span></span></summary><div class="cb-body">${body}</div></details>`;
 
 function terrain(m: Manifest) {
   return block2(
     "terrain",
-    `Terrain types and clusters (${num(m.terrain_types.length)} types)`,
+    m.terrain_types.length,
+    "Terrain types and clusters",
+    `${num(m.terrain_types.length)} terrain types and ${num(m.clustering.k)} clusters, worked out from the data.`,
     `<p>Every land cell gets one terrain tag, by rules worked out from the data. Filter the map by type above.</p>
     <h3>Terrain types</h3>
     <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Type</th><th scope="col">Rule</th><th scope="col">Cells</th></tr></thead><tbody>${m.terrain_types
@@ -303,10 +353,14 @@ function terrain(m: Manifest) {
 }
 
 function challenge(m: Manifest) {
-  return `<p class="lede">Our local event's Challenge Guide sets ${num(m.benchmarks.length)} benchmarks and asks ${num(m.questions.length)} questions. Here is how we meet and answer each.</p>
+  return {
+    lede: `Our local event's Challenge Guide sets ${num(m.benchmarks.length)} benchmarks and asks ${num(m.questions.length)} questions. Here is how we meet and answer each.`,
+    body: `<div class="ch-grid">
     ${block2(
       "benchmarks",
-      `The ${num(m.benchmarks.length)} benchmarks, and how we meet each`,
+      m.benchmarks.length,
+      "Benchmarks, and how we meet each",
+      "Each in the guide's own words, with where to see it on this site.",
       `<p class="small muted">In the guide's own words.</p><ol class="bench">${m.benchmarks
         .map(
           (b) => `<li><span class="b-n">${b.n}</span><div><p class="guide">${esc(b.guide_words)}</p><p>${esc(b.how)}</p><p class="small"><a href="#${WHERE[b.n] ?? "explore"}">${esc(b.where)}</a></p></div></li>`,
@@ -315,10 +369,14 @@ function challenge(m: Manifest) {
     )}
     ${block2(
       "questions",
-      `The ${num(m.questions.length)} questions, answered`,
+      m.questions.length,
+      "Questions, answered",
+      "Each question from the guide, with our answer.",
       `<ol class="qs">${m.questions.map((q) => `<li><span class="b-n">${q.n}</span><div><p class="guide">${esc(q.question)}</p><p>${esc(q.answer)}</p></div></li>`).join("")}</ol>`,
     )}
-    ${terrain(m)}`;
+    ${terrain(m)}
+    </div>`,
+  };
 }
 
 function data(m: Manifest) {
@@ -326,37 +384,49 @@ function data(m: Manifest) {
   const ds = [...m.datasets].sort((a, b) => order.indexOf(a.agency) - order.indexOf(b.agency));
   const archives = [...new Set(ds.map((d) => d.archive).filter((a): a is string => !!a && !/^(computed|published paper)$/i.test(a)))];
   const b1 = m.benchmarks.find((b) => b.n === 1);
-  return `<p class="lede">Every number on this site traces to a named dataset. NASA data does the main scoring work; partner data is marked.</p>
+  const card = (n: number, summary: string, line: string, body: string) =>
+    fold(`<span class="cb-n">${num(n)}</span><span class="cb-tx"><span class="cb-t">${summary}</span>${line ? `<span class="cb-s">${line}</span>` : ""}</span>`, body, "d-block");
+  return {
+    lede: "Every number on this site traces to a named dataset. NASA data does the main scoring work; partner data is marked.",
+    body: `<div class="d-grid">
     ${
       b1
         ? `<div class="archives"><p class="guide">${esc(b1.guide_words)}</p><p>${num(archives.length)} open data archives feed this site: ${archives.map(esc).join(", ")}.</p></div>`
         : ""
     }
-    ${fold(`All ${num(ds.length)} datasets, with archive, licence and use`, `<div class="scroll-x"><table class="data ds"><thead><tr><th scope="col">Dataset</th><th scope="col">Agency</th><th scope="col">Archive</th><th scope="col">Licence</th><th scope="col">Used for</th></tr></thead><tbody>${ds
+    ${card(ds.length, "Datasets", "Each with its archive, licence and use.", `<div class="scroll-x"><table class="data ds"><thead><tr><th scope="col">Dataset</th><th scope="col">Agency</th><th scope="col">Archive</th><th scope="col">Licence</th><th scope="col">Used for</th></tr></thead><tbody>${ds
       .map(
         (d) => `<tr><th scope="row">${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>` : esc(d.name)}</th><td>${esc(d.agency)}${
           d.agency === "partner" ? ' <span class="tag">partner</span>' : ""
         }</td><td>${esc(d.archive ?? "")}</td><td>${esc(d.licence)}</td><td>${esc(d.used_for)}</td></tr>`,
       )
       .join("")}</tbody></table></div>`)}
-    ${fold(`Imagery shown, not scored (${num(IMAGERY.length)})`, `<ul class="plain">${IMAGERY.map((i) => `<li><a href="${i.url}" target="_blank" rel="noopener">${esc(i.name)}</a>, ${esc(i.by)}. ${esc(i.licence)}. ${esc(i.use)}</li>`).join("")}</ul>`)}
-    ${fold(`Code and fonts (${num(CODE.length)})`, `<ul class="plain">${CODE.map((c) => `<li><a href="${c.url}" target="_blank" rel="noopener">${esc(c.name)}</a>: ${esc(c.licence)}. ${esc(c.use)}.</li>`).join("")}</ul>`)}`;
+    ${card(IMAGERY.length, "Imagery shown, not scored", "", `<ul class="plain">${IMAGERY.map((i) => `<li><a href="${i.url}" target="_blank" rel="noopener">${esc(i.name)}</a>, ${esc(i.by)}. ${esc(i.licence)}. ${esc(i.use)}</li>`).join("")}</ul>`)}
+    ${card(CODE.length, "Code and fonts", "", `<ul class="plain">${CODE.map((c) => `<li><a href="${c.url}" target="_blank" rel="noopener">${esc(c.name)}</a>: ${esc(c.licence)}. ${esc(c.use)}.</li>`).join("")}</ul>`)}
+    </div>`,
+  };
+}
+
+function limits(m: Manifest) {
+  return {
+    lede: `${num(m.not_in_version.length)} things we left out of this version. Open any one to read why.`,
+    body: `<ul class="lim-grid">${m.not_in_version
+      .map((n) => `<li><details><summary>${esc(n.item)}</summary><p>${esc(n.reason)}</p></details></li>`)
+      .join("")}</ul>`,
+  };
 }
 
 export function sections(m: Manifest, v: Validation | null) {
-  const sec = (id: string, title: string, body: string) => `<section id="${id}" class="page-sec" aria-labelledby="${id}-h"><h2 id="${id}-h">${esc(title)}</h2>${body}</section>`;
+  const sec = (id: string, kicker: string, title: string, part: { lede: string; body: string }) =>
+    `<section id="${id}" class="page-sec band" aria-labelledby="${id}-h"><header class="sec-head"><p class="sec-k">${esc(kicker)}</p><h2 id="${id}-h">${esc(title)}</h2>${
+      part.lede ? `<p class="lede">${part.lede}</p>` : ""
+    }</header>${part.body}</section>`;
+  const k = Object.fromEntries(NAV);
   return [
-    sec("checked", "How we checked it", checked(v, m)),
-    sec("challenge", "The challenge", challenge(m)),
-    sec("data", "Data", data(m)),
-    sec(
-      "limits",
-      "Not in this version",
-      `<p class="lede">Left out for now: ${m.not_in_version.map((n) => esc(n.item)).join(", ")}.</p>${fold(
-        `Why each is left out (${num(m.not_in_version.length)})`,
-        `<ul class="plain limits">${m.not_in_version.map((n) => `<li><b>${esc(n.item)}.</b> ${esc(n.reason)}</li>`).join("")}</ul>`,
-      )}`,
-    ),
+    sec("checked", k.checked, "How we checked it", checked(v, m)),
+    sec("challenge", k.challenge, "The challenge", challenge(m)),
+    sec("data", k.data, "Data", data(m)),
+    sec("limits", k.limits, "Not in this version", limits(m)),
   ].join("");
 }
 
