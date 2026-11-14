@@ -1,59 +1,83 @@
 # Team plan
 
-Our idea in our own words, from our planning board.
+Our final idea. The approach is ours, from our planning board. Claude reviewed each challenge against the available data and suggested refinements, and we chose which to keep (see "Changes from the board").
 
 ## Approach
 
-My approach to this project is to have specific subcategories best suited to simulate a specific potential challenge that can be faced, as one location can only do that.
+No single place on Earth can simulate everything about a Moon or Mars base. So we split base-building into specific challenges, and match each challenge to the Earth sites best suited to test it.
 
-## Earth Analogs for Base Building
+Within each challenge we score only what both sides can measure. Parts without data on both sides are shown as labels, marked as not scored, with the reason.
 
-Match each base-building challenge to a testable Earth site.
-
-### Moon
+## Moon
 
 **Surface** (shared)
 - Ruggedness: rover ops, construction stability
-- Bearing capacity: load from builds and landers
-- Combined into a construction score
+- Ground strength: load from builds and landers (estimated from stand-in data, and marked as an estimate)
+- Landing safety: slope and rockiness, against NASA's landing limit of slopes under 10°
 
-**Mining & ISRU** (shared)
-- Sites to simulate mining and processing
+**Resources** (shared)
 - Water: ice-cemented ground
-- Ilmenite basalt for oxygen
+- Oxygen from local rock
 
-**Dust** (shared)
-- Fineness and angularity
-- How they affect designs
+**Heat swing** (shared)
+- Extreme cold and large day-to-night or seasonal temperature changes
 
-**Flatlands for railgun** (Moon only)
-- Long, flat, load-bearing strips
-- Built from surface scores
-- Also industrial sites like solar arrays
+**Shelter** (shared)
+- Caves and lava tubes (label only: Earth has no map of them)
 
-**To consider:** thermal cycling, low-angle polar lighting, lava tubes
+**Polar light and power** (Moon only)
+- Low sun, long shadows, and sites for solar power
 
-### Mars
+**Industrial sites** (Moon only)
+- Long, flat strips for landing pads, solar farms, roads, or a railgun
+- Built from the Surface scores
+
+**Dust** (label only)
+- Fine, sharp grains and how they affect designs
+- Not scored: Moon dust is known only from Apollo samples, and Earth has no map of grain shape
+
+## Mars
 
 **Surface** (shared)
 - Ruggedness: rover ops, construction stability
-- Bearing capacity: load from builds and landers
-- Combined into a construction score
+- Ground strength: load from builds and landers (estimated from stand-in data, and marked as an estimate)
+- Landing safety: slope and rockiness
 
-**Mining & ISRU** (shared)
-- Sites to simulate mining and processing
+**Resources** (shared)
 - Water: buried ground ice
-- Hydrated minerals, perchlorates
+- Hydrated minerals (clays, sulfates): NASA data on both sides
+- Perchlorates (label only: known from a few sites, not mapped)
 
-**Dust** (shared)
-- Fineness and angularity
-- How they affect designs
-- Volume: see Atmosphere
+**Heat swing** (shared)
+- Cold and day-to-night temperature changes
 
-**Atmosphere** (Mars only)
-- Wind and dust storms
+**Shelter** (shared)
+- Caves and lava tubes (label only: Earth has no map of them)
+
+**Atmosphere and dust** (Mars only)
+- Wind, dust storms and dust cover
 - Effect on surface ops, habitats and design
+- Compared by how often dust is lifted, not by wind speed, because Mars air is about 1% as thick as Earth's
 
-**To consider:** habitability and biosignatures, salts and brines, ancient water landscapes, thermal
+**Signs of life** (Mars only)
+- Places to practise searching for past life, built on the hydrated-minerals data
 
-*Shared* is a category both bodies have, *Moon only* and *Mars only* are specific to one body, and *To consider* is ideas not yet in scope. (On the board these were blue, peach and white.)
+## Every challenge
+
+Each match shows what Earth can't copy: low gravity, the Moon's vacuum, Mars's thin air, and space radiation.
+
+## To consider
+
+Salts and brines, ancient water landscapes.
+
+## Changes from the board
+
+The original board version is in git history. Claude suggested these changes and we accepted them:
+
+- Bearing capacity became ground strength, marked as an estimate, because nothing measures it directly.
+- Landing safety added under Surface (our placement).
+- Ilmenite became oxygen from local rock, because ilmenite is rare at the Moon's south pole.
+- Moon dust became a label, and Mars dust joined Atmosphere, because dust grain data is too thin to score.
+- The railgun strip became industrial sites, with the railgun as one example.
+- Heat swing, polar light and power, shelter, and signs of life moved up from "to consider".
+- Mars wind is compared by dust activity, not speed.
