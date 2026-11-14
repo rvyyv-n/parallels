@@ -52,3 +52,40 @@
 .page-sec details[open] > summary::before {
   content: "\2212";
 }
+
+.run-label {
+  font: 650 11px/1.2 var(--display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 10px 0 4px;
+}
+
+.v-failed {
+  margin: 0 0 4px;
+}
+
+.v-fail-list {
+  margin: 0 0 10px;
+  padding-left: 20px;
+  max-width: 80ch;
+}
+
+.v-fail-list li {
+  margin: 2px 0;
+}
+
+.not-run {
+  color: var(--ink-2);
+  font-size: 13.5px;
+  max-width: 90ch;
+}
+
+.v-same > p {
+  max-width: 80ch;
+}
+
+.v-test h4 {
+  font-size: 18px;
+  margin: 18px 0 6px;
+}

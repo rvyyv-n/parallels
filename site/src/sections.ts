@@ -52,7 +52,16 @@ const placeName = (t: ValidationTest, id: string) => t.places.find((p) => p.id =
 const outcome = (passed: boolean | null) =>
   `<td class="${passed ? "pass" : passed === false ? "fail" : ""}">${passed ? "Passed" : passed === false ? "Not passed" : "Not run"}</td>`;
 
-function chart(t: ValidationTest, m: Manifest) {
+type Check = ValidationTest["checks"][number];
+
+const FEW = /\s*\(too few sites[^)]*\)\s*$/i;
+const bare = (name: string) => name.replace(FEW, "");
+
+const fold = (summary: string, body: string, cls = "") => `<details${cls ? ` class="${cls}"` : ""}><summary>${summary}</summary>${body}</details>`;
+
+const label = (l: string) => `<p class="run-label">${esc(l)}</p>`;
+
+function chart(t: ValidationTest, m: Manifest, l: string) {
   const W = 640;
   const L = 12;
   const R = 12;
@@ -80,7 +89,7 @@ function chart(t: ValidationTest, m: Manifest) {
       return `<text x="${L}" y="${y - 16}" class="v-glabel">${esc(g.name)} <tspan class="v-count">${pts.length} scored</tspan></text><line x1="${L}" x2="${W - R}" y1="${y}" y2="${y}" class="v-row"/>${dots}`;
     })
     .join("");
-  const table = `<details class="v-table"><summary>Every place as a table</summary><div class="scroll-x"><table class="data">
+  const table = `<details class="v-table"><summary>Every place as a table (${num(t.places.length)})</summary>${label(l)}<div class="scroll-x"><table class="data">
     <thead><tr><th scope="col">Place</th><th scope="col">Group</th>${t.places.some((p) => p.challenge) ? '<th scope="col">Checked on</th>' : ""}<th scope="col">Earth rank</th><th scope="col">Held out</th><th scope="col">Blind</th></tr></thead>
     <tbody>${[...t.places]
       .sort((a, b) => (b.land_rank ?? -1) - (a.land_rank ?? -1))
@@ -93,51 +102,114 @@ function chart(t: ValidationTest, m: Manifest) {
   return `<div class="scroll-x"><svg viewBox="0 0 ${W} ${h}" class="v-chart" role="img" aria-label="${esc(t.title)}: each test place on a 0 to 100 Earth-rank line, one row per group">${grid}${rows}</svg></div>${table}`;
 }
 
-function test(t: ValidationTest, m: Manifest) {
-  const off = t.places.filter((p) => p.land_rank == null);
+function test(t: ValidationTest, m: Manifest, l: string, plain: boolean) {
   return `<article class="v-test">
-    <h3>${esc(t.title)}</h3>
-    <p>${esc(t.plain)}</p>
+    <h4>${esc(t.title)}</h4>
+    ${plain ? `<p>${esc(t.plain)}</p>` : ""}
     <ul class="v-groups">${t.groups.map((g, k) => `<li><i class="sw g${k}"></i><b>${esc(g.name)}.</b> ${esc(g.plain)}</li>`).join("")}</ul>
-    ${chart(t, m)}
-    <p class="small muted">Position: Earth rank of the place's match score, from 0 (worse than all land) to 100 (better than all land). Filled circles: scored places; open circles: the held-out half; diamonds: blind places never scored before.</p>
-    ${t.misses.length ? `<h4>Misses, explained</h4><ul class="plain">${t.misses.map((x) => `<li><b>${esc(placeName(t, x.place))}:</b> ${esc(x.why)}</li>`).join("")}</ul>` : ""}
-    ${off.length ? `<h4>Could not be scored</h4><ul class="plain">${off.map((p) => `<li><b>${esc(p.name)}:</b> ${esc(p.note ?? "Not scored.")}</li>`).join("")}</ul>` : ""}
+    ${chart(t, m, l)}
   </article>`;
 }
 
-function checksTable(tests: ValidationTest[]) {
-  return `<div class="scroll-x"><table class="data v-checks">
+function tests(ts: ValidationTest[], m: Manifest, l: string) {
+  const groups: ValidationTest[][] = [];
+  for (const t of ts) {
+    const g = groups[groups.length - 1];
+    if (g && g[0].plain === t.plain) g.push(t);
+    else groups.push([t]);
+  }
+  const body = groups
+    .map((g) =>
+      g.length > 1
+        ? `<div class="v-same"><p>${esc(g[0].plain)}</p><div class="v-tests">${g.map((t) => test(t, m, l, false)).join("")}</div></div>`
+        : `<div class="v-tests">${test(g[0], m, l, true)}</div>`,
+    )
+    .join("");
+  return `${label(l)}${body}<p class="small muted">Position: Earth rank of the place's match score, from 0 (worse than all land) to 100 (better than all land). Filled circles: scored places; open circles: the held-out half; diamonds: blind places never scored before.</p>`;
+}
+
+function notRun(ts: ValidationTest[]) {
+  const off = ts.flatMap((t) => t.checks.filter((c) => c.passed == null).map((c) => ({ t, c })));
+  if (!off.length) return "";
+  const min = off.map(({ c }) => c.name.match(/fewer than (\d+)/i)?.[1]).find(Boolean);
+  return `<p class="not-run">${num(off.length)} ${off.length === 1 ? "check" : "checks"} had ${min ? `fewer than ${esc(min)} test sites` : "too few test sites"}, so no pass or fail: ${off
+    .map(({ t, c }) => `${esc(bare(c.name))} (${esc(t.title)})`)
+    .join("; ")}.</p>`;
+}
+
+function checksTable(ts: ValidationTest[], l: string) {
+  const rows = ts.flatMap((t) => t.checks).filter((c) => c.passed != null);
+  return fold(
+    `Every check in this run (${num(rows.length)})`,
+    `${label(l)}<div class="scroll-x"><table class="data v-checks">
     <thead><tr><th scope="col">Check</th><th scope="col">Pass mark</th><th scope="col">All sites</th><th scope="col">Held-out half</th><th scope="col">Blind sites</th><th scope="col">Pairs</th><th scope="col">Outcome</th></tr></thead>
-    <tbody>${tests
-      .flatMap((t) => t.checks)
+    <tbody>${rows
       .map(
         (c) => `<tr><th scope="row">${esc(c.name)}</th><td class="n">${pct(c.pass_mark)}</td><td class="n big">${pct(c.result)}</td><td class="n">${pct(c.held_out_only)}</td><td class="n">${pct(c.blind_only)}</td><td class="n">${num(c.n_pairs)}</td>${outcome(c.passed)}</tr>`,
       )
       .join("")}</tbody>
   </table></div>
-  <p class="small muted">A result is the share of pairs where the first group's place ranks higher than the second's (a pair with exactly equal scores counts as half). "Held-out half" uses only the analogs set aside in a fixed split; "blind sites" uses only analogs never scored before this run.</p>`;
+  <p class="small muted">A result is the share of pairs where the first group's place ranks higher than the second's (a pair with exactly equal scores counts as half). "Held-out half" uses only the analogs set aside in a fixed split; "blind sites" uses only analogs never scored before this run.</p>`,
+    "v-all",
+  );
 }
 
-const judged = (tests: ValidationTest[]) => tests.flatMap((t) => t.checks).filter((c) => c.passed != null);
-const passCount = (tests: ValidationTest[]) => judged(tests).filter((c) => c.passed).length;
+const judged = (ts: ValidationTest[]) => ts.flatMap((t) => t.checks).filter((c) => c.passed != null);
+const passCount = (ts: ValidationTest[]) => judged(ts).filter((c) => c.passed).length;
 
-function verdict(tests: ValidationTest[], summary?: string) {
-  const all = judged(tests);
-  const passed = passCount(tests);
+function verdict(ts: ValidationTest[], summary?: string) {
+  const all = judged(ts);
+  const passed = passCount(ts);
+  const failed = all.filter((c: Check) => c.passed === false);
   return `<div class="verdict${passed === all.length ? " ok" : ""}">
     <p class="v-count-big"><b>${num(passed)} of ${num(all.length)}</b> checks passed</p>
+    ${
+      failed.length
+        ? `<p class="v-failed"><b>Not passed:</b></p><ul class="v-fail-list">${failed
+            .map((c) => `<li>${esc(c.name)}: <span class="fail">${pct(c.result)}</span> against a pass mark of ${pct(c.pass_mark)}</li>`)
+            .join("")}</ul>`
+        : ""
+    }
+    ${notRun(ts)}
     ${summary ? `<p class="v-summary">${esc(summary)}</p>` : ""}
   </div>`;
 }
 
+function misses(ts: ValidationTest[]) {
+  const ms = ts.flatMap((t) => t.misses.map((x) => ({ t, x })));
+  const off = ts.flatMap((t) => t.places.filter((p) => p.land_rank == null).map((p) => ({ t, p })));
+  return [
+    ms.length
+      ? fold(
+          `Misses, explained (${num(ms.length)})`,
+          `<ul class="plain">${ms.map(({ t, x }) => `<li><b>${esc(placeName(t, x.place))}</b> <span class="muted">(${esc(t.title)})</span>: ${esc(x.why)}</li>`).join("")}</ul>`,
+        )
+      : "",
+    off.length
+      ? fold(
+          `Could not be scored (${num(off.length)})`,
+          `<ul class="plain">${off.map(({ t, p }) => `<li><b>${esc(p.name)}</b> <span class="muted">(${esc(t.title)})</span>: ${esc(p.note ?? "Not scored.")}</li>`).join("")}</ul>`,
+        )
+      : "",
+  ].join("");
+}
+
+function block(ts: ValidationTest[], m: Manifest, l: string) {
+  return `${checksTable(ts, l)}${fold(`Each test, with its chart (${num(ts.length)})`, tests(ts, m, l))}${misses(ts)}`;
+}
+
 type Later = NonNullable<Validation["second_run"]> & Partial<Pick<NonNullable<Validation["third_run"]>, "method_change" | "adopted" | "adoption_rule">>;
 
-type Run = { id: string; title: string; adopted?: boolean; tests: ValidationTest[]; body: string };
+type Run = { id: string; title: string; label: string; adopted?: boolean; tests: ValidationTest[]; body: string };
 
 const methodOf = (title: string) => title.match(/method version ([\d.]+)/i)?.[1];
 
-function later(r: Later, id: string, m: Manifest) {
+const runLabel = (n: number, title: string) => {
+  const v = methodOf(title);
+  return `Run ${n} · ${v ? `method ${v}` : title}`;
+};
+
+function later(r: Later, id: string, l: string, m: Manifest) {
   const extra = [
     r.method_change ? `<p><b>Method change.</b> ${esc(r.method_change)}</p>` : "",
     r.adoption_rule ? `<p><b>Adoption rule.</b> ${esc(r.adoption_rule)}</p>` : "",
@@ -149,31 +221,36 @@ function later(r: Later, id: string, m: Manifest) {
       <p>${esc(r.plain)}</p>
       ${extra}
       ${verdict(r.tests, r.summary)}
-      ${checksTable(r.tests)}
-      <div class="v-tests">${r.tests.map((t) => test(t, m)).join("")}</div>
-      ${r.unchecked.length ? `<h4>Not checked in this run</h4><ul class="plain">${r.unchecked.map((u) => `<li><b>${esc(u.place)}:</b> ${esc(u.why)}</li>`).join("")}</ul>` : ""}
+      ${block(r.tests, m, l)}
+      ${r.unchecked.length ? fold(`Not checked in this run (${num(r.unchecked.length)})`, `<ul class="plain">${r.unchecked.map((u) => `<li><b>${esc(u.place)}:</b> ${esc(u.why)}</li>`).join("")}</ul>`) : ""}
     </div>`;
 }
 
-function first(v: Validation, m: Manifest) {
+function first(v: Validation, l: string, m: Manifest) {
   return `<div class="run-first" id="first-run">
     <h3 class="run-h">First run</h3>
-    ${verdict(v.tests, v.summary)}
-    ${checksTable(v.tests)}
     <p class="note"><b>Not a blind first run.</b> ${esc(v.not_blind_note)}${
       v.prototype_runs.length ? ` Earlier prototype runs: ${v.prototype_runs.map((r) => `${esc(r.date)}, ${esc(r.result)}`).join("; ")}.` : ""
     } Weights and pass marks fixed at commit ${esc(v.weights_commit)}.</p>
-    <div class="v-tests">${v.tests.map((t) => test(t, m)).join("")}</div>
+    ${verdict(v.tests, v.summary)}
+    ${block(v.tests, m, l)}
   </div>`;
 }
 
 function runs(v: Validation, m: Manifest): Run[] {
-  const out: Run[] = [{ id: "first-run", title: "First run", tests: v.tests, body: first(v, m) }];
-  if (v.second_run) out.push({ id: "second-run", title: v.second_run.title, tests: v.second_run.tests, body: later(v.second_run, "second-run", m) });
-  if (v.third_run) out.push({ id: "third-run", title: v.third_run.title, adopted: v.third_run.adopted, tests: v.third_run.tests, body: later(v.third_run, "third-run", m) });
+  const out: Run[] = [];
+  const add = (id: string, title: string, tests: ValidationTest[], adopted: boolean | undefined, body: (l: string) => string) => {
+    const l = runLabel(out.length + 1, title);
+    out.push({ id, title, label: l, adopted, tests, body: body(l) });
+  };
+  add("first-run", "First run", v.tests, undefined, (l) => first(v, l, m));
+  const s = v.second_run;
+  if (s) add("second-run", s.title, s.tests, undefined, (l) => later(s, "second-run", l, m));
+  const t = v.third_run;
+  if (t) add("third-run", t.title, t.tests, t.adopted, (l) => later(t, "third-run", l, m));
   for (const r of v.more_runs ?? []) {
     const id = `run-${out.length + 1}`;
-    out.push({ id, title: r.title, adopted: r.adopted, tests: r.tests, body: later(r, id, m) });
+    add(id, r.title, r.tests, r.adopted, (l) => later(r, id, l, m));
   }
   return out;
 }

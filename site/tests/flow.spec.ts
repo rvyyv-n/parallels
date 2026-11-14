@@ -141,7 +141,7 @@ test("sample banner shows only for sample data", async ({ page }) => {
 test("validation shows the first run, then later runs when present", async ({ page, request }) => {
   const v = await (await request.get("/data/validation.json")).json();
   await ready(page);
-  const count = (r: { tests: { checks: unknown[] }[] }) => r.tests.flatMap((t) => t.checks).length;
+  const count = (r: { tests: { checks: { passed: boolean | null }[] }[] }) => r.tests.flatMap((t) => t.checks).filter((c) => c.passed != null).length;
   await expect(page.locator("#first-run .v-checks tbody tr")).toHaveCount(count(v));
   const later = [v.third_run, ...(v.more_runs ?? [])].filter(Boolean);
   const now = [...later].reverse().find((r) => r.adopted);
@@ -149,6 +149,13 @@ test("validation shows the first run, then later runs when present", async ({ pa
     const id = now === v.third_run ? "third-run" : `run-${[v.second_run, v.third_run].filter(Boolean).length + 2 + (v.more_runs ?? []).indexOf(now)}`;
     await expect(page.locator(".current-box + div .v-checks").first().locator("tbody tr")).toHaveCount(count(now));
     await expect(page.locator(`#${id}`)).toContainText(now.title);
+    const shown = page.locator(".current-box + div .verdict");
+    await expect(shown.locator(".v-count-big")).toBeVisible();
+    await expect(shown.locator(".v-count-big")).toContainText(`${now.tests.flatMap((t: { checks: { passed: boolean | null }[] }) => t.checks).filter((c: { passed: boolean | null }) => c.passed).length} of ${count(now)}`);
+    for (const c of now.tests.flatMap((t: { checks: { name: string; passed: boolean | null }[] }) => t.checks).filter((c: { passed: boolean | null }) => c.passed === false)) {
+      await expect(shown.locator(".v-fail-list")).toBeVisible();
+      await expect(shown.locator(".v-fail-list")).toContainText(c.name);
+    }
     await expect(page.locator(".current-box")).toContainText(now.title.match(/method version ([\d.]+)/i)?.[1] ?? now.title);
   }
   for (const [i, r] of (v.more_runs ?? []).entries()) await expect(page.locator(`#run-${[v.second_run, v.third_run].filter(Boolean).length + 2 + i}`)).toContainText(r.title);
