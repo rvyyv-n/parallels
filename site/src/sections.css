@@ -257,3 +257,7 @@
 .run-hist td {
   vertical-align: middle;
 }
+
+.run-hist a {
+  white-space: nowrap;
+}
