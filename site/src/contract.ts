@@ -111,6 +111,7 @@ export interface CantCopy {
 export interface Manifest {
   version: 1;
   method_version?: string;
+  method_note?: string;
   generated: string;
   sample: boolean;
   grid: BinFile & { res_deg: number; land_rule: string };

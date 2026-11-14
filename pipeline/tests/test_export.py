@@ -42,7 +42,7 @@ TARGET = {
 }
 CANT = {"name": S, "earth": S, "moon": S, "mars": S, "source": S, "url": S}
 MANIFEST = {
-    "version": enum(1), "method_version": opt(S), "generated": S, "sample": B,
+    "version": enum(1), "method_version": opt(S), "method_note": opt(S), "generated": S, "sample": B,
     "grid": dict(BINFILE, res_deg=N, land_rule=S),
     "regions": [S], "datasets": [DATASET], "traits": [TRAIT],
     "challenges": {"moon": [CHALLENGE], "mars": [CHALLENGE]},

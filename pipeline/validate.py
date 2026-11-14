@@ -177,7 +177,7 @@ def data_checks(cells, where, checks):
     return out
 
 
-def run(cells, scored, sites, cfg, commit):
+def run(cells, scored, sites, cfg, commit, with_misses=False):
     v = cfg["validation"]
     pm = v["pass_marks"]
     held = set(v["held_out"])
@@ -212,7 +212,7 @@ def run(cells, scored, sites, cfg, commit):
             {k: moon["ranks"][k] for k in v["basalt_terrain_traits"] if k in moon["ranks"]},
         ),
     ]
-    second = second_run(cells, scored, sites, cfg, where, held)
+    second = second_run(cells, scored, sites, cfg, where, held, with_misses)
     return {
         "weights_commit": commit,
         "summary": result_line(tests) + " " + second["summary"],
@@ -284,7 +284,21 @@ def tally(rows, other, mark, name, min_sites, pooled=False):
     }
 
 
-def second_test(body, target_id, sc, cells, sites, groups, where, held, cfg):
+def challenge_miss(r, cells, ranks, traits, name):
+    i = r["cell"]
+    if i is None or r["score"] is None:
+        return r.get("note", "Not scored.")
+    low = sorted((float(ranks[k][i]), k) for k in traits if k in ranks and np.isfinite(ranks[k][i]))[:3]
+    extra = []
+    if float(cells["land_frac"][i]) < 0.5:
+        extra.append(f"only {float(cells['land_frac'][i]):.0%} of the cell is land")
+    if float(cells["ice"][i]) > 50:
+        extra.append(f"{float(cells['ice'][i]):.0f}% of the cell is permanent ice")
+    text = f"In the bottom half of land on {name}. Its lowest trait ranks there: " + ", ".join(f"{LABELS[k].lower()} {v:.2f}" for v, k in low)
+    return text + ("; " + "; ".join(extra) if extra else "") + "."
+
+
+def second_test(body, target_id, sc, cells, sites, groups, where, held, cfg, with_misses=False):
     sr = cfg["validation"]["second_run"]
     names = {c["id"]: c["name"] for c in CHALLENGES[body]}
     ch = sc["challenges"]
@@ -329,21 +343,29 @@ def second_test(body, target_id, sc, cells, sites, groups, where, held, cfg):
     groups_out = [{"id": f"analog:{c}", "name": f"Analogs used for {names[c]}", "plain": f"Known analogs whose papers say they are used for {names[c]}, scored on {names[c]} alone."} for c in used]
     groups_out += [{"id": g, "name": GROUPS[g][0], "plain": GROUPS[g][1]} for g in controls]
     title = "Moon, challenge by challenge" if body == "moon" else "Mars, challenge by challenge"
+    misses = []
+    if with_misses:
+        tw = cfg["trait_weights"][body]
+        misses = [
+            {"place": r["id"], "why": challenge_miss(r, cells, sc["ranks"], tw.get(r["challenge"], {}), names[r["challenge"]])}
+            for r in analogs
+            if r["land_rank"] is None or r["land_rank"] < 0.5
+        ]
     test_ = {
         "id": f"second-{body}", "title": title, "body": body,
         "plain": sr["rule"] + " " + sr["pooled_rule"] + " " + sr["few_sites_note"],
         "groups": groups_out, "places": analogs + [r for rs in others.values() for r in rs],
-        "checks": checks, "misses": [],
+        "checks": checks, "misses": misses,
     }
     return test_, unchecked
 
 
-def second_run(cells, scored, sites, cfg, where, held):
+def second_run(cells, scored, sites, cfg, where, held, with_misses=False):
     v = cfg["validation"]
     sr = v["second_run"]
     tests, unchecked = [], []
     for body, tid, groups in (("moon", v["moon_target"], sr["moon_groups"]), ("mars", v["mars_target"], sr["mars_groups"])):
-        t, u = second_test(body, tid, scored[tid], cells, sites, groups, where, held, cfg)
+        t, u = second_test(body, tid, scored[tid], cells, sites, groups, where, held, cfg, with_misses)
         tests.append(t)
         unchecked += [dict(x, place=f"{x['place']} ({body.capitalize()})") for x in u]
     return {
@@ -404,7 +426,9 @@ def third_run(val_old, val_new, cfg, commit):
     checks = [c for t in val_new["tests"] + sn["tests"] for c in t["checks"] if c["passed"] is not None]
     summary = (
         f"A third run tried method version 1.1 ({cfg['rule'].lower().rstrip('.')}, plus a volcanic rock trait for Mars): "
-        f"{sum(bool(c['passed']) for c in checks)} of {len(checks)} checks with enough sites pass. "
+        f"{sum(bool(c['passed']) for c in checks)} of {len(checks)} checks with enough sites pass"
+        + (", so version 1.1 does not pass in full either. " if sum(bool(c['passed']) for c in checks) < len(checks) else ". ")
+        + 
         f"On the held-out half, pooled against ordinary places: {held}. "
         + ("By the rule fixed before the run, version 1.1 is adopted and the map shows it." if ok else "By the rule fixed before the run, version 1.1 is not adopted and the map keeps version 1.0.")
     )

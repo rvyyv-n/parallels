@@ -134,9 +134,10 @@ def score_target(cells, target, cfg):
     opts = dict(floor=sc["floor"], missing=sc["missing_rank"])
     tw = cfg["trait_weights"][body]
     used = {k for c in tw.values() for k in c}
+    unweighted = {k for c in CHALLENGES[body] for k in c["traits"]} - used
     values, ranks = {}, {}
     for t in TRAITS:
-        if body not in t["column"] or t["id"] not in used:
+        if body not in t["column"] or t["id"] in unweighted:
             continue
         tv = target_value(t, body, target)
         if tv is None:

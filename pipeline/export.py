@@ -348,6 +348,15 @@ def method_name(cfg):
     return "1.1" if cfg.get("version") == "v1.1" else "1.0"
 
 
+def method_note(name, third):
+    if third is None:
+        return f"The map shows method version {name}."
+    if third["adopted"]:
+        return ("The map shows method version 1.1: each part of a challenge counts equally, the traits inside a part share its weight, "
+                "and Mars has a volcanic rock trait. It replaced version 1.0 by a rule fixed before it was run; see the third validation run.")
+    return "The map shows method version 1.0. Version 1.1 was tried and not adopted, by a rule fixed before it was run; see the third validation run."
+
+
 def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sample, out=OUT, method_cfg=None, method_commit="uncommitted"):
     out.mkdir(parents=True, exist_ok=True)
     cells, info = build(stages, metas, sites, caves, cfg)
@@ -358,7 +367,7 @@ def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sa
     val = validate.run(cells, scored, sites, cfg, commit)
     if method_cfg is not None:
         scored_new = {tid: score_target(cells, by_id[tid], method_cfg) for tid in cfg["default_targets"]}
-        val_new = validate.run(cells, scored_new, sites, method_cfg, commit)
+        val_new = validate.run(cells, scored_new, sites, method_cfg, commit, with_misses=True)
         val["third_run"] = validate.third_run(val, val_new, method_cfg, method_commit)
         val["summary"] += " " + val["third_run"]["summary"]
         if val["third_run"]["adopted"]:
@@ -372,6 +381,7 @@ def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sa
     manifest = {
         "version": 1,
         "method_version": method_name(cfg),
+        "method_note": method_note(method_name(cfg), val.get("third_run")),
         "generated": datetime.date.today().isoformat(),
         "sample": sample,
         "grid": grid | {"res_deg": 0.5, "land_rule": cfg["land_rule"]["plain"]},
