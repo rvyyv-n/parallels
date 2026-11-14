@@ -702,7 +702,7 @@ async function main() {
         const home = (b: "moon" | "mars") => m.targets.find((t) => t.body === b && t.default) ?? m.targets.find((t) => t.body === b) ?? { lat: 0, lon: 0 };
         intro = createIntro(
           view,
-          { earth: `${import.meta.env.BASE_URL}img/blue-marble.jpg`, moon: TEXTURE.moon, mars: TEXTURE.mars },
+          { earth: `${import.meta.env.BASE_URL}img/blue-marble${innerWidth >= 900 ? "-4k" : ""}.jpg`, moon: TEXTURE.moon, mars: TEXTURE.mars },
           { moon: home("moon"), mars: home("mars") },
           {
             world: (w) => {
