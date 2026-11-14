@@ -118,14 +118,25 @@ def earth_values(cells, t, body, target):
     return cells[t["column"][body]]
 
 
+def part_weights(parts):
+    out = {}
+    for ch, ps in parts.items():
+        out[ch] = {}
+        for p in ps:
+            for t in p["traits"]:
+                out[ch][t] = out[ch].get(t, 0.0) + round(1.0 / len(p["traits"]), 4)
+    return out
+
+
 def score_target(cells, target, cfg):
     body = target["body"]
     sc = cfg["scoring"]
     opts = dict(floor=sc["floor"], missing=sc["missing_rank"])
     tw = cfg["trait_weights"][body]
+    used = {k for c in tw.values() for k in c}
     values, ranks = {}, {}
     for t in TRAITS:
-        if body not in t["column"]:
+        if body not in t["column"] or t["id"] not in used:
             continue
         tv = target_value(t, body, target)
         if tv is None:
@@ -135,7 +146,7 @@ def score_target(cells, target, cfg):
         ranks[t["id"]] = earth_rank(earth_values(cells, t, body, target), goal, cells["area"])
     ch, cov = {}, {}
     for c in CHALLENGES[body]:
-        w = {k: tw[c["id"]][k][0] for k in c["traits"] if k in ranks}
+        w = {k: tw[c["id"]][k][0] for k in c["traits"] if k in ranks and k in tw.get(c["id"], {})}
         if w:
             ch[c["id"]], cov[c["id"]] = challenge({k: ranks[k] for k in w}, w, **opts)
     usable_rank = earth_rank(cells["usable"], 12.0, cells["area"])

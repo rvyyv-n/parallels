@@ -162,3 +162,18 @@ def test_tally_ties_count_half():
     rows = [{"challenge": "c", "score": 0.5, "held_out": False, "blind": False}] * 3
     c = tally(rows, [{"challenge": "c", "score": 0.5}], 0.8, "x", 3)
     assert c["result"] == 0.5 and c["passed"] is False
+
+
+from pipeline.validate import adopt
+
+
+def pooled_run(moon, mars):
+    mk = lambda body, h: {"body": body, "checks": [{"name": "All challenges pooled: x", "held_out_only": h}]}
+    return {"tests": [mk("moon", moon), mk("mars", mars)]}
+
+
+def test_adoption_needs_both_bodies_at_least_as_high():
+    assert adopt(pooled_run(0.9, 0.6), pooled_run(0.9, 0.61)) is True
+    assert adopt(pooled_run(0.9, 0.6), pooled_run(0.95, 0.59)) is False
+    assert adopt(pooled_run(0.9, 0.6), pooled_run(0.89, 0.9)) is False
+    assert adopt(pooled_run(0.9, 0.6), pooled_run(None, 0.9)) is False

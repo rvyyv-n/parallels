@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from pipeline.score import challenge, combine, earth_rank, overall, mineral_share, score_target, target_value, yearround
+from pipeline.score import part_weights, challenge, combine, earth_rank, overall, mineral_share, score_target, target_value, yearround
 from pipeline.traits import trait
 
 
@@ -133,3 +133,24 @@ def test_traits_a_target_lacks_are_left_out():
     assert set(s["scores"]) == {"rover", "rover:yr", "life_support", "life_support:yr", "habitat", "habitat:yr"}
     assert np.isfinite(s["scores"]["habitat"]).all()
     assert s["ranks"]["minerals"] == pytest.approx(np.full(n, 0.5))
+
+
+def test_parts_count_equally_and_share_inside():
+    w = part_weights({"surface": [{"name": "a", "traits": ["slope", "relief"]}, {"name": "b", "traits": ["safe10"]}], "res": [{"name": "w", "traits": ["x"]}, {"name": "o", "traits": ["x"]}]})
+    assert w["surface"] == {"slope": 0.5, "relief": 0.5, "safe10": 1.0}
+    assert w["res"] == {"x": 2.0}
+
+
+def test_config_11_weights_follow_its_parts_and_v1_is_untouched():
+    import json
+    from pipeline.assemble import CONFIG, load_config
+    over = json.loads((CONFIG.parent / "v1.1.json").read_text(encoding="utf8"))
+    for body, chs in over["parts"].items():
+        w = part_weights(chs)
+        assert {c: {t: v[0] for t, v in ts.items()} for c, ts in over["trait_weights"][body].items()} == w
+    base, new = load_config(), load_config(method="1.1")
+    assert base["trait_weights"]["mars"]["surface"]["bare"][0] == 1
+    assert new["trait_weights"]["mars"]["surface"]["bare"][0] == 1 and new["trait_weights"]["mars"]["surface"]["volcanic_rock"][0] == 0.5
+    assert new["trait_weights"]["moon"]["industrial"] == base["trait_weights"]["moon"]["industrial"]
+    assert new["filter_weights"] == base["filter_weights"] and new["validation"] == base["validation"]
+    assert new["version"] == "v1.1" and "adoption_rule" in new

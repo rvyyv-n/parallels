@@ -110,6 +110,7 @@ export interface CantCopy {
 
 export interface Manifest {
   version: 1;
+  method_version?: string;
   generated: string;
   sample: boolean;
   grid: BinFile & { res_deg: number; land_rule: string };
@@ -175,6 +176,7 @@ export interface Validation {
   prototype_runs: { date: string; result: string }[];
   tests: ValidationTest[];
   second_run?: { title: string; plain: string; designed_after_first_run: true; config_commit: string; summary: string; tests: ValidationTest[]; unchecked: { place: string; why: string }[] };
+  third_run?: { title: string; plain: string; designed_after_first_run: true; config_commit: string; summary: string; tests: ValidationTest[]; unchecked: { place: string; why: string }[]; method_change: string; adopted: boolean; adoption_rule: string };
   stability?: string;
   data_checks: { name: string; result: string; passed: boolean }[];
 }

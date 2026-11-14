@@ -78,6 +78,14 @@ PUBLISHED = {
         "kind": "published",
         "note": "No plants grow on the Moon or Mars, so all of the ground is bare.",
     },
+    "basalt_rock": {
+        "value": 100.0,
+        "stat": "main rock of the crust and the crater floor",
+        "dataset": "farley-2022",
+        "resolution": "region",
+        "kind": "published",
+        "note": "Mars's crust is basalt, and Jezero's crater floor is igneous rock (Farley et al. 2022).",
+    },
     "highland_rock": {
         "value": 100.0,
         "stat": "share of the ground in pale highland rock",
@@ -212,6 +220,18 @@ TRAITS = [
         "target": {"moon": ("highland_rock",)},
         "scored_by": "presence",
         "note": "The GLiM rock map only knows \"plutonic\", not \"anorthosite\": it groups granite with the rare anorthosite bodies, so this trait finds the right family of rock, not the exact rock.",
+    },
+    {
+        "id": "volcanic_rock",
+        "label": "Volcanic rock",
+        "unit": "%",
+        "digits": 0,
+        "plain": "Whether the cell's main rock is volcanic (100) or not (0) on Earth's rock map. Mars is a basalt world, and Jezero's floor is volcanic rock.",
+        "earth_stat": "100 if the cell's dominant rock class on the half-degree GLiM map is volcanic (basic, intermediate or acid volcanics, or pyroclastics), otherwise 0",
+        "column": {"mars": "rock_volcanic"},
+        "target": {"mars": ("basalt_rock",)},
+        "scored_by": "presence",
+        "note": "GLiM gives one main rock class per 0.5° cell, so a small lava field inside a cell of other rock does not count, and the flag says volcanic, not basalt.",
     },
     {
         "id": "minerals",
@@ -407,7 +427,7 @@ CHALLENGES = {
             "name": "Surface",
             "question": "Where can rovers drive, landers touch down and builders work?",
             "what_to_test": "Rover driving and lander touchdown on gentle, bare, mineral-rich ground.",
-            "traits": ["slope", "safe10", "relief", "minerals", "bare"],
+            "traits": ["slope", "safe10", "relief", "volcanic_rock", "minerals", "bare"],
             "labels": [
                 STRENGTH["mars"],
                 {"name": "Rocks and boulders", "reason": "Not scored: Earth has no global map of boulders at this scale."},

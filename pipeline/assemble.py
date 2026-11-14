@@ -15,8 +15,17 @@ RES = 0.5
 PERCENT = ("safe10_240", "flat5_240", "safe10_200", "flat5_200", "bare_share", "ice_share", "veg_share", "rock_plutonic", "rock_volcanic", "rock_evaporite")
 
 
-def load_config(path=CONFIG):
-    return json.loads(Path(path).read_text(encoding="utf8"))
+def load_config(path=CONFIG, method=None):
+    cfg = json.loads(Path(path).read_text(encoding="utf8"))
+    if method is None:
+        return cfg
+    over = json.loads((Path(path).parent / f"v{method}.json").read_text(encoding="utf8"))
+    for body, chs in over["trait_weights"].items():
+        cfg["trait_weights"][body].update(chs)
+    for k in ("version", "why", "rule", "parts", "adoption_rule", "plan_notes"):
+        if k in over:
+            cfg[k] = over[k]
+    return cfg
 
 
 def load_stage(name, root=DERIVED):

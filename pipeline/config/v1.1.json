@@ -1,0 +1,282 @@
+{
+  "version": "v1.1",
+  "inherits": "v1.json: everything not listed here (filter weights, Dryness, Industrial sites and Polar light weights, pass marks, the second run's rules, thresholds, the held-out split and the scoring constants) is unchanged.",
+  "why": "The second run checked each known analog only on the challenges its papers say it is used for. Mars Surface failed clearly (21% against ordinary places, pass mark 80%). Jezero's crater floor is nearly flat, and so is farmland, while the slope traits carried most of the Surface weight and Mars had no rock trait at all, although Mars is a basalt world. Version 1.1 makes two changes that follow from Mars and from the team plan, not from the test places: it adds a volcanic rock trait for Mars (Mars's crust is basalt and Jezero's floor is igneous rock), and it replaces the hand-set trait weights with one rule for every challenge on both bodies: each part of a challenge, as the team plan lists them, counts equally, and the traits inside a part share its weight equally.",
+  "rule": "Each part of a challenge counts equally, and the traits inside a part share its weight equally.",
+  "plan_notes": "The parts follow the team plan (docs/team-plan.md), with one addition. The plan's Surface list (Ruggedness, Ground strength, Landing safety, Rock type or Minerals; Ground strength is a label) does not name bare ground, but the v1 spec lists bare ground as a scored trait and version 1.0 scored it under Surface, so Surface keeps a Bare ground part on both bodies; without it bare ground would not be scored anywhere on the Moon. This choice was written into the brief for version 1.1 before any trait-level result was looked at; the agent preparing the config then noted that, in the development half, bare ground was the one Surface trait on which the Mars surface analogs beat farmland, so read the Mars Surface result with that in mind. The team can overrule this part. Heat swing is one scored part in the plan (extreme cold and large temperature changes; thermal inertia is a label), so cold and the swing traits share one part.",
+  "parts": {
+    "moon": {
+      "surface": [
+        {
+          "name": "Ruggedness",
+          "traits": [
+            "slope",
+            "relief"
+          ]
+        },
+        {
+          "name": "Landing safety",
+          "traits": [
+            "safe10"
+          ]
+        },
+        {
+          "name": "Rock type",
+          "traits": [
+            "highland_rock"
+          ]
+        },
+        {
+          "name": "Bare ground",
+          "traits": [
+            "bare"
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "name": "Water",
+          "traits": [
+            "frozen"
+          ]
+        },
+        {
+          "name": "Oxygen from local rock",
+          "traits": [
+            "highland_rock"
+          ]
+        }
+      ],
+      "heat": [
+        {
+          "name": "Extreme cold and large temperature changes",
+          "traits": [
+            "cold",
+            "season_swing"
+          ]
+        }
+      ]
+    },
+    "mars": {
+      "surface": [
+        {
+          "name": "Ruggedness",
+          "traits": [
+            "slope",
+            "relief"
+          ]
+        },
+        {
+          "name": "Landing safety",
+          "traits": [
+            "safe10"
+          ]
+        },
+        {
+          "name": "Rock and minerals",
+          "traits": [
+            "volcanic_rock",
+            "minerals"
+          ]
+        },
+        {
+          "name": "Bare ground",
+          "traits": [
+            "bare"
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "name": "Water",
+          "traits": [
+            "frozen"
+          ]
+        },
+        {
+          "name": "Hydrated minerals",
+          "traits": [
+            "minerals"
+          ]
+        }
+      ],
+      "heat": [
+        {
+          "name": "Cold and day-to-night temperature changes",
+          "traits": [
+            "cold",
+            "day_swing_ground",
+            "day_swing_air"
+          ]
+        }
+      ],
+      "atmosphere": [
+        {
+          "name": "Dust in the air",
+          "traits": [
+            "dust"
+          ]
+        },
+        {
+          "name": "Bare ground as the dust source",
+          "traits": [
+            "bare"
+          ]
+        }
+      ],
+      "life": [
+        {
+          "name": "Water-made minerals",
+          "traits": [
+            "minerals"
+          ]
+        },
+        {
+          "name": "Dryness",
+          "traits": [
+            "dry"
+          ]
+        },
+        {
+          "name": "Cold",
+          "traits": [
+            "cold"
+          ]
+        },
+        {
+          "name": "Bare ground",
+          "traits": [
+            "bare"
+          ]
+        }
+      ]
+    }
+  },
+  "trait_weights": {
+    "moon": {
+      "surface": {
+        "slope": [
+          0.5,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Ruggedness\" (shared by 2 traits)."
+        ],
+        "relief": [
+          0.5,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Ruggedness\" (shared by 2 traits)."
+        ],
+        "safe10": [
+          1.0,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Landing safety\" (alone)."
+        ],
+        "highland_rock": [
+          1.0,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Rock type\" (alone)."
+        ],
+        "bare": [
+          1.0,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Bare ground\" (alone)."
+        ]
+      },
+      "resources": {
+        "frozen": [
+          1.0,
+          "Rule: each of the 2 parts of Resources counts equally; this trait is in \"Water\" (alone)."
+        ],
+        "highland_rock": [
+          1.0,
+          "Rule: each of the 2 parts of Resources counts equally; this trait is in \"Oxygen from local rock\" (alone)."
+        ]
+      },
+      "heat": {
+        "cold": [
+          0.5,
+          "Rule: each of the 1 part of Heat swing counts equally; this trait is in \"Extreme cold and large temperature changes\" (shared by 2 traits)."
+        ],
+        "season_swing": [
+          0.5,
+          "Rule: each of the 1 part of Heat swing counts equally; this trait is in \"Extreme cold and large temperature changes\" (shared by 2 traits)."
+        ]
+      }
+    },
+    "mars": {
+      "surface": {
+        "slope": [
+          0.5,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Ruggedness\" (shared by 2 traits)."
+        ],
+        "relief": [
+          0.5,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Ruggedness\" (shared by 2 traits)."
+        ],
+        "safe10": [
+          1.0,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Landing safety\" (alone)."
+        ],
+        "volcanic_rock": [
+          0.5,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Rock and minerals\" (shared by 2 traits)."
+        ],
+        "minerals": [
+          0.5,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Rock and minerals\" (shared by 2 traits)."
+        ],
+        "bare": [
+          1.0,
+          "Rule: each of the 4 parts of Surface counts equally; this trait is in \"Bare ground\" (alone)."
+        ]
+      },
+      "resources": {
+        "frozen": [
+          1.0,
+          "Rule: each of the 2 parts of Resources counts equally; this trait is in \"Water\" (alone)."
+        ],
+        "minerals": [
+          1.0,
+          "Rule: each of the 2 parts of Resources counts equally; this trait is in \"Hydrated minerals\" (alone)."
+        ]
+      },
+      "heat": {
+        "cold": [
+          0.3333,
+          "Rule: each of the 1 part of Heat swing counts equally; this trait is in \"Cold and day-to-night temperature changes\" (shared by 3 traits)."
+        ],
+        "day_swing_ground": [
+          0.3333,
+          "Rule: each of the 1 part of Heat swing counts equally; this trait is in \"Cold and day-to-night temperature changes\" (shared by 3 traits)."
+        ],
+        "day_swing_air": [
+          0.3333,
+          "Rule: each of the 1 part of Heat swing counts equally; this trait is in \"Cold and day-to-night temperature changes\" (shared by 3 traits)."
+        ]
+      },
+      "atmosphere": {
+        "dust": [
+          1.0,
+          "Rule: each of the 2 parts of Atmosphere and dust counts equally; this trait is in \"Dust in the air\" (alone)."
+        ],
+        "bare": [
+          1.0,
+          "Rule: each of the 2 parts of Atmosphere and dust counts equally; this trait is in \"Bare ground as the dust source\" (alone)."
+        ]
+      },
+      "life": {
+        "minerals": [
+          1.0,
+          "Rule: each of the 4 parts of Signs of life counts equally; this trait is in \"Water-made minerals\" (alone)."
+        ],
+        "dry": [
+          1.0,
+          "Rule: each of the 4 parts of Signs of life counts equally; this trait is in \"Dryness\" (alone)."
+        ],
+        "cold": [
+          1.0,
+          "Rule: each of the 4 parts of Signs of life counts equally; this trait is in \"Cold\" (alone)."
+        ],
+        "bare": [
+          1.0,
+          "Rule: each of the 4 parts of Signs of life counts equally; this trait is in \"Bare ground\" (alone)."
+        ]
+      }
+    }
+  },
+  "adoption_rule": "Version 1.1 replaces version 1.0 on the site only if, on the held-out half, its pooled result against ordinary places (each analog on the challenges it is used for) is at least as high as version 1.0's for both the Moon and Mars. Otherwise version 1.0 stays and version 1.1 is reported as tried and not adopted."
+}

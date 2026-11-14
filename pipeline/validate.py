@@ -362,6 +362,70 @@ def second_run(cells, scored, sites, cfg, where, held):
     }
 
 
+def pooled(second, body):
+    t = next(t for t in second["tests"] if t["body"] == body)
+    return next(c for c in t["checks"] if c["name"].startswith("All challenges pooled"))
+
+
+def adopt(second_old, second_new):
+    for body in ("moon", "mars"):
+        old, new = pooled(second_old, body)["held_out_only"], pooled(second_new, body)["held_out_only"]
+        if old is None or new is None or new < old:
+            return False
+    return True
+
+
+def base_name(name):
+    return name.split(" (too few sites")[0]
+
+
+def beside(tests_new, tests_old, prefix):
+    old = {(t["body"], base_name(c["name"])): c for t in tests_old for c in t["checks"]}
+    pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
+    out = []
+    for t in tests_new:
+        lines = []
+        for c in t["checks"]:
+            o = old.get((t["body"], base_name(c["name"])))
+            if o:
+                lines.append(f"{base_name(c['name'])}: version 1.0 {pct(o['result'])} (held-out {pct(o['held_out_only'])}), version 1.1 {pct(c['result'])} (held-out {pct(c['held_out_only'])}).")
+        out.append(dict(t, id=f"{prefix}-{t['id']}", plain=t["plain"] + " Beside version 1.0: " + " ".join(lines)))
+    return out
+
+
+def third_run(val_old, val_new, cfg, commit):
+    so, sn = val_old["second_run"], val_new["second_run"]
+    ok = adopt(so, sn)
+    pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
+    held = "; ".join(
+        f"{b.capitalize()} {pct(pooled(sn, b)['held_out_only'])} against {pct(pooled(so, b)['held_out_only'])} for version 1.0"
+        for b in ("moon", "mars")
+    )
+    checks = [c for t in val_new["tests"] + sn["tests"] for c in t["checks"] if c["passed"] is not None]
+    summary = (
+        f"A third run tried method version 1.1 ({cfg['rule'].lower().rstrip('.')}, plus a volcanic rock trait for Mars): "
+        f"{sum(bool(c['passed']) for c in checks)} of {len(checks)} checks with enough sites pass. "
+        f"On the held-out half, pooled against ordinary places: {held}. "
+        + ("By the rule fixed before the run, version 1.1 is adopted and the map shows it." if ok else "By the rule fixed before the run, version 1.1 is not adopted and the map keeps version 1.0.")
+    )
+    return {
+        "title": "Third run: method version 1.1",
+        "plain": (
+            "After the second run showed that Mars Surface failed, we changed the method by rule, not by fitting the test places, and fixed "
+            "the rule for adopting it before running it. This run repeats the first run's four checks and the second run's challenge-by-challenge "
+            "checks under version 1.1, each beside its version 1.0 figure. It was designed after seeing the earlier results, so it is not independent proof."
+        ),
+        "designed_after_first_run": True,
+        "config_commit": commit,
+        "summary": summary,
+        "tests": beside(val_new["tests"], val_old["tests"], "third") + beside(sn["tests"], so["tests"], "third"),
+        "unchecked": sn["unchecked"],
+        "method_change": cfg["why"],
+        "adopted": ok,
+        "adoption_rule": cfg["adoption_rule"],
+    }
+
+
 def second_line(tests):
     checks = [c for t in tests for c in t["checks"] if c["passed"] is not None]
     passed = [c for c in checks if c["passed"]]
@@ -405,6 +469,12 @@ def summary(val):
                 lines.append(f"{t['title']}: {c['name']}: {c['result']} (pass {c['pass_mark']}, passed {c['passed']}, held-out {c['held_out_only']}, blind {c['blind_only']}, pairs {c['n_pairs']})")
         for u in sr["unchecked"]:
             lines.append(f"  unchecked: {u['place']}: {u['why']}")
+    tr = val.get("third_run")
+    if tr:
+        lines.append(tr["summary"])
+        for t in tr["tests"]:
+            for c in t["checks"]:
+                lines.append(f"{t['title']}: {c['name']}: {c['result']} (pass {c['pass_mark']}, passed {c['passed']}, held-out {c['held_out_only']}, blind {c['blind_only']})")
     for d in val["data_checks"]:
         lines.append(f"data check: {d['name']}: {d['result']} {'pass' if d['passed'] else 'FAIL'}")
     return "\n".join(lines)

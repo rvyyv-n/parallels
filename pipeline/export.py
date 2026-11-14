@@ -44,6 +44,7 @@ CELL_COLUMNS = [
     ("relief_240", "u16", 1, 0),
     ("relief_200", "u16", 1, 0),
     ("rock_plutonic", "u8", 0.4, 0),
+    ("rock_volcanic", "u8", 0.4, 0),
     ("bare_share", "u8", 0.4, 0),
     ("minerals_seen", "u8", 1, 0),
     ("terrain_type", "u8", 1, 0),
@@ -57,6 +58,7 @@ CONSTANT_DATASETS = [
     {"id": "nasa-fact-sheets", "name": "NASA planetary fact sheets (NSSDCA)", "agency": "NASA", "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/", "licence": "Public domain (NASA)", "used_for": "Gravity, air and the plain facts behind the dryness and bare-ground targets", "archive": "NASA NSSDCA"},
     {"id": "nasa-moon-composition", "name": "NASA Science: the Moon's composition", "agency": "NASA", "url": "https://science.nasa.gov/moon/composition/", "licence": "Public domain (NASA)", "used_for": "The south pole's pale highland rock", "archive": "NASA Science"},
     {"id": "mars-jezero-minerals", "name": "Jezero crater minerals: Horgan et al. 2020 (Icarus) and Scheller et al. 2022 (Science)", "agency": "other", "url": "https://doi.org/10.1126/science.abo5204", "licence": "Cited published result", "used_for": "Which mineral groups are reported at Jezero"},
+    {"id": "farley-2022", "name": "Farley et al. 2022, aqueously altered igneous rocks sampled on the floor of Jezero crater (Science)", "agency": "other", "url": "https://doi.org/10.1126/science.abo2196", "licence": "Cited published result", "used_for": "Mars's basalt crust and Jezero's igneous crater floor, the target for the volcanic rock trait"},
     {"id": "mars-gale-minerals", "name": "Gale crater minerals: Rampe et al. 2020 (Geochemistry)", "agency": "other", "url": "https://doi.org/10.1016/j.chemer.2020.125605", "licence": "Cited published result", "used_for": "Which mineral groups are reported at Gale"},
     {"id": "golombek-2020", "name": "Golombek et al. 2020, Mars landing-site thermal inertia rule", "agency": "other", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502", "licence": "Cited published result", "used_for": "The ground-strength label on Mars"},
 ]
@@ -179,7 +181,7 @@ def challenge_entries(cfg):
             e = {k: c[k] for k in ("id", "name", "question", "what_to_test")}
             if c.get("only"):
                 e["only"] = c["only"]
-            e["traits"] = [{"id": k, "weight": tw[k][0], "why": tw[k][1]} for k in c["traits"]]
+            e["traits"] = [{"id": k, "weight": tw[k][0], "why": tw[k][1]} for k in c["traits"] if k in tw]
             e["labels"] = c["labels"]
             rows.append(e)
         out[body] = rows
@@ -342,22 +344,34 @@ def label_points(sites, caves):
     return out
 
 
-def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sample, out=OUT):
+def method_name(cfg):
+    return "1.1" if cfg.get("version") == "v1.1" else "1.0"
+
+
+def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sample, out=OUT, method_cfg=None, method_commit="uncommitted"):
     out.mkdir(parents=True, exist_ok=True)
     cells, info = build(stages, metas, sites, caves, cfg)
     n = len(cells["lat"])
     grid = write_bin(out / "cells.bin", n, [(c, cells[c], d, s, a) for c, d, s, a in CELL_COLUMNS])
     by_id = {t["id"]: t for t in targets}
-    scored, entries = {}, []
+    scored = {tid: score_target(cells, by_id[tid], cfg) for tid in cfg["default_targets"]}
+    val = validate.run(cells, scored, sites, cfg, commit)
+    if method_cfg is not None:
+        scored_new = {tid: score_target(cells, by_id[tid], method_cfg) for tid in cfg["default_targets"]}
+        val_new = validate.run(cells, scored_new, sites, method_cfg, commit)
+        val["third_run"] = validate.third_run(val, val_new, method_cfg, method_commit)
+        val["summary"] += " " + val["third_run"]["summary"]
+        if val["third_run"]["adopted"]:
+            cfg, scored = method_cfg, scored_new
+    entries = []
     for tid in cfg["default_targets"]:
-        t = by_id[tid]
-        scored[tid] = score_target(cells, t, cfg)
         binfile = target_bin(out / f"target-{tid}.bin", n, scored[tid])
-        entries.append(target_entry(t, scored[tid], binfile))
+        entries.append(target_entry(by_id[tid], scored[tid], binfile))
     datasets = used_datasets(merge_datasets(metas, extra_datasets), metas, entries)
     rules = terrain_rules(cfg)
     manifest = {
         "version": 1,
+        "method_version": method_name(cfg),
         "generated": datetime.date.today().isoformat(),
         "sample": sample,
         "grid": grid | {"res_deg": 0.5, "land_rule": cfg["land_rule"]["plain"]},
@@ -377,7 +391,7 @@ def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sa
     }
     write_json(out / "manifest.json", manifest)
     write_json(out / "labels.json", label_points(sites, caves))
-    write_json(out / "validation.json", validate.run(cells, scored, sites, cfg, commit))
+    write_json(out / "validation.json", val)
     return cells, scored, info
 
 
@@ -462,8 +476,11 @@ def main():
     ap.add_argument("--stub", action="store_true")
     ap.add_argument("--weights-commit", default="uncommitted")
     ap.add_argument("--out", default=str(OUT))
+    ap.add_argument("--method", help="also run a newer method version, e.g. 1.1, as the third validation run")
+    ap.add_argument("--method-commit", default="uncommitted")
     args = ap.parse_args()
     cfg = load_config()
+    method_cfg = load_config(method=args.method) if args.method else None
     sites = json.loads(SITES.read_text(encoding="utf8"))
     caves = load_points(CAVES)
     out = Path(args.out)
@@ -477,7 +494,7 @@ def main():
             stages[name], metas[name] = load_stage(name, DERIVED)
         targets, extra = load_targets()
         commit = args.weights_commit
-    cells, scored, info = export(stages, metas, targets, extra, sites, caves, cfg, commit, args.stub, out)
+    cells, scored, info = export(stages, metas, targets, extra, sites, caves, cfg, commit, args.stub, out, method_cfg, args.method_commit)
     if info["missing"]:
         print("missing input columns:", ", ".join(info["missing"]))
     for f in sorted(out.iterdir()):
