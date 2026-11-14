@@ -1,7 +1,5 @@
 <img src="assets/logo.svg" width="96" alt="Parallels logo">
 
-Logo: AI-made image (drawn by Claude)
-
 # Parallels
 
 **Earth's closest parallels to every part of a Moon or Mars base.**
