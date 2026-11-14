@@ -56,10 +56,10 @@ MANIFEST = {
     "questions": [{"n": I, "question": S, "answer": S}],
 }
 LABEL = {"id": S, "name": S, "kind": enum("known_analog", "cave", "ordinary", "plain_desert"), "lat": N, "lon": N, "country": opt(S), "groups": opt([S]), "note": opt(S), "source": S, "analog_source": opt(S)}
-PLACE = {"id": S, "name": S, "lat": N, "lon": N, "group": S, "cell": null(I), "score": null(N), "land_rank": null(N), "best_target": opt(S), "held_out": B, "blind": B, "note": opt(S)}
+PLACE = {"id": S, "name": S, "lat": N, "lon": N, "group": S, "challenge": opt(S), "cell": null(I), "score": null(N), "land_rank": null(N), "best_target": opt(S), "held_out": B, "blind": B, "note": opt(S)}
 CHECK = {"name": S, "pass_mark": N, "result": null(N), "passed": null(B), "n_pairs": I, "held_out_only": opt(null(N)), "blind_only": opt(null(N))}
 TEST = {"id": S, "title": S, "body": enum("moon", "mars"), "plain": S, "groups": [{"id": S, "name": S, "plain": S}], "places": [PLACE], "checks": [CHECK], "misses": [{"place": S, "why": S}]}
-VALIDATION = {"weights_commit": S, "summary": opt(S), "not_blind_note": S, "prototype_runs": [{"date": S, "result": S}], "tests": [TEST], "stability": opt(S), "data_checks": [{"name": S, "result": S, "passed": B}]}
+VALIDATION = {"weights_commit": S, "summary": opt(S), "not_blind_note": S, "prototype_runs": [{"date": S, "result": S}], "tests": [TEST], "second_run": opt({"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}]}), "stability": opt(S), "data_checks": [{"name": S, "result": S, "passed": B}]}
 
 KINDS = {
     S: lambda v: isinstance(v, str),

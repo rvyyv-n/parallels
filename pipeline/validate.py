@@ -5,7 +5,7 @@ import numpy as np
 
 from pipeline.assemble import cell_of, index_of
 from pipeline.score import challenge, earth_rank, overall
-from pipeline.traits import TRAITS
+from pipeline.traits import CHALLENGES, TRAITS
 
 GROUPS = {
     "mars-analog": ("Known Mars analogs", "Places already used to test Mars missions."),
@@ -212,14 +212,167 @@ def run(cells, scored, sites, cfg, commit):
             {k: moon["ranks"][k] for k in v["basalt_terrain_traits"] if k in moon["ranks"]},
         ),
     ]
+    second = second_run(cells, scored, sites, cfg, where, held)
     return {
         "weights_commit": commit,
-        "summary": result_line(tests),
+        "summary": result_line(tests) + " " + second["summary"],
         "not_blind_note": NOT_BLIND,
         "prototype_runs": v["prototype_runs"],
         "tests": tests,
+        "second_run": second,
         "data_checks": data_checks(cells, where, v["aridity_checks"]),
     }
+
+
+SECOND_COMMIT = "d48b9ab"
+
+
+def uses(site, body):
+    u = site.get("used_for")
+    if u is None:
+        return None
+    if isinstance(u, dict):
+        return u.get(body)
+    return u
+
+
+def entries(sites, body, groups, scored_ids):
+    out, unchecked = [], []
+    for s in sites:
+        if not set(s["groups"]) & set(groups):
+            continue
+        u = uses(s, body)
+        if not u:
+            unchecked.append({"place": s["id"], "why": f"No use is tagged for the {body.capitalize()}, so there is no challenge to check it on."})
+            continue
+        for c in u:
+            if c in ("shelter", "other"):
+                unchecked.append({"place": s["id"], "why": f"Used for {c}, which we do not score."})
+            elif c not in scored_ids:
+                unchecked.append({"place": s["id"], "why": f"Used for {c}, which is not a scored challenge for the {body.capitalize()}."})
+            else:
+                out.append((s, c))
+    return out, unchecked
+
+
+def pair_counts(a, b):
+    r, n = win_rate(a, b)
+    return (0.0, 0) if r is None else (r * n, n)
+
+
+def tally(rows, other, mark, name, min_sites, pooled=False):
+    def rate(sel):
+        wins = pairs = 0
+        for c in {r["challenge"] for r in rows}:
+            a = [r["score"] for r in rows if r["challenge"] == c and sel(r)]
+            b = [o["score"] for o in other if o["challenge"] == c]
+            w, n = pair_counts(a, b)
+            wins += w
+            pairs += n
+        return (None if pairs == 0 else round(wins / pairs, 3)), pairs
+
+    res, n = rate(lambda r: True)
+    few = not pooled and len(rows) < min_sites
+    return {
+        "name": name + (f" (too few sites: {len(rows)}, fewer than {min_sites}, so no pass or fail)" if few else ""),
+        "pass_mark": mark,
+        "result": res,
+        "passed": None if few or res is None else res >= mark,
+        "n_pairs": n,
+        "held_out_only": rate(lambda r: r["held_out"])[0],
+        "blind_only": rate(lambda r: r["blind"])[0],
+    }
+
+
+def second_test(body, target_id, sc, cells, sites, groups, where, held, cfg):
+    sr = cfg["validation"]["second_run"]
+    names = {c["id"]: c["name"] for c in CHALLENGES[body]}
+    ch = sc["challenges"]
+    found, unchecked = entries(sites, body, groups, set(ch))
+    land = {}
+    places = []
+
+    def row(s, c, group):
+        if c not in land:
+            land[c] = earth_rank(ch[c], 1.0, cells["area"])
+        i = where[s["id"]]
+        v = None if i is None or not np.isfinite(ch[c][i]) else round(float(ch[c][i]), 4)
+        return {
+            "id": s["id"], "name": s["name"], "lat": s["lat"], "lon": s["lon"], "group": group, "challenge": c,
+            "cell": i, "score": v, "land_rank": None if v is None else round(float(land[c][i]), 4),
+            "best_target": target_id, "held_out": s["id"] in held, "blind": bool(s.get("blind")),
+        }
+
+    analogs = []
+    for s, c in found:
+        r = row(s, c, f"analog:{c}")
+        if r["score"] is None:
+            why = "its cell is less than 5% land on our grid" if r["cell"] is None else "its cell has no data for this challenge"
+            unchecked.append({"place": s["id"], "why": f"Used for {names[c]}, but {why}."})
+            r["note"] = "Not scored: " + why + "."
+        analogs.append(r)
+    used = [c for c in ch if any(r["challenge"] == c for r in analogs)]
+    controls = {"ordinary": [s for s in sites if "ordinary" in s["groups"]]}
+    if body == "mars":
+        controls["desert"] = [s for s in sites if "desert" in s["groups"]]
+    others = {g: [row(s, c, g) for c in used for s in ss] for g, ss in controls.items()}
+    scored_a = [r for r in analogs if r["score"] is not None]
+    scored_o = {g: [r for r in rs if r["score"] is not None] for g, rs in others.items()}
+    pm, k = sr["pass_marks"], sr["min_sites_per_challenge"]
+    checks = []
+    for c in used:
+        a = [r for r in scored_a if r["challenge"] == c]
+        checks.append(tally(a, scored_o["ordinary"], pm["vs_ordinary"], f"{names[c]}: analogs used for it beat ordinary places", k))
+        if body == "mars":
+            checks.append(tally(a, scored_o["desert"], pm["vs_desert"], f"{names[c]}: analogs used for it beat plain deserts", k))
+    checks.append(tally(scored_a, scored_o["ordinary"], pm["vs_ordinary"], "All challenges pooled: analogs beat ordinary places on the challenges they are used for", k, pooled=True))
+    groups_out = [{"id": f"analog:{c}", "name": f"Analogs used for {names[c]}", "plain": f"Known analogs whose papers say they are used for {names[c]}, scored on {names[c]} alone."} for c in used]
+    groups_out += [{"id": g, "name": GROUPS[g][0], "plain": GROUPS[g][1]} for g in controls]
+    title = "Moon, challenge by challenge" if body == "moon" else "Mars, challenge by challenge"
+    test_ = {
+        "id": f"second-{body}", "title": title, "body": body,
+        "plain": sr["rule"] + " " + sr["pooled_rule"] + " " + sr["few_sites_note"],
+        "groups": groups_out, "places": analogs + [r for rs in others.values() for r in rs],
+        "checks": checks, "misses": [],
+    }
+    return test_, unchecked
+
+
+def second_run(cells, scored, sites, cfg, where, held):
+    v = cfg["validation"]
+    sr = v["second_run"]
+    tests, unchecked = [], []
+    for body, tid, groups in (("moon", v["moon_target"], sr["moon_groups"]), ("mars", v["mars_target"], sr["mars_groups"])):
+        t, u = second_test(body, tid, scored[tid], cells, sites, groups, where, held, cfg)
+        tests.append(t)
+        unchecked += [dict(x, place=f"{x['place']} ({body.capitalize()})") for x in u]
+    return {
+        "title": "Second run: each analog on what it is used for",
+        "plain": (
+            "The first run scored every known analog on its overall match, but no place on Earth copies everything, and analogs are "
+            "chosen for particular jobs. This run checks each analog only on the challenges its papers say it is used for, against "
+            "ordinary places on the same challenge. We designed it after seeing the first run's totals, so it helps explain the first "
+            "result and is not independent proof."
+        ),
+        "designed_after_first_run": True,
+        "config_commit": SECOND_COMMIT,
+        "summary": second_line(tests),
+        "tests": tests,
+        "unchecked": unchecked,
+    }
+
+
+def second_line(tests):
+    checks = [c for t in tests for c in t["checks"] if c["passed"] is not None]
+    passed = [c for c in checks if c["passed"]]
+    pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
+    pooled = [f"{t['body'].capitalize()} {pct(c['result'])}" for t in tests for c in t["checks"] if c["name"].startswith("All challenges pooled")]
+    head = (
+        f"In a second run, designed after seeing those totals, each analog was checked only on the challenges it is used for: "
+        f"{len(passed)} of {len(checks)} checks with enough sites pass"
+    )
+    tail = "." if len(passed) == len(checks) else ", so the second run does not pass in full either."
+    return head + tail + " Pooled against ordinary places (pass mark 80%): " + ", ".join(pooled) + "."
 
 
 def result_line(tests):
@@ -244,6 +397,14 @@ def summary(val):
         for p in t["places"]:
             if p["score"] is None:
                 lines.append(f"  unscored: {p['id']} ({p['note']})")
+    sr = val.get("second_run")
+    if sr:
+        lines.append(sr["summary"])
+        for t in sr["tests"]:
+            for c in t["checks"]:
+                lines.append(f"{t['title']}: {c['name']}: {c['result']} (pass {c['pass_mark']}, passed {c['passed']}, held-out {c['held_out_only']}, blind {c['blind_only']}, pairs {c['n_pairs']})")
+        for u in sr["unchecked"]:
+            lines.append(f"  unchecked: {u['place']}: {u['why']}")
     for d in val["data_checks"]:
         lines.append(f"data check: {d['name']}: {d['result']} {'pass' if d['passed'] else 'FAIL'}")
     return "\n".join(lines)

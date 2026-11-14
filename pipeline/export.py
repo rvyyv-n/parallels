@@ -23,9 +23,7 @@ NODATA = {"u8": 255, "u16": 65535, "i16": -32768}
 CELL_COLUMNS = [
     ("lat", "i16", 0.01, 0),
     ("lon", "i16", 0.01, 0),
-    ("land_frac", "u8", 0.004, 0),
     ("ts_coldest", "i16", 0.01, 0),
-    ("ts_annual", "i16", 0.01, 0),
     ("swing_year", "i16", 0.01, 0),
     ("swing_day_ground", "i16", 0.01, 0),
     ("swing_day_air", "i16", 0.01, 0),
@@ -45,13 +43,9 @@ CELL_COLUMNS = [
     ("flat5_240", "u8", 0.4, 0),
     ("relief_240", "u16", 1, 0),
     ("relief_200", "u16", 1, 0),
-    ("elev_mean", "i16", 1, 0),
     ("rock_plutonic", "u8", 0.4, 0),
-    ("rock_volcanic", "u8", 0.4, 0),
-    ("rock_evaporite", "u8", 0.4, 0),
     ("bare_share", "u8", 0.4, 0),
     ("minerals_seen", "u8", 1, 0),
-    ("mineral_groups", "u8", 1, 0),
     ("terrain_type", "u8", 1, 0),
     ("ice", "u8", 0.4, 0),
     ("cluster", "u8", 1, 0),
@@ -301,6 +295,30 @@ QUESTIONS = [
 ]
 
 
+def uses_text(u):
+    if isinstance(u, dict):
+        return "; ".join(f"{b.capitalize()}: " + ", ".join(names(b, v)) for b, v in u.items())
+    return ", ".join(names("mars", u) if u else [])
+
+
+def names(body, ids):
+    known = {c["id"]: c["name"] for b in BODIES for c in CHALLENGES[b]}
+    return [known.get(i, i.capitalize()) for i in ids]
+
+
+def analog_text(s):
+    parts = []
+    if s.get("analog_for"):
+        parts.append("Analog for: " + s["analog_for"])
+    if s.get("used_for"):
+        parts.append("Used for: " + uses_text(s["used_for"]) + ".")
+    if s.get("used_for_note"):
+        parts.append(s["used_for_note"])
+    if s.get("used_for_source") and s.get("analog_source") and s["used_for_source"] != s["analog_source"]:
+        parts.append("Source for its use: " + s["used_for_source"])
+    return " ".join(parts)
+
+
 def label_points(sites, caves):
     kinds = {"ordinary": "ordinary", "desert": "plain_desert"}
     known = {s["id"] for s in known_analogs(sites)}
@@ -308,10 +326,13 @@ def label_points(sites, caves):
     for s in sites:
         kind = "known_analog" if s["id"] in known else kinds.get(s["groups"][0], "ordinary")
         p = {"id": s["id"], "name": s["name"], "kind": kind, "lat": s["lat"], "lon": s["lon"], "country": s.get("country"), "groups": s["groups"], "source": s.get("coord_source", "")}
-        if s.get("coord_note"):
-            p["note"] = s["coord_note"]
-        if s.get("analog_source"):
-            p["analog_source"] = s["analog_source"]
+        notes = [analog_text(s), s.get("coord_note")] if kind == "known_analog" else [s.get("coord_note")]
+        note = " ".join(x for x in notes if x)
+        if note:
+            p["note"] = note
+        source = s.get("analog_source") or (s.get("used_for_source") if kind == "known_analog" else None)
+        if source:
+            p["analog_source"] = source
         out.append({k: v for k, v in p.items() if v is not None})
     for c in caves:
         if c.get("body", "earth") != "earth":
