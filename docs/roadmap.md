@@ -12,7 +12,7 @@ What gets built when, and by whom, for version 2 of the site. What the site is l
 - **A brief** gives the goal, the files the builder may write, the columns and manifest fields it reads, what it exposes, its done check, and the rules: no invented numbers, plain words, the budgets, reduced motion, keyboard use, and the plan's rule on other projects (study approaches, write our own code, copy nothing).
 - **After each group:** `npm test`, `npm run build`, `npm run e2e`; commit the group on its own; push; tick the box. **After each pass:** deploy a preview and send the team the link. Screenshots only for a visual check or the README.
 
-Times are the team's local time on Sunday 15 November; the build machine is 3 hours ahead. Freeze at 18:00, submit by 21:59.
+The passes run in order, with no set times. Inside a pass, the builder groups run side by side and the orchestrator works on its own group at the same time; a pass ends when every box in it is ticked or cut. The only fixed time is the official deadline in the [guidelines](guidelines.md).
 
 ## Done
 
@@ -22,7 +22,9 @@ Times are the team's local time on Sunday 15 November; the build machine is 3 ho
 - [x] The view in the address: base site, filter, year-round, terrain, place, page (`state.ts`)
 - [x] Vercel project `parallels-v2` with preview deploys
 
-## Pass 1: evidence and controls (now to 07:00)
+## Pass 1: evidence and controls
+
+**Order:** 1A, 1B and 1C side by side; 1D by the orchestrator meanwhile. 1C's tests run against everything after it.
 
 **Goal:** every guide benchmark can be found on the site, the method check is on screen, and tests guard the budgets and the numbers.
 
@@ -47,7 +49,9 @@ Times are the team's local time on Sunday 15 November; the build machine is 3 ho
   - Footer: team, the AI note, data credits, links to "For judges" and the image credits.
   - Done when a copied address reopens the same view with the same places.
 
-## Pass 2: the idea in full (07:00 to 12:00)
+## Pass 2: the idea in full
+
+**Order:** 2D's selection change first, because 2A needs it; then 2A, 2B and 2C side by side while the orchestrator finishes 2D.
 
 **Goal:** show that each part of a base has its own best place, give newcomers a way in, and let a judge see the ground itself.
 
@@ -73,7 +77,9 @@ Times are the team's local time on Sunday 15 November; the build machine is 3 ho
   - Selection of any cell, not only the five best, so "Build the whole base" can open its places.
   - Motion: count-ups on the intro numbers, text that reveals with the scroll, a fixed top bar.
 
-## Pass 3: tour and hardening (12:00 to 16:00)
+## Pass 3: tour and hardening
+
+**Order:** 3A and 3B side by side; 3C reviews once 3A and 3B are joined; 3D by the orchestrator meanwhile, and it fixes 3C's findings.
 
 **Goal:** the page can play itself, every value can be checked outside the site, and nothing breaks on a phone or an old laptop.
 
@@ -93,12 +99,14 @@ Times are the team's local time on Sunday 15 November; the build machine is 3 ho
   - A flat picture map with pins when WebGL is missing; keyboard order; a colour-blind check of gold and blue; smaller textures on phones.
   - Page title, description, share image, icon.
 
-**Extras, only if pass 3 is done before 15:00**
+**Extras, only after pass 3 and only if the team says there is time**
 
 - [ ] "Adjust weights" · Opus, medium · done when a hand-set mix equal to a mission filter gives the same top place
 - [ ] Globe layer of the 50 known analogs and 5 caves, each with its source · orchestrator
 
-## Pass 4: present (16:00 to the freeze at 18:00)
+## Pass 4: present
+
+**Order:** 4A, 4B and 4C side by side; 4D after 4B; 4E when the team decides. After this pass, no new features: fixes only.
 
 **Goal:** everything a judge reads or watches is ready.
 
@@ -110,7 +118,7 @@ Times are the team's local time on Sunday 15 November; the build machine is 3 ho
 - [ ] **4D Project page text** · orchestrator · `docs/project-page.md`: every form field, the NASA Data field with each dataset, link and use, the partner data field, the AI note
 - [ ] **4E Public link and repo** · team, then orchestrator · the team picks version 1 or 2 and makes the repo public and renamed; the orchestrator deploys to production and updates every repo link
 
-## Pass 5: ship (18:00 to 21:59, fixes only)
+## Pass 5: ship (fixes only)
 
 - [ ] Both of us test the live site on a phone and a laptop: try to break it, check numbers against the data, read it as a newcomer
 - [ ] Request a FortiGuard web-filter classification for the public link
@@ -119,25 +127,25 @@ Times are the team's local time on Sunday 15 November; the build machine is 3 ho
 
 ## From the team
 
-| What | By |
+| What | Needed before |
 |---|---|
-| Save a complete draft on the project page with version 1's link | 03:30 |
-| TEAM RMD member names, for the credits and the video's first caption | 16:00 |
-| Version 1 or 2 as the public link; the repo public and its new name | 17:00 |
+| Save a complete draft on the project page with version 1's link | now |
+| TEAM RMD member names, for the credits and the video's first caption | pass 4 |
+| Version 1 or 2 as the public link; the repo public and its new name | step 4E |
 | Check that the Local Event's deadline is in the same time zone as these times | any time |
 
 ## Fallbacks
 
-| Risk | Fallback | Switch by |
+| Risk | Fallback | Switch when |
 |---|---|---|
-| "Build the whole base" not solid | a table of the best place per part, inside "What to test here" | 11:00 |
-| 3D terrain not solid | leave it out; "What to test here" keeps the zoomed globe | 11:00 |
-| Learn page not solid | keep its first three sections only | 11:00 |
-| Tour not solid | a short captioned walk-through with "Next" buttons | 14:00 |
-| Globe too slow on a phone | the flat picture map on phones | 15:00 |
-| Time runs short | cut in this order: the extras, 3D terrain on phones, the Learn page's last two sections, extra motion, the year-round switch, polish on the four unchecked base sites | 15:00 |
-| Recorded video fails | record the screen by hand with the same captions; if that fails too, 7 slides or fewer | 19:00 |
-| Version 2 not ready, or not better | submit version 1's link | 17:00 |
+| "Build the whole base" not solid | a table of the best place per part, inside "What to test here" | it is not done by the end of pass 2 |
+| 3D terrain not solid | leave it out; "What to test here" keeps the zoomed globe | it is not done by the end of pass 2 |
+| Learn page not solid | keep its first three sections only | it is not done by the end of pass 2 |
+| Tour not solid | a short captioned walk-through with "Next" buttons | it is not done by the end of pass 3 |
+| Globe too slow on a phone | the flat picture map on phones | the phone test in pass 3 fails |
+| Time runs short | cut in this order: the extras, 3D terrain on phones, the Learn page's last two sections, extra motion, the year-round switch, polish on the four unchecked base sites | the team calls it |
+| Recorded video fails | record the screen by hand with the same captions; if that fails too, 7 slides or fewer | 4A fails its check |
+| Version 2 not ready, or not better | submit version 1's link | step 4E |
 | Session limit reached | the next session starts at the first unticked box | at once |
 
 Never cut: the picker, the five distinct places, the match and break chapters for the two checked base sites, "Build the whole base" at least as a table, "How we checked it", "For judges", the AI note, the tests, the demo video.
