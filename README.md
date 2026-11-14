@@ -54,7 +54,7 @@ Version 1 was built with Python 3.13.17 and uv 0.13.7. Never print, copy or comm
 
 ## The data files
 
-The pipeline and the site meet only through these files in `dataset/`. `pipeline.export` writes all of them.
+The pipeline's whole output is these files in `dataset/`. `pipeline.export` writes all of them.
 
 | File | What it holds | Size |
 |---|---|---|
@@ -96,7 +96,7 @@ The core idea and the key design decisions come from our team. We use Claude (An
 
 ## Data
 
-Every number on the site comes from one of these datasets. No sample or placeholder data is used. Each row shows the licence as the source states it.
+Every number in the data files comes from one of these datasets. No sample or placeholder data is used. Each row shows the licence as the source states it.
 
 | Dataset | Agency | Licence | Used for |
 |---|---|---|---|

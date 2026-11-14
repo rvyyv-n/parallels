@@ -32,10 +32,10 @@ The first version was planned with **two targets: the Moon's south pole and Jeze
     - an "Earth can't copy" block for gravity, air, radiation and magnetic shield;
     - the site's best months to test, freeze–thaw months and rainy months;
     - one line on what to test there;
-    - Earth and target images side by side.
+    - Earth and target images.
 4. **"How we checked it"** shows the validation chart (section 6).
 
-That's two clicks to a result, well under a minute. A terrain-type filter and hand-set weights sit beside the list.
+That's two clicks to a result, well under a minute. Users can also filter by terrain type and set the weights by hand.
 
 **Extras,** only once that flow works:
 - more targets;
@@ -131,7 +131,6 @@ Every dataset below was checked on 13 November: the files answered, or NASA's da
 | EMIT L3 mineral abundance (EMITL3ASA v002) | 10 surface minerals at 0.5°, 55°S–55°N; no feldspar, so Mars only | Earthdata | 22 MB |
 | MODIS land cover (MCD12C1 v061, 0.05°), read through NASA GIBS | bare ground | no key | 1,187 MB a year as a file; streamed tiles are smaller |
 | MODIS land-surface temperature (MOD11C3 v061) | day–night swing for thermal inertia; sharper temperature | Earthdata | about 0.9 GB a year |
-| [NASA GIBS](https://nasa-gibs.github.io/gibs-api-docs/access-basics/) Blue Marble tiles | map background | no key | streamed |
 
 **Moon and Mars data** (all answered on 13 November unless marked):
 
@@ -260,7 +259,7 @@ The full lists of test places, with positions and sources, are in `pipeline/site
 
 **Stability:** re-run with 1,000 random weight sets, each weight changed by up to ±50%. A top match that stays in the top 20 in at least 90% of runs earns the stability badge.
 
-**On the site:** one chart. Each test place is a dot on a 0–100 Earth-rank line, with one row per group. The same chart goes on the project page and in the video.
+**On the site:** the result for every test place, by group, against the pass marks. The same result goes on the project page and in the video.
 
 **Data checks:**
 - Five random cells match the POWER point API.
@@ -270,22 +269,21 @@ The full lists of test places, with positions and sources, are in `pipeline/site
 ## 7. Tech stack and hosting
 
 - **Pipeline:** Python 3.13 with the packages pinned in `pyproject.toml` and `uv.lock`, in `pipeline/`. Raw downloads go in `data/` (already gitignored). Outputs are small files in `dataset/`. A 0.5° land grid is about 75,000 cells, so the traits plus the scores for each mission filter come to under a few MB per target.
-- **Site:** Vite and TypeScript (no framework unless the interface outgrows it); MapLibre GL JS 6.18 with GIBS Blue Marble tiles (no key; zoom levels up to 8); plain SVG charts. Every score, for every mission filter, is pre-computed into its own file, so the browser never recalculates anything.
+- **Site:** every score, for every mission filter, is pre-computed into its own file, so the browser never recalculates anything.
 - **Tests:**
     - pytest for the pipeline: the scoring rule on hand-made cases, plus the data checks in section 6;
-    - Playwright for the main flow and every link.
+    - browser tests for the main flow and every link.
 - **Hosting:** Vercel's free plan, deploying from the repo on every push. It's for non-commercial use only and pauses a site for 30 days if it goes over the limits. GitHub Pages (needs a public repo) is the fallback, and we can move to it at the very end.
 - **Lasting until 26 January 2027:**
     - no keys, no server, no live data calls;
-    - GIBS tiles are the only live dependency, so a static background image ships as a fallback;
     - we tag the submitted version and request a FortiGuard classification after deploying.
 
 ## 8. Roadmap
 
-Steps in order, each with its check. The site is built on a stub data file from step 1 onward, alongside the pipeline, so it never waits for real data. Clock times appear only where our guidelines ask for them: the fallback switch times in section 9, a first draft on Saturday night, and the final submission by Sunday 21:59.
+Steps in order, each with its check. Clock times appear only where our guidelines ask for them: the fallback switch times in section 9, a first draft on Saturday night, and the final submission by Sunday 21:59.
 
-1. **Before the event: accounts, setup and downloads.** We make a free Earthdata account, install the Python packages, download every file in section 4, and deploy a placeholder site that already runs on stub data.
-    → verify: a download check lists every file and its size; the placeholder opens in a private window on a phone.
+1. **Before the event: accounts, setup and downloads.** We make a free Earthdata account, install the Python packages and download every file in section 4.
+    → verify: a download check lists every file and its size.
 2. **Earth trait grid and target values** for the south pole and Jezero.
     → verify: five random cells match the POWER point API; the Artemis values agree with published ones.
 3. **Scoring, terrain types, seasons and the validation run.** The weights (per mission filter), terrain thresholds and the held-out split are committed first.
@@ -312,12 +310,10 @@ Times are in our Local Event's time zone.
 | SWIM site stays down | NASA image PIA26045 plus Odyssey GRS | Saturday 10:00 |
 | Vercel limits or pause | move to GitHub Pages (public repo) | Saturday 12:00 |
 | Rock trait unworkable | drop it from the score and keep it as an explanation | Saturday 14:00 |
-| Map library trouble | static map image plus a clickable list | Saturday 15:00 |
 | Validation fails | publish the honest result and the reasons, never hidden. It's still more than any rival shows. | write-up by Saturday 16:00 |
 | Moon ranking is all polar ice | already handled: GLiM's ice class scores low on rock, and headlines exclude Antarctica | built in |
 | Zoom stage too slow | ship the 0.5° screen; headline at cell level with imagery | Saturday 20:00 |
 | No headline clears the bar | headline the validation: "it finds the analogs NASA uses, and ranks these next" | Saturday 22:00 |
-| GIBS tiles go down after the event | bundled static background image | built in from the start |
 | Video fails | 7 slides or fewer | Sunday 18:00 |
 
 ## 10. Awards, project page and demo
@@ -430,7 +426,6 @@ Rivals and hosting (opened 13 Nov):
 - the [challenge page](https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/), last edited 13 Nov
 - [GitHub plans](https://docs.github.com/en/get-started/learning-about-github/githubs-plans)
 - Vercel: [Hobby plan](https://vercel.com/docs/plans/hobby), [Git deploys](https://vercel.com/docs/git), [terms](https://vercel.com/legal/terms)
-- [MapLibre raster sources](https://maplibre.org/maplibre-gl-js/docs/API/classes/RasterTileSource/)
 
 Earth data:
 - the [NASA POWER Zarr bucket](https://nasa-power.s3.amazonaws.com/) and point API
