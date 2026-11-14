@@ -3109,7 +3109,7 @@
    "default": true,
    "lat": 18.38,
    "lon": 77.58,
-   "anchor_note": "Centre of Jezero crater (our plan, section 5); the window samples the crater floor. Perseverance landed about 8 km to the north-west.",
+   "anchor_note": "Centre of Jezero crater; the window samples the crater floor. Perseverance landed about 8 km to the north-west.",
    "values": {
     "slope_median_deg": {
      "value": 1.47,

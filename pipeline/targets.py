@@ -171,7 +171,7 @@ MOON = [
 ]
 
 MARS = [
-    ("Jezero", 18.38, 77.58, "Centre of Jezero crater (our plan, section 5); the window samples the crater floor. Perseverance landed about 8 km to the north-west."),
+    ("Jezero", 18.38, 77.58, "Centre of Jezero crater; the window samples the crater floor. Perseverance landed about 8 km to the north-west."),
     ("Arcadia Planitia", 47.2, 184.3, "Buried-ice area studied by Bramson 2015; coordinates from our plan (section 5)."),
     ("Gale", -4.59, 137.44, "Curiosity's landing site on the crater floor, where its climate and radiation values were measured. The crater centre (5.4° S, 137.8° E) is the steep upper flank of Mount Sharp."),
     ("Deuteronilus Mensae", 43.9, 22.6, "Glacier area studied by Plaut 2009; coordinates from our plan (section 5)."),
