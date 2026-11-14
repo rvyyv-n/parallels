@@ -59,7 +59,7 @@ From NASA's official page:
 - [NASA Space Science Data Coordinated Archive](https://nssdc.gsfc.nasa.gov) (the guide's link has a typo, "nssca")
 - [JPL Horizons](https://ssd.jpl.nasa.gov/horizons)
 
-NASA's data list is in [guidelines.md](guidelines.md#3-data); the datasets we use are in [Claude's plan](claudes-plan.md#4-data).
+NASA's data list is in [guidelines.md](guidelines.md#3-data); the datasets we use are in the [README](../README.md#data).
 
 ## Who it's for
 

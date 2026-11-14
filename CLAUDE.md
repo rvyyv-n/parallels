@@ -6,11 +6,10 @@ Our NASA Space Apps 2026 entry for **Identify Earth Locations that Analog the Pe
 
 ## Layout
 
-- `docs/`: our rules and working guidelines (`guidelines.md`), our local event's Challenge Guide (`challenge-guide.pdf`, the main brief: its six benchmarks and seven questions are what we build to), the challenge in plain words (`challenge.md`), how judging works (`judging-notes.md`), our workflow chart (`workflow.png`), and the plans: the team's idea (`team-plan.md`), Claude's method, data, stack and roadmap (`claudes-plan.md`), the brief for the v1 build (`v1-spec.md`) and the review that amends them (`review-pre-v1.md`).
+- `docs/`: our rules and working guidelines (`guidelines.md`), our local event's Challenge Guide (`challenge-guide.pdf`, the main brief: its six benchmarks and seven questions are what we build to), the challenge in plain words (`challenge.md`), how judging works (`judging-notes.md`), our workflow chart (`workflow.png`), and the plans: the team's idea (`team-plan.md`), Claude's method, data, stack and roadmap (`claudes-plan.md`), the brief for the v1 build (`v1-spec.md`) and the data checks made before it (`review-pre-v1.md`).
 - `pipeline/`: the Python data pipeline. Raw downloads go in the gitignored `data/`.
 - `site/`: the Vite site. Pre-computed files are in `site/public/data/`.
 - `assets/`: logo and other images.
-- `retired/`: earlier candidate challenges. Reference only; don't edit or build on them.
 
 ## How Claude works here
 

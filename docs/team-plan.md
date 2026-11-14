@@ -16,13 +16,9 @@ Users pick what they're testing, and the challenges below are weighted to match:
 - **Life support:** Resources, Heat swing, Polar light and power (Moon), Atmosphere and dust (Mars)
 - **Habitat structure:** Surface, Heat swing (scored), plus ground strength and Shelter as labels
 
-Users can also set the weights by hand. Dryness, Industrial sites and Signs of life count only under hand-set weights.
+Users can also set the weights by hand. Dryness, Industrial sites and Signs of life are in no filter and count only under hand-set weights.
 
-**Default set for the build on 15 November; the team can overrule.** These three points are not yet a team decision:
-
-- Mission filters weight the challenges (not the traits).
-- Habitat structure is Surface and Heat swing as scores, with ground strength and Shelter as labels.
-- Dryness, Industrial sites and Signs of life are in no filter and count only under hand-set weights.
+**Default set for the build on 15 November; the team can overrule.** Three points above are not yet a team decision: that mission filters weight the challenges (not the traits), the make-up of Habitat structure, and that Dryness, Industrial sites and Signs of life count only under hand-set weights.
 
 ## Terrain types
 

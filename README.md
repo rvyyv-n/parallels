@@ -22,16 +22,15 @@ Version 1 does not pass every check. It passes 1 of its 4 first checks. In the f
 - [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, the main brief.
 - [docs/challenge.md](docs/challenge.md): the challenge in plain words, and how we meet the guide's six objectives and answer its seven questions.
 - [docs/team-plan.md](docs/team-plan.md): what we're building.
-- [docs/claudes-plan.md](docs/claudes-plan.md): build notes: method, data, checks, stack and roadmap.
+- [docs/claudes-plan.md](docs/claudes-plan.md): the build plan from before v1: rivals, method, data, checks, stack and roadmap.
 - [docs/v1-spec.md](docs/v1-spec.md): the brief for version 1, including the data file layout.
-- [docs/review-pre-v1.md](docs/review-pre-v1.md): the review that amends the plans before the build.
+- [docs/review-pre-v1.md](docs/review-pre-v1.md): the data and test-place checks made before the build.
 - [docs/judging-notes.md](docs/judging-notes.md): how Space Apps is judged and what past winners did.
 - [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
 - [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.
 - `pipeline/`: the Python data pipeline. Its method settings are in `pipeline/config/`.
 - `site/`: the Vite site. It reads the files in `site/public/data/`.
 - `site/public/data/`: the pre-computed files the site loads. See [The data files](#the-data-files).
-- `retired/`: earlier challenge ideas, kept for reference.
 
 ## Run it
 

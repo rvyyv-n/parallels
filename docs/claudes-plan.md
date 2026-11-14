@@ -2,6 +2,8 @@
 
 Build notes for the [team plan](team-plan.md): rivals, method, data, checks, stack, roadmap and fallbacks. Written by Claude on 13 November 2026 and aligned with our local [Challenge Guide](challenge-guide.pdf) on 14 November. Where this file and the team plan differ, the team plan wins.
 
+This is the plan from before the build. What version 1 ships (its targets, data, method and limits) is in the [README](../README.md). Where the two differ, the README has the current state.
+
 ## 1. Rivals
 
 A scan on 13 November found at least 22 public repos for this challenge. Three are serious:
@@ -14,14 +16,14 @@ A scan on 13 November found at least 22 public repos for this challenge. Three a
 
 Where we can beat them:
 
-1. **We test the method in public.** Known analogs should outrank farmland and rainforest, with plain deserts in between, and we commit the weights before the v1 run. A throwaway prototype ran the same test places twice on 14 November (Moon 67% against a pass mark of 80%; Mars 79% against 80% and 54% against 60%), so v1's run isn't blind, and the site says so. None of the three rivals shows a check like this. Our literature search turned up no published analog method checked this way either.
+1. **We test the method in public.** Known analogs should outrank farmland and rainforest, with plain deserts in between, and we commit the weights before the v1 run. A throwaway prototype ran the same test places first, so v1's run isn't blind (section 6). None of the three rivals shows a check like this. Our literature search turned up no published analog method checked this way either.
 2. **Search all of Earth's land, then zoom to one spot.** Screen the globe at 0.5°, then compare terrain at the same scale as the Moon or Mars data, down to one valley, crater or massif. The challenge asks for exactly this ("'The Sahara' is too broad").
 3. **Rank by "Earth rank", show the real gap.** Nowhere on Earth is as cold as a lunar crater, so we rank places by how far toward the target they get. Next to that rank we always show the real gap in units, e.g. how far the coldest month falls short of −248 °C.
 4. **A headline that fills a real gap.** The Moon's south pole is pale anorthosite highland rock ([Lemelin et al. 2022](https://api.crossref.org/works/10.3847/PSJ/ac532c)), but most lunar analogs in use are dark basalt. Mistastin crater, where Artemis crews trained, is the exception ([NASA, LPSC 2024](https://ntrs.nasa.gov/api/citations/20230018695/downloads/LPSC2024_Evans_draft2.pdf)). We headline a highland stand-in only if NASA data alone ranks it high (section 5).
 
 ## 2. The main flow
 
-The first version has **two targets: the Moon's south pole and Jezero crater on Mars.** Arcadia Planitia (buried ice) comes next, then the rest of section 5.
+The first version was planned with **two targets: the Moon's south pole and Jezero crater on Mars.** Arcadia Planitia (buried ice) came next, then the rest of section 5. Version 1 shipped with six; see the README's [Status](../README.md#status).
 
 1. **Open the site.** The map already shows the headline find for the Moon's south pole, with its scorecard open.
 2. **Pick a target and a mission filter** (rover mobility, life support, habitat structure). The map colours all land by match, and a list shows the top 10 spots with their coordinates and terrain type. A "rarely used" badge marks spots more than 100 km from every known analog site in our list.
@@ -115,11 +117,11 @@ The same rule works whether the target sits inside Earth's range (Mars slopes) o
 4. **Compare the terrain:** match the window's slope and roughness spread with the target's.
 5. **Choose the spot:** the best-matching spot inside each cell.
 
-This gives the scorecard its "one valley, crater or massif". The HRSC–MOLA file is read in small windows by range request, never downloaded whole. If that fails, Mars gets no terrain zoom and says so.
+The zoom stage is not in version 1 (see the README's [Limits](../README.md#limits)). It was meant to give the scorecard its "one valley, crater or massif". The HRSC–MOLA file is read in small windows by range request, never downloaded whole. If that fails, Mars gets no terrain zoom and says so.
 
 ## 4. Data
 
-Every dataset below was checked on 13 November: the files answered, or NASA's data catalogue (CMR) listed them.
+Every dataset below was checked on 13 November: the files answered, or NASA's data catalogue (CMR) listed them. The datasets version 1 really uses, with their licences, are in the README's [Data](../README.md#data) section. MOD11C3 and the Obu permafrost map were not used.
 
 **NASA Earth data** (the main scoring work):
 
@@ -331,8 +333,7 @@ Times are in our Local Event's time zone.
 **Project page:**
 - Lead with the headline image and the validation chart, then answer the form's questions.
 - Paste in three images: the map, the headline scorecard with its "where it breaks" block, and the validation chart.
-- The NASA Data field lists each dataset with a link and what we used it for.
-- The AI note goes in the site footer, the description and the README.
+- The NASA Data field and the AI note follow [guidelines §1 and §5](guidelines.md).
 
 **Demo (28 seconds):** the product is on screen from the first frame, captions are burned in, and there's no music.
 
@@ -343,11 +344,6 @@ Times are in our Local Event's time zone.
 | 0:05 | map | name and tagline |
 | 0:10 | pick a target, the map lights up, click the headline, scorecard | how it works, and which NASA data does the work |
 | 0:20 | validation chart, then zoom out | what's next: more targets, finer data, field checks |
-
-## 11. Open questions for the team
-
-- [x] Hosting: Vercel for now, GitHub Pages only if needed at the very end.
-- [x] Earthdata account: the user's account, saved in `~/.netrc` on the build PC.
 
 ## Appendix A. Test places
 
