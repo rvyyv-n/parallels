@@ -115,7 +115,7 @@ function checksTable(tests: ValidationTest[]) {
       )
       .join("")}</tbody>
   </table></div>
-  <p class="small muted">A result is the share of pairs where the first group's place ranks higher than the second's (ties count half). "Held-out half" uses only the analogs set aside in a fixed split; "blind sites" uses only analogs never scored before this run.</p>`;
+  <p class="small muted">A result is the share of pairs where the first group's place ranks higher than the second's (a pair with exactly equal scores counts as half). "Held-out half" uses only the analogs set aside in a fixed split; "blind sites" uses only analogs never scored before this run.</p>`;
 }
 
 function verdict(tests: ValidationTest[], summary?: string) {

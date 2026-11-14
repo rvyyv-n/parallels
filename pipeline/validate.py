@@ -183,7 +183,7 @@ def run(cells, scored, sites, cfg, commit, with_misses=False):
     held = set(v["held_out"])
     where = locate(sites, cells, index_of(cells))
     mars, moon = scored[v["mars_target"]], scored[v["moon_target"]]
-    rule = "Each place is scored on its 0.5° cell against {t}, with every scored challenge weighted equally (a weighted geometric mean of the challenge scores, under the same 70% data rule as the map). A pair counts as a win when the analog scores higher; ties count half."
+    rule = "Each place is scored on its 0.5° cell against {t}, with every scored challenge weighted equally (a weighted geometric mean of the challenge scores, under the same 70% data rule as the map). A pair counts as a win when the analog scores higher; a pair with exactly equal scores counts as half a win."
     tests = [
         test(
             "mars", "Mars test", "mars",
