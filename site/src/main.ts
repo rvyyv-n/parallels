@@ -1,6 +1,7 @@
 import "@fontsource-variable/archivo/wdth.css";
 import "./style.css";
 import "./intro.css";
+import "./work.css";
 import type { Manifest, Target } from "./contract";
 import { BASE, load, loadLabels, loadValidation, manifest, targetCols, type Cols, type Data } from "./data";
 import { handScore, rankOf, top } from "./score";
@@ -76,6 +77,22 @@ function thumb(cv: HTMLCanvasElement, t: Target) {
     mark();
   };
   img.src = `${import.meta.env.BASE_URL}${TEXTURE[t.body]}`;
+}
+
+const GIBS_BM = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8";
+
+function groundThumb(lat: number, lon: number) {
+  const bx = ((lon + 180) / 360) * 100;
+  const by = ((90 - lat) / 180) * 100;
+  const base = `<span class="r-thumb" aria-hidden="true" style="background-position:${bx.toFixed(2)}% ${by.toFixed(2)}%">`;
+  if (Math.abs(lat) > 84) return `${base}</span>`;
+  const n = 32;
+  const x = ((lon + 180) / 360) * n;
+  const y = ((1 - Math.asinh(Math.tan((lat * Math.PI) / 180)) / Math.PI) / 2) * n;
+  const tx = Math.floor(x);
+  const ty = Math.floor(y);
+  const at = (f: number) => Math.max(-46, Math.min(0, 23 - f * 92));
+  return `${base}<img src="${GIBS_BM}/5/${ty}/${tx}.jpeg" alt="" loading="lazy" decoding="async" style="left:${at(x - tx).toFixed(1)}px;top:${at(y - ty).toFixed(1)}px" onerror="this.remove()"></span>`;
 }
 
 const app = document.getElementById("app")!;
@@ -233,12 +250,13 @@ function shell(m: Manifest) {
             <div class="status" id="status"><span class="st-scale" id="st-scale"></span><span class="st-at" id="st-at" aria-hidden="true"></span></div>
             <div class="legend" id="legend">
               <p class="lg-title">Match, 0–100</p>
-              <div class="lg-bar" style="background:${gradient()}"></div>
-              <div class="lg-ticks"><span>0</span><span>50</span><span>100</span></div>
-              <p class="lg-text">A weighted mix of the challenge scores. Each comes from how the place's traits rank against all of Earth's land. Grey: not ranked.</p>
-              <p class="lg-faint">Weak matches are drawn faint so the ground shows.</p>
-              <p class="lg-pole">The map layer stops at 85° N and S; the list still ranks land beyond it.</p>
+              <div class="lg-scale"><div class="lg-bar" style="background:${gradient()}"></div><div class="lg-ticks"><span>0</span><span>50</span><span>100</span></div></div>
               <label class="lg-range"><span>Match layer</span><input type="range" id="pick-strength" min="0" max="100" step="5" value="100"><output id="strength-out">100%</output></label>
+              <details class="lg-more"><summary>${icon("info")}About the colours</summary><div class="lg-pop">
+                <p class="lg-text">A weighted mix of the challenge scores. Each comes from how the place's traits rank against all of Earth's land. Grey: not ranked.</p>
+                <p class="lg-faint">Weak matches are drawn faint so the ground shows.</p>
+                <p class="lg-pole">The map layer stops at 85° N and S; the list still ranks land beyond it.</p>
+              </div></details>
             </div>
             <div class="lg-keys">
               <label><input type="checkbox" id="pick-labels" checked> <i class="k-analog"></i>Known analogs <i class="k-cave"></i>caves</label>
@@ -391,6 +409,7 @@ async function main() {
             const far = d.cells.nearest_analog_km?.[i];
             return `<li data-i="${i}"><button type="button" class="row${i === s.cell ? " on" : ""}" aria-pressed="${i === s.cell}">
               <span class="r-n">${r + 1}</span>
+              ${groundThumb(d.cells.lat[i], d.cells.lon[i])}
               <span class="r-name">${esc(placeName(m, d.cells, i))}${Number.isFinite(far) && far > 100 ? ` <span class="rare" title="${num(far)} km from the nearest known analog">rarely used</span>` : ""}${isIce(d.cells, i) ? ` <span class="tag ice">ice sheet</span>` : ""}</span>
               <span class="r-meta">${[
                 named(i) ? latlon(d.cells.lat[i], d.cells.lon[i], 2) : "",
@@ -399,7 +418,7 @@ async function main() {
               ]
                 .filter(Boolean)
                 .join(" · ")}</span>
-              <span class="r-score"><b>${score100(score[i])}</b><i style="--w:${score[i] * 100}%;--c:${colour(score[i])}"></i></span>
+              <span class="r-score" style="--w:${score[i] * 100}%;--c:${colour(score[i])}"><b>${score100(score[i])}</b></span>
             </button>${i === s.cell ? WHY : ""}</li>`;
           })
           .join("")
