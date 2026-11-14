@@ -6,12 +6,12 @@ test("every source link answers", async ({ page, request }, info) => {
   test.skip(info.project.name !== "laptop", "links are the same on every screen size");
   test.setTimeout(600_000);
   await page.goto("/");
-  for (const body of ["Moon", "Mars"]) {
-    await page.getByRole("radio", { name: body }).check();
-  }
-  const data = await (await request.get("/data/app.json")).json();
+  await expect(page.locator("#ledger li[data-i]")).toHaveCount(10);
   const urls = new Set<string>(await page.locator("a[href^='http']").evaluateAll((as) => as.map((a) => a.getAttribute("href")!)));
-  JSON.stringify(data).replace(/https:\/\/[^"\s]+/g, (u) => (urls.add(u), u));
+  for (const f of ["manifest.json", "labels.json", "validation.json"]) {
+    const text = await (await request.get(`/data/${f}`)).text();
+    text.replace(/https?:\/\/[^"\s)]+/g, (u) => (urls.add(u), u));
+  }
   const bad: string[] = [];
   const opts = { timeout: 30_000, maxRedirects: 5, failOnStatusCode: false };
   for (const u of urls) {

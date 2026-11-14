@@ -1,115 +1,112 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import { cols, manifest } from "./helpers";
+import { handScore, top } from "../src/score";
 
-const MOON = ["Surface", "Resources", "Heat swing", "Shelter", "Polar light and power", "Industrial sites", "Dust"];
-const MARS = ["Surface", "Resources", "Heat swing", "Shelter", "Atmosphere and dust", "Signs of life"];
+const m = manifest();
+const rows = (p: Page) => p.locator("#ledger li[data-i]");
+const order = (p: Page) => rows(p).evaluateAll((els) => els.map((e) => Number((e as HTMLElement).dataset.i)));
+const main = m.targets.find((x) => x.default) ?? m.targets[0];
 
-test("a match is open on arrival", async ({ page }) => {
-  await page.goto("/");
-  const card = page.getByTestId("match");
-  await expect(card.getByRole("heading", { level: 2 })).toBeVisible();
-  await expect(card.getByText("What's similar")).toBeVisible();
-  await expect(card.getByText("How similar")).toBeVisible();
-  await expect(card.getByText("Where it breaks")).toBeVisible();
-  await expect(card.getByText("Earth can't copy")).toBeVisible();
-});
-
-test("main flow: Mars, a challenge, a site, its match", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("radio", { name: "Mars" }).check();
-  await page.getByLabel("Compare against").selectOption({ label: "Gale" });
-  await page.getByRole("button", { name: /^Heat swing/ }).click();
-  const rows = page.getByTestId("ranking").getByRole("button");
-  await expect(rows).toHaveCount(10);
-  const second = rows.nth(1);
-  const name = (await second.getAttribute("data-name"))!;
-  await second.click();
-  const card = page.getByTestId("match");
-  await expect(card.getByRole("heading", { level: 2 })).toHaveText(name);
-  await expect(card.getByText(/Gale/).first()).toBeVisible();
-  await expect(card.getByTestId("score")).toHaveText(/\d+/);
-});
-
-for (const [body, names] of [["Moon", MOON], ["Mars", MARS]] as const) {
-  test(`every ${body} challenge is listed`, async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("radio", { name: body }).check();
-    const list = page.getByTestId("challenges");
-    for (const n of names) await expect(list.getByRole("button", { name: new RegExp(`^${n}`) })).toBeVisible();
-  });
+async function ready(p: Page, q = "") {
+  await p.goto(`/${q}`);
+  await expect(rows(p)).toHaveCount(10);
 }
 
-test("label-only challenges say why they are not scored", async ({ page }) => {
-  await page.goto("/");
-  const card = page.getByTestId("match");
-  await page.getByRole("button", { name: /^Dust/ }).click();
-  await expect(card.getByRole("heading", { level: 2 })).toHaveText("Dust");
-  await expect(card.getByText(/Apollo samples/)).toBeVisible();
-  await expect(card.getByText(/compared with/)).toHaveCount(0);
-  await page.getByRole("button", { name: /^Shelter/ }).click();
-  await expect(card.getByText(/no global map of caves/)).toBeVisible();
+test("main flow: pick a target and a filter, open a match, read the scorecard", async ({ page }) => {
+  await ready(page);
+  if (m.sample) await expect(page.getByRole("note")).toContainText("Sample data");
+  await expect(page.locator("#card h3")).not.toBeEmpty();
+
+  const target = m.targets[m.targets.length - 1];
+  const filter = m.filters[m.filters.length - 1];
+  await page.locator("#pick-target").selectOption(target.id);
+  await page.locator("#pick-filter").selectOption(filter.id);
+  await expect(page.locator("#tcap")).toContainText(target.name);
+
+  const row = rows(page).nth(2);
+  const name = (await row.locator(".r-name").innerText()).replace(/\s*rarely used\s*$/i, "").trim();
+  await row.locator("button").click();
+  await expect(row.locator("button")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#card h3")).toHaveText(name);
+  await expect(page).toHaveURL(new RegExp(`t=${target.id}.*f=${filter.id}.*c=${await row.getAttribute("data-i")}`));
+
+  await expect(page.locator(".card .o-num b")).not.toBeEmpty();
+  await expect(page.locator(".card .ch")).toHaveCount(m.challenges[target.body].length);
+  const open = page.locator(".card .ch details[open]");
+  await expect(open).toHaveCount(1);
+  expect(await open.locator(".trait").count()).toBeGreaterThan(0);
+  const units = m.traits.filter((t) => t.unit).map((t) => t.unit);
+  const vals = await open.locator(".t-vals dd").allInnerTexts();
+  expect(vals.some((v) => units.some((u) => v.includes(u)))).toBe(true);
+  await expect(open.locator(".t-src").first()).toContainText("Earth");
+  await expect(page.locator(".card h4", { hasText: "Where it breaks" })).toBeVisible();
+  await expect(page.locator(".card h4", { hasText: "Earth can't copy" })).toBeVisible();
+  await expect(page.locator(".card .cant tbody tr")).toHaveCount(m.cant_copy.length);
+  await expect(page.locator(".card h4", { hasText: "Seasons" })).toBeVisible();
 });
 
-test("a link that mixes Moon and Mars falls back to a working view", async ({ page }) => {
-  await page.goto("/#/moon/mars-jezero/heat/yungay-atacama");
-  await expect(page.getByTestId("match").getByRole("heading", { level: 2 })).toBeVisible();
-  await expect(page.getByRole("radio", { name: "Moon" })).toBeChecked();
+test("a shared link opens the same view", async ({ page }) => {
+  const f = m.filters[1] ?? m.filters[0];
+  const { t } = cols(m, main.id);
+  const ids = top(t[`score:${f.id}`], 10);
+  await ready(page, `?t=${main.id}&f=${f.id}&c=${ids[4]}`);
+  await expect(page.locator("#pick-filter")).toHaveValue(f.id);
+  await expect(page.locator(`#ledger li[data-i="${ids[4]}"] button`)).toHaveAttribute("aria-pressed", "true");
 });
 
-test("industrial sites are scored against ideal flat ground", async ({ page }) => {
-  await page.goto("/");
-  await page.getByLabel("Compare against").selectOption({ label: "Malapert Massif" });
-  await page.getByRole("button", { name: /^Industrial sites/ }).click();
-  await expect(page.getByTestId("match").getByText("Ideal flat ground").first()).toBeVisible();
+test("year-round switch reorders the list exactly as the year-round scores say", async ({ page }) => {
+  const f = m.filters[0];
+  const { t } = cols(m, main.id);
+  const plain = top(t[`score:${f.id}`], 10);
+  const yr = top(t[`score:${f.id}:yr`], 10);
+  await ready(page, `?t=${main.id}&f=${f.id}`);
+  expect(await order(page)).toEqual(plain);
+  await page.locator("#pick-yr").check({ force: true });
+  await expect.poll(() => order(page)).toEqual(yr);
+  if (JSON.stringify(plain) !== JSON.stringify(yr)) expect(await order(page)).not.toEqual(plain);
 });
 
-test("map dots are big enough to tap", async ({ page }) => {
-  await page.goto("/");
-  const box = await page.locator(".pin").first().boundingBox();
-  expect(box!.width).toBeGreaterThanOrEqual(24);
+test("hand-set weights change the ranking", async ({ page }) => {
+  const f = m.filters[0];
+  const fw = f.weights[main.body];
+  const { t } = cols(m, main.id);
+  await ready(page, `?t=${main.id}&f=${f.id}`);
+  const before = await order(page);
+  await page.locator("#hand summary").click();
+  const chs = m.challenges[main.body].filter((c) => t[`ch:${c.id}`]);
+  const w: Record<string, number> = { ...Object.fromEntries(chs.map((c) => [c.id, 0])), ...fw };
+  const off = Object.keys(fw)[0];
+  const on = chs.find((c) => !(fw[c.id] > 0))!.id;
+  for (const [id, v] of [
+    [on, 5],
+    [off, 0],
+  ] as const) {
+    await page.locator(`#sliders input[data-ch="${id}"]`).fill(String(v));
+    w[id] = v;
+  }
+  const expected = top(handScore(m, t, w, m.grid.n), 10);
+  await expect.poll(() => order(page)).toEqual(expected);
+  expect(expected).not.toEqual(before);
+  await expect(page.locator("#pick-filter")).toHaveValue("__hand");
+  await expect(page.locator("#pick-yr")).toBeDisabled();
 });
 
-test("on a phone, picking a challenge shows its ranking", async ({ page, isMobile }) => {
-  test.skip(!isMobile, "phone only");
-  await page.goto("/");
-  await page.getByRole("button", { name: /^Heat swing/ }).click();
-  await page.waitForTimeout(800);
-  const top = await page.locator("#ranking-wrap").evaluate((el) => el.getBoundingClientRect().top);
-  expect(top).toBeGreaterThanOrEqual(-5);
-  expect(top).toBeLessThan(200);
+test("no horizontal scroll at 375 px", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await ready(page);
+  await page.locator(".card .ch details").evaluateAll((ds) => ds.forEach((d) => ((d as HTMLDetailsElement).open = true)));
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
 });
 
-test("sample values are labelled as sample", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("button", { name: /^Resources/ }).click();
-  await expect(page.getByTestId("match").getByText("sample", { exact: true }).first()).toBeVisible();
-});
-
-test("validation chart is shown and says what data it uses", async ({ page }) => {
-  await page.goto("/");
-  const v = page.getByTestId("validation");
-  await v.scrollIntoViewIfNeeded();
-  await expect(v.getByRole("heading", { name: "How we checked it" })).toBeVisible();
-  expect(await v.locator("svg circle").count()).toBeGreaterThan(20);
-  await expect(v.getByText(/real data only/i).first()).toBeVisible();
+test("every internal anchor resolves", async ({ page }) => {
+  await ready(page);
+  const missing = await page
+    .locator("a[href^='#']")
+    .evaluateAll((as) => as.map((a) => a.getAttribute("href")!.slice(1)).filter((id) => !id || !document.getElementById(id)));
+  expect(missing).toEqual([]);
 });
 
 test("footer carries the AI note", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator("footer").getByText("How we used AI")).toBeVisible();
-});
-
-test("external links are https and open in a new tab", async ({ page }) => {
-  await page.goto("/");
-  const hrefs = await page.locator("a[href^='http']").evaluateAll((as) => as.map((a) => [a.getAttribute("href"), a.getAttribute("target")]));
-  expect(hrefs.length).toBeGreaterThan(5);
-  for (const [href, target] of hrefs) {
-    expect(href).toMatch(/^https:\/\//);
-    expect(target).toBe("_blank");
-  }
-});
-
-test("no page-level horizontal scroll", async ({ page }) => {
-  await page.goto("/");
-  const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  expect(over).toBeLessThanOrEqual(1);
+  await ready(page);
+  await expect(page.locator("footer .ai")).toContainText("How we used AI");
 });

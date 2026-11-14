@@ -1,37 +1,36 @@
-import type { Trait } from "./types";
+export const esc = (s: unknown) =>
+  String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-export function esc(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+export function num(v: number, digits = 0): string {
+  if (!Number.isFinite(v)) return "no data";
+  return v.toLocaleString("en-GB", { minimumFractionDigits: digits, maximumFractionDigits: digits }).replace(/^-/, "−");
 }
 
-export function pct(x: number): number {
-  return Math.round(x * 100);
+export const score100 = (v: number) => (Number.isFinite(v) ? num(v * 100, 0) : "—");
+
+export function deg(v: number, pos: string, neg: string, digits = 2): string {
+  return `${num(Math.abs(v), digits)}° ${v < 0 ? neg : pos}`;
 }
 
-export function num(x: number, digits: number): string {
-  const s = Math.abs(x).toLocaleString("en-GB", { minimumFractionDigits: digits, maximumFractionDigits: digits });
-  return x < 0 && s.replace(/[0.,]/g, "") !== "" ? `−${s}` : s;
+export const latlon = (lat: number, lon: number, digits = 2) => `${deg(lat, "N", "S", digits)}, ${deg(lon, "E", "W", digits)}`;
+
+export const unit = (u: string) => (!u ? "" : /^[°%]/.test(u) ? u : ` ${u}`);
+
+export const MONTHS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+export const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+export function bits(mask: number): boolean[] {
+  const m = Number.isFinite(mask) ? mask : 0;
+  return Array.from({ length: 12 }, (_, i) => (m >> i) & 1).map(Boolean);
 }
 
-export function fmt(t: Trait, v: number): string {
-  const x = v * (t.scale ?? 1);
-  const unit = t.unit === "%" || t.unit === "°" ? t.unit : ` ${t.unit}`;
-  return `${num(x, t.digits)}${unit}`;
+export function monthList(mask: number): string {
+  if (!Number.isFinite(mask)) return "no data";
+  const on = bits(mask);
+  const names = MONTH_NAMES.filter((_, i) => on[i]);
+  if (!names.length) return "none";
+  if (names.length === 12) return "all year";
+  return names.join(", ");
 }
 
-export function link(text: string, url?: string | null): string {
-  return url ? `<a href="${esc(url)}" target="_blank" rel="noopener">${esc(text)}</a>` : esc(text);
-}
-
-const GROUPS: Record<string, string> = {
-  "moon-analog": "known Moon analog",
-  "moon-basalt": "basalt training site",
-  "mars-analog": "known Mars analog",
-  ordinary: "ordinary place (control)",
-  desert: "plain desert (control)",
-  candidate: "rarely used candidate",
-};
-
-export function groupLabel(groups: string[]): string {
-  return groups.map((g) => GROUPS[g] ?? g).join(", ");
-}
+export const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
