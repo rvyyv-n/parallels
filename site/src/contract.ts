@@ -150,6 +150,7 @@ export interface ValidationPlace {
   cell: number | null;
   score: number | null;
   land_rank: number | null;
+  challenge?: string;
   best_target?: string;
   held_out: boolean;
   blind: boolean;
@@ -173,6 +174,7 @@ export interface Validation {
   not_blind_note: string;
   prototype_runs: { date: string; result: string }[];
   tests: ValidationTest[];
+  second_run?: { title: string; plain: string; designed_after_first_run: true; config_commit: string; summary: string; tests: ValidationTest[]; unchecked: { place: string; why: string }[] };
   stability?: string;
   data_checks: { name: string; result: string; passed: boolean }[];
 }

@@ -10,7 +10,12 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://en.wikipedia.org/wiki/Mistastin_crater",
-  "coord_note": "Moved off Mistastin Lake onto Horseshoe Island (Mishta-minishtik), the crater's central uplift, at the Canadian Geographical Names Database point for the island; the old point was on the lake surface. CSA and NASA astronauts have trained in geology at this crater (https://en.wikipedia.org/wiki/Mistastin_crater)."
+  "coord_note": "Moved off Mistastin Lake onto Horseshoe Island (Mishta-minishtik), the crater's central uplift, at the Canadian Geographical Names Database point for the island; the old point was on the lake surface. CSA and NASA astronauts have trained in geology at this crater (https://en.wikipedia.org/wiki/Mistastin_crater).",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Field geology training site for CSA and NASA astronauts, including the Artemis II crew.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Mistastin_crater"
  },
  {
   "id": "haughton-crater-devon-island",
@@ -23,7 +28,19 @@
    "mars-analog"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Haughton_impact_structure"
+  "coord_source": "https://en.wikipedia.org/wiki/Haughton_impact_structure",
+  "used_for": {
+   "mars": [
+    "surface",
+    "life"
+   ],
+   "moon": [
+    "surface",
+    "heat"
+   ]
+  },
+  "used_for_note": "Said to resemble the Mars surface in more ways than any other Earth place and compared with the Moon's Shackleton crater; used for polar field and EVA trials.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "lofoten",
@@ -36,7 +53,12 @@
   ],
   "coords_estimate": true,
   "coord_source": "https://en.wikipedia.org/wiki/Lofoten",
-  "coord_note": "Representative point inside the Lofoten archipelago, on land on Flakstadøya."
+  "coord_note": "Representative point inside the Lofoten archipelago, on land on Flakstadøya.",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "ESA astronaut geology training on anorthosite, the rock of the Moon's bright highlands, exposed by glacial erosion.",
+  "used_for_source": "https://www.esa.int/ESA_Multimedia/Images/2023/07/The_Moon_in_a_fjord"
  },
  {
   "id": "black-point-lava-flow",
@@ -48,7 +70,12 @@
    "moon-basalt"
   ],
   "coords_estimate": false,
-  "coord_source": "https://science.nasa.gov/earth/earth-observatory/black-point-lava-flow-arizona-40076/"
+  "coord_source": "https://science.nasa.gov/earth/earth-observatory/black-point-lava-flow-arizona-40076/",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Training and systems-testing ground for lunar missions; NASA tested the Lunar Electric Rover there in 2009.",
+  "used_for_source": "https://science.nasa.gov/earth/earth-observatory/black-point-lava-flow-arizona-40076/"
  },
  {
   "id": "cinder-lake-crater-field",
@@ -61,7 +88,12 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://catalog.data.gov/dataset/cinder-lake-crater-field-uncrewed-aerial-system-derived-digital-elevation-models-2023-2024",
-  "coord_note": "Centre of the USGS drone-survey area of the crater field; the old point was about 5 km east of the field."
+  "coord_note": "Centre of the USGS drone-survey area of the crater field; the old point was about 5 km east of the field.",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Artificial crater field built in the late 1960s to train Apollo astronauts, still used as an analog environment.",
+  "used_for_source": "https://catalog.data.gov/dataset/cinder-lake-crater-field-uncrewed-aerial-system-derived-digital-elevation-models-2023-2024"
  },
  {
   "id": "meteor-crater",
@@ -73,7 +105,12 @@
    "moon-basalt"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Meteor_Crater"
+  "coord_source": "https://en.wikipedia.org/wiki/Meteor_Crater",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Apollo astronauts trained there in the 1960s; its impact geology resembles lunar and some Martian material.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "kilbourne-hole",
@@ -85,7 +122,12 @@
    "moon-basalt"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Kilbourne_Hole"
+  "coord_source": "https://en.wikipedia.org/wiki/Kilbourne_Hole",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Maar crater used to train Apollo crews in geology in 1969-1971 and for simulated moonwalks and instrument tests in 2017.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Kilbourne_Hole"
  },
  {
   "id": "sedan-crater",
@@ -97,7 +139,12 @@
    "moon-basalt"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Sedan_(nuclear_test)"
+  "coord_source": "https://en.wikipedia.org/wiki/Sedan_(nuclear_test)",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Main stand-in for lunar impact craters in Apollo astronaut training at the Nevada Test Site from 1965.",
+  "used_for_source": "https://st.llnl.gov/news/look-back/apollo-astronauts-train-nevada-test-site"
  },
  {
   "id": "sudbury",
@@ -109,7 +156,12 @@
    "moon-basalt"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Sudbury_Basin"
+  "coord_source": "https://en.wikipedia.org/wiki/Sudbury_Basin",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Impact structure used for impact-geology study and cold-condition habitat simulation for Moon and Mars.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "ries-crater",
@@ -121,7 +173,12 @@
    "moon-basalt"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Nördlinger_Ries"
+  "coord_source": "https://en.wikipedia.org/wiki/Nördlinger_Ries",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Apollo 14 crews trained there in 1970 and ESA PANGAEA uses it to teach impact geology.",
+  "used_for_source": "https://www.frontiersin.org/articles/10.3389/fspas.2023.1186173"
  },
  {
   "id": "lanzarote",
@@ -134,7 +191,12 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://en.wikipedia.org/wiki/Timanfaya_National_Park",
-  "coord_note": "Moved to Timanfaya National Park, the lava-field part of Lanzarote; the old point was in the island's north-east, outside the lava fields."
+  "coord_note": "Moved to Timanfaya National Park, the lava-field part of Lanzarote; the old point was in the island's north-east, outside the lava fields.",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "ESA PANGAEA astronaut field-geology training in volcanic terrain standing in for the Moon and Mars.",
+  "used_for_source": "https://www.esa.int/Our_Activities/Human_Spaceflight/Caves/Astronaut_geological_field_training_on_a_Mars_analogue"
  },
  {
   "id": "mauna-kea",
@@ -146,7 +208,12 @@
    "moon-basalt"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Mauna_Kea"
+  "coord_source": "https://en.wikipedia.org/wiki/Mauna_Kea",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Volcanic terrain where NASA tests technology, with the HI-SEAS habitat nearby for lunar and Martian surface operations.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "askja",
@@ -158,7 +225,12 @@
    "moon-basalt"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Askja"
+  "coord_source": "https://en.wikipedia.org/wiki/Askja",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "NASA trained Apollo astronauts there in geology for lunar missions.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Askja"
  },
  {
   "id": "etna",
@@ -170,7 +242,12 @@
    "moon-basalt"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Mount_Etna"
+  "coord_source": "https://en.wikipedia.org/wiki/Mount_Etna",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Fresh volcanic soils and rocks where ESA and DLR have tested rovers.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "teide",
@@ -182,7 +259,12 @@
    "moon-basalt"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Teide"
+  "coord_source": "https://en.wikipedia.org/wiki/Teide",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Basalt and phonolite terrain similar to rocks on Mars and used for Moon and Mars instrument tests.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "yungay-atacama",
@@ -195,7 +277,13 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6232106",
-  "coord_note": "Moved to the Yungay area used in Atacama Mars-analog studies (lagoons at -24.079, -69.943 in the cited paper; OpenStreetMap places Yungay at -24.0804, -69.9412)."
+  "coord_note": "Moved to the Yungay area used in Atacama Mars-analog studies (lagoons at -24.079, -69.943 in the cited paper; OpenStreetMap places Yungay at -24.0804, -69.9412).",
+  "used_for": [
+   "dryness",
+   "life"
+  ],
+  "used_for_note": "Hyper-arid core used to test life-detection instruments and drills and to study the dry limit of life.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Mars_habitability_analogue_environments_on_Earth"
  },
  {
   "id": "mcmurdo-dry-valleys",
@@ -208,7 +296,14 @@
   ],
   "coords_estimate": true,
   "coord_source": "https://en.wikipedia.org/wiki/McMurdo_Dry_Valleys",
-  "coord_note": "Representative point at the centre Wikipedia gives for the Dry Valleys region."
+  "coord_note": "Representative point at the centre Wikipedia gives for the Dry Valleys region.",
+  "used_for": [
+   "heat",
+   "dryness",
+   "resources"
+  ],
+  "used_for_note": "Among the coldest and driest Mars-like places, with permafrost and thin brine films; NASA tested an inflatable habitat there.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Mars_habitability_analogue_environments_on_Earth"
  },
  {
   "id": "gypsum-hill-axel-heiberg",
@@ -222,7 +317,12 @@
   "coords_estimate": false,
   "coord_source": "https://www.frontiersin.org/articles/10.3389/fmicb.2017.02527",
   "coord_note": "The Frontiers in Microbiology 2017 paper gives the Gypsum Hill spring system at 79°25′N, 90°45′W (79.417, -90.75); our point is about 2 km from it.",
-  "analog_source": "https://www.frontiersin.org/articles/10.3389/fmicb.2017.02527"
+  "analog_source": "https://www.frontiersin.org/articles/10.3389/fmicb.2017.02527",
+  "used_for": [
+   "life"
+  ],
+  "used_for_note": "Perennial cold hypersaline springs flowing through permafrost, a possible surface sign of Martian subsurface brines.",
+  "used_for_source": "https://www.frontiersin.org/articles/10.3389/fmicb.2017.02527"
  },
  {
   "id": "bockfjorden-svalbard",
@@ -235,7 +335,13 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://en.wikipedia.org/wiki/Bockfjorden",
-  "coord_note": "Between the Jotun (79.456, 13.278) and Troll (79.390, 13.440) spring groups, each within about 5 km."
+  "coord_note": "Between the Jotun (79.456, 13.278) and Troll (79.390, 13.440) spring groups, each within about 5 km.",
+  "used_for": [
+   "life",
+   "surface"
+  ],
+  "used_for_note": "AMASE Mars analog expeditions study volcanic centres with carbonates like those in meteorite ALH84001 and Gusev crater, and biosignatures.",
+  "used_for_source": "https://ntrs.nasa.gov/api/citations/20110008112/downloads/20110008112.pdf"
  },
  {
   "id": "rio-tinto",
@@ -248,7 +354,13 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://en.wikipedia.org/wiki/Minas_de_Riotinto",
-  "coord_note": "Moved to the Riotinto mining area in the river's headwaters, where the acidic red water and the Mars-analog work are; the old point was not on the Río Tinto."
+  "coord_note": "Moved to the Riotinto mining area in the river's headwaters, where the acidic red water and the Mars-analog work are; the old point was not on the Río Tinto.",
+  "used_for": [
+   "life",
+   "surface"
+  ],
+  "used_for_note": "Iron and sulfate minerals such as hematite and jarosite plus extremophile bacteria; also used for EVA training.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Mars_habitability_analogue_environments_on_Earth"
  },
  {
   "id": "mdrs-utah",
@@ -260,7 +372,13 @@
    "mars-analog"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Mars_Desert_Research_Station"
+  "coord_source": "https://en.wikipedia.org/wiki/Mars_Desert_Research_Station",
+  "used_for": [
+   "other",
+   "surface"
+  ],
+  "used_for_note": "Mars Society habitat simulator for crew living and operations, with EVA field trials in Mars-like desert.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "qaidam-dalangtan",
@@ -273,7 +391,13 @@
   ],
   "coords_estimate": true,
   "coord_source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6205091",
-  "coord_note": "Moved from the middle of the Qaidam Basin to the centre of the Dalangtan study area the paper gives (38.0–38.67° N, 91.17–92.17° E); the paper gives no single point for the playa."
+  "coord_note": "Moved from the middle of the Qaidam Basin to the centre of the Dalangtan study area the paper gives (38.0–38.67° N, 91.17–92.17° E); the paper gives no single point for the playa.",
+  "used_for": [
+   "dryness",
+   "life"
+  ],
+  "used_for_note": "High hyper-arid plateau with magnesium sulfate salts like Mars's and haloarchaea.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Mars_habitability_analogue_environments_on_Earth"
  },
  {
   "id": "tso-kar",
@@ -286,7 +410,12 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://en.wikipedia.org/wiki/Tso_Kar",
-  "analog_source": "https://meetingorganizer.copernicus.org/EPSC2024/EPSC2024-212.html"
+  "analog_source": "https://meetingorganizer.copernicus.org/EPSC2024/EPSC2024-212.html",
+  "used_for": [
+   "life"
+  ],
+  "used_for_note": "Proposed as an analog for Martian paleolakes.",
+  "used_for_source": "https://meetingorganizer.copernicus.org/EPSC2024/EPSC2024-212.html"
  },
  {
   "id": "puga-valley",
@@ -300,7 +429,12 @@
   "coords_estimate": false,
   "coord_source": "https://meetingorganizer.copernicus.org/EPSC2024/EPSC2024-212.html",
   "coord_note": "Puga hot springs at 33°13′39.38″N, 78°18′22.98″E at the mouth of the Puga Valley, as given in the EPSC 2024 abstract (Sánchez-García et al.), which calls Puga and Tso Kar potential analogs of early Mars. Moved about 5 km from the old point.",
-  "analog_source": "https://meetingorganizer.copernicus.org/EPSC2024/EPSC2024-212.html"
+  "analog_source": "https://meetingorganizer.copernicus.org/EPSC2024/EPSC2024-212.html",
+  "used_for": [
+   "life"
+  ],
+  "used_for_note": "Boron-rich geothermal springs proposed as a prebiotic analog.",
+  "used_for_source": "https://meetingorganizer.copernicus.org/EPSC2024/EPSC2024-212.html"
  },
  {
   "id": "kangerlussuaq",
@@ -312,7 +446,13 @@
    "mars-analog"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Kangerlussuaq"
+  "coord_source": "https://en.wikipedia.org/wiki/Kangerlussuaq",
+  "used_for": [
+   "resources",
+   "surface"
+  ],
+  "used_for_note": "Glacial and periglacial landforms, buried ice and polygonal terrain studied as Mars comparisons.",
+  "used_for_source": "https://www.europlanet-society.org/wp-content/uploads/ninja-forms/46/Europlanet_report_Kangerlussuaq_AGG2023-signed.pdf"
  },
  {
   "id": "makgadikgadi",
@@ -325,7 +465,13 @@
   ],
   "coords_estimate": true,
   "coord_source": "https://en.wikipedia.org/wiki/Sua_Pan",
-  "coord_note": "Representative point at the Wikipedia point for Sua Pan (the Makgadikgadi article's own point, -20.80, 25.33, was not used). The article text also gives 20°59′32″S 25°58′22″E, 27 km south; Sua Pan covers about 24,000 km², so both lie within the pan area. Not checked on a map layer."
+  "coord_note": "Representative point at the Wikipedia point for Sua Pan (the Makgadikgadi article's own point, -20.80, 25.33, was not used). The article text also gives 20°59′32″S 25°58′22″E, 27 km south; Sua Pan covers about 24,000 km², so both lie within the pan area. Not checked on a map layer.",
+  "used_for": [
+   "resources",
+   "life"
+  ],
+  "used_for_note": "Salt pans studied as analogs for Martian playa, hydrated silica and groundwater-upwelling settings with extremophiles.",
+  "used_for_source": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2023.1108386/pdf"
  },
  {
   "id": "pavilion-lake",
@@ -337,7 +483,13 @@
    "mars-analog"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Pavilion_Lake"
+  "coord_source": "https://en.wikipedia.org/wiki/Pavilion_Lake",
+  "used_for": [
+   "life",
+   "surface"
+  ],
+  "used_for_note": "Microbialite lake used to search for signs of life, with underwater reduced-gravity EVA simulation.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "laguna-de-tirez",
@@ -349,7 +501,13 @@
    "mars-analog"
   ],
   "coords_estimate": false,
-  "coord_source": "https://www.geonames.org/search.html?q=Laguna+de+Tirez&country=ES"
+  "coord_source": "https://www.geonames.org/search.html?q=Laguna+de+Tirez&country=ES",
+  "used_for": [
+   "resources",
+   "surface"
+  ],
+  "used_for_note": "Sulfate-rich, hot-spring terrain used for underwater reduced-gravity EVA simulation.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "spotted-lake",
@@ -361,7 +519,13 @@
    "mars-analog"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Spotted_Lake"
+  "coord_source": "https://en.wikipedia.org/wiki/Spotted_Lake",
+  "used_for": [
+   "life",
+   "resources"
+  ],
+  "used_for_note": "Magnesium sulfate brine pools with halophilic organisms, an analog for Martian sulfate environments.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Mars_habitability_analogue_environments_on_Earth"
  },
  {
   "id": "salar-de-pajonales",
@@ -373,7 +537,13 @@
    "mars-analog"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Salar_de_Pajonales"
+  "coord_source": "https://en.wikipedia.org/wiki/Salar_de_Pajonales",
+  "used_for": [
+   "life",
+   "surface"
+  ],
+  "used_for_note": "Ca-sulfate salar whose domes and polygons guide Mars site selection and whose gypsum preserves biosignatures.",
+  "used_for_source": "https://www.frontiersin.org/articles/10.3389/fspas.2021.797591"
  },
  {
   "id": "gros-morne",
@@ -386,7 +556,12 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://en.wikipedia.org/wiki/Gros_Morne_National_Park",
-  "coord_note": "Moved to the Tablelands, the exposed mantle rock that makes Gros Morne a Mars analog; the old point was near the park centre, north-east of them."
+  "coord_note": "Moved to the Tablelands, the exposed mantle rock that makes Gros Morne a Mars analog; the old point was near the park centre, north-east of them.",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Glacial valleys and quartzite for Mars, and oceanic crust for the Moon.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "argentine-puna",
@@ -400,7 +575,12 @@
   "coords_estimate": false,
   "coord_source": "https://meetingorganizer.copernicus.org/EPSC2022/EPSC2022-1152.html",
   "coord_note": "Replaced the whole-plateau point with the lake the EPSC 2022 abstract gives at -26.111148, -67.407338 (Catamarca) and calls a new high-altitude Mars analogue site. The abstract title says \"Laguna de Alumbrera\" and the text says \"Laguna de Antofagasta\"; the coordinates are the same either way. The id is kept for stability.",
-  "analog_source": "https://meetingorganizer.copernicus.org/EPSC2022/EPSC2022-1152.html"
+  "analog_source": "https://meetingorganizer.copernicus.org/EPSC2022/EPSC2022-1152.html",
+  "used_for": [
+   "life"
+  ],
+  "used_for_note": "High-altitude Andean lake mimicking Noachian and Hesperian Mars conditions, a natural laboratory for early Mars.",
+  "used_for_source": "https://meetingorganizer.copernicus.org/EPSC2022/EPSC2022-1152.html"
  },
  {
   "id": "death-valley",
@@ -413,7 +593,12 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://en.wikipedia.org/wiki/Death_Valley",
-  "coord_note": "Moved to the valley floor near Badwater; the old point was on the western valley side."
+  "coord_note": "Moved to the valley floor near Badwater; the old point was on the western valley side.",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Alluvial fans compared with those at Gale crater and used in planning Mars landing sites.",
+  "used_for_source": "https://earthobservatory.nasa.gov/images/78860/mars-rover-curiosity-on-a-familiar-landscape"
  },
  {
   "id": "craters-of-the-moon",
@@ -426,7 +611,13 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://en.wikipedia.org/wiki/Craters_of_the_Moon_National_Monument_and_Preserve",
-  "coord_note": "Moved 5.8 km to the monument's point."
+  "coord_note": "Moved 5.8 km to the monument's point.",
+  "used_for": [
+   "shelter",
+   "surface"
+  ],
+  "used_for_note": "Basaltic lava tubes and fields used by NASA BASALT and FINESSE field campaigns and lava-tube mapping for Mars and the Moon.",
+  "used_for_source": "https://www.nationalgeographic.com/science/article/nasa-lava-tubes-craters-moon-exploring-mars-space-science"
  },
  {
   "id": "kilauea-iki",
@@ -439,7 +630,12 @@
   ],
   "coords_estimate": false,
   "coord_source": "https://www.wikidata.org/wiki/Q1333175",
-  "coord_note": "Moved 5.6 km to the crater itself; the old point was south-east of it."
+  "coord_note": "Moved 5.6 km to the crater itself; the old point was south-east of it.",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Volcanic dust, basalt and volcanic features used for Moon and Mars technology tests.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Terrestrial_analogue_sites"
  },
  {
   "id": "bletterbach",
@@ -451,7 +647,12 @@
    "mars-analog"
   ],
   "coords_estimate": false,
-  "coord_source": "https://en.wikipedia.org/wiki/Bletterbach"
+  "coord_source": "https://en.wikipedia.org/wiki/Bletterbach",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "ESA PANGAEA training site where the Mars-analog geology of the gorge is taught.",
+  "used_for_source": "https://astrobiology.com/?p=26826"
  },
  {
   "id": "chill-ice-lava-tube",
@@ -465,7 +666,12 @@
   "coords_estimate": false,
   "coord_source": "https://en.wikipedia.org/wiki/Surtshellir",
   "coord_note": "About 1.5 km from the Surtshellir–Stefánshellir lava tube system in Hallmundarhraun, the cave reported for the CHILL-ICE analog mission.",
-  "analog_source": "https://meetingorganizer.copernicus.org/EGU21/EGU21-16189.html"
+  "analog_source": "https://meetingorganizer.copernicus.org/EGU21/EGU21-16189.html",
+  "used_for": [
+   "shelter"
+  ],
+  "used_for_note": "Analog mission in an Icelandic lava tube preparing for habitation and human-robot work in lunar and Martian lava tubes.",
+  "used_for_source": "https://meetingorganizer.copernicus.org/EGU21/EGU21-16189.html"
  },
  {
   "id": "iowa-corn-belt",
@@ -833,7 +1039,13 @@
   "coord_note": "Wikipedia point for the lake; the Balci et al. 2019 abstract used by NASA gives 37.55°N, 29.68°E.",
   "blind": true,
   "analog_source": "https://earthobservatory.nasa.gov/blogs/earthmatters/2021/02/17/what-a-lake-in-turkey-can-tell-us-about-mars/",
-  "analog_for": "Carbonate lake and deltas like Jezero crater, Mars (NASA Perseverance landing site)."
+  "analog_for": "Carbonate lake and deltas like Jezero crater, Mars (NASA Perseverance landing site).",
+  "used_for": [
+   "life",
+   "surface"
+  ],
+  "used_for_note": "Carbonate deposits and delta features resembling Jezero crater, studied for Mars sample return targets.",
+  "used_for_source": "https://science.nasa.gov/blogs/earth-matters/2021/02/17/what-a-lake-in-turkey-can-tell-us-about-mars"
  },
  {
   "id": "dallol-danakil",
@@ -849,7 +1061,12 @@
   "coord_note": "Dallol hot-springs sampling site D1 at 14°14′16.69″N, 40°17′52.08″E, from Cavalazzi et al. 2019 (Wikipedia gives the Danakil Depression at 14.24, 40.30). The same paper puts the Dallol volcano at 14°05′28″N, 40°17′58″E, 27 km south; the hot springs were used.",
   "blind": true,
   "analog_source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6459281",
-  "analog_for": "Acidic, salty hydrothermal field standing in for past hydrothermal activity on Mars."
+  "analog_for": "Acidic, salty hydrothermal field standing in for past hydrothermal activity on Mars.",
+  "used_for": [
+   "life"
+  ],
+  "used_for_note": "Active volcanism with acidic sulfate hydrothermal deposits resembling past hydrothermal activity on Mars.",
+  "used_for_source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6459281"
  },
  {
   "id": "el-tatio",
@@ -865,7 +1082,13 @@
   "coord_note": "Wikipedia point for the geyser field.",
   "blind": true,
   "analog_source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5473637",
-  "analog_for": "High, dry, high-UV hot-spring field whose silica deposits resemble those Spirit found at Home Plate, Gusev crater, Mars."
+  "analog_for": "High, dry, high-UV hot-spring field whose silica deposits resemble those Spirit found at Home Plate, Gusev crater, Mars.",
+  "used_for": [
+   "life",
+   "atmosphere"
+  ],
+  "used_for_note": "Geysers with high elevation, daily freeze-thaw and intense UV, a closer Mars analog than Yellowstone for life.",
+  "used_for_source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5473637"
  },
  {
   "id": "arkaroola",
@@ -881,7 +1104,12 @@
   "coord_note": "Wikipedia point for the Arkaroola village area; the Arkaroola Mars Analogue Region covers the wider northern Flinders Ranges.",
   "blind": true,
   "analog_source": "https://researchers.mq.edu.au/en/publications/the-geology-of-australian-mars-analogue-sites/",
-  "analog_for": "Arid ranges with hot springs and ancient sediments, named the Arkaroola Mars Analogue Region (West et al. 2010)."
+  "analog_for": "Arid ranges with hot springs and ancient sediments, named the Arkaroola Mars Analogue Region (West et al. 2010).",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Assessed as an Australian Mars Analogue Region for its geology.",
+  "used_for_source": "https://researchers.mq.edu.au/en/publications/the-geology-of-australian-mars-analogue-sites/"
  },
  {
   "id": "don-juan-pond",
@@ -897,7 +1125,13 @@
   "coord_note": "Wikipedia point; Toner et al. 2017 give 77.565°S, 161.174°E (0.2 km away). About 40 km from our McMurdo Dry Valleys point.",
   "blind": true,
   "analog_source": "https://faculty.washington.edu/dcatling/Toner2017_Don_Juan_Pond_water_chemistry.pdf",
-  "analog_for": "Calcium-chloride brine pond that stays liquid in the cold, treated as a Mars analog for brines and recurring slope lineae."
+  "analog_for": "Calcium-chloride brine pond that stays liquid in the cold, treated as a Mars analog for brines and recurring slope lineae.",
+  "used_for": [
+   "life",
+   "resources"
+  ],
+  "used_for_note": "Salt-driven brine pond studied for habitability limits and as a model for Martian brine flows.",
+  "used_for_source": "https://en.wikipedia.org/wiki/Mars_habitability_analogue_environments_on_Earth"
  },
  {
   "id": "lava-beds-national-monument",
@@ -913,7 +1147,12 @@
   "coord_note": "Wikipedia point for the monument.",
   "blind": true,
   "analog_source": "https://www.geekwire.com/2019/rover-teams-practice-spelunking-moon-mars-california-lava-tubes/",
-  "analog_for": "Lava-tube field where NASA's BRAILLE project rehearses robotic cave exploration for Mars and the Moon."
+  "analog_for": "Lava-tube field where NASA's BRAILLE project rehearses robotic cave exploration for Mars and the Moon.",
+  "used_for": [
+   "shelter"
+  ],
+  "used_for_note": "NASA BRAILLE rehearsed cave-rover exploration in its lava tubes for the Moon and Mars.",
+  "used_for_source": "https://astrobiology.nasa.gov/news/using-a-cave-rover-nasa-learns-to-search-for-life-underground/"
  },
  {
   "id": "stillwater-complex",
@@ -929,7 +1168,13 @@
   "coord_note": "Point from the NASA Earth Observatory article's map link (south of Nye, Montana); Wikipedia gives 45.386, -109.903.",
   "blind": true,
   "analog_source": "https://science.nasa.gov/earth/earth-observatory/montanas-moon-like-rocks-146650",
-  "analog_for": "Near-pure anorthosite like the lunar highlands, used to make highland dust simulants."
+  "analog_for": "Near-pure anorthosite like the lunar highlands, used to make highland dust simulants.",
+  "used_for": [
+   "surface",
+   "resources"
+  ],
+  "used_for_note": "Nearly pure anorthite matching lunar highland anorthosite, used to make lunar highland simulants.",
+  "used_for_source": "https://science.nasa.gov/earth/earth-observatory/montanas-moon-like-rocks-146650"
  },
  {
   "id": "miyake-jima",
@@ -945,6 +1190,11 @@
   "coord_note": "Wikidata point for the island. The island is about 55 km², smaller than one 0.5° grid cell, so a score here is mostly sea. Checked on rock only, not on the overall south-pole score: the island is smaller than one grid cell and its analog value is the anorthite crystals in its lava, which no trait here measures. Set before any v1 scoring run.",
   "blind": true,
   "analog_source": "https://msaweb.org/MSA/AmMin/TOC/2025/Abstracts/AM110P0154.pdf",
-  "analog_for": "Island volcano whose anorthite crystals are proposed as an analog for lunar crust rock (Roy et al. 2025, American Mineralogist); a rock analog, not a terrain one."
+  "analog_for": "Island volcano whose anorthite crystals are proposed as an analog for lunar crust rock (Roy et al. 2025, American Mineralogist); a rock analog, not a terrain one.",
+  "used_for": [
+   "surface"
+  ],
+  "used_for_note": "Natural anorthite studied by infrared spectra as an analog of lunar crustal material.",
+  "used_for_source": "https://msaweb.org/MSA/AmMin/TOC/2025/Abstracts/AM110P0154.pdf"
  }
 ]
