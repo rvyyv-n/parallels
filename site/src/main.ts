@@ -5,7 +5,7 @@ import { BASE, load, loadLabels, loadValidation, manifest, targetCols, type Cols
 import { handScore, rankOf, top } from "./score";
 import type { Earth } from "./earth";
 import { BODY, card, isIce, placeName, terrainOf } from "./card";
-import { NAV, sections } from "./sections";
+import { NAV, sections, wire } from "./sections";
 import { esc, latlon, num, reduced, score100, webgl } from "./format";
 import { colour, gradient } from "./ramp";
 import type { TargetGlobe } from "./globe3d";
@@ -78,7 +78,7 @@ function shell(m: Manifest) {
       <a class="skip" href="#ledger-h">Skip to results</a>
       <a class="wordmark" href="#explore" aria-label="Parallels, back to the top">Parallels</a>
       <p class="tagline">Earth's closest parallels to every part of a Moon or Mars base.</p>
-      <nav aria-label="Sections"><ul>${NAV.slice(1).map(([id, name]) => `<li><a href="#${id}">${esc(name)}</a></li>`).join("")}</ul></nav>
+      <nav aria-label="Sections"><ul>${NAV.map(([id, name]) => `<li><a href="#${id}">${esc(name)}</a></li>`).join("")}</ul></nav>
     </header>
     <main>
       <section id="explore" class="explore" aria-label="Explore matches">
@@ -444,9 +444,13 @@ async function main() {
   loadValidation()
     .then((v) => {
       $("#sections").outerHTML = sections(m, v);
+      wire();
       if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
     })
-    .catch(() => ($("#sections").outerHTML = sections(m, null)));
+    .catch(() => {
+      $("#sections").outerHTML = sections(m, null);
+      wire();
+    });
 
   if (webgl())
     Promise.all([import("./earth"), loadLabels().catch(() => [])])

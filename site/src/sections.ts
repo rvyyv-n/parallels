@@ -5,13 +5,10 @@ import { esc, num } from "./format";
 const pct = (v: number | null | undefined) => (v == null ? "not run" : `${num(v * 100, 0)}%`);
 
 export const NAV = [
-  ["explore", "Explore"],
-  ["checked", "How we checked it"],
-  ["terrain", "Terrain types"],
-  ["benchmarks", "Benchmarks"],
-  ["questions", "Seven questions"],
+  ["checked", "Checks"],
+  ["challenge", "Challenge"],
   ["data", "Data"],
-  ["limits", "Not in this version"],
+  ["limits", "Limits"],
 ];
 
 const WHERE: Record<number, string> = { 1: "data", 2: "terrain", 3: "explore", 4: "terrain", 5: "explore", 6: "explore" };
@@ -253,7 +250,7 @@ function runs(v: Validation, m: Manifest): Run[] {
   return out;
 }
 
-function history(all: Run[], now: Run) {
+function runHistory(all: Run[], now: Run) {
   return `<div class="scroll-x"><table class="data run-hist"><thead><tr><th scope="col">Run</th><th scope="col">Method</th><th scope="col">Checks passed</th><th scope="col">Used now</th></tr></thead><tbody>${all
     .map((r, i) => {
       const v = methodOf(r.title);
@@ -273,7 +270,7 @@ function checked(v: Validation | null, m: Manifest) {
   return `<p class="lede">Places NASA already trusts should score higher than ordinary farmland and plain deserts. We set the pass marks before any data came in.</p>
     <div class="current-box">
       <p class="cur-h">${ver ? `Current method: version ${esc(ver)} (the map uses this)` : `Current method: ${esc(now.title)} (the map uses this)`}</p>
-      ${history(all, now)}
+      ${runHistory(all, now)}
     </div>
     ${now.body}
     ${earlier.length ? `<details class="earlier"><summary>Earlier runs (${num(earlier.length)})</summary>${earlier.map((r) => r.body).join("")}</details>` : ""}
@@ -287,21 +284,41 @@ function checked(v: Validation | null, m: Manifest) {
     )}`;
 }
 
+const block2 = (id: string, title: string, body: string) => `<details class="ch-block" id="${id}"><summary><span class="cb-t">${title}</span></summary><div class="cb-body">${body}</div></details>`;
+
 function terrain(m: Manifest) {
-  return `<p class="lede">Every land cell gets one terrain tag, by rules worked out from the data. Filter the map by type above.</p>
-    ${fold(
-      `The ${num(m.terrain_types.length)} terrain types and their rules`,
-      `<div class="scroll-x"><table class="data"><thead><tr><th scope="col">Type</th><th scope="col">Rule</th><th scope="col">Cells</th></tr></thead><tbody>${m.terrain_types
-        .map((t) => `<tr><th scope="row">${esc(t.name)}</th><td>${esc(t.rule)}</td><td class="n">${num(t.cells)}</td></tr>`)
-        .join("")}</tbody></table></div>`,
-    )}
-    ${fold(
-      `How ${num(m.clustering.k)} clusters compare with the types`,
-      `<p>${esc(m.clustering.summary)}</p><p class="small muted">${esc(m.clustering.method)}. ${m.clustering.k} clusters, from: ${m.clustering.inputs.map(esc).join(", ")}.</p>
+  return block2(
+    "terrain",
+    `Terrain types and clusters (${num(m.terrain_types.length)} types)`,
+    `<p>Every land cell gets one terrain tag, by rules worked out from the data. Filter the map by type above.</p>
+    <h3>Terrain types</h3>
+    <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Type</th><th scope="col">Rule</th><th scope="col">Cells</th></tr></thead><tbody>${m.terrain_types
+      .map((t) => `<tr><th scope="row">${esc(t.name)}</th><td>${esc(t.rule)}</td><td class="n">${num(t.cells)}</td></tr>`)
+      .join("")}</tbody></table></div>
+    <h3>Clusters</h3><p>${esc(m.clustering.summary)}</p><p class="small muted">${esc(m.clustering.method)}. ${m.clustering.k} clusters, from: ${m.clustering.inputs.map(esc).join(", ")}.</p>
     <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Cluster</th><th scope="col">Cells</th><th scope="col">Most common type</th><th scope="col">Share</th></tr></thead><tbody>${m.clustering.agreement
       .map((a) => `<tr><th scope="row">${num(a.cluster)}</th><td class="n">${num(a.cells)}</td><td>${esc(a.top_type)}</td><td class="n">${num(a.share * 100, 0)}%</td></tr>`)
       .join("")}</tbody></table></div>`,
-    )}`;
+  );
+}
+
+function challenge(m: Manifest) {
+  return `<p class="lede">Our local event's Challenge Guide sets ${num(m.benchmarks.length)} benchmarks and asks ${num(m.questions.length)} questions. Here is how we meet and answer each.</p>
+    ${block2(
+      "benchmarks",
+      `The ${num(m.benchmarks.length)} benchmarks, and how we meet each`,
+      `<p class="small muted">In the guide's own words.</p><ol class="bench">${m.benchmarks
+        .map(
+          (b) => `<li><span class="b-n">${b.n}</span><div><p class="guide">${esc(b.guide_words)}</p><p>${esc(b.how)}</p><p class="small"><a href="#${WHERE[b.n] ?? "explore"}">${esc(b.where)}</a></p></div></li>`,
+        )
+        .join("")}</ol>`,
+    )}
+    ${block2(
+      "questions",
+      `The ${num(m.questions.length)} questions, answered`,
+      `<ol class="qs">${m.questions.map((q) => `<li><span class="b-n">${q.n}</span><div><p class="guide">${esc(q.question)}</p><p>${esc(q.answer)}</p></div></li>`).join("")}</ol>`,
+    )}
+    ${terrain(m)}`;
 }
 
 function data(m: Manifest) {
@@ -330,27 +347,7 @@ export function sections(m: Manifest, v: Validation | null) {
   const sec = (id: string, title: string, body: string) => `<section id="${id}" class="page-sec" aria-labelledby="${id}-h"><h2 id="${id}-h">${esc(title)}</h2>${body}</section>`;
   return [
     sec("checked", "How we checked it", checked(v, m)),
-    sec("terrain", "Terrain types and clusters", terrain(m)),
-    sec(
-      "benchmarks",
-      "The six benchmarks",
-      `<p class="lede">Our local event's Challenge Guide sets ${num(m.benchmarks.length)} benchmarks. Here is how we meet each one.</p>${fold(
-        `The ${num(m.benchmarks.length)} benchmarks, in the guide's words`,
-        `<ol class="bench">${m.benchmarks
-          .map(
-            (b) => `<li><span class="b-n">${b.n}</span><div><p class="guide">${esc(b.guide_words)}</p><p>${esc(b.how)}</p><p class="small"><a href="#${WHERE[b.n] ?? "explore"}">${esc(b.where)}</a></p></div></li>`,
-          )
-          .join("")}</ol>`,
-      )}`,
-    ),
-    sec(
-      "questions",
-      "Seven questions",
-      `<p class="lede">The guide asks ${num(m.questions.length)} questions. Each has a short answer.</p>${fold(
-        `The ${num(m.questions.length)} questions and our answers`,
-        `<ol class="qs">${m.questions.map((q) => `<li><span class="b-n">${q.n}</span><div><p class="guide">${esc(q.question)}</p><p>${esc(q.answer)}</p></div></li>`).join("")}</ol>`,
-      )}`,
-    ),
+    sec("challenge", "The challenge", challenge(m)),
     sec("data", "Data", data(m)),
     sec(
       "limits",
@@ -361,4 +358,50 @@ export function sections(m: Manifest, v: Validation | null) {
       )}`,
     ),
   ].join("");
+}
+
+function reveal(id: string, smooth: boolean) {
+  const el = document.getElementById(id);
+  if (!el) return false;
+  if (el instanceof HTMLDetailsElement) el.open = true;
+  for (let p = el.parentElement; p; p = p.parentElement) if (p instanceof HTMLDetailsElement) p.open = true;
+  el.scrollIntoView({ behavior: smooth && !matchMedia("(prefers-reduced-motion: reduce)").matches ? "smooth" : "auto", block: "start" });
+  return true;
+}
+
+let wired = false;
+let watch: IntersectionObserver | null = null;
+
+export function wire(): void {
+  const links = [...document.querySelectorAll<HTMLAnchorElement>(".top nav a")];
+  const ids = links.map((a) => a.hash.slice(1));
+  const mark = (id: string | null) =>
+    links.forEach((a) => (a.hash.slice(1) === id ? a.setAttribute("aria-current", "location") : a.removeAttribute("aria-current")));
+  const seen = new Map<string, boolean>();
+  watch?.disconnect();
+  watch = new IntersectionObserver(
+    (es) => {
+      for (const e of es) seen.set(e.target.id, e.isIntersecting);
+      mark(ids.find((id) => seen.get(id)) ?? null);
+    },
+    { rootMargin: "-30% 0px -60% 0px" },
+  );
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    if (el) watch.observe(el);
+  }
+  if (location.hash) reveal(decodeURIComponent(location.hash.slice(1)), false);
+  if (wired) return;
+  wired = true;
+  document.addEventListener("click", (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = (e.target as Element | null)?.closest?.<HTMLAnchorElement>('a[href^="#"]');
+    if (!a) return;
+    const id = decodeURIComponent(a.getAttribute("href")!.slice(1));
+    if (!id || !document.getElementById(id)) return;
+    e.preventDefault();
+    if (location.hash !== `#${id}`) history.pushState(null, "", `#${id}`);
+    reveal(id, true);
+  });
+  addEventListener("hashchange", () => location.hash && reveal(decodeURIComponent(location.hash.slice(1)), true));
 }

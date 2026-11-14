@@ -184,3 +184,76 @@
     padding: 12px 14px;
   }
 }
+
+.top nav a[aria-current] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--signal);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+}
+
+.top nav a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+}
+
+.ch-block {
+  border-top: 1px solid var(--rule);
+  max-width: 1000px;
+}
+
+.ch-block:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.ch-block > summary {
+  min-height: 56px;
+  color: var(--ink);
+}
+
+.ch-block > summary::before {
+  color: var(--signal);
+}
+
+.cb-t {
+  font: 700 20px/1.2 var(--display);
+  font-stretch: 90%;
+}
+
+.cb-body {
+  padding: 4px 0 24px 22px;
+}
+
+.cb-body h3:first-of-type {
+  margin-top: 16px;
+}
+
+@media (max-width: 759px) {
+  html {
+    scroll-padding-top: 108px;
+  }
+
+  .top nav ul {
+    gap: 0 16px;
+  }
+
+  .top nav {
+    overflow-x: visible;
+  }
+
+  .cb-t {
+    font-size: 18px;
+  }
+
+  .cb-body {
+    padding-left: 0;
+  }
+}
+
+.run-hist th,
+.run-hist td {
+  vertical-align: middle;
+}

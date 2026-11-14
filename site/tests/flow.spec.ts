@@ -212,3 +212,30 @@ test("keyboard alone reaches the pickers, the top 10, the scorecard and the slid
   expect(await slider.inputValue()).not.toBe(before);
   await expect(page.locator("#pick-filter")).toHaveValue("__hand");
 });
+
+test("section nav fits, marks the current section, and links open folded blocks", async ({ page }) => {
+  await ready(page);
+  await page.locator("#checked").waitFor();
+  const nav = page.locator(".top nav a");
+  await expect(nav).toHaveText(["Checks", "Challenge", "Data", "Limits"]);
+  for (const box of await nav.evaluateAll((as) => as.map((a) => a.getBoundingClientRect().toJSON())))
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  expect(await page.locator(".top nav").evaluate((n) => n.scrollWidth <= n.clientWidth + 1)).toBe(true);
+  await nav.nth(2).click();
+  await expect(nav.nth(2)).toHaveAttribute("aria-current", /.+/);
+  await expect(page.locator(".top nav a[aria-current]")).toHaveCount(1);
+  await expect(page.locator("#benchmarks")).not.toHaveAttribute("open", "");
+  await page.locator("#benchmarks > summary").click();
+  await page.locator("#benchmarks a[href='#terrain']").first().click();
+  await expect(page.locator("#terrain")).toHaveAttribute("open", "");
+  await expect(page.locator("#terrain")).toBeInViewport();
+  await page.locator(".run-hist a[href='#second-run']").click();
+  await expect(page.locator("#second-run")).toBeVisible();
+  await expect(page.locator("#second-run")).toBeInViewport();
+});
+
+test("a link with a hash to a folded block opens it on load", async ({ page }) => {
+  await page.goto("/#third-run");
+  await expect(page.locator("#third-run")).toBeVisible();
+  await expect(page.locator("#third-run")).toBeInViewport();
+});
