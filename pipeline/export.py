@@ -12,7 +12,7 @@ from pipeline.assemble import DERIVED, ROOT, SHAPE, build, grid_lat, grid_lon, k
 from pipeline.score import RULE, score_target, target_value, yearround_rule
 from pipeline.traits import BODIES, CANT_COPY, CHALLENGES, FILTERS, INPUTS, NOT_IN_VERSION, TERRAIN_TYPES, TRAITS
 
-OUT = ROOT / "site" / "public" / "data"
+OUT = ROOT / "dataset"
 TARGETS = ROOT / "pipeline" / "derived" / "targets_v1.json"
 SITES = ROOT / "pipeline" / "sites.json"
 CAVES = ROOT / "pipeline" / "caves.json"

@@ -269,7 +269,7 @@ The full lists of test places, with positions and sources, are in `pipeline/site
 
 ## 7. Tech stack and hosting
 
-- **Pipeline:** Python 3.13 with the packages pinned in `pyproject.toml` and `uv.lock`, in `pipeline/`. Raw downloads go in `data/` (already gitignored). Outputs are small files in `site/public/data/`. A 0.5° land grid is about 75,000 cells, so the traits plus the scores for each mission filter come to under a few MB per target.
+- **Pipeline:** Python 3.13 with the packages pinned in `pyproject.toml` and `uv.lock`, in `pipeline/`. Raw downloads go in `data/` (already gitignored). Outputs are small files in `dataset/`. A 0.5° land grid is about 75,000 cells, so the traits plus the scores for each mission filter come to under a few MB per target.
 - **Site:** Vite and TypeScript (no framework unless the interface outgrows it); MapLibre GL JS 6.18 with GIBS Blue Marble tiles (no key; zoom levels up to 8); plain SVG charts. Every score, for every mission filter, is pre-computed into its own file, so the browser never recalculates anything.
 - **Tests:**
     - pytest for the pipeline: the scoring rule on hand-made cases, plus the data checks in section 6;

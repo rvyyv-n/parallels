@@ -16,7 +16,7 @@ Version 1 is live at [dotcatcher.vercel.app](https://dotcatcher.vercel.app). The
 
 Version 1 ranks every land cell on Earth against six targets: the Moon's south pole and five Mars sites (Jezero, Gale, Arcadia Planitia, Deuteronilus Mensae and the Arsia Mons caves). The data files hold method version 1.2. Only the Moon's south pole and Jezero are checked against test places.
 
-Version 1 does not pass every check. It passes 1 of its 4 first checks. In the fourth run, 10 of 15 checks with enough sites pass. On the held-out half, version 1.2 beats ordinary places 96% of the time for the Moon and 76% for Mars. The live site shows all of this. See `site/public/data/validation.json`.
+Version 1 does not pass every check. It passes 1 of its 4 first checks. In the fourth run, 10 of 15 checks with enough sites pass. On the held-out half, version 1.2 beats ordinary places 96% of the time for the Moon and 76% for Mars. The live site shows all of this. See `dataset/validation.json`.
 
 ## What's here
 
@@ -31,7 +31,7 @@ Version 1 does not pass every check. It passes 1 of its 4 first checks. In the f
 - [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
 - [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.
 - `pipeline/`: the Python data pipeline. Its method settings are in `pipeline/config/`.
-- `site/public/data/`: the pre-computed files the pipeline exports. See [The data files](#the-data-files).
+- `dataset/`: the pre-computed files the pipeline exports. See [The data files](#the-data-files).
 
 ## Run it
 
@@ -46,7 +46,7 @@ Pipeline (Python 3.13). Run each command from the repository root.
 | Terrain | `.venv/Scripts/python -m pipeline.terrain_grid` | Reads Copernicus DEM GLO-90 tiles. Writes slope and relief for each cell. Takes about 30 minutes. |
 | Surface | `.venv/Scripts/python -m pipeline.surface` | Reads GLiM rock, NASA EMIT minerals and MODIS land cover. Writes the surface grid. Needs a free NASA Earthdata login in `~/.netrc`. |
 | Targets | `.venv/Scripts/python -m pipeline.targets` | Reads Moon and Mars maps. Writes `pipeline/derived/targets_v1.json`. |
-| Export | `.venv/Scripts/python -m pipeline.export` | Ranks the cells, runs the validation and writes the files in `site/public/data/`. Add `--method 1.2` to run method versions 1.1 and 1.2 as further validation runs. |
+| Export | `.venv/Scripts/python -m pipeline.export` | Ranks the cells, runs the validation and writes the files in `dataset/`. Add `--method 1.2` to run method versions 1.1 and 1.2 as further validation runs. |
 
 3. Run the tests: `.venv/Scripts/python -m pytest`.
 
@@ -54,7 +54,7 @@ On macOS and Linux, use `.venv/bin/python` in place of `.venv/Scripts/python`.
 
 ## The data files
 
-The pipeline and the site meet only through these files in `site/public/data/`. `pipeline.export` writes all of them.
+The pipeline and the site meet only through these files in `dataset/`. `pipeline.export` writes all of them.
 
 | File | What it holds | Size |
 |---|---|---|
@@ -79,7 +79,7 @@ How to read the binary files:
 - `cov:<challenge>` is one byte: the percent of the challenge's trait weight that has data (0 to 100).
 - `score:<filter>` and `score:<filter>:yr` are two bytes each. The values 0 to 10000 mean 0 to 1. The value 65535 means not ranked.
 - `stable:<filter>` is one byte: 1 if the cell stays in the top 20 in at least 90% of 1,000 runs with changed weights, otherwise 0.
-- The types are in `site/src/contract.ts`. The layout is in section 6 of [docs/v1-spec.md](docs/v1-spec.md).
+- The types are in `dataset/contract.ts`. The layout is in section 6 of [docs/v1-spec.md](docs/v1-spec.md).
 
 ## How we used AI
 

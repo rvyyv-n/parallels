@@ -546,5 +546,5 @@ def summary(val):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--file", default="site/public/data/validation.json")
+    ap.add_argument("--file", default="dataset/validation.json")
     print(summary(json.load(open(ap.parse_args().file, encoding="utf8"))))
