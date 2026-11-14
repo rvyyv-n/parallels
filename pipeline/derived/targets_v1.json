@@ -1,0 +1,3923 @@
+{
+ "generated": "2026-11-15",
+ "datasets": [
+  {
+   "id": "lola-ldem-240m",
+   "name": "LRO LOLA polar elevation map LDEM_75S_240M",
+   "agency": "NASA",
+   "url": "https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/ldem_75s_240m.img",
+   "licence": "Public NASA data; no restriction stated on the product page",
+   "used_for": "Moon slopes, relief and share of gentle ground in each 10 km window; places the Diviner and PGDA windows.",
+   "archive": "NASA PDS Geosciences Node"
+  },
+  {
+   "id": "diviner-polar-south",
+   "name": "LRO Diviner south polar winter-minimum and summer-maximum temperature maps (80°S to the pole)",
+   "agency": "NASA",
+   "url": "https://luna1.diviner.ucla.edu/~jpierre/diviner/level4_polar/additional_maps/",
+   "licence": "No licence stated on the Diviner team's download page",
+   "used_for": "Moon coldest and warmest ground temperatures and the summer-to-winter swing.",
+   "archive": "UCLA Diviner team site"
+  },
+  {
+   "id": "pgda-avgvisib",
+   "name": "LOLA/PGDA average solar visibility AVGVISIB_75S_120M",
+   "agency": "NASA",
+   "url": "https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608.TIF",
+   "licence": "Public NASA data; no restriction stated on the product page",
+   "used_for": "Moon share of time in sunlight (best-lit pixel and window median).",
+   "archive": "NASA PGDA (Goddard)"
+  },
+  {
+   "id": "pgda-psr",
+   "name": "LOLA/PGDA permanent shadow map LPSR_75S_120M",
+   "agency": "NASA",
+   "url": "https://pgda.gsfc.nasa.gov/products/69",
+   "licence": "Public NASA data; no restriction stated on the product page",
+   "used_for": "Moon share of each 10 km window in permanent shadow.",
+   "archive": "NASA PGDA (Goddard)"
+  },
+  {
+   "id": "hrsc-mola-dem",
+   "name": "USGS HRSC–MOLA blended elevation map of Mars, 200 m",
+   "agency": "USGS",
+   "url": "https://planetarymaps.usgs.gov/mosaic/Mars/HRSC_MOLA_Blend/Mars_HRSC_MOLA_BlendDEM_Global_200mp_v2.tif",
+   "licence": "Open download from USGS Astrogeology; no licence stated on the file page",
+   "used_for": "Mars slopes, relief and share of gentle ground in each 10 km window.",
+   "archive": "USGS Astrogeology"
+  },
+  {
+   "id": "ody-grs",
+   "name": "Mars Odyssey GRS water-equivalent hydrogen H2O_SR_5X5",
+   "agency": "NASA",
+   "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab",
+   "licence": "Public NASA data; no restriction stated on the product page",
+   "used_for": "Mars hydrogen (as water-equivalent) in the top metre.",
+   "archive": "NASA PDS Geosciences Node"
+  },
+  {
+   "id": "tes-dci",
+   "name": "TES dust cover index (Ruff and Christensen 2002)",
+   "agency": "NASA",
+   "url": "https://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.pds",
+   "licence": "Open download from the Arizona State University TES team; no licence stated",
+   "used_for": "Mars surface dust cover.",
+   "archive": "Arizona State University (TES)"
+  },
+  {
+   "id": "tes-ti",
+   "name": "MGS TES thermal inertia maps, night map and interpolation mask (MGS-M-TES-5-TIMAP-V1.0)",
+   "agency": "NASA",
+   "url": "https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-timap-v1/mgst_9001/data/global_ti_night_2007.img",
+   "licence": "Public NASA data; no restriction stated on the product page",
+   "used_for": "Mars thermal inertia, read against NASA's landing-site rule that thermal inertia above 100–140 J m-2 K-1 s-1/2 means load-bearing ground rather than thick loose dust (Golombek et al. 2020, https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502).",
+   "archive": "NASA PDS Geosciences Node"
+  },
+  {
+   "id": "mars-cave-catalog",
+   "name": "Mars Global Cave Candidate Catalog v1 (Cushing)",
+   "agency": "USGS",
+   "url": "https://astrogeology.usgs.gov/search/map/mars_global_cave_candidate_catalog_v1_cushing",
+   "licence": "Open download from USGS Astrogeology; no licence stated on the page",
+   "used_for": "Cave-candidate label: count within 200 km of each Mars target and the nearest one.",
+   "archive": "USGS Astrogeology"
+  },
+  {
+   "id": "usgs-gazetteer",
+   "name": "USGS Gazetteer of Planetary Nomenclature (lunar feature positions)",
+   "agency": "USGS",
+   "url": "https://planetarynames.wr.usgs.gov/",
+   "licence": "Open lookup; no licence stated",
+   "used_for": "Anchor positions of the nine Artemis III regions.",
+   "archive": "USGS Astrogeology"
+  },
+  {
+   "id": "artemis-overview",
+   "name": "NASA Artemis overview for Space Apps 2025",
+   "agency": "NASA",
+   "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf",
+   "licence": "NASA public document",
+   "used_for": "Sun height at the south pole, 2–7° above the horizon.",
+   "archive": "published paper"
+  },
+  {
+   "id": "nssdc-moon-fact",
+   "name": "NASA NSSDC Moon fact sheet",
+   "agency": "NASA",
+   "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html",
+   "licence": "NASA public document",
+   "used_for": "Noon sun height from latitude (with the Moon's 1.54° tilt).",
+   "archive": "published paper"
+  },
+  {
+   "id": "nssdc-mars-fact",
+   "name": "NASA NSSDC Mars fact sheet",
+   "agency": "NASA",
+   "url": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html",
+   "licence": "NASA public document",
+   "used_for": "Noon sun height from latitude (with Mars's 25.2° tilt); planet-wide average temperature for the frozen-months value.",
+   "archive": "published paper"
+  },
+  {
+   "id": "hayne-2017",
+   "name": "Hayne et al. 2017, Global regolith thermophysical properties of the Moon from the Diviner Lunar Radiometer Experiment",
+   "agency": "other",
+   "url": "https://arxiv.org/abs/1711.00977",
+   "licence": "Open-access preprint",
+   "used_for": "Moon-wide thermal inertia label.",
+   "archive": "published paper"
+  },
+  {
+   "id": "rems-gale-air",
+   "name": "NASA/JPL, REMS air temperature at Gale, Aug 2012–Feb 2013",
+   "agency": "NASA",
+   "url": "https://science.nasa.gov/resource/steady-temperatures-at-mars-gale-crater",
+   "licence": "NASA public page",
+   "used_for": "Gale air temperatures.",
+   "archive": "published paper"
+  },
+  {
+   "id": "gomez-elvira-2017",
+   "name": "Gómez-Elvira et al. 2017, REMS ground temperature at Gale",
+   "agency": "other",
+   "url": "https://www-mars.lmd.jussieu.fr/granada2017/abstracts/gomez-elvira_granada2017.pdf",
+   "licence": "Conference abstract",
+   "used_for": "Gale ground temperatures.",
+   "archive": "published paper"
+  },
+  {
+   "id": "lemmon-msl-tau",
+   "name": "Lemmon et al., MSL Mastcam solar-imaging optical depth record",
+   "agency": "other",
+   "url": "https://doi.org/10.17632/tbh3pg39xc",
+   "licence": "Open dataset",
+   "used_for": "Gale dust optical depth.",
+   "archive": "published paper"
+  },
+  {
+   "id": "meda-2023",
+   "name": "Rodríguez-Manfredi et al. 2023, Perseverance MEDA",
+   "agency": "other",
+   "url": "https://www.nature.com/articles/s41561-022-01084-0",
+   "licence": "Open-access paper",
+   "used_for": "Jezero daily air-temperature swing.",
+   "archive": "published paper"
+  },
+  {
+   "id": "zorzano-2024",
+   "name": "Zorzano et al. 2024, MEDA thermal infrared sensor over one Mars year",
+   "agency": "other",
+   "url": "https://doi.org/10.1038/s41598-024-57458-4",
+   "licence": "Open-access paper",
+   "used_for": "Jezero ground temperature.",
+   "archive": "published paper"
+  },
+  {
+   "id": "lemmon-2022",
+   "name": "Lemmon et al. 2022, Perseverance Mastcam-Z solar imaging",
+   "agency": "other",
+   "url": "https://doi.org/10.1029/2022GL100126",
+   "licence": "Open-access paper",
+   "used_for": "Jezero dust optical depth.",
+   "archive": "published paper"
+  }
+ ],
+ "targets": [
+  {
+   "id": "moon-south-pole",
+   "body": "moon",
+   "name": "Moon's south pole (Artemis III regions)",
+   "default": true,
+   "lat": -90,
+   "lon": 0,
+   "anchor_note": "The nine regions are anchored on the USGS positions of the features they are named after (NASA publishes no centre points), so this target is placed at the pole and stands for all nine.",
+   "values": {
+    "slope_median_deg": {
+     "value": 8.76,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Each region's value is the median slope over the 10 km window. 10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 14.48,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Each region's value is the 90th percentile slope over the 10 km window. 10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.633,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Each region's value is the share of the 10 km window with slope under 10°. 10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.14,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Each region's value is the share of the 10 km window with slope under 5°. 10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 780.8,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Each region's value is the 5th to 95th percentile height range over the 10 km window. 10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 54.3,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Each region's value is the median over the 10 km window of the winter-minimum map. Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+    },
+    "t_min_coldest_k": {
+     "value": 19.9,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Each region's value is the coldest pixel of the winter-minimum map in the 10 km window. Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+    },
+    "t_max_k": {
+     "value": 245.6,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Each region's value is the median over the 10 km window of the summer-maximum map. Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 188.8,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Each region's value is the median of the summer-maximum map minus median of the winter-minimum map, 10 km window. Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12.0,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "Each region's value is the coolest pixel of the summer-maximum map in the 10 km window. The window's coolest spot peaks at 133 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.528,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Each region's value is the best-lit pixel in the 10 km window. Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.26,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Each region's value is the median over the 10 km window. Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 0.047,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Each region's value is the share of 120 m pixels in the 10 km window flagged as permanent shadow. Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 4.02,
+     "stat": "median of NASA's nine Artemis III candidate regions (10 km window each)",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Each region's value is the 90 − |latitude|. Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "LCROSS found 5.6 ± 2.9% water by weight in soil thrown up from nearby Cabeus crater",
+     "source": "Colaprete et al. 2010",
+     "url": "https://doi.org/10.1126/science.1186986"
+    },
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
+    },
+    {
+     "text": "One of NASA's nine Artemis III candidate landing regions",
+     "source": "NASA, 28 Oct 2024",
+     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "regions": [
+    {
+     "id": "moon-peak-near-cabeus-b",
+     "name": "Peak near Cabeus B",
+     "lat": -82.2587,
+     "lon": -54.5846,
+     "anchor_note": "USGS Gazetteer centre of Cabeus B; NASA gives no centre point and the window samples the satellite crater's middle, not a specific peak. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/8058",
+     "values": {
+      "slope_median_deg": {
+       "value": 4.32,
+       "stat": "median slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "slope_p90_deg": {
+       "value": 10.87,
+       "stat": "90th percentile slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_10": {
+       "value": 0.865,
+       "stat": "share of the 10 km window with slope under 10°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_5": {
+       "value": 0.562,
+       "stat": "share of the 10 km window with slope under 5°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "relief_m": {
+       "value": 498.2,
+       "stat": "5th to 95th percentile height range over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "t_min_k": {
+       "value": 44.2,
+       "stat": "median over the 10 km window of the winter-minimum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+      },
+      "t_min_coldest_k": {
+       "value": 21.9,
+       "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+      },
+      "t_max_k": {
+       "value": 233.0,
+       "stat": "median over the 10 km window of the summer-maximum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+      },
+      "t_swing_k": {
+       "value": 188.8,
+       "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+      },
+      "frozen_months": {
+       "value": 12,
+       "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "derived",
+       "note": "The window's coolest spot peaks at 133 K in summer, below 273 K, so it stays frozen all year."
+      },
+      "lit_share": {
+       "value": 0.245,
+       "stat": "best-lit pixel in the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+      },
+      "lit_share_median": {
+       "value": 0.105,
+       "stat": "median over the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window, fraction of time (0–1)."
+      },
+      "psr_share": {
+       "value": 0.013,
+       "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+       "dataset": "pgda-psr",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+      },
+      "noon_sun_deg": {
+       "value": 7.74,
+       "stat": "90 − |latitude|",
+       "dataset": "nssdc-moon-fact",
+       "resolution": "computed from latitude",
+       "kind": "derived",
+       "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+      },
+      "sun_height_min_deg": {
+       "value": 2,
+       "stat": "published range, lower end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "sun_height_max_deg": {
+       "value": 7,
+       "stat": "published range, upper end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "thermal_inertia_moon_wide": {
+       "value": 55,
+       "stat": "Moon-wide average at 273 K, 55 ± 2",
+       "dataset": "hayne-2017",
+       "resolution": "Moon-wide average",
+       "kind": "published",
+       "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+      }
+     }
+    },
+    {
+     "id": "moon-haworth",
+     "name": "Haworth",
+     "lat": -87.45,
+     "lon": -5.17,
+     "anchor_note": "USGS Gazetteer centre of Haworth crater; the window samples the crater floor, while NASA's region lies around it. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/14502",
+     "values": {
+      "slope_median_deg": {
+       "value": 1.98,
+       "stat": "median slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "slope_p90_deg": {
+       "value": 6.96,
+       "stat": "90th percentile slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_10": {
+       "value": 0.946,
+       "stat": "share of the 10 km window with slope under 10°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_5": {
+       "value": 0.824,
+       "stat": "share of the 10 km window with slope under 5°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "relief_m": {
+       "value": 213.0,
+       "stat": "5th to 95th percentile height range over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "t_min_k": {
+       "value": 16.6,
+       "stat": "median over the 10 km window of the winter-minimum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif). Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+      },
+      "t_min_coldest_k": {
+       "value": 7.0,
+       "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+      },
+      "t_max_k": {
+       "value": 65.8,
+       "stat": "median over the 10 km window of the summer-maximum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+      },
+      "t_swing_k": {
+       "value": 49.2,
+       "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+      },
+      "frozen_months": {
+       "value": 12,
+       "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "derived",
+       "note": "The window's coolest spot peaks at 55 K in summer, below 273 K, so it stays frozen all year."
+      },
+      "lit_share": {
+       "value": 0.0,
+       "stat": "best-lit pixel in the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+      },
+      "lit_share_median": {
+       "value": 0.0,
+       "stat": "median over the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window, fraction of time (0–1)."
+      },
+      "psr_share": {
+       "value": 1.0,
+       "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+       "dataset": "pgda-psr",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+      },
+      "noon_sun_deg": {
+       "value": 2.55,
+       "stat": "90 − |latitude|",
+       "dataset": "nssdc-moon-fact",
+       "resolution": "computed from latitude",
+       "kind": "derived",
+       "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+      },
+      "sun_height_min_deg": {
+       "value": 2,
+       "stat": "published range, lower end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "sun_height_max_deg": {
+       "value": 7,
+       "stat": "published range, upper end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "thermal_inertia_moon_wide": {
+       "value": 55,
+       "stat": "Moon-wide average at 273 K, 55 ± 2",
+       "dataset": "hayne-2017",
+       "resolution": "Moon-wide average",
+       "kind": "published",
+       "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+      }
+     }
+    },
+    {
+     "id": "moon-malapert-massif",
+     "name": "Malapert Massif",
+     "lat": -85.98,
+     "lon": -1.67,
+     "anchor_note": "USGS Gazetteer centre of Mons Malapert, the massif the region is named after. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/16338",
+     "values": {
+      "slope_median_deg": {
+       "value": 18.76,
+       "stat": "median slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "slope_p90_deg": {
+       "value": 25.48,
+       "stat": "90th percentile slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_10": {
+       "value": 0.162,
+       "stat": "share of the 10 km window with slope under 10°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_5": {
+       "value": 0.051,
+       "stat": "share of the 10 km window with slope under 5°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "relief_m": {
+       "value": 1470.6,
+       "stat": "5th to 95th percentile height range over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "t_min_k": {
+       "value": 65.9,
+       "stat": "median over the 10 km window of the winter-minimum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+      },
+      "t_min_coldest_k": {
+       "value": 42.3,
+       "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Coldest pixel in the 10 km window."
+      },
+      "t_max_k": {
+       "value": 270.2,
+       "stat": "median over the 10 km window of the summer-maximum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+      },
+      "t_swing_k": {
+       "value": 204.3,
+       "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+      },
+      "frozen_months": {
+       "value": 12,
+       "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "derived",
+       "note": "The window's coolest spot peaks at 176 K in summer, below 273 K, so it stays frozen all year."
+      },
+      "lit_share": {
+       "value": 0.845,
+       "stat": "best-lit pixel in the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+      },
+      "lit_share_median": {
+       "value": 0.405,
+       "stat": "median over the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window, fraction of time (0–1)."
+      },
+      "psr_share": {
+       "value": 0.001,
+       "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+       "dataset": "pgda-psr",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+      },
+      "noon_sun_deg": {
+       "value": 4.02,
+       "stat": "90 − |latitude|",
+       "dataset": "nssdc-moon-fact",
+       "resolution": "computed from latitude",
+       "kind": "derived",
+       "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+      },
+      "sun_height_min_deg": {
+       "value": 2,
+       "stat": "published range, lower end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "sun_height_max_deg": {
+       "value": 7,
+       "stat": "published range, upper end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "thermal_inertia_moon_wide": {
+       "value": 55,
+       "stat": "Moon-wide average at 273 K, 55 ± 2",
+       "dataset": "hayne-2017",
+       "resolution": "Moon-wide average",
+       "kind": "published",
+       "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+      }
+     }
+    },
+    {
+     "id": "moon-mons-mouton-plateau",
+     "name": "Mons Mouton Plateau",
+     "lat": -84.6,
+     "lon": 31.0,
+     "anchor_note": "USGS Gazetteer centre of Mons Mouton, taken as its summit plateau. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/16070",
+     "values": {
+      "slope_median_deg": {
+       "value": 5.29,
+       "stat": "median slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "slope_p90_deg": {
+       "value": 9.53,
+       "stat": "90th percentile slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_10": {
+       "value": 0.922,
+       "stat": "share of the 10 km window with slope under 10°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_5": {
+       "value": 0.47,
+       "stat": "share of the 10 km window with slope under 5°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "relief_m": {
+       "value": 386.8,
+       "stat": "5th to 95th percentile height range over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "t_min_k": {
+       "value": 53.5,
+       "stat": "median over the 10 km window of the winter-minimum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+      },
+      "t_min_coldest_k": {
+       "value": 19.9,
+       "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+      },
+      "t_max_k": {
+       "value": 227.5,
+       "stat": "median over the 10 km window of the summer-maximum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+      },
+      "t_swing_k": {
+       "value": 174.0,
+       "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+      },
+      "frozen_months": {
+       "value": 12,
+       "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "derived",
+       "note": "The window's coolest spot peaks at 87 K in summer, below 273 K, so it stays frozen all year."
+      },
+      "lit_share": {
+       "value": 0.462,
+       "stat": "best-lit pixel in the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+      },
+      "lit_share_median": {
+       "value": 0.315,
+       "stat": "median over the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window, fraction of time (0–1)."
+      },
+      "psr_share": {
+       "value": 0.047,
+       "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+       "dataset": "pgda-psr",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+      },
+      "noon_sun_deg": {
+       "value": 5.4,
+       "stat": "90 − |latitude|",
+       "dataset": "nssdc-moon-fact",
+       "resolution": "computed from latitude",
+       "kind": "derived",
+       "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+      },
+      "sun_height_min_deg": {
+       "value": 2,
+       "stat": "published range, lower end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "sun_height_max_deg": {
+       "value": 7,
+       "stat": "published range, upper end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "thermal_inertia_moon_wide": {
+       "value": 55,
+       "stat": "Moon-wide average at 273 K, 55 ± 2",
+       "dataset": "hayne-2017",
+       "resolution": "Moon-wide average",
+       "kind": "published",
+       "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+      }
+     }
+    },
+    {
+     "id": "moon-mons-mouton",
+     "name": "Mons Mouton",
+     "lat": -85.3549,
+     "lon": 31.0,
+     "anchor_note": "Half way from the USGS Gazetteer centre of Mons Mouton to the pole-ward edge of its Gazetteer extent (86.11° S), on the same meridian, so it differs from the Plateau anchor. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/16070",
+     "values": {
+      "slope_median_deg": {
+       "value": 8.76,
+       "stat": "median slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "slope_p90_deg": {
+       "value": 14.48,
+       "stat": "90th percentile slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_10": {
+       "value": 0.633,
+       "stat": "share of the 10 km window with slope under 10°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_5": {
+       "value": 0.121,
+       "stat": "share of the 10 km window with slope under 5°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "relief_m": {
+       "value": 780.8,
+       "stat": "5th to 95th percentile height range over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "t_min_k": {
+       "value": 62.7,
+       "stat": "median over the 10 km window of the winter-minimum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+      },
+      "t_min_coldest_k": {
+       "value": 26.1,
+       "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Coldest pixel in the 10 km window."
+      },
+      "t_max_k": {
+       "value": 250.0,
+       "stat": "median over the 10 km window of the summer-maximum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+      },
+      "t_swing_k": {
+       "value": 187.2,
+       "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+      },
+      "frozen_months": {
+       "value": 12,
+       "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "derived",
+       "note": "The window's coolest spot peaks at 157 K in summer, below 273 K, so it stays frozen all year."
+      },
+      "lit_share": {
+       "value": 0.8,
+       "stat": "best-lit pixel in the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+      },
+      "lit_share_median": {
+       "value": 0.408,
+       "stat": "median over the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window, fraction of time (0–1)."
+      },
+      "psr_share": {
+       "value": 0.01,
+       "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+       "dataset": "pgda-psr",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+      },
+      "noon_sun_deg": {
+       "value": 4.65,
+       "stat": "90 − |latitude|",
+       "dataset": "nssdc-moon-fact",
+       "resolution": "computed from latitude",
+       "kind": "derived",
+       "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+      },
+      "sun_height_min_deg": {
+       "value": 2,
+       "stat": "published range, lower end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "sun_height_max_deg": {
+       "value": 7,
+       "stat": "published range, upper end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "thermal_inertia_moon_wide": {
+       "value": 55,
+       "stat": "Moon-wide average at 273 K, 55 ± 2",
+       "dataset": "hayne-2017",
+       "resolution": "Moon-wide average",
+       "kind": "published",
+       "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+      }
+     }
+    },
+    {
+     "id": "moon-nobile-rim-1",
+     "name": "Nobile Rim 1",
+     "lat": -86.5829,
+     "lon": 53.2725,
+     "anchor_note": "Point on Nobile's rim facing the pole: Gazetteer centre moved one radius (half the Gazetteer diameter) toward the pole. Which rim NASA calls 1 or 2 is our assumption. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/4321",
+     "values": {
+      "slope_median_deg": {
+       "value": 15.38,
+       "stat": "median slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "slope_p90_deg": {
+       "value": 27.19,
+       "stat": "90th percentile slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_10": {
+       "value": 0.295,
+       "stat": "share of the 10 km window with slope under 10°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_5": {
+       "value": 0.082,
+       "stat": "share of the 10 km window with slope under 5°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "relief_m": {
+       "value": 1554.5,
+       "stat": "5th to 95th percentile height range over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "t_min_k": {
+       "value": 54.3,
+       "stat": "median over the 10 km window of the winter-minimum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+      },
+      "t_min_coldest_k": {
+       "value": 17.5,
+       "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+      },
+      "t_max_k": {
+       "value": 245.6,
+       "stat": "median over the 10 km window of the summer-maximum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+      },
+      "t_swing_k": {
+       "value": 191.2,
+       "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+      },
+      "frozen_months": {
+       "value": 12,
+       "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "derived",
+       "note": "The window's coolest spot peaks at 88 K in summer, below 273 K, so it stays frozen all year."
+      },
+      "lit_share": {
+       "value": 0.676,
+       "stat": "best-lit pixel in the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+      },
+      "lit_share_median": {
+       "value": 0.257,
+       "stat": "median over the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window, fraction of time (0–1)."
+      },
+      "psr_share": {
+       "value": 0.13,
+       "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+       "dataset": "pgda-psr",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+      },
+      "noon_sun_deg": {
+       "value": 3.42,
+       "stat": "90 − |latitude|",
+       "dataset": "nssdc-moon-fact",
+       "resolution": "computed from latitude",
+       "kind": "derived",
+       "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+      },
+      "sun_height_min_deg": {
+       "value": 2,
+       "stat": "published range, lower end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "sun_height_max_deg": {
+       "value": 7,
+       "stat": "published range, upper end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "thermal_inertia_moon_wide": {
+       "value": 55,
+       "stat": "Moon-wide average at 273 K, 55 ± 2",
+       "dataset": "hayne-2017",
+       "resolution": "Moon-wide average",
+       "kind": "published",
+       "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+      }
+     }
+    },
+    {
+     "id": "moon-nobile-rim-2",
+     "name": "Nobile Rim 2",
+     "lat": -83.9688,
+     "lon": 53.2725,
+     "anchor_note": "Point on Nobile's rim facing away from the pole: Gazetteer centre moved one radius away from the pole. Which rim NASA calls 1 or 2 is our assumption. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/4321",
+     "values": {
+      "slope_median_deg": {
+       "value": 9.62,
+       "stat": "median slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "slope_p90_deg": {
+       "value": 15.39,
+       "stat": "90th percentile slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_10": {
+       "value": 0.537,
+       "stat": "share of the 10 km window with slope under 10°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_5": {
+       "value": 0.14,
+       "stat": "share of the 10 km window with slope under 5°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "relief_m": {
+       "value": 1297.8,
+       "stat": "5th to 95th percentile height range over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "t_min_k": {
+       "value": 70.2,
+       "stat": "median over the 10 km window of the winter-minimum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+      },
+      "t_min_coldest_k": {
+       "value": 47.1,
+       "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Coldest pixel in the 10 km window."
+      },
+      "t_max_k": {
+       "value": 266.4,
+       "stat": "median over the 10 km window of the summer-maximum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+      },
+      "t_swing_k": {
+       "value": 196.1,
+       "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+      },
+      "frozen_months": {
+       "value": 12,
+       "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "derived",
+       "note": "The window's coolest spot peaks at 170 K in summer, below 273 K, so it stays frozen all year."
+      },
+      "lit_share": {
+       "value": 0.528,
+       "stat": "best-lit pixel in the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+      },
+      "lit_share_median": {
+       "value": 0.393,
+       "stat": "median over the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window, fraction of time (0–1)."
+      },
+      "psr_share": {
+       "value": 0.0,
+       "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+       "dataset": "pgda-psr",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+      },
+      "noon_sun_deg": {
+       "value": 6.03,
+       "stat": "90 − |latitude|",
+       "dataset": "nssdc-moon-fact",
+       "resolution": "computed from latitude",
+       "kind": "derived",
+       "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+      },
+      "sun_height_min_deg": {
+       "value": 2,
+       "stat": "published range, lower end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "sun_height_max_deg": {
+       "value": 7,
+       "stat": "published range, upper end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "thermal_inertia_moon_wide": {
+       "value": 55,
+       "stat": "Moon-wide average at 273 K, 55 ± 2",
+       "dataset": "hayne-2017",
+       "resolution": "Moon-wide average",
+       "kind": "published",
+       "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+      }
+     }
+    },
+    {
+     "id": "moon-de-gerlache-rim-2",
+     "name": "de Gerlache Rim 2",
+     "lat": -89.0242,
+     "lon": -88.3447,
+     "anchor_note": "Point on de Gerlache's rim facing the pole (toward the Shackleton–de Gerlache ridge): Gazetteer centre moved one radius toward the pole. Which part of the rim NASA means is our assumption. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/1439",
+     "values": {
+      "slope_median_deg": {
+       "value": 14.71,
+       "stat": "median slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "slope_p90_deg": {
+       "value": 22.91,
+       "stat": "90th percentile slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_10": {
+       "value": 0.181,
+       "stat": "share of the 10 km window with slope under 10°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_5": {
+       "value": 0.027,
+       "stat": "share of the 10 km window with slope under 5°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "relief_m": {
+       "value": 1456.2,
+       "stat": "5th to 95th percentile height range over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "t_min_k": {
+       "value": 55.5,
+       "stat": "median over the 10 km window of the winter-minimum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+      },
+      "t_min_coldest_k": {
+       "value": 18.1,
+       "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+      },
+      "t_max_k": {
+       "value": 256.1,
+       "stat": "median over the 10 km window of the summer-maximum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+      },
+      "t_swing_k": {
+       "value": 200.5,
+       "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+      },
+      "frozen_months": {
+       "value": 12,
+       "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "derived",
+       "note": "The window's coolest spot peaks at 100 K in summer, below 273 K, so it stays frozen all year."
+      },
+      "lit_share": {
+       "value": 0.821,
+       "stat": "best-lit pixel in the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+      },
+      "lit_share_median": {
+       "value": 0.26,
+       "stat": "median over the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window, fraction of time (0–1)."
+      },
+      "psr_share": {
+       "value": 0.06,
+       "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+       "dataset": "pgda-psr",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+      },
+      "noon_sun_deg": {
+       "value": 0.98,
+       "stat": "90 − |latitude|",
+       "dataset": "nssdc-moon-fact",
+       "resolution": "computed from latitude",
+       "kind": "derived",
+       "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+      },
+      "sun_height_min_deg": {
+       "value": 2,
+       "stat": "published range, lower end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "sun_height_max_deg": {
+       "value": 7,
+       "stat": "published range, upper end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "thermal_inertia_moon_wide": {
+       "value": 55,
+       "stat": "Moon-wide average at 273 K, 55 ± 2",
+       "dataset": "hayne-2017",
+       "resolution": "Moon-wide average",
+       "kind": "published",
+       "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+      }
+     }
+    },
+    {
+     "id": "moon-slater-plain",
+     "name": "Slater Plain",
+     "lat": -88.0792,
+     "lon": 111.2881,
+     "anchor_note": "USGS Gazetteer centre of Slater crater; the window samples the crater, not a mapped plain. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/15325",
+     "values": {
+      "slope_median_deg": {
+       "value": 3.26,
+       "stat": "median slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "slope_p90_deg": {
+       "value": 11.82,
+       "stat": "90th percentile slope over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_10": {
+       "value": 0.823,
+       "stat": "share of the 10 km window with slope under 10°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "share_under_5": {
+       "value": 0.599,
+       "stat": "share of the 10 km window with slope under 5°",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "relief_m": {
+       "value": 516.1,
+       "stat": "5th to 95th percentile height range over the 10 km window",
+       "dataset": "lola-ldem-240m",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+      },
+      "t_min_k": {
+       "value": 27.3,
+       "stat": "median over the 10 km window of the winter-minimum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+      },
+      "t_min_coldest_k": {
+       "value": 8.5,
+       "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+      },
+      "t_max_k": {
+       "value": 86.5,
+       "stat": "median over the 10 km window of the summer-maximum map",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+      },
+      "t_swing_k": {
+       "value": 59.2,
+       "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "computed",
+       "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+      },
+      "frozen_months": {
+       "value": 12,
+       "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+       "dataset": "diviner-polar-south",
+       "resolution": "240 m",
+       "kind": "derived",
+       "note": "The window's coolest spot peaks at 62 K in summer, below 273 K, so it stays frozen all year."
+      },
+      "lit_share": {
+       "value": 0.025,
+       "stat": "best-lit pixel in the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+      },
+      "lit_share_median": {
+       "value": 0.0,
+       "stat": "median over the 10 km window",
+       "dataset": "pgda-avgvisib",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Median over the 10 km window, fraction of time (0–1)."
+      },
+      "psr_share": {
+       "value": 0.903,
+       "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+       "dataset": "pgda-psr",
+       "resolution": "120 m",
+       "kind": "computed",
+       "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+      },
+      "noon_sun_deg": {
+       "value": 1.92,
+       "stat": "90 − |latitude|",
+       "dataset": "nssdc-moon-fact",
+       "resolution": "computed from latitude",
+       "kind": "derived",
+       "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+      },
+      "sun_height_min_deg": {
+       "value": 2,
+       "stat": "published range, lower end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "sun_height_max_deg": {
+       "value": 7,
+       "stat": "published range, upper end",
+       "dataset": "artemis-overview",
+       "resolution": "published range",
+       "kind": "published"
+      },
+      "thermal_inertia_moon_wide": {
+       "value": 55,
+       "stat": "Moon-wide average at 273 K, 55 ± 2",
+       "dataset": "hayne-2017",
+       "resolution": "Moon-wide average",
+       "kind": "published",
+       "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": "moon-peak-near-cabeus-b",
+   "body": "moon",
+   "name": "Peak near Cabeus B",
+   "lat": -82.2587,
+   "lon": -54.5846,
+   "anchor_note": "USGS Gazetteer centre of Cabeus B; NASA gives no centre point and the window samples the satellite crater's middle, not a specific peak. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/8058",
+   "values": {
+    "slope_median_deg": {
+     "value": 4.32,
+     "stat": "median slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 10.87,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.865,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.562,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 498.2,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 44.2,
+     "stat": "median over the 10 km window of the winter-minimum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+    },
+    "t_min_coldest_k": {
+     "value": 21.9,
+     "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+    },
+    "t_max_k": {
+     "value": 233.0,
+     "stat": "median over the 10 km window of the summer-maximum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 188.8,
+     "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "The window's coolest spot peaks at 133 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.245,
+     "stat": "best-lit pixel in the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.105,
+     "stat": "median over the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 0.013,
+     "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 7.74,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "LCROSS found 5.6 ± 2.9% water by weight in soil thrown up from nearby Cabeus crater",
+     "source": "Colaprete et al. 2010",
+     "url": "https://doi.org/10.1126/science.1186986"
+    },
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
+    },
+    {
+     "text": "One of NASA's nine Artemis III candidate landing regions",
+     "source": "NASA, 28 Oct 2024",
+     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "default": false
+  },
+  {
+   "id": "moon-haworth",
+   "body": "moon",
+   "name": "Haworth",
+   "lat": -87.45,
+   "lon": -5.17,
+   "anchor_note": "USGS Gazetteer centre of Haworth crater; the window samples the crater floor, while NASA's region lies around it. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/14502",
+   "values": {
+    "slope_median_deg": {
+     "value": 1.98,
+     "stat": "median slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 6.96,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.946,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.824,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 213.0,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 16.6,
+     "stat": "median over the 10 km window of the winter-minimum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif). Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+    },
+    "t_min_coldest_k": {
+     "value": 7.0,
+     "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+    },
+    "t_max_k": {
+     "value": 65.8,
+     "stat": "median over the 10 km window of the summer-maximum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 49.2,
+     "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "The window's coolest spot peaks at 55 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.0,
+     "stat": "best-lit pixel in the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.0,
+     "stat": "median over the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 1.0,
+     "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 2.55,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
+    },
+    {
+     "text": "One of NASA's nine Artemis III candidate landing regions",
+     "source": "NASA, 28 Oct 2024",
+     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "default": false
+  },
+  {
+   "id": "moon-malapert-massif",
+   "body": "moon",
+   "name": "Malapert Massif",
+   "lat": -85.98,
+   "lon": -1.67,
+   "anchor_note": "USGS Gazetteer centre of Mons Malapert, the massif the region is named after. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/16338",
+   "values": {
+    "slope_median_deg": {
+     "value": 18.76,
+     "stat": "median slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 25.48,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.162,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.051,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 1470.6,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 65.9,
+     "stat": "median over the 10 km window of the winter-minimum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+    },
+    "t_min_coldest_k": {
+     "value": 42.3,
+     "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Coldest pixel in the 10 km window."
+    },
+    "t_max_k": {
+     "value": 270.2,
+     "stat": "median over the 10 km window of the summer-maximum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 204.3,
+     "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "The window's coolest spot peaks at 176 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.845,
+     "stat": "best-lit pixel in the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.405,
+     "stat": "median over the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 0.001,
+     "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 4.02,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
+    },
+    {
+     "text": "One of NASA's nine Artemis III candidate landing regions",
+     "source": "NASA, 28 Oct 2024",
+     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "default": false
+  },
+  {
+   "id": "moon-mons-mouton-plateau",
+   "body": "moon",
+   "name": "Mons Mouton Plateau",
+   "lat": -84.6,
+   "lon": 31.0,
+   "anchor_note": "USGS Gazetteer centre of Mons Mouton, taken as its summit plateau. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/16070",
+   "values": {
+    "slope_median_deg": {
+     "value": 5.29,
+     "stat": "median slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 9.53,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.922,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.47,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 386.8,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 53.5,
+     "stat": "median over the 10 km window of the winter-minimum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+    },
+    "t_min_coldest_k": {
+     "value": 19.9,
+     "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+    },
+    "t_max_k": {
+     "value": 227.5,
+     "stat": "median over the 10 km window of the summer-maximum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 174.0,
+     "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "The window's coolest spot peaks at 87 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.462,
+     "stat": "best-lit pixel in the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.315,
+     "stat": "median over the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 0.047,
+     "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 5.4,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
+    },
+    {
+     "text": "One of NASA's nine Artemis III candidate landing regions",
+     "source": "NASA, 28 Oct 2024",
+     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "default": false
+  },
+  {
+   "id": "moon-mons-mouton",
+   "body": "moon",
+   "name": "Mons Mouton",
+   "lat": -85.3549,
+   "lon": 31.0,
+   "anchor_note": "Half way from the USGS Gazetteer centre of Mons Mouton to the pole-ward edge of its Gazetteer extent (86.11° S), on the same meridian, so it differs from the Plateau anchor. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/16070",
+   "values": {
+    "slope_median_deg": {
+     "value": 8.76,
+     "stat": "median slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 14.48,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.633,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.121,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 780.8,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 62.7,
+     "stat": "median over the 10 km window of the winter-minimum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+    },
+    "t_min_coldest_k": {
+     "value": 26.1,
+     "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Coldest pixel in the 10 km window."
+    },
+    "t_max_k": {
+     "value": 250.0,
+     "stat": "median over the 10 km window of the summer-maximum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 187.2,
+     "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "The window's coolest spot peaks at 157 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.8,
+     "stat": "best-lit pixel in the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.408,
+     "stat": "median over the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 0.01,
+     "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 4.65,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
+    },
+    {
+     "text": "One of NASA's nine Artemis III candidate landing regions",
+     "source": "NASA, 28 Oct 2024",
+     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "default": false
+  },
+  {
+   "id": "moon-nobile-rim-1",
+   "body": "moon",
+   "name": "Nobile Rim 1",
+   "lat": -86.5829,
+   "lon": 53.2725,
+   "anchor_note": "Point on Nobile's rim facing the pole: Gazetteer centre moved one radius (half the Gazetteer diameter) toward the pole. Which rim NASA calls 1 or 2 is our assumption. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/4321",
+   "values": {
+    "slope_median_deg": {
+     "value": 15.38,
+     "stat": "median slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 27.19,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.295,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.082,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 1554.5,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 54.3,
+     "stat": "median over the 10 km window of the winter-minimum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+    },
+    "t_min_coldest_k": {
+     "value": 17.5,
+     "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+    },
+    "t_max_k": {
+     "value": 245.6,
+     "stat": "median over the 10 km window of the summer-maximum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 191.2,
+     "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "The window's coolest spot peaks at 88 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.676,
+     "stat": "best-lit pixel in the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.257,
+     "stat": "median over the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 0.13,
+     "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 3.42,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
+    },
+    {
+     "text": "One of NASA's nine Artemis III candidate landing regions",
+     "source": "NASA, 28 Oct 2024",
+     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "default": false
+  },
+  {
+   "id": "moon-nobile-rim-2",
+   "body": "moon",
+   "name": "Nobile Rim 2",
+   "lat": -83.9688,
+   "lon": 53.2725,
+   "anchor_note": "Point on Nobile's rim facing away from the pole: Gazetteer centre moved one radius away from the pole. Which rim NASA calls 1 or 2 is our assumption. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/4321",
+   "values": {
+    "slope_median_deg": {
+     "value": 9.62,
+     "stat": "median slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 15.39,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.537,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.14,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 1297.8,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 70.2,
+     "stat": "median over the 10 km window of the winter-minimum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+    },
+    "t_min_coldest_k": {
+     "value": 47.1,
+     "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Coldest pixel in the 10 km window."
+    },
+    "t_max_k": {
+     "value": 266.4,
+     "stat": "median over the 10 km window of the summer-maximum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 196.1,
+     "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "The window's coolest spot peaks at 170 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.528,
+     "stat": "best-lit pixel in the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.393,
+     "stat": "median over the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 0.0,
+     "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 6.03,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
+    },
+    {
+     "text": "One of NASA's nine Artemis III candidate landing regions",
+     "source": "NASA, 28 Oct 2024",
+     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "default": false
+  },
+  {
+   "id": "moon-de-gerlache-rim-2",
+   "body": "moon",
+   "name": "de Gerlache Rim 2",
+   "lat": -89.0242,
+   "lon": -88.3447,
+   "anchor_note": "Point on de Gerlache's rim facing the pole (toward the Shackleton–de Gerlache ridge): Gazetteer centre moved one radius toward the pole. Which part of the rim NASA means is our assumption. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/1439",
+   "values": {
+    "slope_median_deg": {
+     "value": 14.71,
+     "stat": "median slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 22.91,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.181,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.027,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 1456.2,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 55.5,
+     "stat": "median over the 10 km window of the winter-minimum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+    },
+    "t_min_coldest_k": {
+     "value": 18.1,
+     "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+    },
+    "t_max_k": {
+     "value": 256.1,
+     "stat": "median over the 10 km window of the summer-maximum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 200.5,
+     "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "The window's coolest spot peaks at 100 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.821,
+     "stat": "best-lit pixel in the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.26,
+     "stat": "median over the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 0.06,
+     "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 0.98,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
+    },
+    {
+     "text": "One of NASA's nine Artemis III candidate landing regions",
+     "source": "NASA, 28 Oct 2024",
+     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "default": false
+  },
+  {
+   "id": "moon-slater-plain",
+   "body": "moon",
+   "name": "Slater Plain",
+   "lat": -88.0792,
+   "lon": 111.2881,
+   "anchor_note": "USGS Gazetteer centre of Slater crater; the window samples the crater, not a mapped plain. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/15325",
+   "values": {
+    "slope_median_deg": {
+     "value": 3.26,
+     "stat": "median slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 11.82,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.823,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.599,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 516.1,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 27.3,
+     "stat": "median over the 10 km window of the winter-minimum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+    },
+    "t_min_coldest_k": {
+     "value": 8.5,
+     "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+    },
+    "t_max_k": {
+     "value": 86.5,
+     "stat": "median over the 10 km window of the summer-maximum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 59.2,
+     "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "The window's coolest spot peaks at 62 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.025,
+     "stat": "best-lit pixel in the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.0,
+     "stat": "median over the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 0.903,
+     "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 1.92,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
+    },
+    {
+     "text": "One of NASA's nine Artemis III candidate landing regions",
+     "source": "NASA, 28 Oct 2024",
+     "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "default": false
+  },
+  {
+   "id": "mars-jezero",
+   "body": "mars",
+   "name": "Jezero",
+   "default": true,
+   "lat": 18.38,
+   "lon": 77.58,
+   "anchor_note": "Centre of Jezero crater (our plan, section 5); the window samples the crater floor. Perseverance landed about 8 km to the north-west.",
+   "values": {
+    "slope_median_deg": {
+     "value": 1.47,
+     "stat": "median slope over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "slope_p90_deg": {
+     "value": 2.89,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "share_under_10": {
+     "value": 1.0,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "share_under_5": {
+     "value": 0.995,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "relief_m": {
+     "value": 83.3,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "weh_pct": {
+     "value": 3.531,
+     "stat": "5° bin containing the site, smoothed over 10°",
+     "dataset": "ody-grs",
+     "resolution": "5 degree bins smoothed over 10 degrees",
+     "kind": "computed",
+     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.363 (1σ). This is hydrogen counted as if it were water, not ice: near the equator ice is not stable in the top metre, so the hydrogen is likely bound in hydrated minerals."
+    },
+    "dci": {
+     "value": 0.971,
+     "stat": "median of the 3×3 pixels at the site",
+     "dataset": "tes-dci",
+     "resolution": "16 pixels per degree",
+     "kind": "computed",
+     "note": "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free."
+    },
+    "thermal_inertia": {
+     "value": 285,
+     "stat": "median of unmasked pixels in the 10 km window",
+     "dataset": "tes-ti",
+     "resolution": "20 pixels per degree (about 3 km)",
+     "kind": "computed",
+     "note": "Night-time TES thermal inertia in J m-2 K-1 s-1/2, from 9 pixels (20 per degree, about 3 km each) after dropping interpolated pixels (mask 0) and zero values; it describes the area, not the exact spot."
+    },
+    "ground_strength_note": {
+     "value": "above",
+     "stat": "median TES thermal inertia against NASA's 100–140 landing-site rule",
+     "dataset": "tes-ti",
+     "resolution": "20 pixels per degree (about 3 km)",
+     "kind": "derived",
+     "note": "TES night-time thermal inertia is 285, above NASA's 100–140 landing-site line, so the ground reads as load-bearing rather than thick loose dust. Rule: Golombek et al. 2020, https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502"
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "months with mean ground temperature below 0 C",
+     "dataset": "nssdc-mars-fact",
+     "resolution": "planet-wide average",
+     "kind": "derived",
+     "note": "NASA's Mars fact sheet gives an average temperature of about 214 K (−59 C) and a daily range of 184–242 K at the Viking 1 site, all below 273 K (0 C). This value rests on that planet-wide average and this site's published night minimum (-93 C ground), not on a month-by-month record at the site; mid-latitude summers can be warmer than the planet average."
+    },
+    "daily_swing_c": {
+     "value": 52,
+     "stat": "twice the published half-amplitude of the daily air-temperature cycle",
+     "dataset": "meda-2023",
+     "resolution": "one site",
+     "kind": "derived",
+     "note": "Twice the published 26 K half-amplitude of the daily air-temperature cycle (first 250 sols)."
+    },
+    "t_min_air_c": {
+     "value": null,
+     "stat": "coldest air temperature",
+     "dataset": "meda-2023",
+     "resolution": "one site",
+     "kind": "published",
+     "note": "No single coldest air temperature is stated in the text; not read off figures."
+    },
+    "t_min_ground_c": {
+     "value": -93,
+     "stat": "night-time minimum of the regolith over one Mars year",
+     "dataset": "zorzano-2024",
+     "resolution": "one site",
+     "kind": "published",
+     "note": "Night-time minimum of the regolith on the crater floor, 'about 180 K' in the text (−93 °C); frost is briefly stable when the ground is below 185 K."
+    },
+    "daily_ground_swing_c": {
+     "value": null,
+     "stat": "daily ground maximum minus minimum",
+     "dataset": "zorzano-2024",
+     "resolution": "one site",
+     "kind": "published",
+     "note": "The text gives the night minimum (about 180 K) but no daily ground maximum or swing; not read off figures."
+    },
+    "dust_tau": {
+     "value": 0.4,
+     "stat": "visible column optical depth just after a January 2022 local storm",
+     "dataset": "lemmon-2022",
+     "resolution": "one site",
+     "kind": "published",
+     "note": "Visible column optical depth (Mastcam-Z 880 nm channel; dust plus some ice) near 0.4 just after a January 2022 local storm (Ls ~156°, northern late summer) and near 0.3 before it, close to the seasonal minimum. The same paper says the 9 µm dust optical depth is about half the visible value; we did not convert anything. Dusty-season values are higher (the storm peaked near 2)."
+    },
+    "noon_sun_deg": {
+     "value": 71.62,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-mars-fact",
+     "resolution": "computed from latitude; planet-wide average",
+     "kind": "derived",
+     "note": "Mean noon sun height; Mars's 25.2° tilt moves it up to ±25° over the year."
+    }
+   },
+   "facts": [
+    {
+     "text": "Crater floor rocks hold olivine, carbonates and sulfates altered by water",
+     "source": "Farley et al. 2022",
+     "url": "https://doi.org/10.1126/science.abo2196"
+    },
+    {
+     "text": "Air pressure 650–761 Pa over the first 250 sols; gusts to 25 m/s",
+     "source": "Rodríguez-Manfredi et al. 2023",
+     "url": "https://www.nature.com/articles/s41561-022-01084-0"
+    }
+   ]
+  },
+  {
+   "id": "mars-arcadia-planitia",
+   "body": "mars",
+   "name": "Arcadia Planitia",
+   "default": false,
+   "lat": 47.2,
+   "lon": -175.7,
+   "anchor_note": "Buried-ice area studied by Bramson 2015; coordinates from our plan (section 5).",
+   "values": {
+    "slope_median_deg": {
+     "value": 0.26,
+     "stat": "median slope over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "slope_p90_deg": {
+     "value": 0.59,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "share_under_10": {
+     "value": 1.0,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "share_under_5": {
+     "value": 1.0,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "relief_m": {
+     "value": 28.8,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "weh_pct": {
+     "value": 5.261,
+     "stat": "5° bin containing the site, smoothed over 10°",
+     "dataset": "ody-grs",
+     "resolution": "5 degree bins smoothed over 10 degrees",
+     "kind": "computed",
+     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.569 (1σ). This is hydrogen counted as if it were water. At this mid/high latitude it is likely buried ice (Arcadia and Deuteronilus have radar-detected ice)."
+    },
+    "dci": {
+     "value": 0.935,
+     "stat": "median of the 3×3 pixels at the site",
+     "dataset": "tes-dci",
+     "resolution": "16 pixels per degree",
+     "kind": "computed",
+     "note": "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free."
+    },
+    "thermal_inertia": {
+     "value": 241,
+     "stat": "median of unmasked pixels in the 10 km window",
+     "dataset": "tes-ti",
+     "resolution": "20 pixels per degree (about 3 km)",
+     "kind": "computed",
+     "note": "Night-time TES thermal inertia in J m-2 K-1 s-1/2, from 15 pixels (20 per degree, about 3 km each) after dropping interpolated pixels (mask 0) and zero values; it describes the area, not the exact spot."
+    },
+    "ground_strength_note": {
+     "value": "above",
+     "stat": "median TES thermal inertia against NASA's 100–140 landing-site rule",
+     "dataset": "tes-ti",
+     "resolution": "20 pixels per degree (about 3 km)",
+     "kind": "derived",
+     "note": "TES night-time thermal inertia is 241, above NASA's 100–140 landing-site line, so the ground reads as load-bearing rather than thick loose dust. Rule: Golombek et al. 2020, https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502"
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "months with mean ground temperature below 0 C",
+     "dataset": "nssdc-mars-fact",
+     "resolution": "planet-wide average",
+     "kind": "derived",
+     "note": "NASA's Mars fact sheet gives an average temperature of about 214 K (−59 C) and a daily range of 184–242 K at the Viking 1 site, all below 273 K (0 C). This value rests on that planet-wide average, not on a month-by-month record at the site; mid-latitude summers can be warmer than the planet average."
+    },
+    "daily_swing_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "t_min_air_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "t_min_ground_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "daily_ground_swing_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "dust_tau": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site, and we found no NASA orbital dust climatology (TES, THEMIS, MCS) that states a value for this region in its text or tables."
+    },
+    "noon_sun_deg": {
+     "value": 42.8,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-mars-fact",
+     "resolution": "computed from latitude; planet-wide average",
+     "kind": "derived",
+     "note": "Mean noon sun height; Mars's 25.2° tilt moves it up to ±25° over the year."
+    }
+   },
+   "facts": [
+    {
+     "text": "A buried ice slab tens of metres thick lies under the plains",
+     "source": "Bramson et al. 2015",
+     "url": "https://arxiv.org/pdf/1509.03210"
+    }
+   ]
+  },
+  {
+   "id": "mars-gale",
+   "body": "mars",
+   "name": "Gale",
+   "default": false,
+   "lat": -4.59,
+   "lon": 137.44,
+   "anchor_note": "Curiosity's landing site on the crater floor, where its climate and radiation values were measured. The crater centre (5.4° S, 137.8° E) is the steep upper flank of Mount Sharp.",
+   "values": {
+    "slope_median_deg": {
+     "value": 1.5,
+     "stat": "median slope over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "slope_p90_deg": {
+     "value": 5.18,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "share_under_10": {
+     "value": 0.998,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "share_under_5": {
+     "value": 0.894,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "relief_m": {
+     "value": 172.1,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "weh_pct": {
+     "value": 5.415,
+     "stat": "5° bin containing the site, smoothed over 10°",
+     "dataset": "ody-grs",
+     "resolution": "5 degree bins smoothed over 10 degrees",
+     "kind": "computed",
+     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.392 (1σ). This is hydrogen counted as if it were water, not ice: near the equator ice is not stable in the top metre, so the hydrogen is likely bound in hydrated minerals."
+    },
+    "dci": {
+     "value": 0.959,
+     "stat": "median of the 3×3 pixels at the site",
+     "dataset": "tes-dci",
+     "resolution": "16 pixels per degree",
+     "kind": "computed",
+     "note": "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free."
+    },
+    "thermal_inertia": {
+     "value": 364,
+     "stat": "median of unmasked pixels in the 10 km window",
+     "dataset": "tes-ti",
+     "resolution": "20 pixels per degree (about 3 km)",
+     "kind": "computed",
+     "note": "Night-time TES thermal inertia in J m-2 K-1 s-1/2, from 9 pixels (20 per degree, about 3 km each) after dropping interpolated pixels (mask 0) and zero values; it describes the area, not the exact spot."
+    },
+    "ground_strength_note": {
+     "value": "above",
+     "stat": "median TES thermal inertia against NASA's 100–140 landing-site rule",
+     "dataset": "tes-ti",
+     "resolution": "20 pixels per degree (about 3 km)",
+     "kind": "derived",
+     "note": "TES night-time thermal inertia is 364, above NASA's 100–140 landing-site line, so the ground reads as load-bearing rather than thick loose dust. Rule: Golombek et al. 2020, https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502"
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "months with mean ground temperature below 0 C",
+     "dataset": "nssdc-mars-fact",
+     "resolution": "planet-wide average",
+     "kind": "derived",
+     "note": "NASA's Mars fact sheet gives an average temperature of about 214 K (−59 C) and a daily range of 184–242 K at the Viking 1 site, all below 273 K (0 C). This value rests on that planet-wide average and this site's published night minimum (-103 C ground), not on a month-by-month record at the site; mid-latitude summers can be warmer than the planet average."
+    },
+    "daily_swing_c": {
+     "value": 70,
+     "stat": "daily high minus daily low, first ~200 sols",
+     "dataset": "rems-gale-air",
+     "resolution": "one site",
+     "kind": "derived",
+     "note": "Daily highs about 0 °C and lows about −70 °C over Curiosity's first ~200 sols."
+    },
+    "t_min_air_c": {
+     "value": -70,
+     "stat": "typical pre-dawn low, first ~200 sols",
+     "dataset": "rems-gale-air",
+     "resolution": "one site",
+     "kind": "published",
+     "note": "Typical pre-dawn low, first ~200 sols."
+    },
+    "t_min_ground_c": {
+     "value": -103,
+     "stat": "lower end of the daily ground-minimum range over two Mars years",
+     "dataset": "gomez-elvira-2017",
+     "resolution": "one site",
+     "kind": "published",
+     "note": "Daily ground minima span about 170–210 K over two Mars years; 170 K is −103 °C."
+    },
+    "daily_ground_swing_c": {
+     "value": 80,
+     "stat": "gap between the middles of the daily maximum and minimum ranges",
+     "dataset": "gomez-elvira-2017",
+     "resolution": "one site",
+     "kind": "derived",
+     "note": "Daily ground maxima span about 250–290 K and minima about 170–210 K over two Mars years; 80 K is the gap between the middles of the two ranges, not a published single swing. The paper says the swing depends on the ground type under the rover."
+    },
+    "dust_tau": {
+     "value": null,
+     "stat": "typical optical depth (440 and 880 nm)",
+     "dataset": "lemmon-msl-tau",
+     "resolution": "one site",
+     "kind": "published",
+     "note": "The record says optical depth is lower and steadier in southern fall and winter and peaks in southern spring and summer, but states no typical value in its text; the values are only in the data files, which we have not processed yet."
+    },
+    "noon_sun_deg": {
+     "value": 85.41,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-mars-fact",
+     "resolution": "computed from latitude; planet-wide average",
+     "kind": "derived",
+     "note": "Mean noon sun height; Mars's 25.2° tilt moves it up to ±25° over the year."
+    }
+   },
+   "facts": [
+    {
+     "text": "Mudstone with clay minerals and calcium sulfates, from an ancient lake",
+     "source": "Vaniman et al. 2014",
+     "url": "https://doi.org/10.1126/science.1243480"
+    },
+    {
+     "text": "The only place on Mars's surface where radiation has been measured (Curiosity RAD)",
+     "source": "NASA Curiosity RAD",
+     "url": "https://science.nasa.gov/photojournal/radiation-measurements-on-mars/"
+    }
+   ]
+  },
+  {
+   "id": "mars-deuteronilus-mensae",
+   "body": "mars",
+   "name": "Deuteronilus Mensae",
+   "default": false,
+   "lat": 43.9,
+   "lon": 22.6,
+   "anchor_note": "Glacier area studied by Plaut 2009; coordinates from our plan (section 5).",
+   "values": {
+    "slope_median_deg": {
+     "value": 0.25,
+     "stat": "median slope over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "slope_p90_deg": {
+     "value": 0.67,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "share_under_10": {
+     "value": 1.0,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "share_under_5": {
+     "value": 1.0,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "relief_m": {
+     "value": 20.3,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "weh_pct": {
+     "value": 4.595,
+     "stat": "5° bin containing the site, smoothed over 10°",
+     "dataset": "ody-grs",
+     "resolution": "5 degree bins smoothed over 10 degrees",
+     "kind": "computed",
+     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.359 (1σ). This is hydrogen counted as if it were water. At this mid/high latitude it is likely buried ice (Arcadia and Deuteronilus have radar-detected ice)."
+    },
+    "dci": {
+     "value": 0.965,
+     "stat": "median of the 3×3 pixels at the site",
+     "dataset": "tes-dci",
+     "resolution": "16 pixels per degree",
+     "kind": "computed",
+     "note": "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free."
+    },
+    "thermal_inertia": {
+     "value": 283,
+     "stat": "median of unmasked pixels in the 10 km window",
+     "dataset": "tes-ti",
+     "resolution": "20 pixels per degree (about 3 km)",
+     "kind": "computed",
+     "note": "Night-time TES thermal inertia in J m-2 K-1 s-1/2, from 16 pixels (20 per degree, about 3 km each) after dropping interpolated pixels (mask 0) and zero values; it describes the area, not the exact spot."
+    },
+    "ground_strength_note": {
+     "value": "above",
+     "stat": "median TES thermal inertia against NASA's 100–140 landing-site rule",
+     "dataset": "tes-ti",
+     "resolution": "20 pixels per degree (about 3 km)",
+     "kind": "derived",
+     "note": "TES night-time thermal inertia is 283, above NASA's 100–140 landing-site line, so the ground reads as load-bearing rather than thick loose dust. Rule: Golombek et al. 2020, https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502"
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "months with mean ground temperature below 0 C",
+     "dataset": "nssdc-mars-fact",
+     "resolution": "planet-wide average",
+     "kind": "derived",
+     "note": "NASA's Mars fact sheet gives an average temperature of about 214 K (−59 C) and a daily range of 184–242 K at the Viking 1 site, all below 273 K (0 C). This value rests on that planet-wide average, not on a month-by-month record at the site; mid-latitude summers can be warmer than the planet average."
+    },
+    "daily_swing_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "t_min_air_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "t_min_ground_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "daily_ground_swing_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "dust_tau": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site, and we found no NASA orbital dust climatology (TES, THEMIS, MCS) that states a value for this region in its text or tables."
+    },
+    "noon_sun_deg": {
+     "value": 46.1,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-mars-fact",
+     "resolution": "computed from latitude; planet-wide average",
+     "kind": "derived",
+     "note": "Mean noon sun height; Mars's 25.2° tilt moves it up to ±25° over the year."
+    }
+   },
+   "facts": [
+    {
+     "text": "Debris aprons are mostly water ice under a thin rock cover",
+     "source": "Plaut et al. 2009",
+     "url": "https://doi.org/10.1029/2008GL036379"
+    }
+   ]
+  },
+  {
+   "id": "mars-arsia-mons-caves",
+   "body": "mars",
+   "name": "Arsia Mons caves",
+   "default": false,
+   "lat": -5.5332,
+   "lon": -118.6069,
+   "anchor_note": "Cave opening APC075, noted as 'Jeanne' (one of the seven openings in Cushing 2007), from the USGS Mars Global Cave Candidate Catalog; the summit (8.35° S, 239.91° E) is about 150 km away.",
+   "values": {
+    "slope_median_deg": {
+     "value": 1.58,
+     "stat": "median slope over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "slope_p90_deg": {
+     "value": 2.08,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "share_under_10": {
+     "value": 1.0,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "share_under_5": {
+     "value": 1.0,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "relief_m": {
+     "value": 248.0,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "hrsc-mola-dem",
+     "resolution": "200 m",
+     "kind": "computed",
+     "note": "10 km window, slopes at 200 m. The blend is HRSC (~50–100 m) where HRSC exists, otherwise MOLA only (~463 m), so slopes there are smoothed."
+    },
+    "weh_pct": {
+     "value": 3.172,
+     "stat": "5° bin containing the site, smoothed over 10°",
+     "dataset": "ody-grs",
+     "resolution": "5 degree bins smoothed over 10 degrees",
+     "kind": "computed",
+     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.237 (1σ). This is hydrogen counted as if it were water, not ice: near the equator ice is not stable in the top metre, so the hydrogen is likely bound in hydrated minerals."
+    },
+    "dci": {
+     "value": 0.938,
+     "stat": "median of the 3×3 pixels at the site",
+     "dataset": "tes-dci",
+     "resolution": "16 pixels per degree",
+     "kind": "computed",
+     "note": "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free."
+    },
+    "thermal_inertia": {
+     "value": 68,
+     "stat": "median of unmasked pixels in the 10 km window",
+     "dataset": "tes-ti",
+     "resolution": "20 pixels per degree (about 3 km)",
+     "kind": "computed",
+     "note": "Night-time TES thermal inertia in J m-2 K-1 s-1/2, from 2 pixels (20 per degree, about 3 km each) after dropping interpolated pixels (mask 0) and zero values; it describes the area, not the exact spot."
+    },
+    "ground_strength_note": {
+     "value": "below",
+     "stat": "median TES thermal inertia against NASA's 100–140 landing-site rule",
+     "dataset": "tes-ti",
+     "resolution": "20 pixels per degree (about 3 km)",
+     "kind": "derived",
+     "note": "TES night-time thermal inertia is 68, below NASA's 100–140 landing-site line, so the ground may be thick loose dust rather than load-bearing. Rule: Golombek et al. 2020, https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502"
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "months with mean ground temperature below 0 C",
+     "dataset": "nssdc-mars-fact",
+     "resolution": "planet-wide average",
+     "kind": "derived",
+     "note": "NASA's Mars fact sheet gives an average temperature of about 214 K (−59 C) and a daily range of 184–242 K at the Viking 1 site, all below 273 K (0 C). This value rests on that planet-wide average, not on a month-by-month record at the site; mid-latitude summers can be warmer than the planet average."
+    },
+    "daily_swing_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "t_min_air_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "t_min_ground_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "daily_ground_swing_c": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "dust_tau": {
+     "value": null,
+     "stat": "none",
+     "dataset": null,
+     "resolution": "none",
+     "kind": "published",
+     "note": "No surface measurement at this site, and we found no NASA orbital dust climatology (TES, THEMIS, MCS) that states a value for this region in its text or tables."
+    },
+    "noon_sun_deg": {
+     "value": 84.47,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-mars-fact",
+     "resolution": "computed from latitude; planet-wide average",
+     "kind": "derived",
+     "note": "Mean noon sun height; Mars's 25.2° tilt moves it up to ±25° over the year."
+    }
+   },
+   "facts": [
+    {
+     "text": "Seven cave openings 100–225 m wide on Arsia Mons",
+     "source": "Cushing et al. 2007",
+     "url": "https://doi.org/10.1029/2007GL030709"
+    },
+    {
+     "text": "Opening APC075 ('Jeanne') is about 165 m across and about 345 m deep",
+     "source": "USGS Mars Global Cave Candidate Catalog (Cushing)",
+     "url": "https://astrogeology.usgs.gov/search/map/mars_global_cave_candidate_catalog_v1_cushing"
+    }
+   ]
+  }
+ ],
+ "labels": {
+  "mars_caves": {
+   "mars-jezero": {
+    "value": {
+     "count_within_200km": 0,
+     "nearest_id": "CC0808",
+     "nearest_km": 615.2
+    },
+    "stat": "great-circle distance from the target to each catalogue entry",
+    "dataset": "mars-cave-catalog",
+    "resolution": "point list",
+    "kind": "computed",
+    "note": "Candidates only: none is verified as a real cave."
+   },
+   "mars-arcadia-planitia": {
+    "value": {
+     "count_within_200km": 0,
+     "nearest_id": "CC0885",
+     "nearest_km": 1354.4
+    },
+    "stat": "great-circle distance from the target to each catalogue entry",
+    "dataset": "mars-cave-catalog",
+    "resolution": "point list",
+    "kind": "computed",
+    "note": "Candidates only: none is verified as a real cave."
+   },
+   "mars-gale": {
+    "value": {
+     "count_within_200km": 0,
+     "nearest_id": "CC0832",
+     "nearest_km": 1404.5
+    },
+    "stat": "great-circle distance from the target to each catalogue entry",
+    "dataset": "mars-cave-catalog",
+    "resolution": "point list",
+    "kind": "computed",
+    "note": "Candidates only: none is verified as a real cave."
+   },
+   "mars-deuteronilus-mensae": {
+    "value": {
+     "count_within_200km": 6,
+     "nearest_id": "CC0830",
+     "nearest_km": 132.6
+    },
+    "stat": "great-circle distance from the target to each catalogue entry",
+    "dataset": "mars-cave-catalog",
+    "resolution": "point list",
+    "kind": "computed",
+    "note": "Candidates only: none is verified as a real cave."
+   },
+   "mars-arsia-mons-caves": {
+    "value": {
+     "count_within_200km": 62,
+     "nearest_id": "APC075",
+     "nearest_km": 0.0
+    },
+    "stat": "great-circle distance from the target to each catalogue entry",
+    "dataset": "mars-cave-catalog",
+    "resolution": "point list",
+    "kind": "computed",
+    "note": "Candidates only: none is verified as a real cave."
+   }
+  },
+  "lunar_pits": {
+   "value": null,
+   "stat": "not checked",
+   "dataset": null,
+   "resolution": "none",
+   "kind": "published",
+   "note": "The LROC pit atlas is an interactive web page with no simple download, so we did not check it; this is not a finding that none exist."
+  }
+ }
+}
