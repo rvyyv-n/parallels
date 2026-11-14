@@ -111,7 +111,7 @@ Users can filter matches by type. A clustering step also groups Earth places wit
 - **Overall:** each challenge's score combines its traits; the mission filter's weights then combine the challenge scores. The total is never shown without the trait bars.
 - **Checked on known analogs** before we trust it ([guidelines](guidelines.md#2-doing-the-science-honestly)).
 
-Details: the README's [Method in short](../README.md#method-in-short).
+Details: the README's [Scoring model](../README.md#scoring-model).
 
 ### To consider
 
@@ -238,7 +238,7 @@ Times are the team's local time. The build machine's clock is 3 hours ahead.
 | | Step | Who | Check |
 |---|---|---|---|
 | [ ] | Fresh-eyes check: a model shown only four screenshots says what the site found and where one match breaks | Sonnet, medium | two correct sentences |
-| [ ] | README rewritten: summary, screenshot grid, contents, what it does, method, data, limits | Opus, medium | every number matches the data files |
+| [ ] | README: the new structure is in place (summary, screenshot grid, contents, what it does, how it works, validation). At the end, replace the screenshots in `docs/images/` with final ones, update the Status table, and add the live link and the demo video | Opus, medium | every number matches the data files |
 | [ ] | Final plan update; project page text; demo video of the tour with burned-in captions | orchestrator and team | every box in [guidelines](guidelines.md) section 7 |
 | [ ] | The team compares version 1 and version 2 and chooses the public link | team | the link opens in a private window |
 | [ ] | Final submission | team | the success banner shows |
