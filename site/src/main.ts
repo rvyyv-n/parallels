@@ -114,10 +114,12 @@ function shell(m: Manifest) {
               <div class="lg-bar" style="background:${gradient()}"></div>
               <div class="lg-ticks"><span>0</span><span>50</span><span>100</span></div>
               <p class="lg-text">100: closer to the target than all of Earth's land. Grey: not ranked.</p>
+              <p class="lg-faint">Weak matches are drawn faint so the ground shows.</p>
               <p class="lg-pole">The map layer stops at 85° N and S; the list still ranks land beyond it.</p>
               <div class="lg-keys">
                 <label><input type="checkbox" id="pick-labels" checked> <i class="k-analog"></i>Known analogs <i class="k-cave"></i>caves</label>
                 <label><input type="checkbox" id="pick-flat"> Flat map</label>
+                <label class="lg-range"><span>Match layer</span><input type="range" id="pick-strength" min="0" max="100" step="5" value="100"><output id="strength-out">100%</output></label>
               </div>
             </div>
           </div>
@@ -385,6 +387,11 @@ async function main() {
     if (li) pick(Number(li.dataset.i), true);
   });
   $<HTMLInputElement>("#pick-labels").addEventListener("change", (e) => earth?.labels((e.target as HTMLInputElement).checked));
+  $<HTMLInputElement>("#pick-strength").addEventListener("input", (e) => {
+    const v = Number((e.target as HTMLInputElement).value);
+    $("#strength-out").textContent = `${v}%`;
+    earth?.strength(v / 100);
+  });
   $<HTMLInputElement>("#pick-flat").addEventListener("change", (e) => {
     earth?.flat((e.target as HTMLInputElement).checked);
     drawLink(false);
@@ -442,6 +449,7 @@ async function main() {
         if (s.cell >= 0) earth.select(s.cell, false);
         earth.labels($<HTMLInputElement>("#pick-labels").checked);
         earth.flat($<HTMLInputElement>("#pick-flat").checked);
+        earth.strength(Number($<HTMLInputElement>("#pick-strength").value) / 100);
         earth.onMove(() => drawLink(false));
       })
       .catch(() => (earthEl.innerHTML = `<p class="nogl">The map could not be loaded. The ranked list and scorecards still work.</p>`));

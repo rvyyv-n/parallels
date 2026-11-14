@@ -27,6 +27,7 @@ export interface Earth {
   paint(score: Float32Array, keep: (i: number) => boolean): void;
   select(i: number, fly: boolean): void;
   top(ids: number[]): void;
+  strength(v: number): void;
   labels(on: boolean): void;
   flat(on: boolean): void;
   point(): { x: number; y: number } | null;
@@ -56,10 +57,13 @@ function lookup(g: Grid) {
   return { at, px };
 }
 
-function painter(canvas: HTMLCanvasElement, px: Int32Array) {
-  const g = canvas.getContext("2d")!;
-  const img = g.createImageData(W, H);
-  const d = img.data;
+function painter(far: HTMLCanvasElement, near: HTMLCanvasElement, px: Int32Array) {
+  const gf = far.getContext("2d")!;
+  const gn = near.getContext("2d")!;
+  const imgF = gf.createImageData(W, H);
+  const imgN = gn.createImageData(W, H);
+  const d = imgF.data;
+  const e = imgN.data;
   let shown = new Float32Array(0);
   let raf = 0;
   const draw = (s: Float32Array, keep: Uint8Array) => {
@@ -67,24 +71,27 @@ function painter(canvas: HTMLCanvasElement, px: Int32Array) {
       const i = px[p];
       const o = p * 4;
       if (i < 0) {
-        d[o + 3] = 0;
+        d[o + 3] = e[o + 3] = 0;
         continue;
       }
       const v = s[i];
       if (Number.isNaN(v)) {
-        d[o] = 120;
-        d[o + 1] = 126;
-        d[o + 2] = 134;
-        d[o + 3] = keep[i] ? 70 : 30;
+        d[o] = e[o] = 120;
+        d[o + 1] = e[o + 1] = 126;
+        d[o + 2] = e[o + 2] = 134;
+        d[o + 3] = e[o + 3] = keep[i] ? 70 : 30;
         continue;
       }
-      const l = Math.max(0, Math.min(255, Math.round(v * 255))) * 3;
-      d[o] = LUT[l];
-      d[o + 1] = LUT[l + 1];
-      d[o + 2] = LUT[l + 2];
-      d[o + 3] = keep[i] ? 235 : 40;
+      const c = Math.max(0, Math.min(1, v));
+      const l = Math.round(c * 255) * 3;
+      d[o] = e[o] = LUT[l];
+      d[o + 1] = e[o + 1] = LUT[l + 1];
+      d[o + 2] = e[o + 2] = LUT[l + 2];
+      d[o + 3] = keep[i] ? Math.round(255 * (0.3 + 0.6 * c)) : 15;
+      e[o + 3] = keep[i] ? Math.round(255 * (0.1 + 0.75 * c * c)) : 15;
     }
-    g.putImageData(img, 0, 0);
+    gf.putImageData(imgF, 0, 0);
+    gn.putImageData(imgN, 0, 0);
   };
   return (score: Float32Array, keep: Uint8Array, tick: () => void, done: () => void) => {
     cancelAnimationFrame(raf);
@@ -101,11 +108,11 @@ function painter(canvas: HTMLCanvasElement, px: Int32Array) {
     const t0 = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - t0) / 380);
-      const e = 1 - Math.pow(1 - t, 3);
+      const k = 1 - Math.pow(1 - t, 3);
       for (let i = 0; i < to.length; i++) {
         const a = from[i];
         const b = to[i];
-        mix[i] = Number.isNaN(a) || Number.isNaN(b) ? (t < 0.5 ? a : b) : a + (b - a) * e;
+        mix[i] = Number.isNaN(a) || Number.isNaN(b) ? (t < 0.5 ? a : b) : a + (b - a) * k;
       }
       draw(mix, keep);
       tick();
@@ -131,13 +138,18 @@ function parallel(lat: number) {
 export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPick: (i: number) => void): Earth {
   maplibregl.setWorkerUrl(workerUrl);
   const { at, px } = lookup(g);
-  const canvas = document.createElement("canvas");
-  canvas.width = W;
-  canvas.height = H;
-  canvas.id = "match-canvas";
-  canvas.style.display = "none";
-  document.body.append(canvas);
-  const paint = painter(canvas, px);
+  const sheet = (id: string) => {
+    const c = document.createElement("canvas");
+    c.width = W;
+    c.height = H;
+    c.id = id;
+    c.style.display = "none";
+    document.body.append(c);
+    return c;
+  };
+  const farCanvas = sheet("match-far-canvas");
+  const nearCanvas = sheet("match-near-canvas");
+  const paint = painter(farCanvas, nearCanvas, px);
   const pts = labels.filter((l) => l.kind === "known_analog" || l.kind === "cave");
   const phone = matchMedia("(max-width: 759px)").matches;
 
@@ -166,8 +178,8 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPi
       },
       layers: [
         { id: "space", type: "background", paint: { "background-color": "#050607" } },
-        { id: "fallback", type: "raster", source: "fallback", paint: { "raster-saturation": -0.7, "raster-brightness-max": 0.5, "raster-fade-duration": 0 } },
-        { id: "bm", type: "raster", source: "bm", paint: { "raster-saturation": -0.7, "raster-brightness-max": 0.5, "raster-contrast": 0.05 } },
+        { id: "fallback", type: "raster", source: "fallback", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.9, "raster-fade-duration": 0 } },
+        { id: "bm", type: "raster", source: "bm", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.9, "raster-contrast": 0.05 } },
         { id: "par", type: "line", source: "sel", filter: ["==", ["get", "k"], "par"], paint: { "line-color": "#4fd8ff", "line-width": 1, "line-dasharray": [2, 3], "line-opacity": 0.75 } },
         { id: "cell", type: "line", source: "sel", filter: ["==", ["get", "k"], "cell"], paint: { "line-color": "#4fd8ff", "line-width": 2.5 } },
         {
@@ -197,11 +209,16 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPi
   });
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
-  const src = () => map.getSource("match") as maplibregl.CanvasSource | undefined;
+  const LAYERS = ["match-far", "match-near"] as const;
+  const srcs = () => LAYERS.map((id) => map.getSource(id) as maplibregl.CanvasSource | undefined);
+  const fade = (id: (typeof LAYERS)[number], k: number): maplibregl.ExpressionSpecification =>
+    id === "match-far" ? ["interpolate", ["linear"], ["zoom"], 2.5, k, 4.5, 0] : ["interpolate", ["linear"], ["zoom"], 2.5, 0, 4.5, k];
   const ready = new Promise<void>((r) =>
     map.once("load", () => {
-      map.addSource("match", { type: "canvas", canvas, coordinates: WORLD, animate: false });
-      map.addLayer({ id: "match", type: "raster", source: "match", paint: { "raster-resampling": "nearest", "raster-fade-duration": 0 } }, "par");
+      for (const id of LAYERS) {
+        map.addSource(id, { type: "canvas", canvas: id === "match-far" ? farCanvas : nearCanvas, coordinates: WORLD, animate: false });
+        map.addLayer({ id, type: "raster", source: id, paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": fade(id, 1) } }, "par");
+      }
       r();
     }),
   );
@@ -227,9 +244,12 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPi
           score,
           k,
           () => {
-            src()?.play();
+            for (const c of srcs()) c?.play();
           },
-          () => requestAnimationFrame(() => src()?.pause()),
+          () =>
+            requestAnimationFrame(() => {
+              for (const c of srcs()) c?.pause();
+            }),
         ),
       );
     },
@@ -275,6 +295,12 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPi
           });
           markers.push(new maplibregl.Marker({ element: b }).setLngLat([g.lon[i], g.lat[i]]).addTo(map));
         });
+      });
+    },
+    strength(v) {
+      const k = Math.max(0, Math.min(1, v));
+      ready.then(() => {
+        for (const id of LAYERS) map.setPaintProperty(id, "raster-opacity", fade(id, k));
       });
     },
     labels(on) {

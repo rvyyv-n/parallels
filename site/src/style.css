@@ -1883,3 +1883,34 @@ ul.plain li {
     padding: 13px 0;
   }
 }
+
+.lg-faint {
+  color: var(--ink-2);
+  margin: 4px 0 0;
+}
+
+.lg-range {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) 4ch;
+  gap: 8px;
+}
+
+.lg-range input {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.lg-range output {
+  text-align: right;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 759px) {
+  .lg-faint {
+    grid-column: 1 / -1;
+    font-size: 11px;
+    margin: 2px 0 0;
+  }
+}
