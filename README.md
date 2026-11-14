@@ -6,12 +6,13 @@
 
 Our NASA Space Apps 2026 entry for [Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars](https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/). Event: 14–15 November 2026.
 
-**Status:** the idea ([docs/team-plan.md](docs/team-plan.md)) and the name are set. The tech stack and roadmap come next.
+**Status:** the idea ([docs/team-plan.md](docs/team-plan.md)) and the name are set, and the plan has been checked against our local event's Challenge Guide. The tech stack and roadmap come next.
 
 ## What's here
 
 - [docs/workflow.png](docs/workflow.png): our workflow at a glance; start here.
-- [docs/challenge.md](docs/challenge.md): the challenge in plain words.
+- [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, the main brief.
+- [docs/challenge.md](docs/challenge.md): the challenge in plain words, with the guide's six objectives and seven questions checked against our plan.
 - [docs/judging-notes.md](docs/judging-notes.md): how Space Apps is judged and what past winners did.
 - [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
 - [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.

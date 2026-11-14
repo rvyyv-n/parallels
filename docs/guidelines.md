@@ -42,7 +42,7 @@ The challenge says this outright, and it's also how we'll stand out:
 
 - **Every match explains itself:** what is similar, how similar (a number with its data source), and where the analogy breaks down.
 - **Never invent a value.** Every number on screen traces back to a named dataset. If data is missing, show it as missing and lower our confidence.
-- **Say what Earth can't copy:** low gravity, the Moon's vacuum, Mars's thin air, space radiation.
+- **Say what Earth can't copy:** low gravity, the Moon's vacuum, Mars's thin air, space radiation (Earth's magnetic field and thick air block it).
 - **Aim for places nobody uses yet.** Antarctica, Atacama, Iceland and Hawaii are fine to compare against, but they shouldn't be our headline.
 - **Test the method on places we already know.** Before trusting a new find, check that known analogs (Atacama, Haughton Crater, Antarctica's Dry Valleys) score high and an ordinary place scores low. Show that check on the site.
 
@@ -63,6 +63,8 @@ The challenge says this outright, and it's also how we'll stand out:
 | Earth (Europe) | [ESA Open Science Catalog](https://opensciencedata.esa.int/) | Catalogue of open geoscience datasets |
 | Earth (Japan) | [JAXA G-Portal](https://gportal.jaxa.jp/gpr/index/index) | Japanese satellite data: rain, snow, vegetation and more |
 
+**The local [Challenge Guide](challenge-guide.pdf) adds** the [NASA Open Data Portal](https://data.nasa.gov), [NASA Open APIs](https://api.nasa.gov), [USGS Astrogeology](https://astrogeology.usgs.gov), [Moon Trek](https://trek.nasa.gov/moon), [Mars Trek](https://trek.nasa.gov/mars), [NSSDCA](https://nssdc.gsfc.nasa.gov) and [JPL Horizons](https://ssd.jpl.nasa.gov/horizons). Its benchmark: combine at least three distinct open data archives (for example NASA PDS, USGS and Landsat or Sentinel).
+
 **NASA data does the main scoring work.** Partner data (Canada, Europe, Japan) fills gaps and is credited in its own form field. We add sources beyond this table only where they fill a real gap.
 
 - Open data only. Follow each source's terms and credit it.
@@ -72,6 +74,7 @@ The challenge says this outright, and it's also how we'll stand out:
 ## 4. What the plan must settle
 
 - A name, a short tagline, and one sentence a judge could repeat.
+- How we meet each of the Challenge Guide's six benchmarks and answer its seven questions ([challenge.md](challenge.md#the-six-objectives)).
 - One main flow a newcomer finishes in under a minute without help. Everything else is extra.
 - The awards we aim at (Best Use of Science, Best Use of Data, Best Mission Concept) and what on the page makes each case.
 - Hosting that keeps working untouched until 26 January 2027: nothing to restart, no keys that expire, no paid service without a spending cap. Pre-computed results on a static site are the safe default.
@@ -101,6 +104,7 @@ The challenge says this outright, and it's also how we'll stand out:
 - [ ] Final project link opens in a private window, with no login
 - [ ] NASA datasets named, with links; every other source listed
 - [ ] Images pasted on the page, including a "where it breaks" example
+- [ ] Each of the Challenge Guide's six benchmarks is visibly met, and its seven questions are answered on the site or page
 - [ ] AI note in the site footer and the project description; AI images watermarked; no NASA branding in AI output
 - [ ] Site needs no upkeep until 26 Jan 2027; submitted version tagged
 - [ ] No under-18 likenesses
