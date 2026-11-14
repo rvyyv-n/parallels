@@ -453,19 +453,21 @@ export function card(x: CardInput): string {
       </section>
       <section class="mv-verdict" aria-label="Verdict">
         <div class="overall">
-          <div class="o-num" style="--c:${ok ? colour(s) : "#777"}"><span class="o-label">Match</span><b${ok ? "" : ' class="none"'}>${ok ? score100(s) : "—"}</b><span class="o-of">${ok ? "of 100" : "not ranked"}</span></div>
+          <div class="o-num" style="--c:${ok ? colour(s) : "#777"};--p:${ok ? (s * 100).toFixed(1) : 0}"><span class="o-label">Match</span><b${ok ? "" : ' class="none"'}>${ok ? score100(s) : "—"}</b><span class="o-of">${ok ? "of 100" : "not ranked"}</span></div>
           <div class="o-band">
-            ${band ? `<span class="band b-${band.cls}">${icon(band.ic)}${band.word}</span>` : `<span class="band b-none">${icon("info")}No band</span>`}
+            ${band ? `<span class="band b-${band.cls}">${icon(band.ic)}${band.word} match</span>` : `<span class="band b-none">${icon("info")}No band</span>`}
             <p class="o-for">${esc(x.weightsName)} for ${esc(target.name)}${x.yr ? ", year-round" : ""}</p>
           </div>
         </div>
         ${limiting(x, chs)}
+        <details class="o-how"><summary>${icon("info")}How the score works${icon("chevron", "chev")}</summary>
         <p class="o-text">${
           ok
             ? "The match is a weighted mix of the challenge scores below. Each challenge score comes from its traits. A trait scores higher when more of Earth's land is further from the target than this place."
             : "Not enough of the weighted challenges have data here to give a match."
         }</p>
         <p class="v-bands"><b>Bands are our own labels, not data:</b> Close: 80 and up. Partial: 50 to 79. Weak: under 50.</p>
+        </details>
         ${summary(x, chs)}
       </section>
     </div>
