@@ -57,7 +57,7 @@
   "used_for": [
    "surface"
   ],
-  "used_for_note": "ESA astronaut geology training on anorthosite, the rock of the Moon's bright highlands, exposed by glacial erosion.",
+  "used_for_note": "ESA astronaut geology training (PANGAEA) scouts Lofoten, where astronauts are expected to recognise anorthosite, a rock abundant in the lunar highlands.",
   "used_for_source": "https://www.esa.int/ESA_Multimedia/Images/2023/07/The_Moon_in_a_fjord"
  },
  {
@@ -177,7 +177,7 @@
   "used_for": [
    "surface"
   ],
-  "used_for_note": "Apollo 14 crews trained there in 1970 and ESA PANGAEA uses it to teach impact geology.",
+  "used_for_note": "Apollo 14 and 17 crews had geological field training there in 1970; ESA uses it for the same purpose (PANGAEA: lunar geology and impact cratering).",
   "used_for_source": "https://www.frontiersin.org/articles/10.3389/fspas.2023.1186173"
  },
  {
@@ -340,7 +340,7 @@
    "life",
    "surface"
   ],
-  "used_for_note": "AMASE Mars analog expeditions study volcanic centres with carbonates like those in meteorite ALH84001 and Gusev crater, and biosignatures.",
+  "used_for_note": "AMASE Mars analog expeditions study the Bockfjord volcanic complex, whose carbonates resemble those in meteorite ALH84001 and Gusev crater; AMASE also tests life-detection instruments there.",
   "used_for_source": "https://ntrs.nasa.gov/api/citations/20110008112/downloads/20110008112.pdf"
  },
  {
@@ -452,7 +452,7 @@
    "surface"
   ],
   "used_for_note": "Glacial and periglacial landforms, buried ice and polygonal terrain studied as Mars comparisons.",
-  "used_for_source": "https://www.europlanet-society.org/wp-content/uploads/ninja-forms/46/Europlanet_report_Kangerlussuaq_AGG2023-signed.pdf"
+  "used_for_source": "https://www.europlanet.org/wp-content/uploads/ninja-forms/46/Europlanet_report_Kangerlussuaq_AGG2023-signed.pdf"
  },
  {
   "id": "makgadikgadi",
@@ -463,15 +463,16 @@
   "groups": [
    "mars-analog"
   ],
-  "coords_estimate": true,
+  "coords_estimate": false,
   "coord_source": "https://en.wikipedia.org/wiki/Sua_Pan",
-  "coord_note": "Representative point at the Wikipedia point for Sua Pan (the Makgadikgadi article's own point, -20.80, 25.33, was not used). The article text also gives 20°59′32″S 25°58′22″E, 27 km south; Sua Pan covers about 24,000 km², so both lie within the pan area. Not checked on a map layer.",
+  "coord_note": "Representative point at the Wikipedia point for Sua Pan (the Makgadikgadi article's own point, -20.80, 25.33, was not used). The article text also gives 20°59′32″S 25°58′22″E, 27 km south; Sua Pan covers about 24,000 km², so both lie within the pan area. Not checked on a map layer. Confirmed on 15 November: the point lies inside the OpenStreetMap outline of Sua Pan (relation 9479455).",
   "used_for": [
    "resources",
    "life"
   ],
-  "used_for_note": "Salt pans studied as analogs for Martian playa, hydrated silica and groundwater-upwelling settings with extremophiles.",
-  "used_for_source": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2023.1108386/pdf"
+  "used_for_note": "Salt pans (Sua Pan) studied as analogs for Martian playa, hydrated silica (opal) deposits and groundwater-upwelling settings.",
+  "used_for_source": "https://www.frontiersin.org/journals/astronomy-and-space-sciences/articles/10.3389/fspas.2023.1108386/pdf",
+  "used_for_caution": "Source check on 15 November: the \"life\" label has only weak support in the opened source. It was left as first classified because results had already been computed with it."
  },
  {
   "id": "pavilion-lake",
@@ -542,7 +543,7 @@
    "life",
    "surface"
   ],
-  "used_for_note": "Ca-sulfate salar whose domes and polygons guide Mars site selection and whose gypsum preserves biosignatures.",
+  "used_for_note": "Ca-sulfate salar whose domes and polygons are studied as an early-Mars analog; its endolithic microbial communities and gypsum structures are proposed targets for biosignature exploration.",
   "used_for_source": "https://www.frontiersin.org/articles/10.3389/fspas.2021.797591"
  },
  {
@@ -597,8 +598,8 @@
   "used_for": [
    "surface"
   ],
-  "used_for_note": "Alluvial fans compared with those at Gale crater and used in planning Mars landing sites.",
-  "used_for_source": "https://earthobservatory.nasa.gov/images/78860/mars-rover-curiosity-on-a-familiar-landscape"
+  "used_for_note": "Alluvial fans compared with those at Gale crater; the area is a favorite of scientists planning Mars landing sites.",
+  "used_for_source": "https://science.nasa.gov/earth/earth-observatory/mars-rover-curiosity-on-a-familiar-landscape-78860"
  },
  {
   "id": "craters-of-the-moon",
@@ -616,8 +617,8 @@
    "shelter",
    "surface"
   ],
-  "used_for_note": "Basaltic lava tubes and fields used by NASA BASALT and FINESSE field campaigns and lava-tube mapping for Mars and the Moon.",
-  "used_for_source": "https://www.nationalgeographic.com/science/article/nasa-lava-tubes-craters-moon-exploring-mars-space-science"
+  "used_for_note": "Basaltic lava terrain with lava tubes, used by the NASA BASALT and FINESSE field campaigns for Mars and the Moon.",
+  "used_for_source": "https://www.planetary.org/articles/1021-preparing-for-the-journey-to-moon-mars-and-beyond"
  },
  {
   "id": "kilauea-iki",
@@ -651,8 +652,8 @@
   "used_for": [
    "surface"
   ],
-  "used_for_note": "ESA PANGAEA training site where the Mars-analog geology of the gorge is taught.",
-  "used_for_source": "https://astrobiology.com/?p=26826"
+  "used_for_note": "ESA PANGAEA training site: the gorge's Permian sedimentary rocks are used to teach Martian sedimentary geology and surface processes.",
+  "used_for_source": "https://www.esa.int/ESA_Multimedia/Images/2021/09/Pangaea_2018_edition_at_the_Bletterbach_canyon"
  },
  {
   "id": "chill-ice-lava-tube",
@@ -840,7 +841,7 @@
   ],
   "coords_estimate": true,
   "coord_source": "https://en.wikipedia.org/wiki/Grand_Erg_Oriental",
-  "coord_note": "Representative point at the Wikipedia article's point (30°N, 6°E), 154 km from the old point. Our land cover marks the cell as bare ground; the point sits near the erg's south-western side and the article gives no boundary to check against."
+  "coord_note": "Representative point at the Wikipedia article's point (30°N, 6°E), 154 km from the old point. Our land cover marks the cell as bare ground; the point sits near the erg's south-western side and the article gives no boundary to check against. Confirmed on 15 November: the point lies inside the OpenStreetMap outline of the erg, in its western part."
  },
  {
   "id": "thar",
@@ -1130,8 +1131,9 @@
    "life",
    "resources"
   ],
-  "used_for_note": "Salt-driven brine pond studied for habitability limits and as a model for Martian brine flows.",
-  "used_for_source": "https://en.wikipedia.org/wiki/Mars_habitability_analogue_environments_on_Earth"
+  "used_for_note": "Salt-driven CaCl2 brine pond fed by near-surface brine (deliquescence plus some meltwater); studied as an analog for Martian brine flows (RSL) and chloride deposits.",
+  "used_for_source": "https://authors.library.caltech.edu/72457",
+  "used_for_caution": "Source check on 15 November: no opened source supports the \"life\" label for this site, and \"resources\" only loosely. The labels were left as first classified because results had already been computed with them."
  },
  {
   "id": "lava-beds-national-monument",
