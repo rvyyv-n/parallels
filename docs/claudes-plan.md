@@ -408,7 +408,7 @@ Checked on 14 November, before the version 1 build, by opening each link or read
 | Craters of the Moon | 43.4617, −113.5627 | Confirmed: same as the article |
 | Kīlauea Iki | 19.4139, −155.246 | Not re-checked (Wikidata Q1333175) |
 | Bletterbach | 46.35, 11.43 | Confirmed: 0.9 km |
-| Six plain deserts | as in `sites.json` | Thar, Rub' al Khali and Kalahari match their article's point exactly. Grand Erg Oriental, Simpson and Great Victoria are 154, 64 and 220 km from theirs. **Suggestion:** move those three to the article's point so every desert has a named source |
+| Six plain deserts | as in `pipeline/sites.json` | Thar, Rub' al Khali and Kalahari match their article's point exactly. Grand Erg Oriental, Simpson and Great Victoria are 154, 64 and 220 km from theirs. **Suggestion:** move those three to the article's point so every desert has a named source |
 
 Also checked, though not starred:
 
