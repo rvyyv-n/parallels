@@ -12,9 +12,11 @@ No single place on Earth can stand in for a Moon or Mars base. So we split base-
 
 ## Status
 
-Version 1 is live at [dotcatcher.vercel.app](https://dotcatcher.vercel.app). It ranks every land cell on Earth against six targets: the Moon's south pole and five Mars sites (Jezero, Gale, Arcadia Planitia, Deuteronilus Mensae and the Arsia Mons caves). The map shows method version 1.2. Only the Moon's south pole and Jezero are checked against test places.
+Version 1 is live at [dotcatcher.vercel.app](https://dotcatcher.vercel.app). The code of that site is on branch `v1`; this branch holds the data side only.
 
-Version 1 does not pass every check. It passes 1 of its 4 first checks. In the fourth run, 10 of 15 checks with enough sites pass. On the held-out half, version 1.2 beats ordinary places 96% of the time for the Moon and 76% for Mars. The site shows all of this. See `site/public/data/validation.json`.
+Version 1 ranks every land cell on Earth against six targets: the Moon's south pole and five Mars sites (Jezero, Gale, Arcadia Planitia, Deuteronilus Mensae and the Arsia Mons caves). The data files hold method version 1.2. Only the Moon's south pole and Jezero are checked against test places.
+
+Version 1 does not pass every check. It passes 1 of its 4 first checks. In the fourth run, 10 of 15 checks with enough sites pass. On the held-out half, version 1.2 beats ordinary places 96% of the time for the Moon and 76% for Mars. The live site shows all of this. See `site/public/data/validation.json`.
 
 ## What's here
 
@@ -29,8 +31,7 @@ Version 1 does not pass every check. It passes 1 of its 4 first checks. In the f
 - [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
 - [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.
 - `pipeline/`: the Python data pipeline. Its method settings are in `pipeline/config/`.
-- `site/`: the Vite site. It reads the files in `site/public/data/`.
-- `site/public/data/`: the pre-computed files the site loads. See [The data files](#the-data-files).
+- `site/public/data/`: the pre-computed files the pipeline exports. See [The data files](#the-data-files).
 
 ## Run it
 
@@ -50,13 +51,6 @@ Pipeline (Python 3.13). Run each command from the repository root.
 3. Run the tests: `.venv/Scripts/python -m pytest`.
 
 On macOS and Linux, use `.venv/bin/python` in place of `.venv/Scripts/python`.
-
-Site (in `site/`):
-
-1. `npm install`
-2. `npm run dev` starts the dev server.
-3. `npm run build` checks the types and builds the site.
-4. `npm test` runs the Playwright tests on port 4319. Run `npx playwright install chromium` first. Set `RUN_NETWORK=1` to also check every source link.
 
 ## The data files
 
@@ -131,31 +125,13 @@ Every number on the site comes from one of these datasets. No sample or placehol
 
 The datasets come from five main open archives: NASA PDS Geosciences Node, USGS Astrogeology, NASA POWER and NASA Earthdata, Copernicus Data Space / AWS Open Data, and NASA PGDA (Goddard).
 
-### Display imagery
-
-These images are shown, not scored.
-
-| Image | Source | Licence | Use |
-|---|---|---|---|
-| [Blue Marble: Shaded Relief and Bathymetry](https://nasa-gibs.github.io/gibs-api-docs/) | NASA Earth Observatory via NASA GIBS | NASA open data, no restrictions | Earth globe background. We bundle a copy as `site/public/img/blue-marble.jpg`. It takes over if the live tile service is down. |
-| [CGI Moon Kit: LROC colour map with filled poles](https://svs.gsfc.nasa.gov/4720) | NASA Scientific Visualization Studio (LRO data) | Public domain (NASA) | Surface of the 3D Moon globe (`site/public/img/moon.jpg`). |
-| [Viking MDIM 2.1 global colour mosaic](https://trek.nasa.gov/mars/) | NASA / USGS Astrogeology, via NASA Mars Trek tiles | Public domain (NASA / USGS) | Surface of the 3D Mars globe (`site/public/img/mars.jpg`). |
-
 ### Code libraries
 
 | Library | Licence | Use |
 |---|---|---|
-| [MapLibre GL JS](https://maplibre.org/) | BSD-3-Clause | Earth globe and map |
-| [three.js](https://threejs.org/) | MIT | 3D Moon and Mars globes |
-| [Vite](https://vite.dev/) and TypeScript | MIT / Apache-2.0 | Building the site |
-| Playwright | Apache-2.0 | Site tests |
 | numpy, scipy, pandas, xarray, zarr, fsspec, s3fs, aiohttp, netCDF4, h5netcdf, rasterio (GDAL), pyproj, pyshp, requests, earthaccess, pyhdf, pytest | Open-source licences, set by each package | Data pipeline and its tests (see `pyproject.toml`) |
 
-### Fonts
-
-| Font | Licence | Use |
-|---|---|---|
-| [Archivo](https://fontsource.org/fonts/archivo) (variable, by Omnibus-Type) | SIL Open Font Licence 1.1 | Headings, labels and numbers |
+The version 1 site's own libraries, fonts and display images are listed in the README on branch `v1`.
 
 ## Method in short
 
