@@ -132,9 +132,8 @@ function notRun(ts: ValidationTest[]) {
   const off = ts.flatMap((t) => t.checks.filter((c) => c.passed == null).map((c) => ({ t, c })));
   if (!off.length) return "";
   const min = off.map(({ c }) => c.name.match(/fewer than (\d+)/i)?.[1]).find(Boolean);
-  return `<p class="not-run">${num(off.length)} ${off.length === 1 ? "check" : "checks"} had ${min ? `fewer than ${esc(min)} test sites` : "too few test sites"}, so no pass or fail: ${off
-    .map(({ t, c }) => `${esc(bare(c.name))} (${esc(t.title)})`)
-    .join("; ")}.</p>`;
+  const by = [...new Set(off.map(({ t }) => t))].map((t) => `<b>${esc(t.title)}:</b> ${off.filter((o) => o.t === t).map(({ c }) => esc(bare(c.name))).join("; ")}.`);
+  return `<p class="not-run">${num(off.length)} ${off.length === 1 ? "check" : "checks"} had ${min ? `fewer than ${esc(min)} test sites` : "too few test sites"}, so no pass or fail. ${by.join(" ")}</p>`;
 }
 
 function checksTable(ts: ValidationTest[], l: string) {
@@ -171,8 +170,8 @@ function verdict(ts: ValidationTest[], summary?: string) {
         : ""
     }
     ${notRun(ts)}
-    ${summary ? `<p class="v-summary">${esc(summary)}</p>` : ""}
-  </div>`;
+  </div>
+  ${summary ? fold("What this run found, in full", `<p class="v-summary">${esc(summary)}</p>`) : ""}`;
 }
 
 function misses(ts: ValidationTest[]) {
@@ -217,10 +216,9 @@ function later(r: Later, id: string, l: string, m: Manifest) {
   ].join("");
   return `<div class="second" id="${id}">
       <h3 class="run-h">${esc(r.title)}</h3>
-      <p class="note"><b>Designed after seeing the first run.</b> Its design was chosen knowing the first run's result, so it can't confirm the method the way the first run could. Config fixed at commit ${esc(r.config_commit)}.</p>
-      <p>${esc(r.plain)}</p>
-      ${extra}
       ${verdict(r.tests, r.summary)}
+      <p class="note"><b>Designed after seeing the first run.</b> Its design was chosen knowing the first run's result, so it can't confirm the method the way the first run could. Config fixed at commit ${esc(r.config_commit)}.</p>
+      ${fold(extra ? "What this run changed, and the rule for using it" : "What this run did", `<p>${esc(r.plain)}</p>${extra}`)}
       ${block(r.tests, m, l)}
       ${r.unchecked.length ? fold(`Not checked in this run (${num(r.unchecked.length)})`, `<ul class="plain">${r.unchecked.map((u) => `<li><b>${esc(u.place)}:</b> ${esc(u.why)}</li>`).join("")}</ul>`) : ""}
     </div>`;
@@ -229,10 +227,10 @@ function later(r: Later, id: string, l: string, m: Manifest) {
 function first(v: Validation, l: string, m: Manifest) {
   return `<div class="run-first" id="first-run">
     <h3 class="run-h">First run</h3>
+    ${verdict(v.tests, v.summary)}
     <p class="note"><b>Not a blind first run.</b> ${esc(v.not_blind_note)}${
       v.prototype_runs.length ? ` Earlier prototype runs: ${v.prototype_runs.map((r) => `${esc(r.date)}, ${esc(r.result)}`).join("; ")}.` : ""
     } Weights and pass marks fixed at commit ${esc(v.weights_commit)}.</p>
-    ${verdict(v.tests, v.summary)}
     ${block(v.tests, m, l)}
   </div>`;
 }
@@ -270,31 +268,40 @@ function checked(v: Validation | null, m: Manifest) {
   const now = [...all].reverse().find((r) => r.adopted) ?? all[0];
   const ver = m.method_version ?? methodOf(now.title);
   const earlier = all.filter((r) => r !== now);
-  return `<p class="lede">If the method works, places NASA already trusts should score higher than ordinary farmland, and higher than big deserts that are dry but not analogs. The pass marks were set in our plan before any data came in.</p>
+  const dataOk = v.data_checks.filter((c) => c.passed).length;
+  const dataBad = v.data_checks.filter((c) => !c.passed);
+  return `<p class="lede">Places NASA already trusts should score higher than ordinary farmland and plain deserts. We set the pass marks before any data came in.</p>
     <div class="current-box">
       <p class="cur-h">${ver ? `Current method: version ${esc(ver)} (the map uses this)` : `Current method: ${esc(now.title)} (the map uses this)`}</p>
       ${history(all, now)}
     </div>
     ${now.body}
     ${earlier.length ? `<details class="earlier"><summary>Earlier runs (${num(earlier.length)})</summary>${earlier.map((r) => r.body).join("")}</details>` : ""}
-    ${v.stability ? `<p>${esc(v.stability)}</p>` : ""}
-    <h3>Data checks</h3>
-    <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Check</th><th scope="col">Result</th><th scope="col">Outcome</th></tr></thead><tbody>${v.data_checks
-      .map((c) => `<tr><th scope="row">${esc(c.name)}</th><td class="n">${esc(c.result)}</td>${outcome(c.passed)}</tr>`)
-      .join("")}</tbody></table></div>`;
+    ${v.stability ? fold("How stable the top places are", `<p>${esc(v.stability)}</p>`) : ""}
+    ${dataBad.length ? `<p class="v-failed"><b>Data checks not passed:</b> ${dataBad.map((c) => esc(c.name)).join("; ")}</p>` : ""}
+    ${fold(
+      `Data checks (${num(dataOk)} of ${num(v.data_checks.length)} passed)`,
+      `<div class="scroll-x"><table class="data"><thead><tr><th scope="col">Check</th><th scope="col">Result</th><th scope="col">Outcome</th></tr></thead><tbody>${v.data_checks
+        .map((c) => `<tr><th scope="row">${esc(c.name)}</th><td class="n">${esc(c.result)}</td>${outcome(c.passed)}</tr>`)
+        .join("")}</tbody></table></div>`,
+    )}`;
 }
 
 function terrain(m: Manifest) {
-  return `<div class="cols2">
-    <div><h3>Terrain types</h3><p>Every land cell gets one tag, by rules worked out from the data. Filter the map by type above.</p>
-    <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Type</th><th scope="col">Rule</th><th scope="col">Cells</th></tr></thead><tbody>${m.terrain_types
-      .map((t) => `<tr><th scope="row">${esc(t.name)}</th><td>${esc(t.rule)}</td><td class="n">${num(t.cells)}</td></tr>`)
-      .join("")}</tbody></table></div></div>
-    <div><h3>Clusters</h3><p>${esc(m.clustering.summary)}</p><p class="small muted">${esc(m.clustering.method)}. ${m.clustering.k} clusters, from: ${m.clustering.inputs.map(esc).join(", ")}.</p>
+  return `<p class="lede">Every land cell gets one terrain tag, by rules worked out from the data. Filter the map by type above.</p>
+    ${fold(
+      `The ${num(m.terrain_types.length)} terrain types and their rules`,
+      `<div class="scroll-x"><table class="data"><thead><tr><th scope="col">Type</th><th scope="col">Rule</th><th scope="col">Cells</th></tr></thead><tbody>${m.terrain_types
+        .map((t) => `<tr><th scope="row">${esc(t.name)}</th><td>${esc(t.rule)}</td><td class="n">${num(t.cells)}</td></tr>`)
+        .join("")}</tbody></table></div>`,
+    )}
+    ${fold(
+      `How ${num(m.clustering.k)} clusters compare with the types`,
+      `<p>${esc(m.clustering.summary)}</p><p class="small muted">${esc(m.clustering.method)}. ${m.clustering.k} clusters, from: ${m.clustering.inputs.map(esc).join(", ")}.</p>
     <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Cluster</th><th scope="col">Cells</th><th scope="col">Most common type</th><th scope="col">Share</th></tr></thead><tbody>${m.clustering.agreement
       .map((a) => `<tr><th scope="row">${num(a.cluster)}</th><td class="n">${num(a.cells)}</td><td>${esc(a.top_type)}</td><td class="n">${num(a.share * 100, 0)}%</td></tr>`)
-      .join("")}</tbody></table></div></div>
-  </div>`;
+      .join("")}</tbody></table></div>`,
+    )}`;
 }
 
 function data(m: Manifest) {
@@ -302,23 +309,21 @@ function data(m: Manifest) {
   const ds = [...m.datasets].sort((a, b) => order.indexOf(a.agency) - order.indexOf(b.agency));
   const archives = [...new Set(ds.map((d) => d.archive).filter((a): a is string => !!a && !/^(computed|published paper)$/i.test(a)))];
   const b1 = m.benchmarks.find((b) => b.n === 1);
-  return `<p class="lede">Every number on this site traces to one of these. NASA data does the main scoring work; partner data is marked.</p>
+  return `<p class="lede">Every number on this site traces to a named dataset. NASA data does the main scoring work; partner data is marked.</p>
     ${
       b1
         ? `<div class="archives"><p class="guide">${esc(b1.guide_words)}</p><p>${num(archives.length)} open data archives feed this site: ${archives.map(esc).join(", ")}.</p></div>`
         : ""
     }
-    <div class="scroll-x"><table class="data ds"><thead><tr><th scope="col">Dataset</th><th scope="col">Agency</th><th scope="col">Archive</th><th scope="col">Licence</th><th scope="col">Used for</th></tr></thead><tbody>${ds
+    ${fold(`All ${num(ds.length)} datasets, with archive, licence and use`, `<div class="scroll-x"><table class="data ds"><thead><tr><th scope="col">Dataset</th><th scope="col">Agency</th><th scope="col">Archive</th><th scope="col">Licence</th><th scope="col">Used for</th></tr></thead><tbody>${ds
       .map(
         (d) => `<tr><th scope="row">${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>` : esc(d.name)}</th><td>${esc(d.agency)}${
           d.agency === "partner" ? ' <span class="tag">partner</span>' : ""
         }</td><td>${esc(d.archive ?? "")}</td><td>${esc(d.licence)}</td><td>${esc(d.used_for)}</td></tr>`,
       )
-      .join("")}</tbody></table></div>
-    <h3>Imagery shown, not scored</h3>
-    <ul class="plain">${IMAGERY.map((i) => `<li><a href="${i.url}" target="_blank" rel="noopener">${esc(i.name)}</a>, ${esc(i.by)}. ${esc(i.licence)}. ${esc(i.use)}</li>`).join("")}</ul>
-    <h3>Code and fonts</h3>
-    <ul class="plain">${CODE.map((c) => `<li><a href="${c.url}" target="_blank" rel="noopener">${esc(c.name)}</a>: ${esc(c.licence)}. ${esc(c.use)}.</li>`).join("")}</ul>`;
+      .join("")}</tbody></table></div>`)}
+    ${fold(`Imagery shown, not scored (${num(IMAGERY.length)})`, `<ul class="plain">${IMAGERY.map((i) => `<li><a href="${i.url}" target="_blank" rel="noopener">${esc(i.name)}</a>, ${esc(i.by)}. ${esc(i.licence)}. ${esc(i.use)}</li>`).join("")}</ul>`)}
+    ${fold(`Code and fonts (${num(CODE.length)})`, `<ul class="plain">${CODE.map((c) => `<li><a href="${c.url}" target="_blank" rel="noopener">${esc(c.name)}</a>: ${esc(c.licence)}. ${esc(c.use)}.</li>`).join("")}</ul>`)}`;
 }
 
 export function sections(m: Manifest, v: Validation | null) {
@@ -329,18 +334,31 @@ export function sections(m: Manifest, v: Validation | null) {
     sec(
       "benchmarks",
       "The six benchmarks",
-      `<p class="lede">From our local event's Challenge Guide, in its own words.</p><ol class="bench">${m.benchmarks
-        .map(
-          (b) => `<li><span class="b-n">${b.n}</span><div><p class="guide">${esc(b.guide_words)}</p><p>${esc(b.how)}</p><p class="small"><a href="#${WHERE[b.n] ?? "explore"}">${esc(b.where)}</a></p></div></li>`,
-        )
-        .join("")}</ol>`,
+      `<p class="lede">Our local event's Challenge Guide sets ${num(m.benchmarks.length)} benchmarks. Here is how we meet each one.</p>${fold(
+        `The ${num(m.benchmarks.length)} benchmarks, in the guide's words`,
+        `<ol class="bench">${m.benchmarks
+          .map(
+            (b) => `<li><span class="b-n">${b.n}</span><div><p class="guide">${esc(b.guide_words)}</p><p>${esc(b.how)}</p><p class="small"><a href="#${WHERE[b.n] ?? "explore"}">${esc(b.where)}</a></p></div></li>`,
+          )
+          .join("")}</ol>`,
+      )}`,
     ),
     sec(
       "questions",
       "Seven questions",
-      `<ol class="qs">${m.questions.map((q) => `<li><span class="b-n">${q.n}</span><div><p class="guide">${esc(q.question)}</p><p>${esc(q.answer)}</p></div></li>`).join("")}</ol>`,
+      `<p class="lede">The guide asks ${num(m.questions.length)} questions. Each has a short answer.</p>${fold(
+        `The ${num(m.questions.length)} questions and our answers`,
+        `<ol class="qs">${m.questions.map((q) => `<li><span class="b-n">${q.n}</span><div><p class="guide">${esc(q.question)}</p><p>${esc(q.answer)}</p></div></li>`).join("")}</ol>`,
+      )}`,
     ),
     sec("data", "Data", data(m)),
-    sec("limits", "Not in this version", `<ul class="plain limits">${m.not_in_version.map((n) => `<li><b>${esc(n.item)}.</b> ${esc(n.reason)}</li>`).join("")}</ul>`),
+    sec(
+      "limits",
+      "Not in this version",
+      `<p class="lede">Left out for now: ${m.not_in_version.map((n) => esc(n.item)).join(", ")}.</p>${fold(
+        `Why each is left out (${num(m.not_in_version.length)})`,
+        `<ul class="plain limits">${m.not_in_version.map((n) => `<li><b>${esc(n.item)}.</b> ${esc(n.reason)}</li>`).join("")}</ul>`,
+      )}`,
+    ),
   ].join("");
 }

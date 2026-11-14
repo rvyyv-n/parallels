@@ -89,3 +89,98 @@
   font-size: 18px;
   margin: 18px 0 6px;
 }
+
+.ask-note {
+  position: absolute;
+  left: 14px;
+  bottom: 8px;
+  right: 14px;
+  z-index: 2;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  pointer-events: none;
+}
+
+.ask-note > summary {
+  pointer-events: auto;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--signal);
+  font-weight: 600;
+  list-style: none;
+}
+
+.ask-note > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ask-note > summary::before {
+  content: "+";
+  font: 700 15px/1 var(--display);
+  width: 14px;
+}
+
+.ask-note[open] > summary::before {
+  content: "\2212";
+}
+
+.ask-note .ask-sub {
+  pointer-events: auto;
+  margin: 0;
+  max-width: 60ch;
+  max-height: 160px;
+  overflow: auto;
+  padding: 8px 10px;
+  background: rgba(5, 6, 7, 0.92);
+  border: 1px solid var(--rule-2);
+  font-size: 12.5px;
+}
+
+.ask-note[open] {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.current-box + .second {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.earlier .second:first-of-type,
+.earlier .run-first {
+  margin-top: 12px;
+}
+
+.run-hist th[scope="row"] {
+  white-space: nowrap;
+}
+
+.run-hist th[scope="row"] a {
+  display: inline-block;
+  padding: 6px 0;
+}
+
+@media (pointer: coarse) {
+  .run-hist th[scope="row"] a {
+    min-height: 44px;
+    padding: 12px 0 0;
+  }
+}
+
+@media (max-width: 759px) {
+  .current-box {
+    padding: 12px 12px 4px;
+    border-left-width: 4px;
+  }
+
+  .cur-h {
+    font-size: 18px;
+  }
+
+  .verdict {
+    padding: 12px 14px;
+  }
+}

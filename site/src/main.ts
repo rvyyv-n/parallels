@@ -89,7 +89,6 @@ function shell(m: Manifest) {
               .map((t) => `<option value="${esc(t.id)}">${esc(t.name)}</option>`)
               .join("")}</select></span></h1>
           <p class="ask-how">Every patch of land on Earth, in squares about 50 km across, is scored from 0 to 100 for how closely it matches the target. Pick a place in the top 10 or on the map to see why it matches and where it falls short.</p>
-          <p class="ask-sub" id="ask-sub"></p>
         </div>
         <div class="stage">
           <aside class="ledger-col" aria-labelledby="ledger-h">
@@ -128,6 +127,7 @@ function shell(m: Manifest) {
             <figure class="tglobe">
               <div class="tglobe-view" id="tglobe"></div>
               <figcaption id="tcap"></figcaption>
+              <details class="ask-note"><summary>About this filter and target</summary><p class="ask-sub" id="ask-sub"></p></details>
             </figure>
             <div class="card-wrap" id="card" aria-live="polite"></div>
           </div>
