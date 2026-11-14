@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import random
@@ -8,11 +9,22 @@ import pytest
 
 from pipeline.earth import (
     DERIVED,
+    class_of,
+    decode,
     fetch_power,
+    fetch_surface,
+    land_cover_summary,
+    latest_times,
     lit_share,
+    load_colormap,
     metric_pixel,
+    ndvi_of,
+    ndvi_summary,
     noon_sun_deg,
     parse_power,
+    parse_surface,
+    parse_times,
+    read_png,
     resample_masked,
     tile_name,
     tiles_for,
@@ -79,11 +91,82 @@ def test_parse_power_fill_value_is_null():
     assert v["frozen_months"] is None
 
 
+def test_parse_surface_fixture():
+    v = parse_surface(json.loads((FIXTURES / "power_surface_yungay.json").read_text()))
+    assert v == {
+        "ts_min_c": -2.44,
+        "ts_max_c": 45.22,
+        "ts_seasonal_swing_c": 47.66,
+        "ts_daily_range_c": 28.59,
+        "frozen_months_surface": 0,
+        "soil_wetness": 0.1,
+        "aod_550": 0.04,
+    }
+
+
+def test_parse_surface_counts_frozen_months_and_nulls_fill():
+    doc = json.loads((FIXTURES / "power_surface_yungay.json").read_text())
+    p = doc["properties"]["parameter"]
+    p["TS"]["JUN"] = p["TS"]["JUL"] = -3.0
+    p["AOD_55"]["ANN"] = -999.0
+    del p["TS_RANGE"]
+    v = parse_surface(doc)
+    assert v["frozen_months_surface"] == 2
+    assert v["aod_550"] is None
+    assert v["ts_daily_range_c"] is None
+
+
+def test_land_cover_fixture_decodes_to_barren_and_ice():
+    cmap = load_colormap((FIXTURES / "colormap_igbp.xml").read_text())
+    classes = decode(read_png((FIXTURES / "land_cover_dry_valleys.png").read_bytes()), cmap, class_of)
+    assert classes.shape == (8, 24)
+    assert set(np.unique(classes).tolist()) == {10.0, 15.0, 16.0}
+    labels = {int(c): e["label"] for e in cmap.values() for c in e["source"].split(",")}
+    v = land_cover_summary(classes, labels)
+    assert v["land_cover_main"] == "Permanent Snow and Ice"
+    assert v["bare_share"] + v["ice_share"] == pytest.approx(189 / 192, abs=0.002)
+
+
+def test_land_cover_shares_skip_water_and_unknown_colours():
+    cmap = load_colormap((FIXTURES / "colormap_igbp.xml").read_text())
+    rgba = np.array(
+        [[[191, 191, 189, 255], [191, 191, 189, 255], [134, 202, 227, 255], [134, 202, 227, 255]],
+         [[250, 239, 115, 255], [255, 255, 255, 255], [1, 2, 3, 255], [0, 0, 0, 0]]],
+        dtype=np.uint8,
+    )
+    classes = decode(rgba, cmap, class_of)
+    assert np.isnan(classes[1, 2]) and np.isnan(classes[1, 3])
+    labels = {int(c): e["label"] for e in cmap.values() for c in e["source"].split(",")}
+    v = land_cover_summary(classes, labels)
+    assert v["bare_share"] == 0.5
+    assert v["ice_share"] == 0.25
+    assert v["land_cover_main"] in {"Barren", "Water Bodies"}
+    assert land_cover_summary(None, labels) == {"bare_share": None, "ice_share": None, "land_cover_main": None}
+
+
+def test_ndvi_inverts_to_bin_middle_and_drops_transparent():
+    cmap = load_colormap((FIXTURES / "colormap_ndvi.xml").read_text())
+    rgba = np.array([[[0, 100, 0, 255], [0, 100, 1, 255], [241, 236, 236, 255], [0, 0, 0, 0]]], dtype=np.uint8)
+    v = decode(rgba, cmap, ndvi_of)
+    assert v[0, :3] == pytest.approx([0.8251, 0.8351, 0.0026])
+    assert np.isnan(v[0, 3])
+    assert ndvi_summary([v, None]) == {"ndvi_max": round(float(np.nanmean(v)), 3)}
+    assert ndvi_summary([v[:, 3:], None]) == {"ndvi_max": None}
+
+
+def test_latest_times_skip_years_without_a_full_ndvi_record():
+    land = parse_times("2001-01-01/2024-01-01/P1Y")
+    ndvi = parse_times("2000-03-01/2025-03-01/P1M,2025-05-01/2026-10-01/P1M")
+    assert datetime.date(2025, 4, 1) not in ndvi
+    assert latest_times(land, ndvi) == ("2024-01-01", ("2025-01-01", "2025-07-01"))
+
+
 @pytest.mark.skipif(not os.environ.get("RUN_NETWORK"), reason="set RUN_NETWORK=1")
 def test_reference_climate_matches_fresh_fetch():
     points = json.loads((DERIVED / "earth_reference.json").read_text())["points"]
     for p in random.Random(1).sample(points, 5):
         fresh = parse_power(fetch_power(p["lat"], p["lon"], use_cache=False))
+        fresh |= parse_surface(fetch_surface(p["lat"], p["lon"], use_cache=False))
         assert {k: p["values"][k] for k in fresh} == fresh
 
 

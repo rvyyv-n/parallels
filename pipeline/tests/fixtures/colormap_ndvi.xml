@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ColorMaps xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://gibs.earthdata.nasa.gov/schemas/ColorMap_v1.3.xsd">
+  <ColorMap title="No Data">
+    <Entries>
+      <ColorMapEntry rgb="0,26,105" transparent="true" sourceValue="[-3000,-2000)" value="[-0.3,-0.2)" nodata="true" ref="0" />
+    </Entries>
+    <Legend type="classification">
+      <LegendEntry rgb="0,26,105" tooltip="Fill" id="0" />
+    </Legend>
+  </ColorMap>
+  <ColorMap title="Vegetation Indices">
+    <Entries>
+      <ColorMapEntry rgb="225,225,225" transparent="true" sourceValue="[-2000,-999)" value="[-0.2000,-0.0999)" ref="1" />
+      <ColorMapEntry rgb="225,225,226" transparent="true" sourceValue="[-999,1)" value="[-0.0999,0.0001)" ref="2" />
+      <ColorMapEntry rgb="241,236,236" transparent="false" sourceValue="[1,51)" value="[0.0001,0.0051)" ref="3" />
+      <ColorMapEntry rgb="241,236,237" transparent="false" sourceValue="[51,101)" value="[0.0051,0.0101)" ref="4" />
+      <ColorMapEntry rgb="0,100,0" transparent="false" sourceValue="[8201,8301)" value="[0.8201,0.8301)" ref="125" />
+      <ColorMapEntry rgb="0,100,1" transparent="false" sourceValue="[8301,8401)" value="[0.8301,0.8401)" ref="126" />
+      </Entries>
+    <Legend type="continuous" minLabel="0.0" maxLabel="1.0">
+      <LegendEntry rgb="241,236,236" tooltip="0.000 â€“ 0.005" id="3" />
+      <LegendEntry rgb="241,236,237" tooltip="0.005 â€“ 0.010" id="4" />
+      <LegendEntry rgb="0,100,0" tooltip="0.820 â€“ 0.830" id="125" />
+      <LegendEntry rgb="0,100,1" tooltip="0.830 â€“ 0.840" id="126" />
+      </Legend>
+  </ColorMap>
+</ColorMaps>
