@@ -18,13 +18,13 @@ Four gates, in this order. Don't write build code until the user has said yes to
 
 ### Gate 1. Setup questions and your approach
 
-- Ask the user what you need to know to start: for example, the production URL once the Vercel rename is done, where the Earthdata login lives on this machine, how they want to be reached for approvals, and any limits on time, models or cost.
+- Ask the user what you need to know to start: for example, the production URL, where the Earthdata login lives on this machine, how they want to be reached for approvals, and any limits on time, models or cost.
 - Recommend how you'll run the build: tools, which models do which work, how you split it (for example a pipeline track, a site track and a checking track), and how each piece gets tested before it's committed.
 
 ### Gate 2. Research and a UI design
 
 - **Rivals:** start from the three in [plan §1](claudes-plan.md#1-rivals), then scan the other public repos for this challenge (at least 22 on 13 November) and similar tools (for example NASA Moon Trek and Mars Trek, and climate-analog finders). Note what each does well and what confuses a newcomer.
-- **Our earlier drafts:** the `prototype` branch (a working analog finder with the main flow and validation chart) and the `ui-draft` branch (an interface around 3D globes). Reuse what fits; v1 still starts from `research`.
+- **Our earlier draft:** `main` already holds a working prototype analog finder (`pipeline/` and `site/`, with the main flow and validation chart; screenshots in `docs/screenshots/`). v1 builds on it: keep what works, replace what doesn't.
 - **Recommend one UI design** that:
   - is easy to understand at a glance;
   - gets a newcomer to a result in under a minute without help;
@@ -48,10 +48,10 @@ See section 7. This gate can wait until the pipeline is ready to score; it doesn
 
 ## 3. Branch and deploy
 
-- Cut branch **`v1` from `research`**. Push after every working step, so any step can be undone.
-- The user is renaming the existing Vercel project (`prototype`) to **`parallels`**, with **`v1` as its production branch**. Each push to `v1` deploys. The Vercel CLI isn't installed and isn't needed: deploys run from the Git connection.
-- **Never merge to `master`**, never force-push, never delete remote branches.
-- This replaces the guidelines' "push to `research`" for the v1 build only.
+- Work on branch **`v1`**, cut from `main`. Push after every working step, so any step can be undone.
+- The Vercel project (renamed from `dotcatcher` to `parallels`) is connected to the GitHub repo `rvyyv-n/dotcatcher`, with root directory `site`, framework Vite and **`v1` as its production branch**. Each push to `v1` deploys. The Vercel CLI isn't installed and isn't needed: deploys run from the Git connection.
+- **Never merge to `main`** (the user does that), never force-push, never delete remote branches. Older branches are kept as tags `archive/prototype` and `archive/research`.
+- `research` is retired.
 
 ## 4. Scope
 
