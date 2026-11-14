@@ -293,7 +293,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPi
             e.stopPropagation();
             onPick(i);
           });
-          markers.push(new maplibregl.Marker({ element: b }).setLngLat([g.lon[i], g.lat[i]]).addTo(map));
+          markers.push(new maplibregl.Marker({ element: b, opacityWhenCovered: "0" }).setLngLat([g.lon[i], g.lat[i]]).addTo(map));
         });
       });
     },

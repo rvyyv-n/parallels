@@ -1884,21 +1884,31 @@ ul.plain li {
   }
 }
 
+.r-near {
+  white-space: nowrap;
+}
+
 .lg-faint {
   color: var(--ink-2);
   margin: 4px 0 0;
 }
 
 .lg-range {
-  display: grid !important;
+  display: grid;
   grid-template-columns: auto minmax(0, 1fr) 4ch;
+  align-items: center;
   gap: 8px;
+  min-height: 30px;
+  border-top: 1px solid var(--rule);
+  padding-top: 4px;
+  cursor: pointer;
 }
 
 .lg-range input {
   width: 100%;
   min-width: 0;
   margin: 0;
+  accent-color: var(--signal);
 }
 
 .lg-range output {
@@ -1907,14 +1917,129 @@ ul.plain li {
   font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 759px) {
-  .lg-faint {
-    grid-column: 1 / -1;
-    font-size: 11px;
-    margin: 2px 0 0;
+@media (min-width: 760px) {
+  .legend {
+    width: 300px;
+    bottom: 12px;
   }
 }
 
-.r-near {
-  white-space: nowrap;
+.earth-col > .lg-keys {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  border: 1px solid var(--rule);
+  padding: 4px 10px;
+  background: rgba(5, 6, 7, 0.86);
+  font-size: 12px;
+}
+
+.card-wrap {
+  position: relative;
+  z-index: 16;
+  background: var(--space);
+}
+
+.tglobe figcaption {
+  z-index: 16;
+  background: var(--space);
+  padding: 2px 6px 4px 0;
+}
+
+.pin.sel {
+  background: #fff;
+  border: 2px solid var(--signal);
+  color: #000;
+  line-height: 18px;
+}
+
+.skip {
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  z-index: 30;
+  padding: 10px 14px;
+  background: var(--space);
+  color: var(--ink);
+  border: 1px solid var(--rule-2);
+  transform: translateY(-200%);
+}
+
+.skip:focus {
+  transform: none;
+}
+
+@media (max-width: 759px) {
+  .earth-col {
+    height: auto;
+    min-height: 0;
+  }
+
+  .earth-col .earth {
+    position: relative;
+    inset: auto;
+    height: 45svh;
+    min-height: 300px;
+  }
+
+  .legend {
+    position: static;
+    display: block;
+    width: auto;
+    padding: 8px 14px 6px;
+    border-width: 1px 0 0;
+  }
+
+  .lg-bar {
+    margin-top: 0;
+  }
+
+  .lg-text {
+    display: block;
+    font-size: 11.5px;
+  }
+
+  .lg-faint {
+    font-size: 11.5px;
+    margin: 2px 0 0;
+  }
+
+  .lg-pole {
+    margin: 2px 0 4px;
+  }
+
+  .lg-range {
+    min-height: 44px;
+  }
+
+  .earth-col > .lg-keys {
+    top: 8px;
+    left: 8px;
+    padding: 0 8px;
+  }
+
+  .earth-col .maplibregl-ctrl-bottom-right {
+    bottom: 0;
+  }
+}
+
+@media (max-width: 459px) {
+  .sentence select {
+    font-size: 22px;
+    max-width: 100%;
+    text-overflow: ellipsis;
+  }
+
+  .pin::before {
+    content: "";
+    position: absolute;
+    inset: -11px;
+  }
+
+  .switch,
+  .ctl select,
+  .sentence select {
+    min-height: 44px;
+  }
 }

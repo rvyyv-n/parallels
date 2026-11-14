@@ -75,6 +75,7 @@ function shell(m: Manifest) {
   app.innerHTML = `
     ${m.sample ? `<p class="sample" role="note"><b>Sample data.</b> Every number on this page is a made-up test value while the real data is processed. Nothing here is a result yet.</p>` : ""}
     <header class="top">
+      <a class="skip" href="#ledger-h">Skip to results</a>
       <a class="wordmark" href="#explore" aria-label="Parallels, back to the top">Parallels</a>
       <p class="tagline">Earth's closest parallels to every part of a Moon or Mars base.</p>
       <nav aria-label="Sections"><ul>${NAV.slice(1).map(([id, name]) => `<li><a href="#${id}">${esc(name)}</a></li>`).join("")}</ul></nav>
@@ -92,7 +93,7 @@ function shell(m: Manifest) {
         </div>
         <div class="stage">
           <aside class="ledger-col" aria-labelledby="ledger-h">
-            <div class="col-head"><h2 id="ledger-h">Top 10 on Earth</h2><span class="muted small" id="ledger-note" aria-live="polite"></span></div>
+            <div class="col-head"><h2 id="ledger-h" tabindex="-1">Top 10 on Earth</h2><span class="muted small" id="ledger-note" aria-live="polite"></span></div>
             <ol class="ledger" id="ledger"><li class="empty" role="status">Ranking Earth's land…</li></ol>
             <div class="controls">
               <label class="ctl"><span>Terrain type</span><select id="pick-type"><option value="">All land</option>${m.terrain_types
@@ -113,14 +114,14 @@ function shell(m: Manifest) {
               <p class="lg-title">Match, 0–100</p>
               <div class="lg-bar" style="background:${gradient()}"></div>
               <div class="lg-ticks"><span>0</span><span>50</span><span>100</span></div>
-              <p class="lg-text">100: closer to the target than all of Earth's land. Grey: not ranked.</p>
+              <p class="lg-text">A weighted mix of the challenge scores. Each comes from how the place's traits rank against all of Earth's land. Grey: not ranked.</p>
               <p class="lg-faint">Weak matches are drawn faint so the ground shows.</p>
               <p class="lg-pole">The map layer stops at 85° N and S; the list still ranks land beyond it.</p>
-              <div class="lg-keys">
-                <label><input type="checkbox" id="pick-labels" checked> <i class="k-analog"></i>Known analogs <i class="k-cave"></i>caves</label>
-                <label><input type="checkbox" id="pick-flat"> Flat map</label>
-                <label class="lg-range"><span>Match layer</span><input type="range" id="pick-strength" min="0" max="100" step="5" value="100"><output id="strength-out">100%</output></label>
-              </div>
+              <label class="lg-range"><span>Match layer</span><input type="range" id="pick-strength" min="0" max="100" step="5" value="100"><output id="strength-out">100%</output></label>
+            </div>
+            <div class="lg-keys">
+              <label><input type="checkbox" id="pick-labels" checked> <i class="k-analog"></i>Known analogs <i class="k-cave"></i>caves</label>
+              <label><input type="checkbox" id="pick-flat"> Flat map</label>
             </div>
           </div>
           <div class="target-col">
