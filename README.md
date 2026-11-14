@@ -24,9 +24,7 @@ Version 1 does not pass every check. It passes 1 of its 4 first checks. In the f
 - [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, the main brief.
 - [docs/challenge.md](docs/challenge.md): the challenge in plain words, and how we meet the guide's six objectives and answer its seven questions.
 - [docs/team-plan.md](docs/team-plan.md): what we're building.
-- [docs/claudes-plan.md](docs/claudes-plan.md): the build plan from before v1: rivals, method, data, checks, stack and roadmap.
-- [docs/v1-spec.md](docs/v1-spec.md): the brief for version 1, including the data file layout.
-- [docs/review-pre-v1.md](docs/review-pre-v1.md): the data and test-place checks made before the build.
+- [docs/claudes-plan.md](docs/claudes-plan.md): the build plan from before v1: rivals, method, data, checks and roadmap, and the data checks made before the build.
 - [docs/judging-notes.md](docs/judging-notes.md): how Space Apps is judged and what past winners did.
 - [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
 - [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.
@@ -44,13 +42,15 @@ Pipeline (Python 3.13). Run each command from the repository root.
 |---|---|---|
 | Climate | `.venv/Scripts/python -m pipeline.climate` | Reads NASA POWER climate data and Natural Earth land. Writes the 0.5 degree climate grid. |
 | Terrain | `.venv/Scripts/python -m pipeline.terrain_grid` | Reads Copernicus DEM GLO-90 tiles. Writes slope and relief for each cell. Takes about 30 minutes. |
-| Surface | `.venv/Scripts/python -m pipeline.surface` | Reads GLiM rock, NASA EMIT minerals and MODIS land cover. Writes the surface grid. Needs a free NASA Earthdata login in `~/.netrc`. |
+| Surface | `.venv/Scripts/python -m pipeline.surface` | Reads GLiM rock, NASA EMIT minerals and MODIS land cover. Writes the surface grid. Needs a free NASA Earthdata login in `~/.netrc`, read through `earthaccess`. Without it, EMIT minerals and every MODIS file are out. rasterio's GDAL has no HDF4 driver, so the MODIS file is read with `pyhdf`. |
 | Targets | `.venv/Scripts/python -m pipeline.targets` | Reads Moon and Mars maps. Writes `pipeline/derived/targets_v1.json`. |
 | Export | `.venv/Scripts/python -m pipeline.export` | Ranks the cells, runs the validation and writes the files in `dataset/`. Add `--method 1.2` to run method versions 1.1 and 1.2 as further validation runs. |
 
 3. Run the tests: `.venv/Scripts/python -m pytest`.
 
 On macOS and Linux, use `.venv/bin/python` in place of `.venv/Scripts/python`.
+
+Version 1 was built with Python 3.13.17 and uv 0.13.7. Never print, copy or commit the Earthdata login.
 
 ## The data files
 
@@ -79,7 +79,16 @@ How to read the binary files:
 - `cov:<challenge>` is one byte: the percent of the challenge's trait weight that has data (0 to 100).
 - `score:<filter>` and `score:<filter>:yr` are two bytes each. The values 0 to 10000 mean 0 to 1. The value 65535 means not ranked.
 - `stable:<filter>` is one byte: 1 if the cell stays in the top 20 in at least 90% of 1,000 runs with changed weights, otherwise 0.
-- The types are in `dataset/contract.ts`. The layout is in section 6 of [docs/v1-spec.md](docs/v1-spec.md).
+- Hand-set weights use the same 70% gate as the mission filters: the sum of each challenge weight times its `cov`, over the sum of the challenge weights. A cell under 70% is not ranked.
+- The manifest's `scoring.layout` repeats these target-file rules in one paragraph.
+- The types are in `dataset/contract.ts`.
+
+What the files promise:
+
+- Every number traces to a named dataset. Each trait in the manifest names its Earth dataset (an id into the data list), its statistic and its resolution. Each target value names its statistic, its dataset or paper, its resolution and its kind (computed, published or derived).
+- The Moon's south-pole target also holds its own values for each of the nine Artemis regions, under `regions`.
+- The data list gives each dataset's id, name, link, licence and use.
+- A reader of the files may combine the pre-computed ranks with its own weights. It never recomputes a rank or a value.
 
 ## How we used AI
 
@@ -142,6 +151,7 @@ The version 1 site's own libraries, fonts and display images are listed in the R
 - Version 1.1 gave each part of a challenge equal weight and added a volcanic rock trait for Mars. Why: Mars Surface failed clearly in the second run (21% against ordinary places, pass mark 80%). Farmland is as flat as Jezero's floor, and Mars had no rock trait.
 - Version 1.2 counts only land strictly further from the target. Why: the Amazon near Manaus scored above 90% of land for rover mobility at Jezero, because tied values got half credit.
 - Each version replaced the one before only by a rule fixed before it ran. The test places have now been used four times, so no further change will be judged on them.
+- The default weights come from what each target and its hardware need, never from the test places. Each weight has a one-line reason in `pipeline/config/`. They were set before any version 1 score existed.
 - The rules were fixed in git before each run: commits `16b6a1c` (weights, thresholds, pass marks and held-out split), `d48b9ab` (config formatting restored), `7661981` (version 1.1) and `b070766` (version 1.2).
 
 ## Limits
