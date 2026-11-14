@@ -176,7 +176,7 @@ Only the Moon's south pole and Jezero have a headline in the data. The other fou
 - `pipeline/` and `dataset/` don't change. The browser selects, groups and displays only what is already computed.
 - No keys, no server, and no live calls except map tiles, which have a bundled fallback image.
 - Playwright tests the word and click budgets, the 390 px layout, keyboard use, reduced motion, and every data and link check.
-- Hosting on Vercel. Version 1 stays live and untouched. Version 2 gets a preview link first; a public version 2 link is the team's call.
+- Hosting on Vercel. Version 1 stays live and untouched. Version 2 has its own Vercel project, `parallels-v2`, and is deployed from the command line; pushes to `v2` start no build in version 1's project. Version 2 gets a preview link first; a public version 2 link is the team's call.
 
 ### Roadmap (Sunday)
 

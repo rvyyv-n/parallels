@@ -1,0 +1,10 @@
+/data
+/.venv
+/docs
+/pipeline
+/assets
+/site/node_modules
+/site/dist
+/site/shots
+/site/public/data
+/site/test-results
