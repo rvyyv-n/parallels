@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import json
+import re
 from itertools import product
 from pathlib import Path
 
@@ -109,13 +110,22 @@ SOURCES = [
     {"name": "NASA PGDA lunar south-pole illumination (LOLA)", "url": "https://pgda.gsfc.nasa.gov/products/69", "use": "Moon share of time in sunlight", "kind": "real"},
     {"name": "HRSC and MOLA blended Mars elevation, 200 m (USGS)", "url": "https://astrogeology.usgs.gov/search/map/mars_mgs_mola_mex_hrsc_blended_dem_global_200m", "use": "Mars slopes and height range", "kind": "real", "partner": True},
     {"name": "Mars Odyssey GRS water-equivalent hydrogen", "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/", "use": "Mars ice in the ground", "kind": "real"},
-    {"name": "MGS TES dust cover index", "url": "http://www.mars.asu.edu/~ruff/DCI/dci.html", "use": "Mars dust cover", "kind": "real"},
+    {"name": "MGS TES dust cover index", "url": "https://www.mars.asu.edu/~ruff/DCI/dci.html", "use": "Mars dust cover", "kind": "real"},
     {"name": "Curiosity REMS and Perseverance MEDA (published)", "url": "https://science.nasa.gov/resource/steady-temperatures-at-mars-gale-crater", "use": "Mars temperatures at Gale and Jezero", "kind": "real"},
     {"name": "USGS Gazetteer of Planetary Nomenclature", "url": "https://planetarynames.wr.usgs.gov/", "use": "where we place each Artemis region", "kind": "real"},
     {"name": "USGS Mars Global Cave Candidate Catalog", "url": "https://astrogeology.usgs.gov/search/map/mars_global_cave_candidate_catalog_v1_cushing", "use": "Arsia Mons cave opening", "kind": "real"},
     {"name": "NASA GIBS Blue Marble", "url": "https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api", "use": "map background", "kind": "real"},
     {"name": "Sample values", "url": "", "use": "ground strength, rock cover, ice in the ground (Earth and Moon), feldspar-rich rock, clays and sulfates, dust-lifting days, and Mars temperatures at Arcadia, Deuteronilus and Arsia. Placeholders until real data replaces them.", "kind": "sample"},
 ]
+
+
+def anchor(note):
+    if not note:
+        return {}
+    m = re.search(r"\s*Gazetteer: (https://\S+)", note)
+    if not m:
+        return {"anchorNote": note}
+    return {"anchorNote": note[: m.start()] + note[m.end():], "anchorUrl": m.group(1).rstrip(".")}
 
 
 def load():
@@ -207,7 +217,7 @@ def build():
 
     out_targets = [
         {k: tg[k] for k in ("id", "body", "name", "lat", "lon") if k in tg}
-        | {"anchorNote": tg.get("anchor_note"), "facts": tg.get("facts", []), "values": tg["_values"], "extra": {k: tg["values"].get(k) for k in ("lit_share", "lit_share_median", "dci", "weh_pct", "t_min_coldest_k") if tg["values"].get(k)}}
+        | anchor(tg.get("anchor_note")) | {"facts": tg.get("facts", []), "values": tg["_values"], "extra": {k: tg["values"].get(k) for k in ("lit_share", "lit_share_median", "dci", "weh_pct", "t_min_coldest_k") if tg["values"].get(k)}}
         for tg in targets
     ]
     out_sites = [
