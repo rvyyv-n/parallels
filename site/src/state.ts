@@ -83,3 +83,8 @@ export function useAsync<T>(load: () => Promise<T> | undefined, deps: unknown[])
   }, deps);
   return value;
 }
+
+export function scrollToId(id: string) {
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.getElementById(id)?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+}

@@ -5,6 +5,8 @@ export interface Disc {
   x: number;
   y: number;
   r: number;
+  ax: number;
+  ay: number;
 }
 
 export interface Layout {
@@ -106,8 +108,13 @@ function unit(lat: number, lon: number) {
   return new THREE.Vector3(c * Math.cos(lon * DEG), Math.sin(lat * DEG), -c * Math.sin(lon * DEG));
 }
 
-function facing(lat: number, lon: number) {
-  return new THREE.Quaternion().setFromEuler(new THREE.Euler(lat * DEG, -Math.PI / 2 - lon * DEG, 0, "XYZ"));
+const FRONT = new THREE.Vector3(0, 0, 1);
+const DISC_KEYS = ["x", "y", "r", "ax", "ay"] as const;
+
+function facing(lat: number, lon: number, disc: Disc) {
+  const centred = new THREE.Quaternion().setFromEuler(new THREE.Euler(lat * DEG, -Math.PI / 2 - lon * DEG, 0, "XYZ"));
+  const aim = new THREE.Vector3(disc.ax, disc.ay, Math.sqrt(Math.max(0, 1 - disc.ax ** 2 - disc.ay ** 2)));
+  return new THREE.Quaternion().setFromUnitVectors(FRONT, aim).multiply(centred);
 }
 
 function halo(tint: THREE.Color, inner: number) {
@@ -120,7 +127,6 @@ function halo(tint: THREE.Color, inner: number) {
       blending: THREE.AdditiveBlending,
       depthTest: false,
       depthWrite: false,
-      transparent: true,
     }),
   );
 }
@@ -148,6 +154,7 @@ function stars(count: number) {
 export class Scene {
   onFrame: (() => void) | undefined;
   onEarthClick: ((lat: number, lon: number) => void) | undefined;
+  onDragEnd: (() => void) | undefined;
 
   private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
@@ -160,13 +167,14 @@ export class Scene {
   private starfield = stars(900);
   private matchTexture: THREE.DataTexture;
 
-  private layout: Layout = { earth: { x: 0, y: 0, r: 1 }, companion: { x: 0, y: 0, r: 1 } };
+  private layout: Layout = { earth: { x: 0, y: 0, r: 1, ax: 0, ay: 0 }, companion: { x: 0, y: 0, r: 1, ax: 0, ay: 0 } };
   private shown: Layout | undefined;
   private view = { lat: 20, lon: 0 };
   private goal = { lat: 20, lon: 0 };
-  private companionGoal = new THREE.Quaternion();
+  private companionAt = { lat: 0, lon: 0 };
   private body: Body | undefined;
   private bodyTextures = new Map<Body, THREE.Texture>();
+  private companionSettled = false;
   private frame = 0;
   private last = 0;
   private dragging = false;
@@ -217,6 +225,9 @@ export class Scene {
       }),
     );
     this.companionHalo = halo(new THREE.Color(0, 0, 0), 1 / 1.25) as typeof this.companionHalo;
+    this.starfield.renderOrder = -2;
+    this.earthHalo.renderOrder = -1;
+    this.companionHalo.renderOrder = -1;
     this.scene.add(this.starfield, this.earthHalo, this.companionHalo, this.earth, this.companion);
 
     canvas.addEventListener("pointerdown", this.pointerDown);
@@ -252,18 +263,18 @@ export class Scene {
     this.kick();
   }
 
-  setLayout(layout: Layout, instant = false) {
+  setLayout(layout: Layout, from?: Layout) {
     this.layout = layout;
-    if (instant || !this.shown || this.reducedMotion) this.shown = structuredClone(layout);
+    if (from && !this.shown) this.shown = structuredClone(from);
+    if (!this.shown || this.reducedMotion) this.shown = structuredClone(layout);
     this.kick();
   }
 
   setBody(body: Body, lat: number, lon: number) {
-    const viewLat = Math.max(-58, Math.min(58, lat));
-    this.companionGoal = facing(viewLat, lon);
+    this.companionAt = { lat, lon };
     if (this.body !== body) {
       this.body = body;
-      this.companion.quaternion.copy(this.companionGoal);
+      this.companionSettled = false;
       const u = this.companion.material.uniforms;
       u.fade.value = 0;
       u.haze.value = body === "mars" ? new THREE.Color(0.55, 0.3, 0.16) : new THREE.Color(0.12, 0.12, 0.13);
@@ -285,9 +296,10 @@ export class Scene {
     this.kick();
   }
 
-  lookAt(lat: number, lon: number, instant = false) {
+  lookAt(lat: number, lon: number, fromLonOffset = 0) {
     this.goal = { lat, lon };
-    if (instant || this.reducedMotion) this.view = { lat, lon };
+    if (this.reducedMotion) this.view = { lat, lon };
+    else if (fromLonOffset) this.view = { lat, lon: lon + fromLonOffset };
     this.kick();
   }
 
@@ -327,24 +339,27 @@ export class Scene {
         this.view = { ...this.goal };
       }
     }
-    this.earth.quaternion.copy(facing(this.view.lat, this.view.lon));
-
-    if (this.companion.quaternion.angleTo(this.companionGoal) > 0.001) {
-      this.companion.quaternion.slerp(this.companionGoal, ease(3.2));
-      moving = true;
-    }
-
     const shown = (this.shown ??= structuredClone(this.layout));
     for (const key of ["earth", "companion"] as const) {
-      for (const k of ["x", "y", "r"] as const) {
+      for (const k of DISC_KEYS) {
         const d = this.layout[key][k] - shown[key][k];
-        if (Math.abs(d) > 0.3) {
+        if (Math.abs(d) > (k === "ax" || k === "ay" ? 0.001 : 0.3)) {
           shown[key][k] += d * ease(4.5);
           moving = true;
         } else {
           shown[key][k] = this.layout[key][k];
         }
       }
+    }
+    this.earth.quaternion.copy(facing(this.view.lat, this.view.lon, shown.earth));
+
+    const companionGoal = facing(this.companionAt.lat, this.companionAt.lon, shown.companion);
+    if (!this.companionSettled || this.reducedMotion) {
+      this.companion.quaternion.copy(companionGoal);
+      this.companionSettled = true;
+    } else if (this.companion.quaternion.angleTo(companionGoal) > 0.001) {
+      this.companion.quaternion.slerp(companionGoal, ease(5));
+      moving = true;
     }
     this.place(this.earth, this.earthHalo, shown.earth);
     this.place(this.companion, this.companionHalo, shown.companion);
@@ -399,6 +414,7 @@ export class Scene {
       this.dragging = false;
       this.view.lon = ((this.view.lon + 540) % 360) - 180;
       this.goal = { ...this.view };
+      this.onDragEnd?.();
       if (travelled < 5 && this.onEarthClick) {
         const x = (u.clientX - rect.left - disc.x) / disc.r;
         const y = -(u.clientY - rect.top - disc.y) / disc.r;

@@ -1,5 +1,5 @@
 // Usage: node scripts/shots.mjs <name> [hash] [url]
-// Saves shots/<name>-390.png and shots/<name>-1440.png of the running preview.
+// Saves shots/<name>-<chapter>-<width>.png for each story chapter of the running preview.
 import { mkdirSync } from "node:fs";
 import { chromium } from "@playwright/test";
 
@@ -13,7 +13,17 @@ for (const [w, h, scale] of [[390, 844, 2], [1440, 900, 1]]) {
   await page.goto(url + hash);
   await page.waitForSelector("[data-testid=feature] .pairs tbody tr", { timeout: 20000 }).catch(() => console.log("no feature yet"));
   await page.waitForTimeout(3500);
-  await page.screenshot({ path: `shots/${name}-${w}.png` });
+  for (const id of ["find", "match", "breaks", "test"]) {
+    await page.evaluate((id) => {
+      const el = document.querySelector(`[data-chapter="${id}"]`);
+      if (!el || id === "find") return window.scrollTo(0, 0);
+      const top = el.getBoundingClientRect().top + scrollY;
+      const world = document.querySelector(".world").getBoundingClientRect().height;
+      window.scrollTo(0, innerWidth >= 900 ? top + innerHeight * 0.12 : top - world - 6);
+    }, id);
+    await page.waitForTimeout(2200);
+    await page.screenshot({ path: `shots/${name}-${id}-${w}.png` });
+  }
   await page.close();
 }
 await browser.close();

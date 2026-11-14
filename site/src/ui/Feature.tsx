@@ -56,19 +56,23 @@ interface Props {
   target: Target;
   filter: MissionFilter;
   place: PlaceInfo;
+  rank: number;
   match: Match | undefined;
+  caution: string | undefined;
   onOpen: () => void;
 }
 
-export function Feature({ target, filter, place, match, onOpen }: Props) {
+export function Feature({ target, filter, place, rank, match, caution, onOpen }: Props) {
   const { name, country } = placeName(place.region);
   const pairs = [
     match?.bestMatch && { row: match.bestMatch, kind: "match" as const },
     match?.worstBreak && { row: match.worstBreak, kind: "break" as const },
   ].filter((p) => !!p);
   return (
-    <article class="feature" data-testid="feature">
-      <p class="kicker">Best place on Earth to practise {filter.name.toLowerCase()}</p>
+    <article class="feature" data-testid="feature" key={place.cell}>
+      <p class="kicker">
+        {rank === 1 ? "Best place on Earth" : `No. ${rank} on Earth`} to practise {filter.name.toLowerCase()}
+      </p>
       <h2 class="place-name">{name}</h2>
       <p class="meta">
         <span class="coords">
@@ -80,9 +84,10 @@ export function Feature({ target, filter, place, match, onOpen }: Props) {
       <div class="pairs-box" aria-busy={!match}>
         {pairs.length > 0 && <Pairs rows={pairs} there={bodyName(target)} />}
       </div>
+      {caution && <p class="caution">{caution}</p>}
       <button class="cta" onClick={onOpen}>
         See the full match
-        <span aria-hidden="true">→</span>
+        <span aria-hidden="true">↓</span>
       </button>
     </article>
   );
