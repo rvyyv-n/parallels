@@ -28,7 +28,7 @@ A discovery tool, not a list of famous sites: every land cell is scored, and eve
 
 ## Main flow
 
-1. The page opens on a sentence that is the control: "Earth's best places to test [mission filter] for [target]". The first match's scorecard is already open.
+1. The page opens on a 3D scene: the logo's Earth, Moon and Mars come alive, joined by a cyan line from Earth to the chosen base site. Beside it, two steps with plain buttons: "Where is the base?" and "What are you testing?". Clicking the Moon or Mars in the scene also picks that world. The best match and its score are already shown, and "See Earth's top 10" (or clicking Earth) drops into the explorer, where the first match's scorecard is already open. A shared link with a place in it skips straight to the explorer.
 2. Earth's land is coloured by match on a globe; the top 10 are listed beside it; the target world turns to its site.
 3. Click a row or any land cell: the Earth globe flies there, a line links it to the target site, and the scorecard opens with each challenge's traits drawn as gap rulers.
 

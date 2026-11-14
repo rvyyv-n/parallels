@@ -19,8 +19,11 @@ test("main flow: pick a target and a filter, open a match, read the scorecard", 
 
   const target = m.targets[m.targets.length - 1];
   const filter = m.filters[m.filters.length - 1];
-  await page.locator("#pick-target").selectOption(target.id);
-  await page.locator("#pick-filter").selectOption(filter.id);
+  await page.locator(`.intro [data-target="${target.id}"]`).click();
+  await page.locator(`.intro [data-filter="${filter.id}"]`).click();
+  await expect(page.locator(`.bar [data-target="${target.id}"]`)).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#now")).toContainText(target.name);
+  await expect(page.locator("#intro-best")).toContainText("Best match now");
   await expect(page.locator("#tcap")).toContainText(target.name);
 
   const row = rows(page).nth(2);
@@ -50,7 +53,8 @@ test("a shared link opens the same view", async ({ page }) => {
   const { t, cells } = cols(m, main.id);
   const { ids } = top(t[`score:${f.id}`], 10, cells);
   await ready(page, `?t=${main.id}&f=${f.id}&c=${ids[4]}`);
-  await expect(page.locator("#pick-filter")).toHaveValue(f.id);
+  await expect(page.locator(`.intro [data-filter="${f.id}"]`)).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#explore")).toBeInViewport();
   await expect(page.locator(`#ledger li[data-i="${ids[4]}"] button`)).toHaveAttribute("aria-pressed", "true");
 });
 
@@ -87,7 +91,8 @@ test("hand-set weights change the ranking", async ({ page }) => {
   const expected = top(handScore(m, t, w, m.grid.n), 10, cells).ids;
   await expect.poll(() => order(page)).toEqual(expected);
   expect(expected).not.toEqual(before);
-  await expect(page.locator("#pick-filter")).toHaveValue("__hand");
+  await expect(page.locator('.intro [data-filter="__hand"]')).toBeVisible();
+  await expect(page.locator('.intro [data-filter="__hand"]')).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("#pick-yr")).toBeDisabled();
 });
 
@@ -192,9 +197,15 @@ test("works with NASA GIBS tiles blocked, and makes no other outside calls", asy
 test("keyboard alone reaches the pickers, the top 10, the scorecard and the sliders", async ({ page }, info) => {
   test.skip(info.project.name !== "laptop", "keyboard path is a laptop check");
   await ready(page);
-  await page.locator("#pick-filter").focus();
+  const chips = page.locator(".intro .chip:visible");
+  await chips.nth(0).focus();
   await page.keyboard.press("Tab");
-  await expect(page.locator("#pick-target")).toBeFocused();
+  await expect(chips.nth(1)).toBeFocused();
+  await chips.nth(1).press("Enter");
+  await expect(chips.nth(1)).toHaveAttribute("aria-pressed", "true");
+  await page.locator("#go").focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#explore")).toBeInViewport();
   const second = rows(page).nth(1).locator("button");
   await second.focus();
   await page.keyboard.press("Enter");
@@ -210,7 +221,7 @@ test("keyboard alone reaches the pickers, the top 10, the scorecard and the slid
   const before = await slider.inputValue();
   await page.keyboard.press("ArrowRight");
   expect(await slider.inputValue()).not.toBe(before);
-  await expect(page.locator("#pick-filter")).toHaveValue("__hand");
+  await expect(page.locator('.intro [data-filter="__hand"]')).toHaveAttribute("aria-pressed", "true");
 });
 
 test("section nav fits, marks the current section, and links open folded blocks", async ({ page }) => {
