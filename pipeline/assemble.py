@@ -48,7 +48,7 @@ def cell_of(lat, lon):
 
 
 def emit_groups(surface):
-    keys = [k for k in surface if k.startswith("emit_")]
+    keys = [k for k in surface if k.startswith("emit_") and not k.endswith("_unc")]
     bits = np.zeros(SHAPE)
     any_data = np.zeros(SHAPE, bool)
     for i, minerals in enumerate(MINERAL_GROUPS.values()):
@@ -98,8 +98,8 @@ def terrain_rules(cfg):
     return {
         "none": "Meets none of the rules below.",
         "arid_basin": f"Aridity index below {t['arid_basin']['max_aridity']} and at least {t['arid_basin']['min_drop_m']} m lower than the average land within {t['arid_basin']['window_deg']:g}° around it.",
-        "volcanic_high": f"At least {t['volcanic_high']['min_volcanic_pct']}% volcanic rock on the GLiM rock map and average height above {t['volcanic_high']['min_elev_m']:,} m.",
-        "salt_flat": f"At least {t['salt_flat']['min_evaporite_pct']}% evaporite (salt) rock on the GLiM rock map and aridity index below {t['salt_flat']['max_aridity']}.",
+        "volcanic_high": f"Volcanic rock is the cell's main rock on the GLiM rock map (the half-degree map gives one main rock per cell, so \"at least {t['volcanic_high']['min_volcanic_pct']}%\" is read as \"main rock\") and average height above {t['volcanic_high']['min_elev_m']:,} m.",
+        "salt_flat": f"Evaporite (salt) rock is the cell's main rock on the GLiM rock map (the half-degree map gives one main rock per cell, so \"at least {t['salt_flat']['min_evaporite_pct']}%\" is read as \"main rock\") and aridity index below {t['salt_flat']['max_aridity']}.",
         "frozen_ground": f"Yearly average ground temperature below {t['frozen_ground']['max_annual_ground_c']:g} °C (NASA POWER).",
         "cave": "A known cave or lava tube from our list lies in the cell. Caves can't be seen from orbit, so this is a list, not a map.",
     }
@@ -196,10 +196,11 @@ def build(stages, metas, sites, caves, cfg):
     cells["row"], cells["col"] = rows, cols
     cells["lat"], cells["lon"] = lat2[rows, cols], lon2[rows, cols]
     cells["area"] = np.cos(np.radians(cells["lat"])) * cells["land_frac"]
-    cells["terrain"] = tags[rows, cols]
+    cells["terrain_type"] = tags[rows, cols]
+    cells["ice"] = cells["ice_share"]
     cells["cluster"] = cluster(cells, cfg)
     cells["nearest_analog_km"] = nearest_km(cells["lat"], cells["lon"], known_analogs(sites))
-    rows_, summary = agreement(cells["cluster"], cells["terrain"], cfg["clustering"]["k"])
+    rows_, summary = agreement(cells["cluster"], cells["terrain_type"], cfg["clustering"]["k"])
     info = {"missing": missing, "agreement": rows_, "summary": summary}
     return cells, info
 

@@ -169,6 +169,7 @@ export interface ValidationTest {
 
 export interface Validation {
   weights_commit: string;
+  summary?: string;
   not_blind_note: string;
   prototype_runs: { date: string; result: string }[];
   tests: ValidationTest[];

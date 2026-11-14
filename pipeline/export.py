@@ -14,7 +14,6 @@ from pipeline.traits import BODIES, CANT_COPY, CHALLENGES, FILTERS, INPUTS, NOT_
 
 OUT = ROOT / "site" / "public" / "data"
 TARGETS = ROOT / "pipeline" / "derived" / "targets_v1.json"
-PROTOTYPE_TARGETS = ROOT / "pipeline" / "derived" / "targets.json"
 SITES = ROOT / "pipeline" / "sites.json"
 CAVES = ROOT / "pipeline" / "caves.json"
 
@@ -53,7 +52,8 @@ CELL_COLUMNS = [
     ("bare_share", "u8", 0.4, 0),
     ("minerals_seen", "u8", 1, 0),
     ("mineral_groups", "u8", 1, 0),
-    ("terrain", "u8", 1, 0),
+    ("terrain_type", "u8", 1, 0),
+    ("ice", "u8", 0.4, 0),
     ("cluster", "u8", 1, 0),
     ("nearest_analog_km", "u16", 1, 0),
 ]
@@ -64,11 +64,9 @@ CONSTANT_DATASETS = [
     {"id": "nasa-moon-composition", "name": "NASA Science: the Moon's composition", "agency": "NASA", "url": "https://science.nasa.gov/moon/composition/", "licence": "Public domain (NASA)", "used_for": "The south pole's pale highland rock", "archive": "NASA Science"},
     {"id": "mars-jezero-minerals", "name": "Jezero crater minerals: Horgan et al. 2020 (Icarus) and Scheller et al. 2022 (Science)", "agency": "other", "url": "https://doi.org/10.1126/science.abo5204", "licence": "Cited published result", "used_for": "Which mineral groups are reported at Jezero"},
     {"id": "mars-gale-minerals", "name": "Gale crater minerals: Rampe et al. 2020 (Geochemistry)", "agency": "other", "url": "https://doi.org/10.1016/j.chemer.2020.125605", "licence": "Cited published result", "used_for": "Which mineral groups are reported at Gale"},
-    {"id": "hayne-2017", "name": "Hayne et al. 2017, global regolith thermophysical properties of the Moon from Diviner", "agency": "other", "url": "https://arxiv.org/abs/1711.00977", "licence": "Cited published result", "used_for": "The Moon-wide thermal inertia shown as a label"},
     {"id": "golombek-2020", "name": "Golombek et al. 2020, Mars landing-site thermal inertia rule", "agency": "other", "url": "https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502", "licence": "Cited published result", "used_for": "The ground-strength label on Mars"},
 ]
 
-MOON_TI = {"value": 55.0, "stat": "Moon-wide average at 273 K, J m⁻² K⁻¹ s⁻½", "dataset": "hayne-2017", "resolution": "Moon-wide", "kind": "published", "note": "Moon-wide average; not mapped at the pole."}
 
 LAYOUT = (
     "Each target file holds rank:<trait> and ch:<challenge> as one byte (0-250 is 0-1, 255 is no data), "
@@ -77,7 +75,13 @@ LAYOUT = (
     "Hand-set weights use the same 70% gate: the sum of each challenge weight times its cov, over the sum of the challenge weights."
 )
 
-SHOWN_KEYS = {"moon": ["lit_share", "psr_share", "t_min_k", "t_max_k"], "mars": ["weh_pct", "dci", "thermal_inertia", "t_min_air_c"]}
+SHOWN_KEYS = {"moon": ["lit_share", "psr_share", "thermal_inertia_moon_wide", "t_min_k", "t_max_k", "t_min_coldest_k"], "mars": ["weh_pct", "dci", "thermal_inertia", "ground_strength_note"]}
+
+RESOLUTION = {
+    "power_merra2": "about 50 km (MERRA-2 0.5 x 0.625 degree, averaged onto our grid)",
+    "hargreaves": "about 50 km (MERRA-2 0.5 x 0.625 degree, averaged onto our grid)",
+    "power_syn1deg": "about 110 km (CERES SYN1deg 1 degree, averaged onto our grid)",
+}
 
 
 def clean(x):
@@ -164,7 +168,8 @@ def trait_entries(metas):
         first = next(iter(t["column"].values()))
         m = column_meta(metas, first)
         e = {k: t[k] for k in ("id", "label", "unit", "digits", "plain", "column", "scored_by")}
-        e.update(earth_stat=m.get("stat", ""), earth_dataset=m.get("dataset", "computed"), earth_resolution=m.get("resolution", ""))
+        ds = m.get("dataset", "computed")
+        e.update(earth_stat=t.get("earth_stat", m.get("stat", "")), earth_dataset=ds, earth_resolution=RESOLUTION.get(ds, m.get("resolution", "")))
         if t.get("note"):
             e["note"] = t["note"]
         out.append(e)
@@ -201,9 +206,16 @@ def filter_entries(cfg):
 def shown_values(target):
     body = target["body"]
     vals = target["values"]
-    out = {k: vals[k] for k in SHOWN_KEYS[body] if vals.get(k) and vals[k].get("value") is not None}
-    if body == "moon":
-        out["thermal_inertia"] = dict(MOON_TI)
+    out = {}
+    for k in SHOWN_KEYS[body]:
+        v = vals.get(k)
+        if v is None:
+            continue
+        v = dict(v)
+        if not isinstance(v.get("value"), (int, float)):
+            v["note"] = f"{v.get('value')}: {v.get('note', '')}" if v.get("value") is not None else v.get("note", "")
+            v["value"] = None
+        out[k] = v
     return out
 
 
@@ -258,8 +270,16 @@ def merge_datasets(metas, extra):
     return out
 
 
+def used_datasets(datasets, metas, entries):
+    used = {column_meta(metas, t).get("dataset") for t in INPUTS} | {column_meta(metas, "minerals_seen").get("dataset")}
+    for e in entries:
+        groups = [e["values"], e["shown"]] + [r["values"] for r in e.get("regions", [])]
+        used |= {v["dataset"] for g in groups for v in g.values()}
+    return [d for d in datasets if d["id"] in used]
+
+
 def benchmarks(datasets, cfg):
-    archives = sorted({d["archive"] for d in datasets if d.get("archive")})
+    archives = sorted({d["archive"] for d in datasets if d.get("archive") and d["archive"] not in ("computed", "published paper")})
     return [
         {"n": 1, "guide_words": "Cross-domain data: at least 3 distinct open data archives (e.g. NASA PDS, USGS, Landsat/Sentinel)", "how": f"Data comes from {len(archives)} open archives: " + ", ".join(archives) + ".", "where": "The data list at the foot of the page names every dataset with a link."},
         {"n": 2, "guide_words": "Geographical scope: map and index at least 4 terrain types: arid basins, high-altitude volcanic fields, salt flats, caves", "how": "Every land cell is tagged arid basin, high-altitude volcanic field, salt flat, frozen ground or cave by rules worked out from the data, shown with each type.", "where": "The terrain-type filter on the map."},
@@ -313,7 +333,7 @@ def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sa
         scored[tid] = score_target(cells, t, cfg)
         binfile = target_bin(out / f"target-{tid}.bin", n, scored[tid])
         entries.append(target_entry(t, scored[tid], binfile))
-    datasets = merge_datasets(metas, extra_datasets)
+    datasets = used_datasets(merge_datasets(metas, extra_datasets), metas, entries)
     rules = terrain_rules(cfg)
     manifest = {
         "version": 1,
@@ -326,7 +346,7 @@ def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sa
         "challenges": challenge_entries(cfg),
         "filters": filter_entries(cfg),
         "scoring": {"floor": cfg["scoring"]["floor"], "missing_rank": cfg["scoring"]["missing_rank"], "min_weight_with_data": cfg["scoring"]["min_weight_with_data"], "rule": RULE, "layout": LAYOUT, "yearround_rule": yearround_rule(cfg["scoring"]["yearround_share"])},
-        "terrain_types": [{"id": i, "key": k, "name": name, "rule": rules[k], "cells": int((cells["terrain"] == i).sum())} for i, k, name in TERRAIN_TYPES],
+        "terrain_types": [{"id": i, "key": k, "name": name, "rule": rules[k], "cells": int((cells["terrain_type"] == i).sum())} for i, k, name in TERRAIN_TYPES],
         "clustering": {"k": cfg["clustering"]["k"], "method": f"k-means on standardised trait values (seed {cfg['clustering']['seed']}); cells missing any input are left out", "inputs": cfg["clustering"]["inputs"], "agreement": info["agreement"], "summary": info["summary"]},
         "targets": entries,
         "cant_copy": CANT_COPY,
@@ -410,24 +430,6 @@ def synthetic(seed=7):
     return {"climate": climate, "terrain": terrain, "surface": surface}, metas
 
 
-def prototype_targets():
-    data = json.loads(PROTOTYPE_TARGETS.read_text(encoding="utf8"))["targets"]
-    def tv(v):
-        return {"value": v["value"], "stat": "sample copied from the prototype", "dataset": "sample", "resolution": "10 km window", "kind": "computed", "note": "Sample: " + (v.get("note") or "")}
-    moon = [t for t in data if t["body"] == "moon"]
-    keys = {k for t in moon for k in t["values"]}
-    values = {}
-    for k in keys:
-        xs = [t["values"][k]["value"] for t in moon if k in t["values"] and t["values"][k]["value"] is not None]
-        if xs:
-            values[k] = tv({"value": float(np.median(xs)), "note": "median of the nine Artemis III regions"})
-    pole = {"id": "moon-south-pole", "body": "moon", "name": "Moon south pole (sample)", "short": "South pole", "lat": -89.9, "lon": 0.0, "anchor_note": "Sample: median of NASA's nine Artemis III candidate regions.", "values": values, "facts": [],
-            "regions": [{"id": t["id"], "name": t["name"], "lat": t["lat"], "lon": t["lon"], "anchor_note": t["anchor_note"], "values": {k: tv(v) for k, v in t["values"].items()}} for t in moon]}
-    j = next(t for t in data if t["id"] == "mars-jezero")
-    jez = {"id": "mars-jezero", "body": "mars", "name": "Jezero crater (sample)", "short": "Jezero", "lat": j["lat"], "lon": j["lon"], "anchor_note": "Sample: " + j["anchor_note"], "values": {k: tv(v) for k, v in j["values"].items() if v["value"] is not None}, "facts": []}
-    return [pole, jez]
-
-
 def load_targets(path=TARGETS):
     data = json.loads(Path(path).read_text(encoding="utf8"))
     targets = data["targets"] if isinstance(data, dict) else data
@@ -446,7 +448,7 @@ def main():
     out = Path(args.out)
     if args.stub:
         stages, metas = synthetic()
-        targets, extra = prototype_targets(), []
+        targets, extra = load_targets()
         commit = "sample"
     else:
         stages, metas = {}, {}

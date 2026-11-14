@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from pipeline.assemble import load_config, load_points
-from pipeline.export import CAVES, OUT, RANGE, SITES, decode, encode, export, prototype_targets, read_bin, synthetic, write_bin
+from pipeline.export import CAVES, OUT, RANGE, SITES, decode, encode, export, load_targets, read_bin, synthetic, write_bin
 
 S, N, I, B = "str", "num", "int", "bool"
 
@@ -59,7 +59,7 @@ LABEL = {"id": S, "name": S, "kind": enum("known_analog", "cave", "ordinary", "p
 PLACE = {"id": S, "name": S, "lat": N, "lon": N, "group": S, "cell": null(I), "score": null(N), "land_rank": null(N), "best_target": opt(S), "held_out": B, "blind": B, "note": opt(S)}
 CHECK = {"name": S, "pass_mark": N, "result": null(N), "passed": null(B), "n_pairs": I, "held_out_only": opt(null(N)), "blind_only": opt(null(N))}
 TEST = {"id": S, "title": S, "body": enum("moon", "mars"), "plain": S, "groups": [{"id": S, "name": S, "plain": S}], "places": [PLACE], "checks": [CHECK], "misses": [{"place": S, "why": S}]}
-VALIDATION = {"weights_commit": S, "not_blind_note": S, "prototype_runs": [{"date": S, "result": S}], "tests": [TEST], "stability": opt(S), "data_checks": [{"name": S, "result": S, "passed": B}]}
+VALIDATION = {"weights_commit": S, "summary": opt(S), "not_blind_note": S, "prototype_runs": [{"date": S, "result": S}], "tests": [TEST], "stability": opt(S), "data_checks": [{"name": S, "result": S, "passed": B}]}
 
 KINDS = {
     S: lambda v: isinstance(v, str),
@@ -104,7 +104,8 @@ def stub(tmp_path_factory):
     out = tmp_path_factory.mktemp("data")
     stages, metas = synthetic()
     sites = json.loads(SITES.read_text(encoding="utf8"))
-    cells, scored, _ = export(stages, metas, prototype_targets(), [], sites, load_points(CAVES), load_config(), "abc123", True, out)
+    targets, extra = load_targets()
+    cells, scored, _ = export(stages, metas, targets, extra, sites, load_points(CAVES), load_config(), "abc123", True, out)
     load = lambda name: json.loads((out / name).read_text(encoding="utf8"))
     return out, cells, scored, load("manifest.json"), load("labels.json"), load("validation.json")
 
