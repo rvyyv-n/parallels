@@ -1,0 +1,151 @@
+.tour-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 36px;
+  padding: 0 14px 0 6px;
+  font: 600 13px/1 var(--body);
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--rule-2);
+  border-radius: 999px;
+  cursor: pointer;
+  justify-self: start;
+  white-space: nowrap;
+}
+
+.tour-btn i {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--signal);
+}
+
+.tour-btn i::before {
+  content: "";
+  margin-left: 2px;
+  border: 5px solid transparent;
+  border-left: 8px solid #000;
+  border-right: 0;
+}
+
+.tour-btn small {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.tour-btn:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.tour-hole {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  outline: 2px solid var(--signal);
+  outline-offset: -2px;
+  box-shadow: 0 0 0 200vmax rgba(0, 0, 0, 0.66);
+}
+
+.tour-box {
+  position: fixed;
+  z-index: 61;
+  right: 20px;
+  bottom: 20px;
+  width: min(380px, calc(100vw - 28px));
+  padding: 16px 18px 14px;
+  color: var(--ink);
+  background: #0c0e11;
+  border: 1px solid var(--rule-2);
+  border-top: 2px solid var(--signal);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.7);
+}
+
+.tour-hole[hidden],
+.tour-box[hidden] {
+  display: none;
+}
+
+.tour-n {
+  margin: 0 0 8px;
+  font: 600 11.5px/1 var(--display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.tour-t {
+  margin: 0 0 6px;
+  font: 800 26px/1 var(--display);
+  font-stretch: 70%;
+  text-transform: uppercase;
+}
+
+.tour-p {
+  margin: 0;
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+
+.tour-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.tour-btns button {
+  min-height: 44px;
+  padding: 0 16px;
+  font: 600 13.5px/1 var(--body);
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--rule-2);
+  cursor: pointer;
+}
+
+.tour-btns button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.tour-btns .tour-next {
+  color: #000;
+  background: var(--signal);
+  border-color: var(--signal);
+}
+
+.tour-btns [data-tour="end"] {
+  margin-left: auto;
+  border-color: transparent;
+  color: var(--ink-2);
+}
+
+@media (max-width: 759px) {
+  .tour-box {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    width: auto;
+  }
+}
+
+@media (pointer: coarse) {
+  .tour-btn {
+    min-height: 44px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .bar .now {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .bar .tour-btn {
+    grid-row: 2;
+    grid-column: 1;
+  }
+}

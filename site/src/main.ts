@@ -12,6 +12,7 @@ import { esc, latlon, num, reduced, score100, webgl } from "./format";
 import { colour, gradient } from "./ramp";
 import { logo } from "./logo";
 import { icon } from "./icons";
+import { tour } from "./tour";
 import { fillAnalogs, headline, wireWorlds, worlds } from "./worlds";
 import type { Intro } from "./intro";
 
@@ -222,6 +223,7 @@ function shell(m: Manifest, body: "moon" | "mars") {
       <section id="explore" class="explore" aria-label="Explore matches">
         <div class="bar">
           <p class="now" id="now" aria-live="polite"></p>
+          <button type="button" class="tour-btn" id="tour"><i aria-hidden="true"></i>Guided tour <small>7 steps</small></button>
           <div class="pickrow"><span class="pk" id="pk-t">Base site</span><div class="chips" data-chips="target" role="group" aria-labelledby="pk-t"></div></div>
           <div class="pickrow"><span class="pk" id="pk-f">Testing</span><div class="chips" data-chips="filter" role="group" aria-labelledby="pk-f"></div></div>
         </div>
@@ -670,6 +672,7 @@ async function main() {
     fillAnalogs(app, ls);
   });
   wireWorlds($("#worlds"));
+  tour($("#tour"));
   $("#worlds").addEventListener("click", (e) => {
     if ((e.target as HTMLElement).closest(".w-go")) $("#explore").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" });
   });

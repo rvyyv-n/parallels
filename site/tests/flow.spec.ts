@@ -338,3 +338,25 @@ test("each check of the current run is a bar against its pass mark, failed first
   await expect(ok.locator(".cbar .cbar-st", { hasText: "Passed" })).toHaveCount(passed.length);
   if (cs.some((c) => c.passed == null)) await expect(box.locator(".not-run")).toBeVisible();
 });
+
+test("the guided tour steps through the page and closes on Escape", async ({ page }) => {
+  await ready(page);
+  await page.locator("#tour").click();
+  const box = page.locator(".tour-box");
+  await expect(box).toBeVisible();
+  await expect(box.locator(".tour-n")).toHaveText(/^1 of \d+$/);
+  await box.locator(".tour-next").click();
+  await expect(box.locator(".tour-n")).toHaveText(/^2 of \d+$/);
+  await page.keyboard.press("Escape");
+  await expect(box).toBeHidden();
+  await expect(page.locator("#tour")).toBeFocused();
+});
+
+test("the worlds section shows both worlds and their known analog sites", async ({ page }) => {
+  await ready(page);
+  await expect(page.locator("#w-moon .w-fact")).toHaveCount(m.cant_copy.length);
+  await expect(page.locator("#w-moon .w-analog").first()).toBeVisible();
+  await page.locator('#worlds [data-show="mars"]').click();
+  await expect(page.locator("#w-moon")).toBeHidden();
+  await expect(page.locator("#w-mars .w-fact")).toHaveCount(m.cant_copy.length);
+});
