@@ -317,12 +317,11 @@ h4 {
 }
 
 .pin {
-  width: 10px;
-  height: 10px;
+  width: 26px;
+  height: 26px;
   padding: 0;
-  border-radius: 50%;
-  border: 1.5px solid var(--paper);
-  background: var(--ink-2);
+  border: 0;
+  background: none;
   cursor: pointer;
   display: grid;
   place-items: center;
@@ -330,27 +329,47 @@ h4 {
   color: var(--paper);
 }
 
-.pin.top {
+.pin::before {
+  content: "";
+  grid-area: 1 / 1;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1.5px solid var(--paper);
+  background: var(--ink-2);
+}
+
+.pin span {
+  grid-area: 1 / 1;
+  position: relative;
+}
+
+.pin.top::before {
   width: 22px;
   height: 22px;
   background: var(--accent);
 }
 
-.pin.sel {
-  width: 28px;
-  height: 28px;
+.pin.sel::before {
+  width: 26px;
+  height: 26px;
   background: var(--ink);
   outline: 2px solid var(--accent);
   outline-offset: 1px;
-  font-size: 0.8rem;
 }
 
 .pin:not(.top).sel::after {
   content: "";
+  grid-area: 1 / 1;
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--paper);
+}
+
+.nodata {
+  color: var(--ink-2);
+  font-style: italic;
 }
 
 .rank-head,

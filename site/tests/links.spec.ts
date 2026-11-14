@@ -2,15 +2,16 @@ import { expect, test } from "@playwright/test";
 
 test.skip(!process.env.RUN_NETWORK, "set RUN_NETWORK=1 to check every link answers");
 
-test("every source link answers", async ({ page, request }) => {
-  test.setTimeout(180_000);
+test("every source link answers", async ({ page, request }, info) => {
+  test.skip(info.project.name !== "laptop", "links are the same on every screen size");
+  test.setTimeout(600_000);
   await page.goto("/");
   for (const body of ["Moon", "Mars"]) {
     await page.getByRole("radio", { name: body }).check();
   }
   const data = await (await request.get("/data/app.json")).json();
   const urls = new Set<string>(await page.locator("a[href^='http']").evaluateAll((as) => as.map((a) => a.getAttribute("href")!)));
-  JSON.stringify(data).replace(/https:\/\/[^"\s)]+/g, (u) => (urls.add(u), u));
+  JSON.stringify(data).replace(/https:\/\/[^"\s]+/g, (u) => (urls.add(u), u));
   const bad: string[] = [];
   const opts = { timeout: 30_000, maxRedirects: 5, failOnStatusCode: false };
   for (const u of urls) {
@@ -21,9 +22,21 @@ test("every source link answers", async ({ page, request }) => {
       continue;
     }
     const file = /\.(tif|img|pds|tab|lbl)$/i.test(u);
-    const r = await (file ? request.head(u, opts) : request.get(u, opts)).catch(() => null);
+    let r = await (file ? request.head(u, opts) : request.get(u, opts)).catch(() => null);
+    for (let wait = 2000; r?.status() === 429 && wait <= 16000; wait *= 2) {
+      await page.waitForTimeout(wait);
+      r = await request.get(u, opts).catch(() => null);
+    }
+    if (u.includes("wikipedia.org")) await page.waitForTimeout(400);
     if (r && r.status() < 400) continue;
-    const inBrowser = r ? false : await page.evaluate((x) => fetch(x, { method: "HEAD", mode: "no-cors" }).then(() => true, () => false), u);
+    let inBrowser = false;
+    if (!r) {
+      inBrowser = await page.evaluate((x) => fetch(x, { method: "HEAD", mode: "no-cors" }).then(() => true, () => false), u);
+    } else if (r.status() === 403) {
+      const tab = await page.context().newPage();
+      inBrowser = ((await tab.goto(u, { timeout: 30_000 }).catch(() => null))?.status() ?? 999) < 400;
+      await tab.close();
+    }
     if (!inBrowser) bad.push(`${r?.status() ?? "error"} ${u}`);
   }
   expect(bad).toEqual([]);

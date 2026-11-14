@@ -10,8 +10,10 @@ export interface Trait {
 }
 
 export interface Value {
-  value: number;
+  value: number | null;
   sample: boolean;
+  missing?: boolean;
+  ideal?: boolean;
   source?: string;
   url?: string;
   kind?: string;
@@ -45,6 +47,8 @@ export interface Challenge {
   parts: Part[];
   labels?: Label[];
   unscored?: Unscored[];
+  ideal?: Record<string, number>;
+  ideal_note?: string;
 }
 
 export interface Fact {
@@ -74,6 +78,8 @@ export interface Site {
   lon: number;
   groups: string[];
   coordsEstimate: boolean;
+  coordSource?: string;
+  coordNote?: string;
   values: Record<Body, Record<string, Value>>;
   context: Record<string, number | null>;
 }
@@ -82,7 +88,7 @@ export interface Result {
   site: string;
   score: number;
   sample: boolean;
-  ranks: Record<string, number>;
+  ranks: Record<string, number | null>;
 }
 
 export interface CantCopy {
@@ -103,9 +109,11 @@ export interface Check {
 
 export interface Validation {
   traits: string[];
-  groups: { id: string; label: string; points: { site: string; rank: number }[] }[];
+  challenges: string[];
+  groups: { id: string; label: string; points: { site: string; rank: number; heldOut: boolean }[] }[];
   checks: Check[];
   note: string;
+  firstRun: string;
 }
 
 export interface Source {
@@ -126,6 +134,7 @@ export interface App {
   targets: Target[];
   sites: Site[];
   results: Record<string, Record<string, Result[]>>;
+  previews: Record<string, string[]>;
   validation: Record<Body, Validation>;
   sources: Source[];
 }

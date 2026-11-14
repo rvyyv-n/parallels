@@ -40,11 +40,42 @@ for (const [body, names] of [["Moon", MOON], ["Mars", MARS]] as const) {
 
 test("label-only challenges say why they are not scored", async ({ page }) => {
   await page.goto("/");
+  const card = page.getByTestId("match");
   await page.getByRole("button", { name: /^Dust/ }).click();
-  await expect(page.getByText("Not scored", { exact: false }).first()).toBeVisible();
-  await expect(page.getByText(/Apollo samples/)).toBeVisible();
+  await expect(card.getByRole("heading", { level: 2 })).toHaveText("Dust");
+  await expect(card.getByText(/Apollo samples/)).toBeVisible();
+  await expect(card.getByText(/compared with/)).toHaveCount(0);
   await page.getByRole("button", { name: /^Shelter/ }).click();
-  await expect(page.getByText(/no global map of caves/)).toBeVisible();
+  await expect(card.getByText(/no global map of caves/)).toBeVisible();
+});
+
+test("a link that mixes Moon and Mars falls back to a working view", async ({ page }) => {
+  await page.goto("/#/moon/mars-jezero/heat/yungay-atacama");
+  await expect(page.getByTestId("match").getByRole("heading", { level: 2 })).toBeVisible();
+  await expect(page.getByRole("radio", { name: "Moon" })).toBeChecked();
+});
+
+test("industrial sites are scored against ideal flat ground", async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel("Compare against").selectOption({ label: "Malapert Massif" });
+  await page.getByRole("button", { name: /^Industrial sites/ }).click();
+  await expect(page.getByTestId("match").getByText("Ideal flat ground").first()).toBeVisible();
+});
+
+test("map dots are big enough to tap", async ({ page }) => {
+  await page.goto("/");
+  const box = await page.locator(".pin").first().boundingBox();
+  expect(box!.width).toBeGreaterThanOrEqual(24);
+});
+
+test("on a phone, picking a challenge shows its ranking", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "phone only");
+  await page.goto("/");
+  await page.getByRole("button", { name: /^Heat swing/ }).click();
+  await page.waitForTimeout(800);
+  const top = await page.locator("#ranking-wrap").evaluate((el) => el.getBoundingClientRect().top);
+  expect(top).toBeGreaterThanOrEqual(-5);
+  expect(top).toBeLessThan(200);
 });
 
 test("sample values are labelled as sample", async ({ page }) => {

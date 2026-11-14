@@ -18,7 +18,7 @@ No single place on Earth can stand in for a Moon or Mars base. So we split base-
 ## Run it
 
 - Pipeline (Python 3.13): `uv venv .venv && uv pip install -p .venv numpy scipy rasterio pyproj requests pytest`, then `.venv/Scripts/python -m pipeline.earth`, `-m pipeline.planets` and `-m pipeline.build`. Tests: `.venv/Scripts/python -m pytest pipeline`.
-- Site (`site/`): `npm install`, `npm run dev`. Tests: `npx playwright install chromium`, then `npm test` (set `RUN_NETWORK=1` to also check every source link).
+- Site (`site/`): `npm install`, `npm run dev`. Tests: `npx playwright install chromium`, then `npm test` (uses port 4319) (set `RUN_NETWORK=1` to also check every source link).
 
 ## How we used AI
 
@@ -32,20 +32,22 @@ The prototype mixes real data with clearly labelled sample values. On the site, 
 
 | Source | Used for |
 |---|---|
-| [NASA POWER climatology](https://power.larc.nasa.gov/) | Earth coldest temperature, yearly and daily swing, frozen months, rain and snow |
+| [NASA POWER climatology](https://power.larc.nasa.gov/) | Earth ground-surface temperatures, yearly and daily swings, frozen months, rain and snow, haze (aerosol optical depth) |
+| [NASA MODIS land cover (MCD12Q1, 2024) via NASA GIBS](https://nasa-gibs.github.io/gibs-api-docs/) | Earth bare ground in each 10 km patch |
 | [Copernicus DEM GLO-90](https://registry.opendata.aws/copernicus-dem/) (ESA, partner data) | Earth slopes and height range, resampled to 240 m (Moon) and 200 m (Mars) |
 | [LRO LOLA south-pole elevation, 240 m](https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/) | Moon slopes and height range |
 | [LRO Diviner polar temperatures](https://www.diviner.ucla.edu/science) | Moon coldest and hottest ground |
 | [NASA PGDA south-pole illumination](https://pgda.gsfc.nasa.gov/products/69) | Moon share of time in sunlight |
 | [HRSC–MOLA blended Mars DEM, 200 m](https://astrogeology.usgs.gov/search/map/mars_mgs_mola_mex_hrsc_blended_dem_global_200m) (USGS; ESA/DLR and NASA) | Mars slopes and height range |
-| [Mars Odyssey GRS water-equivalent hydrogen](https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/) | Mars ice in the ground |
+| [Mars Odyssey GRS water-equivalent hydrogen](https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/) | Mars water in the top metre (hydrogen, as ice or in minerals) |
 | [MGS TES dust cover index](https://www.mars.asu.edu/~ruff/DCI/dci.html) | Mars dust cover (shown, not scored) |
-| Curiosity REMS and Perseverance MEDA, published | Mars temperatures at Gale and Jezero |
+| Curiosity REMS (Gómez-Elvira 2017); Perseverance MEDA and Mastcam-Z (Zorzano 2024, Lemmon 2022) | Gale coldest ground temperature and daily swing (swing worked out from published ranges); Jezero coldest ground temperature and dust in the air |
 | [USGS Gazetteer of Planetary Nomenclature](https://planetarynames.wr.usgs.gov/), [USGS Mars cave catalogue](https://astrogeology.usgs.gov/search/map/mars_global_cave_candidate_catalog_v1_cushing) | where we place each target |
 | [NASA GIBS Blue Marble](https://nasa-gibs.github.io/gibs-api-docs/) | map background |
 | Sun height | computed from latitude |
+| Earth site positions | each site's `coord_source` in `pipeline/sites.json` |
 
-**Sample (placeholders)**: ground strength, rock cover, ice in the ground (Earth and Moon), feldspar-rich rock, clays and sulfates, dust-lifting days, and Mars temperatures at Arcadia Planitia, Deuteronilus Mensae and Arsia Mons. They are generated from a fixed seed, so they don't change between runs, and they are never used in the validation check.
+**Sample (placeholders)**: ground strength, rock cover, water in the ground on Earth and the Moon, feldspar-rich rock, clays and sulfates, Mars ground temperatures at Arcadia Planitia, Deuteronilus Mensae and Arsia Mons, Jezero's day-to-night swing, and dust in the air at every Mars site except Jezero. They are generated from a fixed seed, so they don't change between runs, and they are never used in the validation check.
 
 Code libraries: numpy, scipy, rasterio (GDAL), pyproj, requests, pytest; Vite, TypeScript, MapLibre GL JS, Playwright; Barlow fonts (SIL Open Font License).
 

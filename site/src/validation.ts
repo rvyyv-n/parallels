@@ -1,5 +1,5 @@
 import type { App, Body } from "./types";
-import { esc, pct } from "./format";
+import { esc, num, pct } from "./format";
 
 const W = 640;
 const ROW = 60;
@@ -40,7 +40,7 @@ export function renderValidation(el: HTMLElement, data: App) {
     const v = data.validation[body];
     const checks = v.checks
       .map(
-        (c) => `<tr><th>${esc(c.label)}</th><td class="num">${pct(c.value)}% of pairs</td><td class="num">pass mark ${pct(c.pass_mark)}%</td><td class="${c.passed ? "pass" : "fail"}">${c.passed ? "passed" : "not passed"}</td></tr>`,
+        (c) => `<tr><th>${esc(c.label)}</th><td class="num">${num(c.value * 100, 1)}% of pairs</td><td class="num">pass mark ${pct(c.pass_mark)}%</td><td class="${c.passed ? "pass" : "fail"}">${c.passed ? "passed" : "not passed"}</td></tr>`,
       )
       .join("");
     return `<div class="vpanel">
@@ -49,7 +49,8 @@ export function renderValidation(el: HTMLElement, data: App) {
       <p class="axis-note">Each dot is one test place. Position: share of Earth's land that scores lower (0–100). Bar: group median.</p>
       <table class="checks"><tbody>${checks}</tbody></table>
       <p class="vnote">${esc(v.note)}</p>
-      <p class="tr-src">Traits used: ${v.traits.map((t) => esc(data.traits[t].label.toLowerCase())).join(", ")}.</p>
+      <p class="tr-src">${esc(v.firstRun)}</p>
+      <p class="tr-src">Each place's score averages these challenges, each counted once, using only their real-data traits: ${v.challenges.map((id) => esc(data.challenges[body].find((c) => c.id === id)!.name.toLowerCase())).join(", ")}. Traits: ${v.traits.map((t) => esc(data.traits[t].label.toLowerCase())).join(", ")}. The held-out half of the known analogs is a fixed random split, set before the second run.</p>
     </div>`;
   };
   el.innerHTML = `
