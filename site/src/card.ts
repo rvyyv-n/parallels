@@ -1,3 +1,4 @@
+import "./card.css";
 import type { Body, Challenge, Manifest, Target, TargetValue, Trait } from "./contract";
 import type { Cols } from "./data";
 import { MONTHS, bits, esc, latlon, monthList, num, score100, unit } from "./format";
@@ -68,8 +69,21 @@ function earthImage(x: CardInput) {
 
 const ds = (m: Manifest, id: string) => m.datasets.find((d) => d.id === id)?.name ?? id;
 
-function sourceLine(m: Manifest, label: string, dataset: string, resolution: string, stat: string) {
-  return `<span><b>${esc(label)}</b> ${esc(ds(m, dataset))} · ${esc(resolution)} · ${esc(stat)}</span>`;
+const short = (m: Manifest, id: string) => {
+  const n = ds(m, id);
+  return n.replace(/\s*\([^)]*\)/g, "").split(", ")[0].trim() || n;
+};
+
+const brief = (res: string) => res.replace(/\s*\([^)]*\)/g, "").trim() || res;
+
+function sourceLine(m: Manifest, label: string, dataset: string, resolution: string) {
+  return `<span><b>${esc(label)}</b> ${esc(ds(m, dataset))} · ${esc(brief(resolution))}</span>`;
+}
+
+function targetSource(x: CardInput, r: Row, label: string) {
+  if (!r.tv) return "";
+  if (r.tr.scored_by === "ideal") return `<span><b>${esc(label)}</b> a set goal, not a measurement</span>`;
+  return sourceLine(x.m, label, r.tv.dataset, r.tv.resolution);
 }
 
 interface Row {
@@ -116,10 +130,18 @@ function flags(r: Row, label: string) {
     <span><b>Here</b>${pips(r.ev)}</span><span><b>${esc(label)}</b>${pips(tv)}</span></div>`;
 }
 
-function notes(x: CardInput, r: Row) {
+function notes(x: CardInput, r: Row, missing: boolean) {
+  const who = side(x, r.tr);
+  const tv = r.tv;
   const parts = [
-    r.tr.note ? `<p><b>Earth side.</b> ${esc(r.tr.note)}</p>` : "",
-    r.tv?.note ? `<p><b>${esc(side(x, r.tr))} side.</b> ${esc(r.tv.note)}</p>` : "",
+    !missing && r.tr.note ? `<p><b>Earth side.</b> ${esc(r.tr.note)}</p>` : "",
+    !missing && tv?.note ? `<p><b>${esc(who)} side.</b> ${esc(tv.note)}</p>` : "",
+    `<p><b>How the Earth value is worked out.</b> ${esc(r.tr.earth_stat)}. Resolution: ${esc(r.tr.earth_resolution)}.</p>`,
+    tv
+      ? `<p><b>How the ${r.tr.scored_by === "ideal" ? "ideal" : `${esc(who)} value`} is set.</b> ${esc(tv.stat)}${tv.kind !== "computed" ? ` (${esc(tv.kind)})` : ""}. ${
+          r.tr.scored_by === "ideal" ? "" : `Source: ${esc(ds(x.m, tv.dataset))}. `
+        }Resolution: ${esc(tv.resolution)}.</p>`
+      : "",
   ].join("");
   return parts ? `<details class="t-notes"><summary>Notes</summary>${parts}</details>` : "";
 }
@@ -169,44 +191,92 @@ function traitHtml(x: CardInput, r: Row, why: string) {
       <div><dt>Gap</dt><dd>${gapText}</dd></div>
       <div><dt>${esc(label)}</dt><dd>${val(r.tr, tv)}</dd></div>
     </dl>
-    <p class="t-src">${sourceLine(x.m, "Earth", r.tr.earth_dataset, r.tr.earth_resolution, r.tr.earth_stat)}${
-      r.tv ? sourceLine(x.m, label, r.tv.dataset, r.tv.resolution, r.tv.stat + (r.tv.kind !== "computed" ? ` (${r.tv.kind})` : "")) : ""
-    }</p>
-    ${missing ? "" : notes(x, r)}
+    <p class="t-src">${sourceLine(x.m, "Earth", r.tr.earth_dataset, r.tr.earth_resolution)}${targetSource(x, r, label)}</p>
+    ${notes(x, r, !!missing)}
   </li>`;
 }
 
-function breaks(x: CardInput, chs: Challenge[]) {
+function scoredRows(x: CardInput, chs: Challenge[]) {
   const seen = new Set<string>();
-  const out: { r: Row; text: string }[] = [];
+  const out: Row[] = [];
   for (const c of chs) {
     if (!(x.weights[c.id] > 0)) continue;
-    for (const { id } of c.traits) {
-      if (seen.has(id)) continue;
+    for (const { id, weight } of c.traits) {
+      if (seen.has(id) || !(weight > 0)) continue;
       seen.add(id);
       const r = row(x, id);
-      const tv = r?.tv?.value;
-      if (!r || tv == null || !Number.isFinite(r.ev)) continue;
-      const who = side(x, r.tr);
-      if (r.tr.scored_by === "presence") {
-        const short = yesNo(r.tr) ? r.ev >= 50 !== tv >= 50 : r.ev < tv;
-        if (short) out.push({ r, text: `Here <b>${val(r.tr, r.ev)}</b>, ${esc(who)} <b>${val(r.tr, tv)}</b>.` });
-        continue;
-      }
-      const beyond = tv < r.lo || tv > r.hi;
-      if (!beyond && !(r.rank < 0.5)) continue;
-      const d = r.tr.digits;
-      const u = unit(r.tr.unit);
-      const dir = r.ev > tv ? "above" : "below";
-      const text = beyond
-        ? `No land on Earth reaches the ${esc(who)} value: Earth's land spans ${num(r.lo, d)} to ${num(r.hi, d)}${u}.`
-        : `Weaker than most of Earth's land on this trait (Earth rank ${score100(r.rank)}).`;
-      out.push({ r, text: `<b>${num(Math.abs(r.ev - tv), d)}${u}</b> ${dir} the ${r.tr.scored_by === "ideal" ? "ideal" : "target"}. ${text}` });
+      if (!r || r.tv?.value == null || !Number.isFinite(r.ev)) continue;
+      out.push(r);
     }
   }
-  out.sort((a, b) => (a.r.rank || 0) - (b.r.rank || 0));
+  return out;
+}
+
+function breakRows(x: CardInput, chs: Challenge[]) {
+  const out: { r: Row; text: string }[] = [];
+  for (const r of scoredRows(x, chs)) {
+    const tv = r.tv!.value!;
+    const who = side(x, r.tr);
+    if (r.tr.scored_by === "presence") {
+      const short = yesNo(r.tr) ? r.ev >= 50 !== tv >= 50 : r.ev < tv;
+      if (short) out.push({ r, text: `Here <b>${val(r.tr, r.ev)}</b>, ${esc(who)} <b>${val(r.tr, tv)}</b>.` });
+      continue;
+    }
+    const beyond = tv < r.lo || tv > r.hi;
+    if (!beyond && !(r.rank < 0.5)) continue;
+    const d = r.tr.digits;
+    const u = unit(r.tr.unit);
+    const dir = r.ev > tv ? "above" : "below";
+    const text = beyond
+      ? `No land on Earth reaches the ${esc(who)} value: Earth's land spans ${num(r.lo, d)} to ${num(r.hi, d)}${u}.`
+      : `Weaker than most of Earth's land on this trait (Earth rank ${score100(r.rank)}).`;
+    const ref = r.tr.scored_by === "ideal" ? `the ideal (ideal: ${val(r.tr, tv)})` : `the ${esc(who)} value`;
+    out.push({ r, text: `<b>${num(Math.abs(r.ev - tv), d)}${u}</b> ${dir} ${ref}. ${text}` });
+  }
+  return out.sort((a, b) => (a.r.rank || 0) - (b.r.rank || 0));
+}
+
+function breaks(x: CardInput, chs: Challenge[]) {
+  const out = breakRows(x, chs);
   if (!out.length) return `<p class="muted">No weighted trait falls in Earth's weaker half or beyond Earth's range here.</p>`;
-  return `<ul class="breaks">${out.map(({ r, text }) => `<li><span class="b-name">${esc(r.tr.label)}</span><span>${text}</span></li>`).join("")}</ul>`;
+  return `<ul class="breaks">${out
+    .map(({ r, text }) => `<li><span class="b-name">${esc(r.tr.label)}</span><span>${text} <span class="b-src">Earth: ${esc(short(x.m, r.tr.earth_dataset))}</span></span></li>`)
+    .join("")}</ul>`;
+}
+
+function pairText(x: CardInput, r: Row) {
+  const tv = r.tv!.value!;
+  const ideal = r.tr.scored_by === "ideal";
+  const there = ideal ? `ideal: ${val(r.tr, tv)}` : `${esc(BODY[x.body])} ${val(r.tr, tv)}`;
+  const src = `Earth rank ${score100(r.rank)} · Earth: ${esc(short(x.m, r.tr.earth_dataset))}${ideal ? "" : ` · ${esc(BODY[x.body])}: ${esc(short(x.m, r.tv!.dataset))}`}`;
+  return `<li><b>${esc(r.tr.label)}</b>: ${val(r.tr, r.ev)} here, ${there}<span class="s-src">${src}</span></li>`;
+}
+
+function summary(x: CardInput, chs: Challenge[]) {
+  const all = scoredRows(x, chs).filter((r) => Number.isFinite(r.rank));
+  const top = [...all].sort((a, b) => b.rank - a.rank).slice(0, 3);
+  const weak = breakRows(x, chs)
+    .map((b) => b.r)
+    .filter((r) => !top.includes(r) && num(Math.abs(r.ev - r.tv!.value!), r.tr.digits) !== num(0, r.tr.digits))
+    .slice(0, 2);
+  const list = (rs: Row[], none: string) => (rs.length ? `<ul>${rs.map((r) => pairText(x, r)).join("")}</ul>` : `<p class="muted">${none}</p>`);
+  const names = x.m.cant_copy.map((c) => c.name.toLowerCase());
+  const said = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0] ?? "";
+  return `<section class="c-block c-sum" aria-label="Summary">
+    <div class="sum-row sum-ok"><h5 class="sum-k">Matches</h5>${list(top, "no data")}</div>
+    <div class="sum-row sum-bad"><h5 class="sum-k">Breaks</h5>${list(weak, all.length ? "No trait in this filter is weak here." : "no data")}</div>
+    <div class="sum-row sum-cant"><h5 class="sum-k">Earth can't copy</h5><p>${x.body === "moon" ? "The Moon's" : "Mars's"} ${esc(said)}. <a href="#c-cant">See the table below.</a></p></div>
+  </section>`;
+}
+
+function plainWhy(m: Manifest, why: string) {
+  let s = why.replace(/closer than 0% of land/g, "further from the target than almost all land");
+  for (const tr of m.traits) {
+    if (tr.scored_by !== "ideal") continue;
+    const re = new RegExp(`(${tr.label.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} [^;()]*? against )`, "g");
+    s = s.replace(re, "$1ideal: ");
+  }
+  return s;
 }
 
 function seasons(x: CardInput) {
@@ -262,7 +332,7 @@ function unscored(x: CardInput, chs: Challenge[]) {
   const used = new Set(items.map(({ l }) => l.target_key).filter(Boolean));
   const extra = Object.entries(x.target.shown).filter(([k]) => !used.has(k));
   if (!items.length && !extra.length) return "";
-  return `<section class="c-block"><h4>Shown, not scored</h4><ul class="labels">
+  return `<details class="c-block c-fold"><summary><h4>Shown, not scored <span class="muted">(${items.length + extra.length})</span></h4></summary><ul class="labels">
     ${items
       .map(
         ({ c, l }) => `<li><span class="b-name">${esc(l.name)}</span><span class="l-body"><span><span class="tag">${esc(c.name)}</span> ${esc(l.reason)}</span>${
@@ -276,7 +346,7 @@ function unscored(x: CardInput, chs: Challenge[]) {
           `<li><span class="b-name">${esc(x.m.traits.find((t) => t.id === k)?.label ?? SHOWN[k] ?? k.replace(/_/g, " "))}</span><span class="l-body">${shownHtml(x, k, v)}</span></li>`,
       )
       .join("")}
-  </ul></section>`;
+  </ul></details>`;
 }
 
 function regions(x: CardInput) {
@@ -356,16 +426,19 @@ export function card(x: CardInput): string {
         isIce(cells, i) ? ` <span class="tag ice">Ice sheet: ${num(ice)}% permanent ice</span>` : ""
       }</p>
       <h3 id="card-title">${esc(region)}</h3>
-      <p class="c-meta">${region === latlon(cells.lat[i], cells.lon[i], 2) ? "" : `<span>${latlon(cells.lat[i], cells.lon[i])}</span>`}<span>${esc(ttype && ttype.key !== "none" ? ttype.name : "No terrain type")}</span>${
+      <p class="c-meta">${region === latlon(cells.lat[i], cells.lon[i], 2) ? "" : `<span>${latlon(cells.lat[i], cells.lon[i])}</span>`}<span>${!ttype ? "Terrain type: no data" : ttype.key === "none" ? "Other land (no special type)" : esc(ttype.name)}</span>${
         Number.isFinite(cells.cluster?.[i]) ? `<span>Cluster ${num(cells.cluster[i])}</span>` : ""
       }<span>0.5° cell</span></p>
     </header>
-    ${head ? `<section class="c-block headline"><h4>${esc(head.title)}</h4><p>${esc(head.why)}</p></section>` : ""}
+    ${summary(x, chs)}
+    ${head ? `<details class="c-block c-fold headline"><summary><h4>Why this is the headline match</h4></summary><p><b>${esc(head.title)}.</b> ${esc(plainWhy(m, head.why))}</p></details>` : ""}
     <section class="c-block">
       <div class="overall">
         <div class="o-num" style="--c:${Number.isFinite(s) ? colour(s) : "#777"}"><span class="o-label">Match</span><b>${Number.isFinite(s) ? score100(s) : "—"}</b></div>
-        <p class="o-text">${esc(x.weightsName)} for ${esc(target.name)}${x.yr ? ", year-round" : ""}. It combines the challenge scores below, each an Earth rank from 0 to 100: ${
-          Number.isFinite(s) ? "100 means closer to the target than all of Earth's land." : "not enough of the weighted challenges have data here."
+        <p class="o-text">${esc(x.weightsName)} for ${esc(target.name)}${x.yr ? ", year-round" : ""}. ${
+          Number.isFinite(s)
+            ? "The match is a weighted mix of the challenge scores below. Each challenge score comes from its traits. A trait scores higher when more of Earth's land is further from the target than this place."
+            : "Not enough of the weighted challenges have data here to give a match."
         }</p>
       </div>
       <p class="key small muted"><span><i class="kk band"></i>Earth's land range</span><span><i class="kk dot"></i>this place</span><span><i class="kk tick"></i>target</span><span><i class="kk gap"></i>the gap, in real units</span></p>
@@ -374,7 +447,7 @@ export function card(x: CardInput): string {
     ${lead ? `<section class="c-block"><h4>What to test here</h4><p>${esc(lead.what_to_test)} <span class="muted">(${esc(lead.name)})</span></p></section>` : ""}
     <section class="c-block"><h4>Earth and ${esc(body)} side by side</h4><div class="pair">${earthImage(x)}<p class="pair-t">The ${esc(body)} side is the globe above, turned to ${esc(target.name)}. Earth can't show the target's low gravity, air or radiation: see below.</p></div></section>
     <section class="c-block"><h4>Where it breaks</h4>${breaks(x, chs)}</section>
-    <section class="c-block"><h4>Earth can't copy</h4>
+    <section class="c-block" id="c-cant"><h4>Earth can't copy</h4>
       <div class="scroll-x"><table class="data cant"><thead><tr><th scope="col"></th><th scope="col">Earth</th><th scope="col">${body}</th><th scope="col">Source</th></tr></thead><tbody>${cc}</tbody></table></div>
     </section>
     <section class="c-block"><h4>Seasons</h4>${seasons(x)}</section>

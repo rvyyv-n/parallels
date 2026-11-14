@@ -1,0 +1,143 @@
+.card .c-block {
+  margin-top: 12px;
+  padding-top: 10px;
+}
+
+.card .c-block h4 {
+  margin-bottom: 6px;
+}
+
+.c-sum {
+  display: grid;
+  gap: 8px;
+}
+
+.sum-row {
+  display: grid;
+  gap: 3px;
+  font-size: 13.5px;
+}
+
+.card .sum-k {
+  margin: 0;
+  font: 650 12px/1.2 var(--display);
+  font-stretch: 85%;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.card .sum-ok .sum-k {
+  color: var(--signal);
+}
+
+.card .sum-bad .sum-k {
+  color: var(--warn);
+}
+
+.sum-row ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.sum-row p {
+  margin: 0;
+}
+
+.sum-row a {
+  display: inline-block;
+}
+
+.s-src,
+.b-src {
+  color: var(--ink-3);
+  font-size: 11.5px;
+}
+
+.s-src,
+.b-src {
+  display: block;
+}
+
+.c-fold > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.c-fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+.card .c-fold > summary h4 {
+  margin: 0;
+}
+
+.c-fold > summary h4::before {
+  content: "+";
+  display: inline-block;
+  width: 14px;
+  color: var(--ink-3);
+}
+
+.c-fold[open] > summary h4::before {
+  content: "−";
+}
+
+.c-fold.headline p {
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+
+.card .o-text {
+  font-size: 12.5px;
+}
+
+.card .trait {
+  padding: 8px 0;
+}
+
+.card .t-plain {
+  margin: 1px 0;
+}
+
+.card .key {
+  margin-top: 8px;
+}
+
+.card .ch summary {
+  min-height: 44px;
+  padding: 4px 0;
+}
+
+.card .breaks li,
+.card .labels li {
+  padding: 5px 0;
+}
+
+@media (max-width: 759px) {
+  .card .eimg-view {
+    zoom: 0.75;
+  }
+
+  .card .eimg figcaption {
+    max-width: none;
+  }
+
+  .card .cant th[scope="row"] {
+    white-space: normal;
+  }
+}
+
+@media (pointer: coarse) {
+  .sum-row a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
