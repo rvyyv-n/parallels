@@ -16,7 +16,7 @@ Without it, gear gets tested where conditions don't match, scouting trips replac
 
 ## The six objectives, and how we meet them
 
-| # | Objective | Benchmark | How we meet it ([team plan](team-plan.md)) |
+| # | Objective | Benchmark | How we meet it ([plan](plan.md)) |
 |---|---|---|---|
 | 1 | Cross-domain data | At least 3 distinct open data archives (e.g. NASA PDS, USGS, Landsat/Sentinel) | Five archives in use: NASA PDS Geosciences (Moon and Mars), USGS Astrogeology (Mars caves, feature names), NASA POWER and NASA Earthdata (Earth), Copernicus (Earth terrain) and NASA PGDA (Moon sunlight), named on the site |
 | 2 | Geographical scope | Map and index at least 4 terrain types: arid basins, high-altitude volcanic fields, salt flats, caves | Terrain types: those four plus frozen ground, tagged from the data and filterable |
