@@ -1,5 +1,7 @@
 <img src="assets/logo.svg" width="96" alt="Parallels logo">
 
+Logo: AI-made image (drawn by Claude)
+
 # Parallels
 
 **Earth's closest parallels to every part of a Moon or Mars base.**
@@ -24,12 +26,12 @@ No single place on Earth can stand in for a Moon or Mars base. So we split base-
 
 ## Run it
 
-- Pipeline (Python 3.13): `uv venv .venv && uv pip install -p .venv numpy scipy rasterio pyproj requests pytest`, then `.venv/Scripts/python -m pipeline.earth`, `-m pipeline.planets` and `-m pipeline.build`. Tests: `.venv/Scripts/python -m pytest pipeline`.
+- Pipeline (Python 3.13): `uv sync`, then `.venv/Scripts/python -m pipeline.<step>` (Windows). Tests: `.venv/Scripts/python -m pytest`. On macOS and Linux the path is `.venv/bin/python`.
 - Site (`site/`): `npm install`, `npm run dev`. Tests: `npx playwright install chromium`, then `npm test` (uses port 4319) (set `RUN_NETWORK=1` to also check every source link).
 
 ## How we used AI
 
-The core idea and the key design decisions come from our team. We use Claude (Anthropic) to research the challenge and the judging rules, write our planning documents and, during the event, write and test the code. We check its work at each checkpoint. Claude checked our plan against the local Challenge Guide and suggested the mission filters, terrain types, seasons and extra traits; we chose to adopt them. Claude suggested a list of names and we picked Parallels. Claude also drew the logo, which is labelled here and in the file's metadata. Any other AI-made image or video carries a visible watermark.
+The core idea and the key design decisions come from our team. We use Claude (Anthropic) to research the challenge and the judging rules, write our planning documents and, during the event, write and test the code. We check its work at each checkpoint. Our local Challenge Guide asks for mission filters, terrain types and seasons. Claude checked our plan against the guide and we added them. Claude suggested a list of names and we picked Parallels. Claude also drew the logo; it is marked as AI-made wherever it appears, and it is not used on the site or the project page. Any other AI-made image or video carries a visible watermark.
 
 ## Data
 

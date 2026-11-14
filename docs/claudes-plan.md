@@ -14,7 +14,7 @@ A scan on 13 November found at least 22 public repos for this challenge. Three a
 
 Where we can beat them:
 
-1. **We test the method in public.** Known analogs should outrank farmland and rainforest, with plain deserts in between, and we fix the weights before running the test. None of the three rivals does this. Our literature search turned up no published analog method checked this way either.
+1. **We test the method in public.** Known analogs should outrank farmland and rainforest, with plain deserts in between, and we commit the weights before the v1 run. A throwaway prototype ran the same test places twice on 14 November (Moon 67% against a pass mark of 80%; Mars 79% against 80% and 54% against 60%), so v1's run isn't blind, and the site says so. None of the three rivals shows a check like this. Our literature search turned up no published analog method checked this way either.
 2. **Search all of Earth's land, then zoom to one spot.** Screen the globe at 0.5°, then compare terrain at the same scale as the Moon or Mars data, down to one valley, crater or massif. The challenge asks for exactly this ("'The Sahara' is too broad").
 3. **Rank by "Earth rank", show the real gap.** Nowhere on Earth is as cold as a lunar crater, so we rank places by how far toward the target they get. Next to that rank we always show the real gap in units, e.g. how far the coldest month falls short of −248 °C.
 4. **A headline that fills a real gap.** The Moon's south pole is pale anorthosite highland rock ([Lemelin et al. 2022](https://api.crossref.org/works/10.3847/PSJ/ac532c)), but most lunar analogs in use are dark basalt. Mistastin crater, where Artemis crews trained, is the exception ([NASA, LPSC 2024](https://ntrs.nasa.gov/api/citations/20230018695/downloads/LPSC2024_Evans_draft2.pdf)). We headline a highland stand-in only if NASA data alone ranks it high (section 5).
@@ -29,7 +29,6 @@ The first version has **two targets: the Moon's south pole and Jezero crater on 
     - each trait as a bar of Earth rank, with the real Earth and target values (and their datasets and resolution) as the main figure beside it;
     - an "Earth can't copy" block for gravity, air, radiation and magnetic shield;
     - the site's best months to test, freeze–thaw months and rainy months;
-    - how hard it is to get there;
     - one line on what to test there;
     - Earth and target images side by side.
 4. **"How we checked it"** shows the validation chart (section 6).
@@ -38,8 +37,9 @@ That's two clicks to a result, well under a minute. A terrain-type filter and ha
 
 **Extras,** only once that flow works:
 - more targets;
-- a stability badge (section 6);
-- a reverse mode: click any place on Earth and see its closest target.
+- a stability badge (section 6).
+
+What's next, after the event: a reverse mode (click any place on Earth and see its closest target).
 
 ## 3. Method
 
@@ -51,19 +51,20 @@ The first version scores these traits; wind, dust and UV count for Mars only.
 |---|---|---|---|
 | Cold | POWER surface temperature, coldest month | Diviner winter minimum | REMS and MEDA ground temperature |
 | Heat swing | POWER day-to-night and seasonal range | Diviner summer max minus winter min | REMS and MEDA daily swing |
-| Thermal inertia | estimated from MODIS day–night temperature (MOD11C3) and albedo (MCD43C3), marked as an estimate | Diviner regolith properties ([Hayne et al. 2017](https://doi.org/10.1002/2017JE005387)) | TES thermal inertia map |
-| Dryness | aridity index: POWER rain (PRECTOTCORR) against evaporation (EVPTRNS) | dry | MEDA humidity |
-| Sunlight and sun height | POWER sunlight; noon sun height, which we compute | PGDA fraction of time lit; sun 2–7° above the horizon | computed from latitude |
-| Bare ground | MODIS vegetation index (MOD13C2) | bare | bare |
-| Terrain | slope and roughness, computed by us from SRTMGL30, NASADEM or Copernicus | slope and roughness, computed by us from LOLA height | slope and roughness from MOLA height |
+| Thermal inertia | estimated from MODIS day–night temperature (MOD11C3) and POWER's surface albedo (`ALLSKY_SRF_ALB`), marked as an estimate | not scored: the Diviner regolith map stops at 70° latitude, so the Moon gets the label "Moon-wide average; not mapped at the pole" (55 ± 2 J m⁻² K⁻¹ s⁻½ at 273 K, [Hayne et al. 2017](https://arxiv.org/abs/1711.00977)) | TES thermal inertia map (NASA PDS `MGS-M-TES-5-TIMAP-V1.0`, [Putzig and Mellon 2007](https://pds-geosciences.wustl.edu/missions/mgs/tes-timap.html)) |
+| Dryness | aridity index: POWER rain (PRECTOTCORR) divided by potential evaporation, which we compute from POWER temperatures and latitude (Hargreaves method), marked as computed by us | dry | MEDA humidity |
+| Sunlight and sun height | noon sun height, which we compute (scored). Time in sunlight is shown, not scored, because every place on Earth averages 50% over a year | PGDA fraction of time lit; sun 2–7° above the horizon | computed from latitude |
+| Bare ground | MODIS land-cover map (MCD12C1) | bare | bare |
+| Terrain | slope and roughness, computed by us from Copernicus GLO-90 everywhere (so this trait's Earth side is ESA data, and the site says so) | slope and roughness, computed by us from LOLA height | slope and roughness from the USGS HRSC–MOLA 200 m height map |
 | Rock and minerals | Moon: share of the cell in GLiM rock classes like the target's (plutonic for highlands). Mars: EMIT minerals (10 kinds, 55°S–55°N) | anorthosite, low iron | clays, sulfates, carbonates, olivine |
-| Ice and frozen ground | MODIS snow (MOD10CM), POWER soil temperature, Obu 2018 permafrost | ice in shadowed craters (LCROSS, LEND, Mini-RF) | buried ice (SWIM, SHARAD, Odyssey GRS) |
+| Ice and frozen ground | POWER rule: yearly mean ground temperature below 0 °C tags frozen ground on the whole globe (Obu 2018 permafrost is only a cross-check if time allows) | ice in shadowed craters (LCROSS, LEND, Mini-RF, cited as published values) | buried ice (Odyssey GRS scored; SWIM shown as a label) |
 | Wind and dust (Mars only) | POWER wind | — | MEDA wind; TES dust cover index |
 | UV (Mars only) | POWER UV index (ALLSKY_SFC_UV_INDEX) | — | published surface UV; Earth falls short, shown as a gap |
 
 - **Traits a target lacks score zero weight for that target:** wind on the Moon, for example. Otherwise the calmest rainforest basins would score as "Moon-like".
 - **Labels only, never scored:** lists from papers (anorthosite massifs, lava tubes, impact craters). They explain a match, so a place can't rank high just because we put it on a list.
-- **Not scored:** how hard it is to get there, from SEDAC population (GPWv4) and GRIP4 roads.
+- **Ground strength: not scored.** On Mars, show the TES thermal inertia against NASA's landing-site rule (above 100–140 means load-bearing ground, not thick dust; [Golombek et al. 2020](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502)). On the Moon, show "not mapped at the pole" with the reason.
+- **Cut from v1:** how hard it is to get there. It goes on the site's "Not in this version" list.
 - **Seasons:** from POWER monthly values. A freeze–thaw month has an average daily low below 0 °C and high above it (T2M_MIN, T2M_MAX); a rainy month has well above the site's average rain. Best months are those with neither. Year-round viability is the share of usable months, and it lowers the score only for year-round testing.
 - **Same statistic on both sides where possible.** Where it isn't (Earth monthly climate against a Diviner pixel extreme, for example), the scorecard names each one. Slope is computed with one method from every elevation map, never mixed with ready-made slope products.
 
@@ -76,10 +77,10 @@ Each 0.5° cell gets one tag, by rules shown on the site:
 | Arid basin | aridity index below 0.2 and lower than its surroundings |
 | High-altitude volcanic field | mostly GLiM volcanic rock, above 2,000 m |
 | Salt flat | GLiM evaporites, aridity index below 0.2 |
-| Frozen ground | permafrost (Obu 2018) |
+| Frozen ground | POWER yearly mean ground temperature below 0 °C |
 | Cave or lava tube | point list: USGS Mars cave catalogue, [LROC lunar pits](http://lroc.sese.asu.edu/atlases/pits), Earth caves from papers |
 
-The thresholds are first guesses, fixed before any validation run. Separately, k-means on the trait values groups cells into clusters; the site shows how far clusters and tags agree, as a check on both.
+The thresholds are first guesses, fixed before the v1 run. Separately, k-means on the trait values groups cells into clusters; the site shows how far clusters and tags agree, as a check on both.
 
 **Shown on every scorecard, never scored**, because nowhere on Earth comes close:
 
@@ -103,18 +104,18 @@ The same rule works whether the target sits inside Earth's range (Mars slopes) o
 
 - **Overall match:** a weighted geometric mean of the trait ranks, each floored at 0.01 so one trait can't zero the total. A weak trait still pulls it down hard. The [Earth Similarity Index](https://arxiv.org/pdf/1507.06293) combines traits this way. Its known flaw is that one number hides which traits match, so we never show the total without the trait bars.
 - **Missing data:** never filled in on screen. The scorecard says "no data". For ranking only, a missing trait counts as the median (0.5), so a gap can't lift a place. A cell where less than 70% of the weight has data isn't ranked at all.
-- **Weights:** one default set per target and mission filter, chosen from what the target and the hardware need, not from the test sites. They're committed before the first validation run. Users can change them; every filter's scores are pre-computed.
+- **Weights:** one default set per target and mission filter, chosen from what the target and the hardware need, not from the test sites. They're committed before the v1 run. Users can change them; every filter's scores are pre-computed.
 - **Honest resolution:** POWER's climate values are model output at about 50 km (MERRA-2) and 110 km (CERES), not satellite pixels. The global map is 0.5° and says so. Only the zoom stage claims fine detail, and only for terrain.
 
 ### Zoom stage
 
 1. **Pick the windows:** the top 30 cells per target, plus the known analogs smaller than a cell.
-2. **Cut each one:** a 20 × 20 km window of NASADEM (60°S–60°N), or Copernicus beyond that.
-3. **Bring both sides to one scale:** resample to the planet map's scale, 240 m for LOLA and about 460 m for 128-pixel-per-degree MOLA.
+2. **Cut each one:** a 20 × 20 km window of Copernicus GLO-90.
+3. **Bring both sides to one scale:** resample to the planet map's scale, 240 m for LOLA and 200 m for the HRSC–MOLA blend.
 4. **Compare the terrain:** match the window's slope and roughness spread with the target's.
 5. **Choose the spot:** the best-matching spot inside each cell.
 
-This gives the scorecard its "one valley, crater or massif". If the fine MOLA map is too big to fetch in time, Mars gets no terrain zoom and says so.
+This gives the scorecard its "one valley, crater or massif". The HRSC–MOLA file is read in small windows by range request, never downloaded whole. If that fails, Mars gets no terrain zoom and says so.
 
 ## 4. Data
 
@@ -126,12 +127,8 @@ Every dataset below was checked on 13 November: the files answered, or NASA's da
 |---|---|---|---|
 | [NASA POWER climatology](https://nasa-power.s3.amazonaws.com/) (MERRA-2 and CERES SYN1deg, Zarr on AWS) | temperature (incl. monthly lows and highs), sunlight, rain, evaporation, UV index, humidity, wind, soil temperature, snow depth | no | about 150 MB |
 | EMIT L3 mineral abundance (EMITL3ASA v002) | 10 surface minerals at 0.5°, 55°S–55°N; no feldspar, so Mars only | Earthdata | 22 MB |
-| SRTMGL30 v002; NASADEM tiles for zoom windows | elevation, slope, roughness, 60°S–60°N | Earthdata | about 250 MB, plus about 1 MB per window |
-| MODIS vegetation index (MOD13C2 v061), 0.05° | bare ground | Earthdata | about 100 MB a month (fewer months will do) |
-| MODIS snow cover (MOD10CM v61) | months with snow | Earthdata | about 15 MB |
-| MODIS land-surface temperature (MOD11C3 v061) | day–night swing for thermal inertia; sharper temperature | Earthdata | about 0.8 GB a year |
-| MODIS albedo (MCD43C3 v061) | thermal inertia estimate | Earthdata | size to check |
-| SEDAC population (GPWv4 rev11, 1°) | how hard to get there | Earthdata | under 1 MB |
+| MODIS land cover (MCD12C1 v061, 0.05°), read through NASA GIBS | bare ground | no key | 1,187 MB a year as a file; streamed tiles are smaller |
+| MODIS land-surface temperature (MOD11C3 v061) | day–night swing for thermal inertia; sharper temperature | Earthdata | about 0.9 GB a year |
 | [NASA GIBS](https://nasa-gibs.github.io/gibs-api-docs/access-basics/) Blue Marble tiles | map background | no key | streamed |
 
 **Moon and Mars data** (all answered on 13 November unless marked):
@@ -141,24 +138,22 @@ Every dataset below was checked on 13 November: the files answered, or NASA's da
 | [LOLA south-pole height](https://pds-geosciences.wustl.edu/lro/lro-l-lola-3-rdr-v1/lrolol_1xxx/data/lola_gdr/polar/img/ldem_75s_240m.img), 240 m | terrain (we compute slope and roughness) | 29 MB |
 | [LOLA fraction of time lit](https://pgda.gsfc.nasa.gov/data/MoonIllumination/AVGVISIB_75S_120M_201608.TIF) and [permanent shadow](https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF), 120 m | sunlight | 83 MB, 1 MB |
 | Diviner [summer maximum](https://luna1.diviner.ucla.edu/~jpierre/diviner/level4_polar/additional_maps/polar_south_80_summer_max-float.tif) and [winter minimum](https://luna1.diviner.ucla.edu/~jpierre/diviner/level4_polar/additional_maps/polar_south_80_winter_min-float.tif) temperature | cold, heat swing | 26 MB each |
-| [MOLA height map](https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg016/megt90n000eb.img), 16 px per degree; 128 px per degree for zoom windows | Mars terrain | 33 MB; 128 px size still to check |
+| [USGS HRSC–MOLA 200 m height map](https://planetarymaps.usgs.gov/mosaic/Mars/HRSC_MOLA_Blend/Mars_HRSC_MOLA_BlendDEM_Global_200mp_v2.tif), read in small windows by range request | Mars terrain | 11.4 GB file, never downloaded whole |
 | [TES dust cover index](http://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.tif) | Mars dust | 50 MB |
 | [Odyssey GRS water-equivalent hydrogen](https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab) | Mars ice | 187 KB |
 | [USGS Mars cave catalogue](https://astrogeology.usgs.gov/search/map/mars_global_cave_candidate_catalog_v1_cushing) | Mars caves (label) | 1.8 MB |
-| TES thermal inertia map (USGS Astrogeology or PDS) | Mars thermal inertia | link to confirm |
-| Diviner regolith properties ([Hayne et al. 2017](https://doi.org/10.1002/2017JE005387)) | Moon thermal inertia | link to confirm |
+| [TES thermal inertia maps](https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-timap-v1/mgst_9001/data/global_ti_night_2007.img) (PDS `MGS-M-TES-5-TIMAP-V1.0`; day map and masks beside it) | Mars thermal inertia; ground-strength label | 51.8 MB each; 69.6 MB for the whole set |
 | [LROC lunar pit atlas](http://lroc.sese.asu.edu/atlases/pits) | Moon pits (label) | small |
-| [SWIM ice maps](https://swim.psi.edu/SWIM4MIMProducts.php) | Mars buried ice | unknown: site was down; retry |
-| Rover and orbiter results (REMS, RAD, MEDA, LCROSS, LEND, Mini-RF) | target values | from papers (section 5) |
+| [SWIM ice maps](https://swim.psi.edu/SWIM4MIMProducts.php) | Mars buried ice (label only, and only if Arcadia is built) | 71 MB per depth band |
+| Rover and orbiter results (REMS, RAD, MEDA, LCROSS, LEND, Mini-RF) | target values; LEND, Mini-RF and LCROSS are cited, not loaded | from papers (section 5) |
 
 **Partner and other data** (fills gaps; credited in its own form field):
 
 | Dataset | What for | Licence |
 |---|---|---|
-| Copernicus DEM GLO-90 (ESA, on AWS, no login) | terrain beyond 60°N and 56°S | Copernicus licence |
-| [GLiM rock map](https://doi.org/10.1594/PANGAEA.788537) | rock class for Moon targets and wherever EMIT doesn't reach; volcanic and evaporite classes for terrain types | CC-BY 3.0 |
-| [Obu et al. 2018 permafrost](https://doi.org/10.1594/PANGAEA.888600) | frozen ground, Northern Hemisphere | CC-BY 3.0 |
-| [GRIP4 roads](https://www.globio.info/download-grip-dataset) | how hard to get there | check on download |
+| Copernicus DEM GLO-90 (ESA, on AWS, no login) | terrain everywhere, pole to pole | Copernicus licence |
+| [GLiM rock map](https://doi.org/10.1594/PANGAEA.788537) (0.5° version, one zip, no login) | rock class for Moon targets and wherever EMIT doesn't reach; volcanic and evaporite classes for terrain types | CC-BY 3.0 |
+| [Obu et al. 2018 permafrost](https://doi.org/10.1594/PANGAEA.888600) | cross-check of the frozen-ground rule, Northern Hemisphere, if time allows | CC-BY 3.0 |
 | Anorthosite massifs, lava tubes, impact craters | labels | from papers. The Earth Impact Database site looks dead, and no global lava-tube map exists. |
 
 **Totals:** about 2 GB, and one free NASA Earthdata account unlocks all of it. Without that account, POWER, Copernicus and the planetary files still cover most traits (section 9).
@@ -205,9 +200,9 @@ Published values for the region as a whole:
 |---|---|---|---|
 | Jezero (first version) | 18.38, 77.58 | Perseverance; ancient lake | air pressure 650–761 Pa; gusts to 25 m/s; carbonates, sulfates, olivine ([Rodríguez-Manfredi 2023](https://www.nature.com/articles/s41561-022-01084-0)) |
 | Arcadia Planitia (next) | 47.2, 184.3 | best candidate for reachable buried ice | ice slab tens of metres thick ([Bramson 2015](https://arxiv.org/pdf/1509.03210)); SWIM's top area ([Morgan 2021](https://www.nature.com/articles/s41550-020-01290-z)) |
-| Gale | −5.4, 137.8 | Curiosity; the only radiation measurement on Mars's surface | day-to-night drop usually over 55 °C; clay mudstone ([Vaniman 2014](https://doi.org/10.1126/science.1243480)) |
-| Deuteronilus or Protonilus Mensae | 43.9, 22.6 or 42.19, 48.06 | glaciers; NASA 2015 human landing-site workshop | debris aprons mostly water ice ([Plaut 2009](https://api.crossref.org/works/10.1029/2008GL036379)) |
-| Arsia Mons caves | −8.35, 239.91 (summit) | cave openings | 7 openings 100–225 m wide ([Cushing 2007](https://doi.org/10.1029/2007GL030709)) |
+| Gale | −4.59, 137.44 (Curiosity's landing site, not the crater centre) | Curiosity; the only radiation measurement on Mars's surface | day-to-night drop usually over 55 °C; clay mudstone ([Vaniman 2014](https://doi.org/10.1126/science.1243480)) |
+| Deuteronilus Mensae | 43.9, 22.6 | glaciers; NASA 2015 human landing-site workshop | debris aprons mostly water ice ([Plaut 2009](https://api.crossref.org/works/10.1029/2008GL036379)) |
+| Arsia Mons caves | cave opening APC075 (position in `pipeline/sites.json`; not the summit) | cave openings | 7 openings 100–225 m wide ([Cushing 2007](https://doi.org/10.1029/2007GL030709)) |
 
 ### Headline candidates
 
@@ -234,7 +229,7 @@ We pick the headline on Saturday evening from the results. If none clears the ba
 
 ## 6. How we check it
 
-The full lists of test places are in appendix A.
+The full lists of test places, with positions and sources, are in `pipeline/sites.json` (see appendix A).
 
 **Mars test (overall score):**
 
@@ -255,7 +250,8 @@ The full lists of test places are in appendix A.
 - **On the site:** we show where NASA's basalt training sites land for the south pole. Ranking low on rock is the point of the headline, not a failure.
 
 **Fairness:**
-- **Weights:** committed before the first run, so the git history shows we didn't tune them to pass.
+- **Weights:** committed before the v1 run, so the git history shows we didn't tune them to pass. A throwaway prototype ran the test places twice on 14 November (Moon 67% against a pass mark of 80%; Mars 79% against 80% and 54% against 60%), so this isn't a blind first run. The site says so and shows v1's result against the pass marks set beforehand.
+- **Blind check:** five to ten known analogs that have never been scored are added, each with a sourced position, and only those serve as the blind check (default taken for the build; the team can overrule).
 - **Held-out half:** half the known analogs are set aside in a fixed, committed random split. If we ever change the weights, only that unseen half judges the change, and the site shows both runs.
 - **Small sites:** places smaller than a 0.5° cell (Meteor Crater, Rio Tinto) are scored on climate and rock at 0.5°, and on terrain only after the zoom stage.
 - **Misses:** if a known analog ranks low, we say why. Rio Tinto, for example, is an analog for its acid chemistry, which no trait here measures.
@@ -266,11 +262,12 @@ The full lists of test places are in appendix A.
 
 **Data checks:**
 - Five random cells match the POWER point API.
+- The aridity index puts Yungay below 0.05 and the Iowa corn belt above 0.65.
 - The computed Artemis values agree with published ones (ridge lit about 92%; shadowed floors below 110 K).
 
 ## 7. Tech stack and hosting
 
-- **Pipeline:** Python 3.13 with numpy, xarray, zarr, fsspec, rasterio, netCDF4, earthaccess and pandas, in `pipeline/`. Raw downloads go in `data/` (already gitignored). Outputs are small files in `site/public/data/`. A 0.5° land grid is about 75,000 cells, so the traits plus the scores for each mission filter come to under a few MB per target.
+- **Pipeline:** Python 3.13 with the packages pinned in `pyproject.toml` and `uv.lock`, in `pipeline/`. Raw downloads go in `data/` (already gitignored). Outputs are small files in `site/public/data/`. A 0.5° land grid is about 75,000 cells, so the traits plus the scores for each mission filter come to under a few MB per target.
 - **Site:** Vite and TypeScript (no framework unless the interface outgrows it); MapLibre GL JS 6.18 with GIBS Blue Marble tiles (no key; zoom levels up to 8); plain SVG charts. Every score, for every mission filter, is pre-computed into its own file, so the browser never recalculates anything.
 - **Tests:**
     - pytest for the pipeline: the scoring rule on hand-made cases, plus the data checks in section 6;
@@ -310,7 +307,7 @@ Times are in our Local Event's time zone.
 |---|---|---|
 | Python packages won't install here | uv or Miniforge; failing that, run the pipeline on the laptop | Friday night |
 | Earthdata login or downloads fail | POWER, Copernicus and the planetary files only (no login); rock from GLiM | Saturday 10:00 |
-| SWIM site stays down | NASA image PIA26045 plus SHARAD and Odyssey GRS | Saturday 10:00 |
+| SWIM site stays down | NASA image PIA26045 plus Odyssey GRS | Saturday 10:00 |
 | Vercel limits or pause | move to GitHub Pages (public repo) | Saturday 12:00 |
 | Rock trait unworkable | drop it from the score and keep it as an explanation | Saturday 14:00 |
 | Map library trouble | static map image plus a clickable list | Saturday 15:00 |
@@ -350,77 +347,11 @@ Times are in our Local Event's time zone.
 ## 11. Open questions for the team
 
 - [x] Hosting: Vercel for now, GitHub Pages only if needed at the very end.
-- [ ] Who makes the free NASA Earthdata account, and when?
+- [x] Earthdata account: the user's account, saved in `~/.netrc` on the build PC.
 
 ## Appendix A. Test places
 
-Coordinates are latitude, longitude. A \* marks an estimate still to be checked on a map.
-
-**Moon, polar and highland (overall score):**
-- Mistastin crater 55.88, −63.30\*
-- Haughton crater, Devon Island 75.38, −89.67
-- Lofoten 68.10, 13.30\*
-
-**Moon, basalt and crater (trait checks only):**
-- Black Point lava flow 35.70, −111.40\*
-- Cinder Lake crater field 35.30, −111.45\*
-- Meteor Crater 35.03, −111.02
-- Kilbourne Hole 31.97, −106.97\*
-- Sedan crater 37.18, −116.05\*
-- Sudbury 46.60, −81.18
-- Ries crater 48.88, 10.57\*
-- Lanzarote 29.16, −13.45\*
-- Mauna Kea 19.78, −155.47\*
-- Askja 65.05, −16.75\*
-- Etna 37.75, 15.00
-- Teide 28.26, −16.62
-
-**Mars analogs (23):**
-- Yungay, Atacama −24.10, −70.02\*
-- McMurdo Dry Valleys −77.47, 162.52
-- Haughton crater 75.38, −89.67
-- Gypsum Hill, Axel Heiberg 79.40, −90.75
-- Bockfjorden, Svalbard 79.43, 13.33\*
-- Rio Tinto 37.40, −6.34
-- MDRS, Utah 38.41, −110.79
-- Qaidam (Dalangtan) 37.27, 94.45
-- Tso Kar 33.30, 77.98\*
-- Puga Valley 33.22, 78.31\*
-- Kangerlussuaq 67.00, −50.70\*
-- Makgadikgadi −20.70, 25.90\*
-- Pavilion Lake 50.87, −121.74
-- Laguna de Tirez 39.54, −3.36
-- Spotted Lake 49.08, −119.57
-- Salar de Pajonales −25.14, −68.82
-- Gros Morne 49.62, −57.75
-- Argentine Puna −26, −67\*
-- Death Valley 36.50, −117.00\*
-- Craters of the Moon 43.42, −113.52\*
-- Kīlauea Iki 19.37, −155.22\*
-- Bletterbach 46.35, 11.43\*
-- CHILL-ICE lava tube 64.79, −20.71
-
-**Ordinary places (12):**
-- Iowa corn belt 42.0, −93.5
-- Beauce 48.2, 1.7
-- Pampas −35.0, −61.0
-- central Ukraine 49.5, 32.0
-- Amazon near Manaus −3.0, −60.0
-- Congo Basin 0.5, 24.0
-- central Borneo 1.0, 114.0
-- Pantanal −17.5, −57.0
-- Flevoland 52.5, 5.5
-- Ganges plain near Dhaka 24.0, 90.0
-- Waikato −37.8, 175.3
-- Kampala 0.3, 32.6
-
-**Plain deserts (6, all estimates to check):**
-- Grand Erg Oriental 30.5, 7.5\*
-- Thar 27.0, 71.0\*
-- Rub' al Khali 20.0, 50.0\*
-- Simpson Desert −25.0, 137.0\*
-- Great Victoria Desert −29.0, 127.0\*
-- Kalahari −23.0, 22.0\*
+Positions and sources are in `pipeline/sites.json`.
 
 **Left out:** habitat-only analogs (HI-SEAS, NEEMO, Concordia), because they copy isolation, not ground.
 

@@ -18,7 +18,7 @@ Without it, gear gets tested where conditions don't match, scouting trips replac
 
 | # | Objective | Benchmark | How we meet it ([team plan](team-plan.md)) |
 |---|---|---|---|
-| 1 | Cross-domain data | At least 3 distinct open data archives (e.g. NASA PDS, USGS, Landsat/Sentinel) | NASA PDS (Moon and Mars), NASA Earthdata (Earth), USGS Astrogeology (Mars caves, feature names), named on the site |
+| 1 | Cross-domain data | At least 3 distinct open data archives (e.g. NASA PDS, USGS, Landsat/Sentinel) | Five archives in use: NASA PDS Geosciences (Moon and Mars), USGS Astrogeology (Mars caves, feature names), NASA POWER and NASA Earthdata (Earth), Copernicus (Earth terrain) and NASA PGDA (Moon sunlight), named on the site |
 | 2 | Geographical scope | Map and index at least 4 terrain types: arid basins, high-altitude volcanic fields, salt flats, caves | Terrain types: those four plus frozen ground, tagged from the data and filterable |
 | 3 | Useful output | Web dashboard with similarity rankings, coordinates and data details on the map | Map, ranked list with latitude and longitude, and the source of every value |
 | 4 | Multi-variable scoring | Weighting and clustering; thermal inertia, minerals, aridity | Weighted trait scores; clustering for terrain types; thermal inertia, rock and minerals, and dryness as traits |
@@ -32,11 +32,11 @@ These answers go on the site and the project page.
 | # | Question, shortened | Our answer |
 |---|---|---|
 | 1 | How do you handle sun angles and permanent darkness when matching Earth caves or polar canyons? | NASA's lunar maps of time in sunlight and permanent shadow (made from LOLA heights) against Earth sun height worked out from latitude. Earth has no permanent shadow outside caves; that's listed under "where it breaks". |
-| 2 | Which spectroscopy and neutron data link Earth's dry or frozen ground to lunar ice traps? | Moon: LEND (neutrons), Mini-RF (radar), LCROSS. Mars: Odyssey's gamma-ray and neutron instruments. Earth: permafrost and snow maps, and EMIT mineral spectra. |
+| 2 | Which spectroscopy and neutron data link Earth's dry or frozen ground to lunar ice traps? | Loaded as data: Mars from Odyssey's gamma-ray and neutron instruments, and Earth minerals from EMIT spectra. Cited as published values, not loaded: Moon LEND (neutrons), Mini-RF (radar) and LCROSS. Earth frozen ground comes from a POWER temperature rule. |
 | 3 | How do you compare coarse planetary data with sharp Earth images fairly? | Both sides go onto one 0.5° grid for the global search; terrain is compared at the planet map's own scale. Every value shows its resolution. |
 | 4 | Which distance measure or clustering scores the match? | Each trait is ranked by how close a place gets to the target compared with all of Earth's land; the ranks are combined with the mission filter's weights. k-means clustering groups terrain types. |
 | 5 | Caves don't show in surface images: which height maps or LiDAR do you use? | None can: no global cave map exists for Earth, the Moon or Mars. We index known caves (USGS Mars cave catalogue, LROC lunar pits, Earth caves from papers) as labels, not scores. |
-| 6 | How do weights change for the hardware being tested? | Mission filters and hand-set weights. Dust abrasion stays a label; UV comes from NASA POWER; day-to-night swing is in Heat swing. |
+| 6 | How do weights change for the hardware being tested? | Mission filters and hand-set weights. Dust abrasion stays a label; UV comes from NASA POWER; day-to-night swing is in Heat swing. The guide also names a "weathering index": we don't compute one. Freeze–thaw months and aridity are our stand-ins for weathering. |
 | 7 | How do you check the rankings against real field sites? | Known analogs must score high and ordinary places low, shown on the site ([guidelines](guidelines.md#2-doing-the-science-honestly)). |
 
 ## What makes a strong entry
@@ -64,7 +64,3 @@ NASA's data list is in [guidelines.md](guidelines.md#3-data); the datasets we us
 ## Who it's for
 
 Mission planners and hardware engineers choosing where to test rovers, habitats and life support; scientists looking for new field sites; students and the public.
-
-## Competition
-
-A scan on 2026-11-13 found at least 22 public team repos for this challenge, and most build a web app that ranks Earth sites by similarity. The three strongest are compared in [Claude's plan](claudes-plan.md#1-rivals). Standing out means a surprising location, a visible check of the method, and an honest account of where each match breaks.
