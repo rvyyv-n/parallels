@@ -30,20 +30,35 @@ export function handScore(m: Manifest, t: Cols, w: Record<string, number>, n: nu
   return out;
 }
 
-export function top(score: Float32Array, k: number, keep?: (i: number) => boolean): number[] {
-  const best: number[] = [];
-  for (let i = 0; i < score.length; i++) {
-    const s = score[i];
-    if (Number.isNaN(s) || (keep && !keep(i))) continue;
-    if (best.length === k && s <= score[best[k - 1]]) continue;
-    let j = best.length < k ? best.length : k - 1;
-    while (j > 0 && score[best[j - 1]] < s) {
-      best[j] = best[j - 1];
-      j--;
+export interface Picks {
+  ids: number[];
+  near: number[];
+}
+
+const APART_KM = 150;
+
+function km(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const r = Math.PI / 180;
+  const a = Math.sin(((lat2 - lat1) * r) / 2) ** 2 + Math.cos(lat1 * r) * Math.cos(lat2 * r) * Math.sin(((lon2 - lon1) * r) / 2) ** 2;
+  return 12742 * Math.asin(Math.min(1, Math.sqrt(a)));
+}
+
+export function top(score: Float32Array, k: number, geo: Cols, keep?: (i: number) => boolean): Picks {
+  const order: number[] = [];
+  for (let i = 0; i < score.length; i++) if (!Number.isNaN(score[i]) && (!keep || keep(i))) order.push(i);
+  order.sort((a, b) => score[b] - score[a] || a - b);
+  const ids: number[] = [];
+  const near: number[] = [];
+  for (const i of order) {
+    if (ids.length === k) break;
+    const j = ids.findIndex((p) => km(geo.lat[p], geo.lon[p], geo.lat[i], geo.lon[i]) < APART_KM);
+    if (j >= 0) near[j]++;
+    else {
+      ids.push(i);
+      near.push(0);
     }
-    best[j] = i;
   }
-  return best;
+  return { ids, near };
 }
 
 export function rankOf(score: Float32Array, i: number): number {

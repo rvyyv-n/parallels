@@ -169,6 +169,7 @@ async function main() {
   let cols: Cols = {};
   let score: Float32Array = new Float32Array(d.n).fill(NaN);
   let ids: number[] = [];
+  let near: number[] = [];
   let ranked = 0;
   let globe: TargetGlobe | null = null;
 
@@ -241,7 +242,13 @@ async function main() {
             return `<li data-i="${i}"><button type="button" class="row${i === s.cell ? " on" : ""}" aria-pressed="${i === s.cell}">
               <span class="r-n">${r + 1}</span>
               <span class="r-name">${esc(placeName(m, d.cells, i))}${Number.isFinite(far) && far > 100 ? ` <span class="rare" title="${num(far)} km from the nearest known analog">rarely used</span>` : ""}${isIce(d.cells, i) ? ` <span class="tag ice">ice sheet</span>` : ""}</span>
-              <span class="r-meta">${named(i) ? `${latlon(d.cells.lat[i], d.cells.lon[i], 2)} · ` : ""}${esc(tt && tt.key !== "none" ? tt.name : "No terrain type")}</span>
+              <span class="r-meta">${[
+                named(i) ? latlon(d.cells.lat[i], d.cells.lon[i], 2) : "",
+                tt && tt.key !== "none" ? esc(tt.name) : "",
+                near[r] ? `<span class="r-near" title="${num(near[r])} more ${near[r] === 1 ? "cell" : "cells"} within 150 km of this one ${near[r] === 1 ? "scores" : "score"} high enough for this list. The map shows them all.">+${num(near[r])} ${near[r] === 1 ? "cell" : "cells"} next to it</span>` : "",
+              ]
+                .filter(Boolean)
+                .join(" · ")}</span>
               <span class="r-score"><b>${score100(score[i])}</b><i style="--w:${score[i] * 100}%;--c:${colour(score[i])}"></i></span>
             </button></li>`;
           })
@@ -298,7 +305,7 @@ async function main() {
     score = s.hand ? handScore(m, cols, s.hand, d.n) : (cols[`score:${s.filter}${s.yr ? ":yr" : ""}`] ?? new Float32Array(d.n).fill(NaN));
     ranked = 0;
     for (const v of score) if (!Number.isNaN(v)) ranked++;
-    ids = top(score, 10, keep);
+    ({ ids, near } = top(score, 10, d.cells, keep));
     earth?.paint(score, keep);
     earth?.top(ids);
     ledger();

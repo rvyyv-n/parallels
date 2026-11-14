@@ -1914,3 +1914,7 @@ ul.plain li {
     margin: 2px 0 0;
   }
 }
+
+.r-near {
+  white-space: nowrap;
+}

@@ -47,8 +47,8 @@ test("main flow: pick a target and a filter, open a match, read the scorecard", 
 
 test("a shared link opens the same view", async ({ page }) => {
   const f = m.filters[1] ?? m.filters[0];
-  const { t } = cols(m, main.id);
-  const ids = top(t[`score:${f.id}`], 10);
+  const { t, cells } = cols(m, main.id);
+  const { ids } = top(t[`score:${f.id}`], 10, cells);
   await ready(page, `?t=${main.id}&f=${f.id}&c=${ids[4]}`);
   await expect(page.locator("#pick-filter")).toHaveValue(f.id);
   await expect(page.locator(`#ledger li[data-i="${ids[4]}"] button`)).toHaveAttribute("aria-pressed", "true");
@@ -56,9 +56,9 @@ test("a shared link opens the same view", async ({ page }) => {
 
 test("year-round switch reorders the list exactly as the year-round scores say", async ({ page }) => {
   const f = m.filters[0];
-  const { t } = cols(m, main.id);
-  const plain = top(t[`score:${f.id}`], 10);
-  const yr = top(t[`score:${f.id}:yr`], 10);
+  const { t, cells } = cols(m, main.id);
+  const plain = top(t[`score:${f.id}`], 10, cells).ids;
+  const yr = top(t[`score:${f.id}:yr`], 10, cells).ids;
   await ready(page, `?t=${main.id}&f=${f.id}`);
   expect(await order(page)).toEqual(plain);
   await page.locator("#pick-yr").check({ force: true });
@@ -69,7 +69,7 @@ test("year-round switch reorders the list exactly as the year-round scores say",
 test("hand-set weights change the ranking", async ({ page }) => {
   const f = m.filters[0];
   const fw = f.weights[main.body];
-  const { t } = cols(m, main.id);
+  const { t, cells } = cols(m, main.id);
   await ready(page, `?t=${main.id}&f=${f.id}`);
   const before = await order(page);
   await page.locator("#hand summary").click();
@@ -84,11 +84,29 @@ test("hand-set weights change the ranking", async ({ page }) => {
     await page.locator(`#sliders input[data-ch="${id}"]`).fill(String(v));
     w[id] = v;
   }
-  const expected = top(handScore(m, t, w, m.grid.n), 10);
+  const expected = top(handScore(m, t, w, m.grid.n), 10, cells).ids;
   await expect.poll(() => order(page)).toEqual(expected);
   expect(expected).not.toEqual(before);
   await expect(page.locator("#pick-filter")).toHaveValue("__hand");
   await expect(page.locator("#pick-yr")).toBeDisabled();
+});
+
+test("the top 10 never lists two cells within 150 km of each other", async ({ page }) => {
+  for (const t of m.targets) {
+    await ready(page, `?t=${t.id}`);
+    const ids = await order(page);
+    const { cells } = cols(m, t.id);
+    const r = Math.PI / 180;
+    const km = (a: number, b: number) =>
+      12742 *
+      Math.asin(
+        Math.sqrt(
+          Math.sin(((cells.lat[b] - cells.lat[a]) * r) / 2) ** 2 +
+            Math.cos(cells.lat[a] * r) * Math.cos(cells.lat[b] * r) * Math.sin(((cells.lon[b] - cells.lon[a]) * r) / 2) ** 2,
+        ),
+      );
+    for (let a = 0; a < ids.length; a++) for (let b = a + 1; b < ids.length; b++) expect(km(ids[a], ids[b])).toBeGreaterThanOrEqual(150);
+  }
 });
 
 test("no horizontal scroll at 375 px", async ({ page }) => {
