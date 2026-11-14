@@ -224,6 +224,60 @@ test("keyboard alone reaches the pickers, the top 10, the scorecard and the slid
   await expect(page.locator('.intro [data-filter="__hand"]')).toHaveAttribute("aria-pressed", "true");
 });
 
+test("two-column explorer with the match view below it, no inner scroll", async ({ page }, info) => {
+  await ready(page);
+  await page.locator("#explore").evaluate((e) => e.scrollIntoView());
+  await expect(page.locator(".tglobe, #link")).toHaveCount(0);
+  await expect(page.locator("#match .match-head #tcap")).toContainText(main.name);
+  await expect(page.locator("#match .ask-note #ask-sub")).toBeAttached();
+  const card = page.locator("#card");
+  expect(await card.evaluate((c) => c.scrollHeight <= c.clientHeight + 1)).toBe(true);
+  if (info.project.name !== "laptop") return;
+  const [l, e] = await Promise.all([page.locator(".ledger-col").boundingBox(), page.locator(".earth-col").boundingBox()]);
+  expect(l!.x + l!.width).toBeLessThanOrEqual(e!.x + 1);
+  expect(Math.abs(l!.y - e!.y)).toBeLessThan(2);
+  await expect(page.locator("#card h3")).toBeInViewport();
+  await expect(page.locator(".status .maplibregl-ctrl-scale")).toBeVisible();
+  await page.locator("#ledger .why").click();
+  await expect(card).toBeInViewport();
+});
+
+test("list rows and map pins highlight each other, and the map can fly back to the pick", async ({ page }, info) => {
+  test.skip(info.project.name !== "laptop", "hover is a laptop check");
+  await ready(page);
+  await page.locator("#explore").evaluate((e) => e.scrollIntoView());
+  await expect(page.locator(".pin")).toHaveCount(10);
+  const row = rows(page).nth(3);
+  const id = await row.getAttribute("data-i");
+  await row.hover();
+  await expect(page.locator(`.pin.hot[data-i="${id}"]`)).toHaveCount(1);
+  await row.locator("button").focus();
+  await expect(page.locator(`.pin.hot[data-i="${id}"]`)).toHaveCount(1);
+  const pin = page.locator(`.pin[data-i="${await rows(page).nth(0).getAttribute("data-i")}"]`);
+  await pin.dispatchEvent("mouseenter");
+  await expect(page.locator("#ledger li.hot")).toHaveCount(1);
+  await expect(rows(page).nth(0)).toHaveClass(/hot/);
+  await expect(page.locator("#back")).toBeHidden();
+  for (let k = 0; k < 3; k++) await page.locator(".maplibregl-ctrl-zoom-in").click();
+  const box = (await page.locator("#earth").boundingBox())!;
+  await expect(page.locator("#back")).toBeHidden();
+  for (let k = 0; k < 2; k++) {
+    await page.mouse.move(box.x + box.width * 0.35, box.y + 100);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.98, box.y + 100, { steps: 15 });
+    await page.mouse.up();
+  }
+  await expect(page.locator("#back")).toBeVisible();
+  await page.locator("#back").click();
+  await expect(page.locator("#back")).toBeHidden({ timeout: 8000 });
+});
+
+test("skip intro goes straight to the explorer", async ({ page }) => {
+  await ready(page);
+  await page.locator("#skip-intro").click();
+  await expect(page.locator("#explore")).toBeInViewport();
+});
+
 test("section nav fits, marks the current section, and links open folded blocks", async ({ page }) => {
   await ready(page);
   await page.locator("#checked").waitFor();

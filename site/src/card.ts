@@ -455,3 +455,4 @@ export function card(x: CardInput): string {
     ${regions(x)}
   </article>`;
 }
+export function wireCard(_el: HTMLElement): void {}

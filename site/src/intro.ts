@@ -12,6 +12,7 @@ export interface Intro {
   target(world: World, site: Spot): void;
   matches(spots: Spot[]): void;
   enter(): Promise<void>;
+  finish(): void;
 }
 
 interface Globe {
@@ -322,6 +323,18 @@ export function createIntro(el: HTMLElement, textures: { earth: string; moon: st
       diveGoal = 1;
       run();
       return new Promise((r) => setTimeout(r, 520));
+    },
+    finish() {
+      const now = performance.now();
+      t0 = now - 60000;
+      last = now;
+      drawn = 1;
+      for (const g of [earth, worlds.moon, worlds.mars]) {
+        g.cur = { ...g.goal };
+        g.size = g.sizeGoal;
+        g.light = g.lightGoal;
+      }
+      run();
     },
   };
 }

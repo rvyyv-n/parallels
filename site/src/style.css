@@ -243,9 +243,9 @@ option {
 
 .stage {
   display: grid;
-  grid-template-columns: 340px minmax(0, 1fr) 440px;
-  grid-template-areas: "ledger earth target";
-  height: clamp(620px, calc(100svh - 170px), 1100px);
+  grid-template-columns: clamp(340px, 26vw, 380px) minmax(0, 1fr);
+  grid-template-areas: "ledger earth";
+  height: clamp(380px, calc(100svh - 64px - var(--bar, 120px) - 160px), 1000px);
   border-bottom: 1px solid var(--rule);
 }
 
@@ -266,14 +266,6 @@ option {
   position: absolute;
   inset: 0;
   background: var(--space);
-}
-
-.target-col {
-  grid-area: target;
-  display: grid;
-  grid-template-rows: 250px minmax(0, 1fr);
-  border-left: 1px solid var(--rule);
-  min-height: 0;
 }
 
 .col-head {
@@ -578,83 +570,11 @@ option {
   z-index: 3;
 }
 
-.tglobe {
-  margin: 0;
-  position: relative;
-  border-bottom: 1px solid var(--rule);
-  min-height: 0;
-  overflow: hidden;
-}
-
-.tglobe-view {
-  position: absolute;
-  inset: 0 0 0 32%;
-}
-
-.fit-ruler {
-  position: absolute;
-  visibility: hidden;
-  white-space: nowrap;
-  font-weight: 700;
-  left: 0;
-  top: 0;
-}
-
-.tglobe-view canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.tglobe figcaption {
-  position: absolute;
-  left: 14px;
-  top: 12px;
-  display: grid;
-  gap: 1px;
-  font-size: 12.5px;
-  color: var(--ink-2);
-  pointer-events: none;
-}
-
-.tglobe figcaption b {
-  font: 700 18px/1.15 var(--display);
-  font-stretch: 90%;
-  color: var(--ink);
-}
-
 .tc-body {
   font: 650 11px/1 var(--display);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--signal);
-}
-
-.flat-target {
-  position: absolute;
-  inset: 40px 14px 14px;
-  display: flex;
-  align-items: center;
-}
-
-.flat-target img {
-  width: 100%;
-  display: block;
-  opacity: 0.85;
-}
-
-.flat-target i {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border: 2px solid var(--signal);
-  border-radius: 50%;
-}
-
-.card-wrap {
-  overflow-y: auto;
-  scrollbar-width: thin;
 }
 
 .pad {
@@ -1335,32 +1255,6 @@ ul.plain li {
   padding: 40px 20px;
 }
 
-.link {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 15;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.link.on {
-  opacity: 1;
-}
-
-.link path {
-  fill: none;
-  stroke: var(--signal);
-  stroke-width: 1.25;
-  opacity: 0.85;
-}
-
-.link circle {
-  fill: var(--signal);
-}
-
 .maplibregl-ctrl-group {
   background: var(--space) !important;
   border: 1px solid var(--rule-2);
@@ -1417,27 +1311,7 @@ ul.plain li {
 
 @media (max-width: 1099px) {
   .stage {
-    height: auto;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas: "earth earth" "ledger target";
-  }
-
-  .earth-col {
-    height: 58svh;
-    min-height: 360px;
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .ledger-col {
-    overflow: visible;
-  }
-
-  .target-col {
-    grid-template-rows: 240px auto;
-  }
-
-  .card-wrap {
-    overflow: visible;
+    grid-template-columns: 300px minmax(0, 1fr);
   }
 
   .tagline {
@@ -1480,8 +1354,15 @@ ul.plain li {
   }
 
   .stage {
+    height: auto;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "earth" "ledger" "target";
+    grid-template-areas: "earth" "ledger";
+  }
+
+  .ledger-col {
+    overflow: visible;
+    border-right: 0;
+    border-top: 1px solid var(--rule);
   }
 
   .earth-col {
@@ -1533,15 +1414,6 @@ ul.plain li {
     bottom: 64px;
   }
 
-  .ledger-col,
-  .target-col {
-    border: 0;
-  }
-
-  .target-col {
-    grid-template-rows: 220px auto;
-    border-top: 1px solid var(--rule);
-  }
 
   .card {
     padding: 14px 14px 24px;
@@ -1935,18 +1807,6 @@ ul.plain li {
   font-size: 12px;
 }
 
-.card-wrap {
-  position: relative;
-  z-index: 16;
-  background: var(--space);
-}
-
-.tglobe figcaption {
-  z-index: 16;
-  background: var(--space);
-  padding: 2px 6px 4px 0;
-}
-
 .pin.sel {
   background: #fff;
   border: 2px solid var(--signal);
@@ -2110,5 +1970,241 @@ ul.plain li {
 @media (max-width: 759px) {
   .logo {
     height: 32px;
+  }
+}
+
+.skip-intro {
+  position: absolute;
+  top: 12px;
+  right: 20px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+  color: var(--ink-2);
+  background: rgba(5, 6, 7, 0.7);
+  border: 1px solid var(--rule);
+  text-decoration: none;
+}
+
+.skip-intro:hover {
+  color: var(--signal);
+  border-color: var(--signal);
+}
+
+.earth-col .earth {
+  bottom: 30px;
+}
+
+.status {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 12px;
+  border-top: 1px solid var(--rule);
+  background: var(--raise);
+  font-size: 12px;
+  color: var(--ink-2);
+  z-index: 2;
+}
+
+.st-scale .maplibregl-ctrl-scale {
+  margin: 0;
+  padding: 0 4px;
+  height: 16px;
+  font: 600 11px/14px var(--body);
+  color: var(--ink-2);
+  background: transparent;
+  border: 1px solid var(--ink-2);
+  border-top: 0;
+  box-sizing: border-box;
+}
+
+.st-at {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.back {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  min-height: 36px;
+  padding: 0 14px;
+  font: 600 13px/1 var(--body);
+  color: #000;
+  background: var(--signal);
+  border: 0;
+  cursor: pointer;
+}
+
+.back[hidden] {
+  display: none;
+}
+
+.back:focus-visible {
+  outline-color: var(--ink);
+}
+
+.earth-col .legend {
+  bottom: 42px;
+}
+
+.pin.hot {
+  background: var(--ink);
+  color: #000;
+  transform: scale(1.25);
+  z-index: 4;
+}
+
+.pin.sel.hot {
+  background: var(--signal);
+}
+
+.ledger li.hot .row {
+  background: rgba(79, 216, 255, 0.08);
+}
+
+.ledger li.hot .r-n {
+  color: var(--signal);
+}
+
+.why {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  margin: -4px 0 4px;
+  padding: 0 16px 0 52px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.why svg {
+  width: 12px;
+  height: 12px;
+}
+
+.why:hover {
+  text-decoration: underline;
+}
+
+.match {
+  border-bottom: 1px solid var(--rule);
+}
+
+.match-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 24px;
+  padding: 8px 20px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--raise);
+}
+
+.tcap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.tcap b {
+  font: 700 16px/1.2 var(--display);
+  font-stretch: 90%;
+  color: var(--ink);
+}
+
+.match-head .ask-note {
+  position: static;
+  pointer-events: auto;
+  display: block;
+  flex: 1 1 260px;
+  font-size: 12.5px;
+}
+
+.match-head .ask-note > summary {
+  min-height: 36px;
+}
+
+.match-head .ask-note .ask-sub {
+  max-width: 90ch;
+  max-height: none;
+  overflow: visible;
+  margin: 0 0 8px;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+#card {
+  padding: 0 20px;
+  outline: none;
+}
+
+#card:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: -2px;
+}
+
+@media (max-width: 759px) {
+  .skip-intro {
+    top: 8px;
+    right: 14px;
+  }
+
+  .earth-col .earth {
+    bottom: auto;
+  }
+
+  .status {
+    position: static;
+    height: 32px;
+    padding: 0 14px;
+  }
+
+  .earth-col .legend {
+    bottom: auto;
+  }
+
+  .match-head {
+    padding: 8px 14px;
+  }
+
+  #card {
+    padding: 0 14px;
+  }
+
+  .back {
+    top: auto;
+    bottom: 12px;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .st-at {
+    display: none;
+  }
+
+  .back,
+  .skip-intro,
+  .why,
+  .match-head .ask-note > summary {
+    min-height: 44px;
   }
 }

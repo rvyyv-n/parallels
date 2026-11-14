@@ -5,12 +5,11 @@ import type { Manifest, Target } from "./contract";
 import { BASE, load, loadLabels, loadValidation, manifest, targetCols, type Cols, type Data } from "./data";
 import { handScore, rankOf, top } from "./score";
 import type { Earth } from "./earth";
-import { BODY, card, isIce, placeName, terrainOf } from "./card";
+import { BODY, card, isIce, placeName, terrainOf, wireCard } from "./card";
 import { NAV, sections, wire } from "./sections";
 import { esc, latlon, num, reduced, score100, webgl } from "./format";
 import { colour, gradient } from "./ramp";
 import { logo } from "./logo";
-import type { TargetGlobe } from "./globe3d";
 import type { Intro } from "./intro";
 
 interface State {
@@ -25,6 +24,8 @@ interface State {
 const TEXTURE = { moon: "img/moon.jpg", mars: "img/mars.jpg" };
 const AI_NOTE =
   "How we used AI: the idea and the key design decisions are our team's. Claude (Anthropic) helped research the challenge, write our planning documents, and write and test the code and data pipeline. Our logo was drawn with AI. We check its work at each checkpoint.";
+
+const WHY = `<a class="why" href="#card">Why it matches<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3 8.5 8 13l5-4.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>`;
 
 const app = document.getElementById("app")!;
 const $ = <T extends HTMLElement>(s: string) => app.querySelector<T>(s)!;
@@ -85,6 +86,7 @@ function shell(m: Manifest) {
     </header>
     <main>
       <section id="intro" class="intro" aria-labelledby="intro-h">
+        <a class="skip-intro" id="skip-intro" href="#explore">Skip intro</a>
         <div class="intro-view" id="intro-view" aria-hidden="true"><div class="intro-still">${logo()}</div></div>
         <div class="intro-copy">
           <p class="intro-k">NASA Space Apps Challenge 2026</p>
@@ -123,6 +125,8 @@ function shell(m: Manifest) {
           </aside>
           <div class="earth-col">
             <div class="earth" id="earth" role="region" aria-label="Map of Earth's land coloured by match. Use the top 10 list for keyboard access."></div>
+            <button type="button" class="back" id="back" hidden>Back to selected</button>
+            <div class="status" id="status"><span class="st-scale" id="st-scale"></span><span class="st-at" id="st-at" aria-hidden="true"></span></div>
             <div class="legend" id="legend">
               <p class="lg-title">Match, 0–100</p>
               <div class="lg-bar" style="background:${gradient()}"></div>
@@ -137,14 +141,13 @@ function shell(m: Manifest) {
               <label><input type="checkbox" id="pick-flat"> Flat map</label>
             </div>
           </div>
-          <div class="target-col">
-            <figure class="tglobe">
-              <div class="tglobe-view" id="tglobe"></div>
-              <figcaption id="tcap"></figcaption>
-              <details class="ask-note"><summary>About this filter and target</summary><p class="ask-sub" id="ask-sub"></p></details>
-            </figure>
-            <div class="card-wrap" id="card" aria-live="polite"></div>
+        </div>
+        <div class="match" id="match">
+          <div class="match-head">
+            <p class="tcap" id="tcap"></p>
+            <details class="ask-note"><summary>About this filter and target</summary><p class="ask-sub" id="ask-sub"></p></details>
           </div>
+          <div class="card-wrap" id="card" tabindex="-1" aria-live="polite"></div>
         </div>
       </section>
       <div id="sections"></div>
@@ -154,8 +157,7 @@ function shell(m: Manifest) {
       <p>NASA Space Apps Challenge 2026 entry: Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars. Data generated ${esc(m.generated)}.</p>
       <p class="ai">${esc(AI_NOTE)}</p>
       <p class="small muted">No NASA logos or insignia are used. Imagery credits are in the Data section.</p>
-    </footer>
-    <svg class="link" id="link" aria-hidden="true"><path id="link-path"/><circle id="link-a" r="3"/><circle id="link-b" r="3"/></svg>`;
+    </footer>`;
 }
 
 async function main() {
@@ -188,11 +190,12 @@ async function main() {
   let ids: number[] = [];
   let near: number[] = [];
   let ranked = 0;
-  let globe: TargetGlobe | null = null;
 
   const earthEl = $("#earth");
   let earth: Earth | null = null;
 
+  const bar = $(".bar");
+  new ResizeObserver(() => $("#explore").style.setProperty("--bar", `${Math.ceil(bar.offsetHeight)}px`)).observe(bar);
   const typeSel = $<HTMLSelectElement>("#pick-type");
   let intro: Intro | null = null;
   for (const el of app.querySelectorAll<HTMLElement>('[data-chips="target"]'))
@@ -264,7 +267,7 @@ async function main() {
                 .filter(Boolean)
                 .join(" · ")}</span>
               <span class="r-score"><b>${score100(score[i])}</b><i style="--w:${score[i] * 100}%;--c:${colour(score[i])}"></i></span>
-            </button></li>`;
+            </button>${i === s.cell ? WHY : ""}</li>`;
           })
           .join("")
       : `<li class="empty">No ranked land for this choice. ${s.type != null ? "Try all land in the terrain filter." : ""}</li>`;
@@ -311,7 +314,7 @@ async function main() {
       yr: s.yr && !s.hand,
       ranges: rng,
     });
-    el.scrollTop = 0;
+    wireCard(el);
   };
 
   const recompute = () => {
@@ -338,9 +341,10 @@ async function main() {
       b.classList.toggle("on", on);
       b.setAttribute("aria-pressed", String(on));
     }
+    app.querySelector("#ledger .why")?.remove();
+    app.querySelector(`#ledger li[data-i="${i}"]`)?.insertAdjacentHTML("beforeend", WHY);
     earth?.select(i, fly);
     showCard();
-    drawLink(true);
   };
 
   const setTarget = async (first: boolean) => {
@@ -357,15 +361,7 @@ async function main() {
     if (!first || s.cell < 0) s.cell = head != null && head >= 0 ? head : (ids[0] ?? -1);
     if (s.cell >= 0) pick(s.cell, !first);
     else showCard();
-    if (globe) globe.show(TEXTURE[t.body], t, t.regions ?? []);
-    else staticTarget();
     writeUrl(s);
-  };
-
-  const staticTarget = () => {
-    const t = target();
-    if (globe) return;
-    $("#tglobe").innerHTML = `<div class="flat-target"><img src="${TEXTURE[t.body]}" alt="${BODY[t.body]} surface map (equirectangular) with the target marked"><i style="left:${((t.lon + 180) / 360) * 100}%;top:${((90 - t.lat) / 180) * 100}%"></i></div>`;
   };
 
   const changed = () => {
@@ -396,6 +392,11 @@ async function main() {
     await intro?.enter();
     $("#explore").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" });
   };
+  $("#skip-intro").addEventListener("click", (e) => {
+    e.preventDefault();
+    intro?.finish();
+    $("#explore").scrollIntoView({ behavior: "instant" });
+  });
   $("#go").addEventListener("click", (e) => {
     e.preventDefault();
     void go();
@@ -422,48 +423,39 @@ async function main() {
     changed();
   });
   $("#ledger").addEventListener("click", (e) => {
+    const why = (e.target as HTMLElement).closest(".why");
+    if (why) {
+      e.preventDefault();
+      const c = $("#card");
+      c.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
+      c.focus({ preventScroll: true });
+      return;
+    }
     const li = (e.target as HTMLElement).closest<HTMLElement>("li[data-i]");
     if (li) pick(Number(li.dataset.i), true);
   });
+  const hot = (i: number | null) => {
+    for (const b of app.querySelectorAll<HTMLElement>("#ledger li[data-i]")) b.classList.toggle("hot", i != null && b.dataset.i === String(i));
+  };
+  const rowOf = (e: Event) => (e.target as HTMLElement).closest<HTMLElement>("#ledger li[data-i]");
+  $("#ledger").addEventListener("mouseover", (e) => {
+    const li = rowOf(e);
+    earth?.hover(li ? Number(li.dataset.i) : null);
+  });
+  $("#ledger").addEventListener("mouseleave", () => earth?.hover(null));
+  $("#ledger").addEventListener("focusin", (e) => {
+    const li = rowOf(e);
+    if (li) earth?.hover(Number(li.dataset.i));
+  });
+  $("#ledger").addEventListener("focusout", () => earth?.hover(null));
+  $("#back").addEventListener("click", () => earth?.back());
   $<HTMLInputElement>("#pick-labels").addEventListener("change", (e) => earth?.labels((e.target as HTMLInputElement).checked));
   $<HTMLInputElement>("#pick-strength").addEventListener("input", (e) => {
     const v = Number((e.target as HTMLInputElement).value);
     $("#strength-out").textContent = `${v}%`;
     earth?.strength(v / 100);
   });
-  $<HTMLInputElement>("#pick-flat").addEventListener("change", (e) => {
-    earth?.flat((e.target as HTMLInputElement).checked);
-    drawLink(false);
-  });
-
-  const link = $<SVGSVGElement & HTMLElement>("#link");
-  const path = link.querySelector("path")!;
-  const wide = matchMedia("(min-width: 1100px)");
-  let raf = 0;
-  function drawLink(fresh: boolean) {
-    cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(() => {
-      const a = wide.matches ? earth?.point() : null;
-      const b = wide.matches ? globe?.point() : null;
-      const stage = $(".stage").getBoundingClientRect();
-      const inside = (p: { x: number; y: number }) => p.y > stage.top && p.y < stage.bottom;
-      if (!a || !b || !inside(a) || !inside(b)) {
-        link.classList.remove("on");
-        return;
-      }
-      const mx = (a.x + b.x) / 2;
-      path.setAttribute("d", `M${a.x},${a.y} C${mx},${a.y} ${mx},${b.y} ${b.x},${b.y}`);
-      link.querySelector("#link-a")!.setAttribute("transform", `translate(${a.x},${a.y})`);
-      link.querySelector("#link-b")!.setAttribute("transform", `translate(${b.x},${b.y})`);
-      link.classList.add("on");
-      if (fresh && !reduced()) {
-        const len = path.getTotalLength();
-        path.animate([{ strokeDasharray: `${len}`, strokeDashoffset: `${len}` }, { strokeDasharray: `${len}`, strokeDashoffset: "0" }], { duration: 700, easing: "ease-out" });
-      }
-    });
-  }
-  addEventListener("scroll", () => drawLink(false), { passive: true });
-  addEventListener("resize", () => drawLink(false));
+  $<HTMLInputElement>("#pick-flat").addEventListener("change", (e) => earth?.flat((e.target as HTMLInputElement).checked));
 
   try {
     await setTarget(true);
@@ -487,14 +479,20 @@ async function main() {
   if (webgl())
     Promise.all([import("./earth"), loadLabels().catch(() => [])])
       .then(([mod, labels]) => {
-        earth = mod.createEarth(earthEl, { lat: d.cells.lat, lon: d.cells.lon, n: d.n }, labels, (i) => pick(i, true));
+        const at = $("#st-at");
+        earth = mod.createEarth(earthEl, { lat: d.cells.lat, lon: d.cells.lon, n: d.n }, labels, {
+          pick: (i) => pick(i, true),
+          pin: hot,
+          away: (on) => ($("#back").hidden = !on),
+          pointer: (p) => (at.textContent = p ? latlon(p.lat, p.lon, 2) : ""),
+          scale: $("#st-scale"),
+        });
         earth.paint(score, keep);
         earth.top(ids);
         if (s.cell >= 0) earth.select(s.cell, false);
         earth.labels($<HTMLInputElement>("#pick-labels").checked);
         earth.flat($<HTMLInputElement>("#pick-flat").checked);
         earth.strength(Number($<HTMLInputElement>("#pick-strength").value) / 100);
-        earth.onMove(() => drawLink(false));
       })
       .catch(() => (earthEl.innerHTML = `<p class="nogl">The map could not be loaded. The ranked list and scorecards still work.</p>`));
   else earthEl.innerHTML = `<p class="nogl">This browser can't draw the 3D map (WebGL is off). The ranked list and scorecards still work.</p>`;
@@ -523,20 +521,6 @@ async function main() {
         intro.matches(ids.map((i) => ({ lat: d.cells.lat[i], lon: d.cells.lon[i] })));
       })
       .catch(() => {});
-  const idle = (f: () => void) => ("requestIdleCallback" in window ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f, 300));
-  if (webgl() && !weak)
-    idle(async () => {
-      try {
-        const { createTargetGlobe } = await import("./globe3d");
-        $("#tglobe").innerHTML = "";
-        globe = createTargetGlobe($("#tglobe"), () => drawLink(false));
-        const t = target();
-        globe.show(TEXTURE[t.body], t, t.regions ?? []);
-        drawLink(true);
-      } catch {
-        staticTarget();
-      }
-    });
 }
 
 main();

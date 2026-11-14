@@ -30,8 +30,16 @@ export interface Earth {
   strength(v: number): void;
   labels(on: boolean): void;
   flat(on: boolean): void;
-  point(): { x: number; y: number } | null;
-  onMove(f: () => void): void;
+  hover(i: number | null): void;
+  back(): void;
+}
+
+export interface Hooks {
+  pick(i: number): void;
+  pin(i: number | null): void;
+  away(on: boolean): void;
+  pointer(at: { lat: number; lon: number } | null): void;
+  scale: HTMLElement;
 }
 
 export const cellAt = (lat: number, lon: number) => {
@@ -135,7 +143,7 @@ function parallel(lat: number) {
   return { type: "LineString" as const, coordinates: Array.from({ length: 145 }, (_, i) => [-180 + i * 2.5, lat]) };
 }
 
-export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPick: (i: number) => void): Earth {
+export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: Hooks): Earth {
   maplibregl.setWorkerUrl(workerUrl);
   const { at, px } = lookup(g);
   const sheet = (id: string) => {
@@ -208,6 +216,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPi
     fadeDuration: 0,
   });
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+  on.scale.append(new maplibregl.ScaleControl({ unit: "metric", maxWidth: 110 }).onAdd(map));
 
   const LAYERS = ["match-far", "match-near"] as const;
   const srcs = () => LAYERS.map((id) => map.getSource(id) as maplibregl.CanvasSource | undefined);
@@ -226,14 +235,47 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPi
   let centred = false;
   const markers: maplibregl.Marker[] = [];
 
+  const wrap = (lng: number) => ((((lng + 180) % 360) + 360) % 360) - 180;
   map.on("click", (e) => {
-    const k = cellAt(e.lngLat.lat, ((((e.lngLat.lng + 180) % 360) + 360) % 360) - 180);
-    if (k >= 0 && at[k] >= 0) onPick(at[k]);
+    const k = cellAt(e.lngLat.lat, wrap(e.lngLat.lng));
+    if (k >= 0 && at[k] >= 0) on.pick(at[k]);
   });
   map.on("mousemove", (e) => {
-    const k = cellAt(e.lngLat.lat, e.lngLat.lng);
+    const k = cellAt(e.lngLat.lat, wrap(e.lngLat.lng));
     map.getCanvas().style.cursor = k >= 0 && at[k] >= 0 ? "pointer" : "";
+    on.pointer({ lat: e.lngLat.lat, lon: wrap(e.lngLat.lng) });
   });
+  map.on("mouseout", () => on.pointer(null));
+
+  const visible = () => {
+    if (selected < 0) return true;
+    const ll = new maplibregl.LngLat(g.lon[selected], g.lat[selected]);
+    const c = map.getCenter();
+    const r = Math.PI / 180;
+    const dot = Math.sin(ll.lat * r) * Math.sin(c.lat * r) + Math.cos(ll.lat * r) * Math.cos(c.lat * r) * Math.cos((ll.lng - c.lng) * r);
+    if (map.getProjection()?.type !== "mercator" && dot < 0.15) return false;
+    const p = map.project(ll);
+    const b = el.getBoundingClientRect();
+    return p.x >= 0 && p.y >= 0 && p.x <= b.width && p.y <= b.height;
+  };
+  let away = false;
+  const check = () => {
+    const now = !visible();
+    if (now !== away) on.away((away = now));
+  };
+  map.on("moveend", check);
+  map.on("resize", check);
+  map.on("move", () => {
+    if (away && visible()) on.away((away = false));
+  });
+  const goTo = (i: number, animate: boolean) => {
+    const z = Math.max(map.getZoom(), phone ? 1.1 : 1.8);
+    const center: [number, number] = [g.lon[i], Math.max(-60, Math.min(60, g.lat[i]))];
+    if (!animate || reduced()) {
+      map.jumpTo({ center, zoom: z });
+      check();
+    } else map.flyTo({ center, zoom: z, duration: 1300, essential: false });
+  };
 
   return {
     paint(score, keep) {
@@ -266,15 +308,13 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPi
           ],
         });
         for (const m of markers) m.getElement().classList.toggle("sel", Number(m.getElement().dataset.i) === i);
-        const z = Math.max(map.getZoom(), phone ? 1.1 : 1.8);
         if (!centred) {
           centred = true;
-          map.jumpTo({ center: [lon, Math.max(-60, Math.min(60, lat))], zoom: z });
+          goTo(i, false);
           return;
         }
-        if (!fly) return;
-        if (reduced()) map.jumpTo({ center: [lon, Math.max(-60, Math.min(60, lat))], zoom: z });
-        else map.flyTo({ center: [lon, Math.max(-60, Math.min(60, lat))], zoom: z, duration: 1300, essential: false });
+        if (fly) goTo(i, true);
+        else check();
       });
     },
     top(ids) {
@@ -291,8 +331,10 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPi
           b.classList.toggle("sel", i === selected);
           b.addEventListener("click", (e) => {
             e.stopPropagation();
-            onPick(i);
+            on.pick(i);
           });
+          b.addEventListener("mouseenter", () => on.pin(i));
+          b.addEventListener("mouseleave", () => on.pin(null));
           markers.push(new maplibregl.Marker({ element: b, opacityWhenCovered: "0" }).setLngLat([g.lon[i], g.lat[i]]).addTo(map));
         });
       });
@@ -309,24 +351,16 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], onPi
       });
     },
     flat(on) {
-      ready.then(() => map.setProjection({ type: on ? "mercator" : "globe" }));
+      ready.then(() => {
+        map.setProjection({ type: on ? "mercator" : "globe" });
+        map.once("idle", check);
+      });
     },
-    point() {
-      if (selected < 0 || !map.loaded()) return null;
-      const ll = new maplibregl.LngLat(g.lon[selected], g.lat[selected]);
-      const c = map.getCenter();
-      const r = Math.PI / 180;
-      const far = Math.sin(ll.lat * r) * Math.sin(c.lat * r) + Math.cos(ll.lat * r) * Math.cos(c.lat * r) * Math.cos((ll.lng - c.lng) * r) < 0.15;
-      if (map.getProjection()?.type === "globe" && far) return null;
-      const p = map.project(ll);
-      const b = el.getBoundingClientRect();
-      if (p.x < 0 || p.y < 0 || p.x > b.width || p.y > b.height) return null;
-      return { x: b.left + p.x, y: b.top + p.y };
+    hover(i) {
+      for (const m of markers) m.getElement().classList.toggle("hot", i != null && Number(m.getElement().dataset.i) === i);
     },
-    onMove(f) {
-      map.on("move", f);
-      map.on("idle", f);
-      map.on("resize", f);
+    back() {
+      if (selected >= 0) goTo(selected, true);
     },
   };
 }
