@@ -65,13 +65,13 @@ export async function manifest(base = BASE): Promise<Manifest> {
 }
 
 export async function load(m: Manifest, base = BASE): Promise<Data> {
-  const [cells, labels, validation] = await Promise.all([
-    bytes(base + m.grid.file).then((b) => decode(b, m.grid)),
-    json<LabelPoint[]>(`${base}labels.json`),
-    json<Validation>(`${base}validation.json`),
-  ]);
-  return { m, n: m.grid.n, cells, labels: labels ?? [], validation, base };
+  const cells = decode(await bytes(base + m.grid.file), m.grid);
+  return { m, n: m.grid.n, cells, labels: [], validation: null, base };
 }
+
+export const loadLabels = (base = BASE) => json<LabelPoint[]>(`${base}labels.json`).then((l) => l ?? []);
+
+export const loadValidation = (base = BASE) => json<Validation>(`${base}validation.json`);
 
 const cache = new Map<string, Promise<Cols>>();
 

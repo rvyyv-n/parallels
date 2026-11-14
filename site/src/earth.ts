@@ -56,15 +56,6 @@ function lookup(g: Grid) {
   return { at, px };
 }
 
-export function webgl(): boolean {
-  try {
-    const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") || c.getContext("webgl"));
-  } catch {
-    return false;
-  }
-}
-
 function painter(canvas: HTMLCanvasElement, px: Int32Array) {
   const g = canvas.getContext("2d")!;
   const img = g.createImageData(W, H);

@@ -127,13 +127,13 @@ function verdict(tests: ValidationTest[], summary?: string) {
   </div>`;
 }
 
-type Later = NonNullable<Validation["second_run"]> & { method_change?: string; adopted?: boolean | string; adoption_rule?: string };
+type Later = NonNullable<Validation["second_run"]> & Partial<Pick<NonNullable<Validation["third_run"]>, "method_change" | "adopted" | "adoption_rule">>;
 
 function later(r: Later, id: string, m: Manifest) {
   const extra = [
     r.method_change ? `<p><b>Method change.</b> ${esc(r.method_change)}</p>` : "",
     r.adoption_rule ? `<p><b>Adoption rule.</b> ${esc(r.adoption_rule)}</p>` : "",
-    r.adopted != null ? `<p><b>Adopted.</b> ${esc(r.adopted === true ? "Yes" : r.adopted === false ? "No" : r.adopted)}</p>` : "",
+    r.adopted != null ? `<p><b>Adopted.</b> ${r.adopted ? "Yes" : "No"}</p>` : "",
   ].join("");
   return `<div class="second" id="${id}">
       <h3 class="run-h">${esc(r.title)}</h3>
@@ -150,7 +150,7 @@ function later(r: Later, id: string, m: Manifest) {
 function checked(v: Validation | null, m: Manifest) {
   if (!v) return `<p>The validation file is missing from this build, so no check results are shown.</p>`;
   const s = v.second_run;
-  const v3 = (v as Validation & { third_run?: Later }).third_run;
+  const v3 = v.third_run;
   return `<p class="lede">If the method works, places NASA already trusts should score higher than ordinary farmland, and higher than big deserts that are dry but not analogs. The pass marks were set in our plan before any data came in.</p>
     <h3 class="run-h">First run</h3>
     ${verdict(v.tests, v.summary)}

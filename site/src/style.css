@@ -1794,3 +1794,92 @@ ul.plain li {
 .key .kk {
   margin-left: 0;
 }
+
+.pair {
+  display: grid;
+  grid-template-columns: 256px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.pair-t {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+.eimg {
+  margin: 0;
+}
+
+.eimg-view {
+  position: relative;
+  width: 256px;
+  height: 256px;
+  overflow: hidden;
+  background: #0b0d10;
+}
+
+.eimg-view img {
+  position: absolute;
+  width: 256px;
+  height: 256px;
+}
+
+.eimg.fb .eimg-view {
+  background: var(--fb) var(--fbx) var(--fby) / var(--fbs) var(--fbs) no-repeat;
+}
+
+.eimg.fb img {
+  display: none;
+}
+
+.eimg-view i {
+  position: absolute;
+  border: 2px solid var(--signal);
+  box-shadow: 0 0 0 1px #000;
+}
+
+.eimg figcaption {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 6px;
+  max-width: 256px;
+}
+
+.fb-note {
+  display: none;
+}
+
+.eimg.fb .fb-note {
+  display: inline;
+}
+
+.eimg.none p {
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+@media (max-width: 459px) {
+  .pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.ask-how {
+  margin: 12px 0 0;
+  max-width: 78ch;
+  font-size: 15.5px;
+  color: var(--ink);
+}
+
+@media (pointer: coarse) {
+  .lg-keys label,
+  .t-notes summary,
+  .v-table summary {
+    min-height: 44px;
+  }
+
+  .top nav a {
+    padding: 13px 0;
+  }
+}

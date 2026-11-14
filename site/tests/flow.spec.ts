@@ -100,6 +100,7 @@ test("no horizontal scroll at 375 px", async ({ page }) => {
 
 test("every internal anchor resolves", async ({ page }) => {
   await ready(page);
+  await page.locator("#checked").waitFor();
   const missing = await page
     .locator("a[href^='#']")
     .evaluateAll((as) => as.map((a) => a.getAttribute("href")!.slice(1)).filter((id) => !id || !document.getElementById(id)));
@@ -125,7 +126,7 @@ test("validation shows the first run, then later runs when present", async ({ pa
   const checks = v.tests.flatMap((t: { checks: unknown[] }) => t.checks).length;
   await expect(page.locator("#checked .v-checks").first().locator("tbody tr")).toHaveCount(checks);
   await expect(page.locator("#second-run")).toHaveCount(v.second_run ? 1 : 0);
-  await expect(page.locator("#third-run")).toHaveCount(0);
+  await expect(page.locator("#third-run")).toHaveCount(v.third_run ? 1 : 0);
   const base = v.second_run ?? { title: "Run", plain: "", designed_after_first_run: true, config_commit: "x", summary: "", tests: v.tests, unchecked: [] };
   await page.route("**/data/validation.json", async (r) =>
     r.fulfill({ json: { ...v, third_run: { ...base, title: "Third run test", method_change: "Changed X", adopted: false, adoption_rule: "Rule Y" } } }),
@@ -134,4 +135,46 @@ test("validation shows the first run, then later runs when present", async ({ pa
   await expect(page.locator("#third-run")).toContainText("Third run test");
   await expect(page.locator("#third-run")).toContainText("Changed X");
   await expect(page.locator("#third-run")).toContainText("Rule Y");
+});
+
+test("works with NASA GIBS tiles blocked, and makes no other outside calls", async ({ page }) => {
+  const outside: string[] = [];
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(String(e)));
+  page.on("request", (r) => {
+    const u = new URL(r.url());
+    if (u.hostname !== "localhost" && !u.protocol.startsWith("data") && !u.protocol.startsWith("blob")) outside.push(u.hostname);
+  });
+  await page.route("**://gibs.earthdata.nasa.gov/**", (r) => r.abort());
+  await ready(page);
+  await expect(page.locator("#earth canvas.maplibregl-canvas")).toBeVisible();
+  await page.locator(".card .eimg").scrollIntoViewIfNeeded();
+  await expect(page.locator(".card .eimg.fb")).toHaveCount(1);
+  await page.locator("#checked").waitFor();
+  expect(errors).toEqual([]);
+  expect([...new Set(outside)].filter((h) => h !== "gibs.earthdata.nasa.gov")).toEqual([]);
+});
+
+test("keyboard alone reaches the pickers, the top 10, the scorecard and the sliders", async ({ page }, info) => {
+  test.skip(info.project.name !== "laptop", "keyboard path is a laptop check");
+  await ready(page);
+  await page.locator("#pick-filter").focus();
+  await page.keyboard.press("Tab");
+  await expect(page.locator("#pick-target")).toBeFocused();
+  const second = rows(page).nth(1).locator("button");
+  await second.focus();
+  await page.keyboard.press("Enter");
+  await expect(second).toHaveAttribute("aria-pressed", "true");
+  const summary = page.locator(".card .ch summary").nth(1);
+  await summary.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator(".card .ch details").nth(1)).toHaveAttribute("open", "");
+  await page.locator("#hand summary").focus();
+  await page.keyboard.press("Enter");
+  const slider = page.locator("#sliders input").first();
+  await slider.focus();
+  const before = await slider.inputValue();
+  await page.keyboard.press("ArrowRight");
+  expect(await slider.inputValue()).not.toBe(before);
+  await expect(page.locator("#pick-filter")).toHaveValue("__hand");
 });

@@ -31,6 +31,41 @@ export function placeName(m: Manifest, c: Cols, i: number): string {
   return (Number.isFinite(r) && m.regions[r]) || latlon(c.lat[i], c.lon[i], 2);
 }
 
+const TILE = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8";
+const FALLBACK = `${import.meta.env.BASE_URL}img/blue-marble.jpg`;
+
+function merc(lat: number, lon: number, n: number) {
+  const r = (lat * Math.PI) / 180;
+  return [((lon + 180) / 360) * n * 256, ((1 - Math.asinh(Math.tan(r)) / Math.PI) / 2) * n * 256];
+}
+
+function earthImage(x: CardInput) {
+  const lat = x.cells.lat[x.i];
+  const lon = x.cells.lon[x.i];
+  const caption = `NASA Blue Marble (GIBS), about 1.2 km per pixel at the equator. The square is this 0.5° cell.`;
+  if (Math.abs(lat) > 84.5) return `<figure class="eimg none"><p>No map image beyond 85° latitude.</p></figure>`;
+  const z = 7;
+  const n = 2 ** z;
+  const S = 256;
+  const [cx, cy] = merc(lat, lon, n);
+  const x0 = cx - S / 2;
+  const y0 = cy - S / 2;
+  const tiles: string[] = [];
+  for (let ty = Math.floor(y0 / 256); ty <= Math.floor((y0 + S) / 256); ty++)
+    for (let tx = Math.floor(x0 / 256); tx <= Math.floor((x0 + S) / 256); tx++) {
+      if (ty < 0 || ty >= n) continue;
+      const wx = ((tx % n) + n) % n;
+      tiles.push(`<img src="${TILE}/${z}/${ty}/${wx}.jpeg" alt="" loading="lazy" style="left:${tx * 256 - x0}px;top:${ty * 256 - y0}px" onerror="this.closest('.eimg').classList.add('fb')">`);
+    }
+  const [ax, ay] = merc(lat + 0.25, lon - 0.25, n);
+  const [bx, by] = merc(lat - 0.25, lon + 0.25, n);
+  const scale = 2 ** (z - 2);
+  return `<figure class="eimg" style="--fb:url('${FALLBACK}');--fbs:${1024 * scale}px;--fbx:${-x0}px;--fby:${-y0}px">
+      <div class="eimg-view" role="img" aria-label="Satellite image of Earth around this place, with the 0.5 degree cell outlined">${tiles.join("")}<i style="left:${ax - x0}px;top:${ay - y0}px;width:${bx - ax}px;height:${by - ay}px"></i></div>
+      <figcaption>${caption}<span class="fb-note"> The live tiles did not load, so this is the bundled low-resolution copy of the same imagery.</span></figcaption>
+    </figure>`;
+}
+
 const ds = (m: Manifest, id: string) => m.datasets.find((d) => d.id === id)?.name ?? id;
 
 function sourceLine(m: Manifest, label: string, dataset: string, resolution: string, stat: string) {
@@ -337,6 +372,7 @@ export function card(x: CardInput): string {
       <ol class="chs">${chRows}</ol>
     </section>
     ${lead ? `<section class="c-block"><h4>What to test here</h4><p>${esc(lead.what_to_test)} <span class="muted">(${esc(lead.name)})</span></p></section>` : ""}
+    <section class="c-block"><h4>Earth and ${esc(body)} side by side</h4><div class="pair">${earthImage(x)}<p class="pair-t">The ${esc(body)} side is the globe above, turned to ${esc(target.name)}. Earth can't show the target's low gravity, air or radiation: see below.</p></div></section>
     <section class="c-block"><h4>Where it breaks</h4>${breaks(x, chs)}</section>
     <section class="c-block"><h4>Earth can't copy</h4>
       <div class="scroll-x"><table class="data cant"><thead><tr><th scope="col"></th><th scope="col">Earth</th><th scope="col">${body}</th><th scope="col">Source</th></tr></thead><tbody>${cc}</tbody></table></div>

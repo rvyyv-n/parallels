@@ -34,3 +34,12 @@ export function monthList(mask: number): string {
 }
 
 export const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+export function webgl(): boolean {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}

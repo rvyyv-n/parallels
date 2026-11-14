@@ -1,12 +1,12 @@
 import "@fontsource-variable/archivo/wdth.css";
 import "./style.css";
 import type { Manifest, Target } from "./contract";
-import { BASE, load, manifest, targetCols, type Cols, type Data } from "./data";
+import { BASE, load, loadLabels, loadValidation, manifest, targetCols, type Cols, type Data } from "./data";
 import { handScore, rankOf, top } from "./score";
-import { createEarth, webgl, type Earth } from "./earth";
+import type { Earth } from "./earth";
 import { BODY, card, isIce, placeName, terrainOf } from "./card";
 import { NAV, sections } from "./sections";
-import { esc, latlon, num, reduced, score100 } from "./format";
+import { esc, latlon, num, reduced, score100, webgl } from "./format";
 import { colour, gradient } from "./ramp";
 import type { TargetGlobe } from "./globe3d";
 
@@ -71,8 +71,7 @@ function ranges(d: Data) {
   return out;
 }
 
-function shell(d: Data) {
-  const m = d.m;
+function shell(m: Manifest) {
   app.innerHTML = `
     ${m.sample ? `<p class="sample" role="note"><b>Sample data.</b> Every number on this page is a made-up test value while the real data is processed. Nothing here is a result yet.</p>` : ""}
     <header class="top">
@@ -88,12 +87,13 @@ function shell(d: Data) {
             for <span class="pick"><select id="pick-target" aria-label="Target: where the base would be">${m.targets
               .map((t) => `<option value="${esc(t.id)}">${esc(t.name)}</option>`)
               .join("")}</select></span></h1>
+          <p class="ask-how">Every patch of land on Earth, in squares about 50 km across, is scored from 0 to 100 for how closely it matches the target. Pick a place in the top 10 or on the map to see why it matches and where it falls short.</p>
           <p class="ask-sub" id="ask-sub"></p>
         </div>
         <div class="stage">
           <aside class="ledger-col" aria-labelledby="ledger-h">
-            <div class="col-head"><h2 id="ledger-h">Top 10 on Earth</h2><span class="muted small" id="ledger-note"></span></div>
-            <ol class="ledger" id="ledger"></ol>
+            <div class="col-head"><h2 id="ledger-h">Top 10 on Earth</h2><span class="muted small" id="ledger-note" aria-live="polite"></span></div>
+            <ol class="ledger" id="ledger"><li class="empty" role="status">Ranking Earth's land…</li></ol>
             <div class="controls">
               <label class="ctl"><span>Terrain type</span><select id="pick-type"><option value="">All land</option>${m.terrain_types
                 .filter((t) => t.key !== "none")
@@ -130,7 +130,7 @@ function shell(d: Data) {
           </div>
         </div>
       </section>
-      ${sections(m, d.validation)}
+      <div id="sections"></div>
     </main>
     <footer class="foot">
       <p class="wordmark small">Parallels</p>
@@ -144,16 +144,19 @@ function shell(d: Data) {
 async function main() {
   let d: Data;
   let s: State;
+  const fail = (e: unknown) => {
+    app.innerHTML = `<div class="boot"><b>PARALLELS</b></div><p class="fatal" role="alert">The data files could not be loaded (${esc((e as Error).message)}). Please check your connection and reload the page.</p>`;
+  };
   try {
     const mf = await manifest();
     s = readUrl(mf);
-    void targetCols(BASE, mf.targets.find((t) => t.id === s.target)!);
+    void targetCols(BASE, mf.targets.find((t) => t.id === s.target)!).catch(() => {});
+    shell(mf);
     d = await load(mf);
   } catch (e) {
-    app.innerHTML = `<p class="fatal">The data files could not be loaded (${esc((e as Error).message)}). Please reload the page.</p>`;
+    fail(e);
     return;
   }
-  shell(d);
   const m = d.m;
   const rng = ranges(d);
   const terr = terrainOf(d.cells);
@@ -169,8 +172,6 @@ async function main() {
 
   const earthEl = $("#earth");
   let earth: Earth | null = null;
-  if (webgl()) earth = createEarth(earthEl, { lat: d.cells.lat, lon: d.cells.lon, n: d.n }, d.labels, (i) => pick(i, true));
-  else earthEl.innerHTML = `<p class="nogl">This browser can't draw the 3D map (WebGL is off). The ranked list and scorecards below still work.</p>`;
 
   const fSel = $<HTMLSelectElement>("#pick-filter");
   const tSel = $<HTMLSelectElement>("#pick-target");
@@ -210,7 +211,7 @@ async function main() {
       : m.scoring.yearround_rule;
     const f = filter();
     const t = target();
-    $("#ask-sub").innerHTML = `${esc(s.hand ? "Your own weights" : f.plain)} <span class="muted">${esc(t.anchor_note)}</span>`;
+    $("#ask-sub").innerHTML = `<b>${esc(s.hand ? "Your own weights" : f.name)}:</b> ${esc(s.hand ? "you set how much each challenge counts." : f.plain)} <span class="muted">${esc(t.name)}: ${esc(t.anchor_note)}</span>`;
     fit(fSel);
     fit(tSel);
   };
@@ -415,11 +416,36 @@ async function main() {
       }
     });
   }
-  earth?.onMove(() => drawLink(false));
   addEventListener("scroll", () => drawLink(false), { passive: true });
   addEventListener("resize", () => drawLink(false));
 
-  await setTarget(true);
+  try {
+    await setTarget(true);
+  } catch (e) {
+    $("#ledger").innerHTML = `<li class="empty" role="alert">The target file could not be loaded (${esc((e as Error).message)}). Please reload the page.</li>`;
+    return;
+  }
+
+  loadValidation()
+    .then((v) => {
+      $("#sections").outerHTML = sections(m, v);
+      if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
+    })
+    .catch(() => ($("#sections").outerHTML = sections(m, null)));
+
+  if (webgl())
+    Promise.all([import("./earth"), loadLabels().catch(() => [])])
+      .then(([mod, labels]) => {
+        earth = mod.createEarth(earthEl, { lat: d.cells.lat, lon: d.cells.lon, n: d.n }, labels, (i) => pick(i, true));
+        earth.paint(score, keep);
+        earth.top(ids);
+        if (s.cell >= 0) earth.select(s.cell, false);
+        earth.labels($<HTMLInputElement>("#pick-labels").checked);
+        earth.flat($<HTMLInputElement>("#pick-flat").checked);
+        earth.onMove(() => drawLink(false));
+      })
+      .catch(() => (earthEl.innerHTML = `<p class="nogl">The map could not be loaded. The ranked list and scorecards still work.</p>`));
+  else earthEl.innerHTML = `<p class="nogl">This browser can't draw the 3D map (WebGL is off). The ranked list and scorecards still work.</p>`;
 
   const weak = ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 2;
   const idle = (f: () => void) => ("requestIdleCallback" in window ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f, 300));
