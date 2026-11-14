@@ -1161,7 +1161,7 @@
      "source": "Mars Odyssey GRS water-equivalent hydrogen (H2O_SR_5X5)",
      "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab",
      "kind": "computed",
-     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.363 (1σ)."
+     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.363 (1σ). This is hydrogen counted as if it were water, not ice: near the equator ice is not stable in the top metre, so the hydrogen is likely bound in hydrated minerals."
     },
     "dci": {
      "value": 0.971,
@@ -1185,11 +1185,25 @@
      "note": "No single coldest air temperature is stated in the text; not read off figures."
     },
     "t_min_ground_c": {
-     "value": null,
-     "source": "Rodríguez-Manfredi et al. 2023, MEDA",
-     "url": "https://www.nature.com/articles/s41561-022-01084-0",
+     "value": -93,
+     "source": "Zorzano et al. 2024, MEDA thermal infrared sensor over one Mars year",
+     "url": "https://doi.org/10.1038/s41598-024-57458-4",
      "kind": "published",
-     "note": "No single coldest ground temperature is stated in the text; not read off figures."
+     "note": "Night-time minimum of the regolith on the crater floor, 'about 180 K' in the text (−93 °C); frost is briefly stable when the ground is below 185 K."
+    },
+    "daily_ground_swing_c": {
+     "value": null,
+     "source": "Zorzano et al. 2024, MEDA thermal infrared sensor",
+     "url": "https://doi.org/10.1038/s41598-024-57458-4",
+     "kind": "published",
+     "note": "The text gives the night minimum (about 180 K) but no daily ground maximum or swing; not read off figures."
+    },
+    "dust_tau": {
+     "value": 0.4,
+     "source": "Lemmon et al. 2022, Perseverance Mastcam-Z solar imaging",
+     "url": "https://doi.org/10.1029/2022GL100126",
+     "kind": "published",
+     "note": "Visible column optical depth (Mastcam-Z 880 nm channel; dust plus some ice) near 0.4 just after a January 2022 local storm (Ls ~156°, northern late summer) and near 0.3 before it, close to the seasonal minimum. The same paper says the 9 µm dust optical depth is about half the visible value; we did not convert anything. Dusty-season values are higher (the storm peaked near 2)."
     },
     "noon_sun_deg": {
      "value": 71.62,
@@ -1260,7 +1274,7 @@
      "source": "Mars Odyssey GRS water-equivalent hydrogen (H2O_SR_5X5)",
      "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab",
      "kind": "computed",
-     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.569 (1σ)."
+     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.569 (1σ). This is hydrogen counted as if it were water. At this mid/high latitude it is likely buried ice (Arcadia and Deuteronilus have radar-detected ice)."
     },
     "dci": {
      "value": 0.935,
@@ -1289,6 +1303,20 @@
      "url": null,
      "kind": "published",
      "note": "No surface measurement at this site."
+    },
+    "daily_ground_swing_c": {
+     "value": null,
+     "source": "none",
+     "url": null,
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "dust_tau": {
+     "value": null,
+     "source": "none",
+     "url": null,
+     "kind": "published",
+     "note": "No surface measurement at this site, and we found no NASA orbital dust climatology (TES, THEMIS, MCS) that states a value for this region in its text or tables."
     },
     "noon_sun_deg": {
      "value": 42.8,
@@ -1354,7 +1382,7 @@
      "source": "Mars Odyssey GRS water-equivalent hydrogen (H2O_SR_5X5)",
      "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab",
      "kind": "computed",
-     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.392 (1σ)."
+     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.392 (1σ). This is hydrogen counted as if it were water, not ice: near the equator ice is not stable in the top metre, so the hydrogen is likely bound in hydrated minerals."
     },
     "dci": {
      "value": 0.959,
@@ -1383,6 +1411,20 @@
      "url": "https://www-mars.lmd.jussieu.fr/granada2017/abstracts/gomez-elvira_granada2017.pdf",
      "kind": "published",
      "note": "Daily ground minima span about 170–210 K over two Mars years; 170 K is −103 °C."
+    },
+    "daily_ground_swing_c": {
+     "value": 80,
+     "source": "Gómez-Elvira et al. 2017, REMS ground temperature",
+     "url": "https://www-mars.lmd.jussieu.fr/granada2017/abstracts/gomez-elvira_granada2017.pdf",
+     "kind": "derived",
+     "note": "Daily ground maxima span about 250–290 K and minima about 170–210 K over two Mars years; 80 K is the gap between the middles of the two ranges, not a published single swing. The paper says the swing depends on the ground type under the rover."
+    },
+    "dust_tau": {
+     "value": null,
+     "source": "Lemmon et al., MSL Mastcam solar-imaging optical depth record (440 and 880 nm)",
+     "url": "https://doi.org/10.17632/tbh3pg39xc",
+     "kind": "published",
+     "note": "The record says optical depth is lower and steadier in southern fall and winter and peaks in southern spring and summer, but states no typical value in its text; the values are only in the data files, which we have not processed yet."
     },
     "noon_sun_deg": {
      "value": 85.41,
@@ -1453,7 +1495,7 @@
      "source": "Mars Odyssey GRS water-equivalent hydrogen (H2O_SR_5X5)",
      "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab",
      "kind": "computed",
-     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.359 (1σ)."
+     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.359 (1σ). This is hydrogen counted as if it were water. At this mid/high latitude it is likely buried ice (Arcadia and Deuteronilus have radar-detected ice)."
     },
     "dci": {
      "value": 0.965,
@@ -1482,6 +1524,20 @@
      "url": null,
      "kind": "published",
      "note": "No surface measurement at this site."
+    },
+    "daily_ground_swing_c": {
+     "value": null,
+     "source": "none",
+     "url": null,
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "dust_tau": {
+     "value": null,
+     "source": "none",
+     "url": null,
+     "kind": "published",
+     "note": "No surface measurement at this site, and we found no NASA orbital dust climatology (TES, THEMIS, MCS) that states a value for this region in its text or tables."
     },
     "noon_sun_deg": {
      "value": 46.1,
@@ -1547,7 +1603,7 @@
      "source": "Mars Odyssey GRS water-equivalent hydrogen (H2O_SR_5X5)",
      "url": "https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab",
      "kind": "computed",
-     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.237 (1σ)."
+     "note": "5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± 0.237 (1σ). This is hydrogen counted as if it were water, not ice: near the equator ice is not stable in the top metre, so the hydrogen is likely bound in hydrated minerals."
     },
     "dci": {
      "value": 0.938,
@@ -1576,6 +1632,20 @@
      "url": null,
      "kind": "published",
      "note": "No surface measurement at this site."
+    },
+    "daily_ground_swing_c": {
+     "value": null,
+     "source": "none",
+     "url": null,
+     "kind": "published",
+     "note": "No surface measurement at this site."
+    },
+    "dust_tau": {
+     "value": null,
+     "source": "none",
+     "url": null,
+     "kind": "published",
+     "note": "No surface measurement at this site, and we found no NASA orbital dust climatology (TES, THEMIS, MCS) that states a value for this region in its text or tables."
     },
     "noon_sun_deg": {
      "value": 84.47,

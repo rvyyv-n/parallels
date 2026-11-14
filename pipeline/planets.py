@@ -238,6 +238,16 @@ MARS_CLIMATE = {
         "t_min_ground_c": val(-103, "Gómez-Elvira et al. 2017, REMS ground temperature",
                               "https://www-mars.lmd.jussieu.fr/granada2017/abstracts/gomez-elvira_granada2017.pdf",
                               "published", "Daily ground minima span about 170–210 K over two Mars years; 170 K is −103 °C."),
+        "daily_ground_swing_c": val(80, "Gómez-Elvira et al. 2017, REMS ground temperature",
+                                    "https://www-mars.lmd.jussieu.fr/granada2017/abstracts/gomez-elvira_granada2017.pdf",
+                                    "derived", "Daily ground maxima span about 250–290 K and minima about 170–210 K over two "
+                                    "Mars years; 80 K is the gap between the middles of the two ranges, not a published "
+                                    "single swing. The paper says the swing depends on the ground type under the rover."),
+        "dust_tau": val(None, "Lemmon et al., MSL Mastcam solar-imaging optical depth record (440 and 880 nm)",
+                        "https://doi.org/10.17632/tbh3pg39xc", "published",
+                        "The record says optical depth is lower and steadier in southern fall and winter and peaks in "
+                        "southern spring and summer, but states no typical value in its text; the values are only in "
+                        "the data files, which we have not processed yet."),
     },
     "Jezero": {
         "daily_swing_c": val(52, "Rodríguez-Manfredi et al. 2023, MEDA",
@@ -246,9 +256,20 @@ MARS_CLIMATE = {
         "t_min_air_c": val(None, "Rodríguez-Manfredi et al. 2023, MEDA",
                            "https://www.nature.com/articles/s41561-022-01084-0", "published",
                            "No single coldest air temperature is stated in the text; not read off figures."),
-        "t_min_ground_c": val(None, "Rodríguez-Manfredi et al. 2023, MEDA",
-                              "https://www.nature.com/articles/s41561-022-01084-0", "published",
-                              "No single coldest ground temperature is stated in the text; not read off figures."),
+        "t_min_ground_c": val(-93, "Zorzano et al. 2024, MEDA thermal infrared sensor over one Mars year",
+                              "https://doi.org/10.1038/s41598-024-57458-4", "published",
+                              "Night-time minimum of the regolith on the crater floor, 'about 180 K' in the text "
+                              "(−93 °C); frost is briefly stable when the ground is below 185 K."),
+        "daily_ground_swing_c": val(None, "Zorzano et al. 2024, MEDA thermal infrared sensor",
+                                    "https://doi.org/10.1038/s41598-024-57458-4", "published",
+                                    "The text gives the night minimum (about 180 K) but no daily ground maximum or "
+                                    "swing; not read off figures."),
+        "dust_tau": val(0.4, "Lemmon et al. 2022, Perseverance Mastcam-Z solar imaging",
+                        "https://doi.org/10.1029/2022GL100126", "published",
+                        "Visible column optical depth (Mastcam-Z 880 nm channel; dust plus some ice) near 0.4 just "
+                        "after a January 2022 local storm (Ls ~156°, northern late summer) and near 0.3 before it, close "
+                        "to the seasonal minimum. The same paper says the 9 µm dust optical depth is about half the "
+                        "visible value; we did not convert anything. Dusty-season values are higher (the storm peaked near 2)."),
     },
 }
 
@@ -282,6 +303,14 @@ MARS_FACTS = {
 }
 
 
+def weh_meaning(lat):
+    if abs(lat) >= 40:
+        return ("This is hydrogen counted as if it were water. At this mid/high latitude it is likely buried ice "
+                "(Arcadia and Deuteronilus have radar-detected ice).")
+    return ("This is hydrogen counted as if it were water, not ice: near the equator ice is not stable in the top "
+            "metre, so the hydrogen is likely bound in hydrated minerals.")
+
+
 def mars_target(name, lat, lon, anchor_note, files, grs_rows, dci):
     lon = lon180(lon)
     values = {}
@@ -298,8 +327,8 @@ def mars_target(name, lat, lon, anchor_note, files, grs_rows, dci):
             values[k] = val(None, "USGS HRSC–MOLA blended DEM 200 m", MARS_DEM_URL, "computed", f"Read failed: {e}")
     weh, sigma = grs_value(grs_rows, lat, lon)
     values["weh_pct"] = val(weh, "Mars Odyssey GRS water-equivalent hydrogen (H2O_SR_5X5)", GRS_URL, "computed",
-                            f"5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± {sigma} (1σ)."
-                            if weh is not None else "No GRS value for this bin.")
+                            (f"5° bin containing the site, smoothed over 10°; weight % of the top ~1 m; ± {sigma} (1σ). "
+                             if weh is not None else "No GRS value for this bin. ") + weh_meaning(lat))
     if dci is None:
         values["dci"] = val(None, "TES dust cover index", DCI_URL, "computed", "File not available.")
     else:
@@ -310,9 +339,13 @@ def mars_target(name, lat, lon, anchor_note, files, grs_rows, dci):
                             DCI_URL, "computed",
                             "Median of the 3×3 pixels (16 per degree) at the site; below ~0.94 means dusty, above ~0.96 dust-free.")
     climate = MARS_CLIMATE.get(name)
-    for k in ("daily_swing_c", "t_min_air_c", "t_min_ground_c"):
+    for k in ("daily_swing_c", "t_min_air_c", "t_min_ground_c", "daily_ground_swing_c"):
         values[k] = climate[k] if climate else val(None, "none", None, "published",
                                                    "No surface measurement at this site.")
+    values["dust_tau"] = climate["dust_tau"] if climate else val(
+        None, "none", None, "published",
+        "No surface measurement at this site, and we found no NASA orbital dust climatology (TES, THEMIS, MCS) "
+        "that states a value for this region in its text or tables.")
     values["noon_sun_deg"] = val(round(90 - abs(lat), 2), "90 − |latitude|", "https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html", "derived",
                                  "Mean noon sun height; Mars's 25.2° tilt moves it up to ±25° over the year.")
     return {"id": "mars-" + kebab(name), "body": "mars", "name": name, "lat": round(lat, 4), "lon": round(lon, 4),
