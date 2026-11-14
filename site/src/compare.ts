@@ -323,9 +323,28 @@ function install() {
 
 install();
 
+const WAIT_MS = 10000;
+
+function giveUp(p: HTMLElement) {
+  if (!p.isConnected || p.classList.contains("fb")) return;
+  const slow = [...p.querySelectorAll<HTMLImageElement>("img.t")].filter((im) => !im.complete);
+  for (const im of slow) if (im.classList.contains("hi")) im.remove();
+  if (!slow.some((im) => !im.classList.contains("hi"))) return;
+  p.classList.add("fb");
+  drawFallback(p);
+}
+
 export function wireCompare(el: HTMLElement) {
   install();
+  const seen = new IntersectionObserver((es) => {
+    for (const e of es) {
+      if (!e.isIntersecting) continue;
+      seen.unobserve(e.target);
+      setTimeout(() => giveUp(e.target as HTMLElement), WAIT_MS);
+    }
+  });
   el.querySelectorAll<HTMLElement>(".cmp-p").forEach((p) => {
+    seen.observe(p);
     if (p.classList.contains("fb")) drawFallback(p);
     p.querySelectorAll<HTMLImageElement>("img.t").forEach((im) => {
       if (!im.complete) return;
