@@ -1,3 +1,9 @@
 .venv/
 __pycache__/
-data/
+/data/
+.pytest_cache/
+node_modules/
+dist/
+test-results/
+playwright-report/
+.vercel/
