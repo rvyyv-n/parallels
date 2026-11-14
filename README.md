@@ -12,11 +12,9 @@ No single place on Earth can stand in for a Moon or Mars base. So we split base-
 
 ## Status
 
-Version 1 is live at [dotcatcher.vercel.app](https://dotcatcher.vercel.app). The code of that site is on branch `v1`; this branch holds the data side only.
-
 Version 1 ranks every land cell on Earth against six targets: the Moon's south pole and five Mars sites (Jezero, Gale, Arcadia Planitia, Deuteronilus Mensae and the Arsia Mons caves). The data files hold method version 1.2. Only the Moon's south pole and Jezero are checked against test places.
 
-Version 1 does not pass every check. It passes 1 of its 4 first checks. In the fourth run, 10 of 15 checks with enough sites pass. On the held-out half, version 1.2 beats ordinary places 96% of the time for the Moon and 76% for Mars. The live site shows all of this. See `dataset/validation.json`.
+Version 1 does not pass every check. It passes 1 of its 4 first checks. In the fourth run, 10 of 15 checks with enough sites pass. On the held-out half, version 1.2 beats ordinary places 96% of the time for the Moon and 76% for Mars. See `dataset/validation.json`.
 
 ## What's here
 
@@ -139,8 +137,6 @@ The datasets come from five main open archives: NASA PDS Geosciences Node, USGS 
 | Library | Licence | Use |
 |---|---|---|
 | numpy, scipy, pandas, xarray, zarr, fsspec, s3fs, aiohttp, netCDF4, h5netcdf, rasterio (GDAL), pyproj, pyshp, requests, earthaccess, pyhdf, pytest | Open-source licences, set by each package | Data pipeline and its tests (see `pyproject.toml`) |
-
-The version 1 site's own libraries, fonts and display images are listed in the README on branch `v1`.
 
 ## Method in short
 

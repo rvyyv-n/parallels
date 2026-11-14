@@ -91,7 +91,7 @@ The challenge says this outright, and it's also how we'll stand out:
 ## 6. Working together
 
 - **Claude** builds and polishes the project; see [CLAUDE.md](../CLAUDE.md).
-- **Keep it working.** Commit and push to the working branch (`v1` during the build) after every change that works, so any step can be undone.
+- **Keep it working.** Commit and push to the working branch (`v2` now) after every change that works, so any step can be undone.
 - **Checkpoints** (the roadmap sets the times): the live site is deployed, and both of us test it on a phone and a laptop. Try to break it, check the numbers on screen against the source data, read the text as a newcomer would, and check that a newcomer can get a result in under a minute without help.
 - **Day 2 (Sunday)** keeps building (features, bug fixes, improvements) alongside the presenting: the demo video and the project page.
 - **Submit a first complete draft by Saturday night**, then improve it. Final submission as early as we can, and by **Sunday 21:59** at the latest, two hours before the deadline.
