@@ -114,7 +114,7 @@ SOURCES = [
     {"name": "Curiosity REMS and Perseverance MEDA (published)", "url": "https://science.nasa.gov/resource/steady-temperatures-at-mars-gale-crater", "use": "Mars temperatures at Gale and Jezero", "kind": "real"},
     {"name": "USGS Gazetteer of Planetary Nomenclature", "url": "https://planetarynames.wr.usgs.gov/", "use": "where we place each Artemis region", "kind": "real"},
     {"name": "USGS Mars Global Cave Candidate Catalog", "url": "https://astrogeology.usgs.gov/search/map/mars_global_cave_candidate_catalog_v1_cushing", "use": "Arsia Mons cave opening", "kind": "real"},
-    {"name": "NASA GIBS Blue Marble", "url": "https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api", "use": "map background", "kind": "real"},
+    {"name": "NASA GIBS Blue Marble", "url": "https://nasa-gibs.github.io/gibs-api-docs/", "use": "map background", "kind": "real"},
     {"name": "Sample values", "url": "", "use": "ground strength, rock cover, ice in the ground (Earth and Moon), feldspar-rich rock, clays and sulfates, dust-lifting days, and Mars temperatures at Arcadia, Deuteronilus and Arsia. Placeholders until real data replaces them.", "kind": "sample"},
 ]
 

@@ -19,7 +19,7 @@ export function createMap(el: HTMLElement, sites: Site[], onPick: (id: string) =
           tiles: [GIBS],
           tileSize: 256,
           maxzoom: 8,
-          attribution: '<a href="https://www.earthdata.nasa.gov/engage/open-data-services-software/earthdata-developer-portal/gibs-api" target="_blank" rel="noopener">NASA GIBS Blue Marble</a>',
+          attribution: '<a href="https://nasa-gibs.github.io/gibs-api-docs/" target="_blank" rel="noopener">NASA GIBS Blue Marble</a>',
         },
       },
       layers: [
