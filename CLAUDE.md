@@ -6,10 +6,10 @@ Our NASA Space Apps 2026 entry for **Identify Earth Locations that Analog the Pe
 
 ## Layout
 
-- `docs/`: our rules and working guidelines (`guidelines.md`), our local event's Challenge Guide (`challenge-guide.pdf`, a key brief: its six benchmarks and seven questions are what we build to), the challenge in plain words (`challenge.md`), how judging works (`judging-notes.md`), and the plan: the team's idea and how we build version 2 (`plan.md`).
+- `docs/`: our rules and working guidelines (`guidelines.md`), our local event's Challenge Guide (`challenge-guide.pdf`, a key brief: its six benchmarks and seven questions are what we build to), the challenge in plain words (`challenge.md`), how judging works (`judging-notes.md`), the plan: the team's idea and the version 2 spec (`plan.md`), and the roadmap: what gets built when (`roadmap.md`).
 - `pipeline/`: the Python data pipeline. Raw downloads go in the gitignored `data/`.
 - `dataset/`: the pre-computed data files the pipeline exports, described by `dataset/contract.ts`.
-- `site/`: the version 2 site (Vite, TypeScript, Preact, three.js). It reads `dataset/` and never changes it. The roadmap in `docs/plan.md` part 2 says what is built and what is next.
+- `site/`: the version 2 site (Vite, TypeScript, Preact, three.js). It reads `dataset/` and never changes it. `docs/roadmap.md` says what is built and what is next.
 - `assets/`: logo and other images.
 
 ## How Claude works here

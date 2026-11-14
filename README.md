@@ -147,15 +147,17 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 |---|---|
 | Intro, "Find a place", "Where it matches", "Where it breaks", "What to test here" | Built |
 | "How we checked it", "For judges", terrain filter, year-round switch | Next |
-| Guided tour, 3D terrain close-up | Next |
+| "Build the whole base", 3D terrain close-up, Learn page | Next |
+| Guided tour | Next |
 
-The roadmap is in [docs/plan.md](docs/plan.md).
+The roadmap is in [docs/roadmap.md](docs/roadmap.md).
 
 ## Repository layout
 
 - [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, a key brief.
 - [docs/challenge.md](docs/challenge.md): the challenge in plain words, and how we meet the guide's six objectives and answer its seven questions.
-- [docs/plan.md](docs/plan.md): the plan: the team's idea, and how we build version 2.
+- [docs/plan.md](docs/plan.md): the plan: the team's idea, and the spec for version 2.
+- [docs/roadmap.md](docs/roadmap.md): what gets built when, and by whom.
 - [docs/judging-notes.md](docs/judging-notes.md): how Space Apps is judged and what past winners did.
 - [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
 - [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.
