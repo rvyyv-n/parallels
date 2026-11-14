@@ -48,7 +48,7 @@ app.innerHTML = `
     </section>
     <section class="mapcol" aria-label="Earth test sites">
       <div id="map" class="map" role="region" aria-label="World map of Earth test sites"></div>
-      <div class="step ranking-wrap">
+      <div class="step ranking-wrap" id="ranking-wrap">
         <h3><span class="n">3</span>Best Earth test sites <span class="for" id="ranking-for"></span></h3>
         <div data-testid="ranking" id="ranking"></div>
       </div>
@@ -84,7 +84,7 @@ function defaults(body: Body): State {
 
 function readHash(): State | null {
   const [body, target, challenge, site] = location.hash.replace(/^#\/?/, "").split("/");
-  if ((body !== "moon" && body !== "mars") || !targetById.has(target) || !siteById.has(site)) return null;
+  if ((body !== "moon" && body !== "mars") || targetById.get(target)?.body !== body || !siteById.has(site)) return null;
   if (!data.challenges[body].some((c) => c.id === challenge)) return null;
   return { body, target, challenge, site };
 }
@@ -101,12 +101,14 @@ function topSite() {
   return ranking()[0]?.site ?? state.site;
 }
 
-function set(patch: Partial<State>, opts: { reveal?: boolean } = {}) {
+function set(patch: Partial<State>, opts: { reveal?: "match" | "ranking" } = {}) {
   Object.assign(state, patch);
   history.replaceState(null, "", `#/${state.body}/${state.target}/${state.challenge}/${state.site}`);
   render();
-  if (opts.reveal && window.matchMedia("(max-width: 1099px)").matches) {
-    document.getElementById("match")!.scrollIntoView({ behavior: "smooth", block: "start" });
+  const narrow = window.matchMedia(opts.reveal === "match" ? "(max-width: 1099px)" : "(max-width: 759px)").matches;
+  if (opts.reveal && narrow) {
+    const el = document.getElementById(opts.reveal === "match" ? "match" : "ranking-wrap")!;
+    el.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
   }
 }
 
@@ -143,8 +145,13 @@ function renderRanking() {
   const box = app.querySelector<HTMLDivElement>("#ranking")!;
   if (!c.parts.length) {
     box.innerHTML = `<div class="unscored">
-      <p class="u-head"><span class="tag muted">not scored</span> This challenge is shown as a label only.</p>
-      ${(c.labels ?? []).map((l) => `<p><strong>${esc(l.name)}.</strong> ${esc(l.reason)}</p>`).join("")}
+      <p class="u-head"><span class="tag muted">not scored</span> No Earth sites are ranked for ${esc(c.name.toLowerCase())}: it is shown as a label only. The reason is in the panel titled "Why there is no ranking".</p>
+    </div>`;
+    return;
+  }
+  if (data.previews[state.target]?.includes(state.challenge)) {
+    box.innerHTML = `<div class="unscored">
+      <p class="u-head"><span class="tag sample">sample</span> <strong>Preview, not ranked.</strong> Every value in this challenge is a sample at ${esc(target.name)} for now, so a ranking would be noise. Pick any site on the map to see what will be compared.</p>
     </div>`;
     return;
   }
@@ -184,15 +191,15 @@ app.addEventListener("click", (e) => {
   const ch = (e.target as HTMLElement).closest<HTMLButtonElement>("button.ch");
   if (ch) {
     state.challenge = ch.dataset.id!;
-    set({ site: topSite() });
+    set({ site: topSite() }, { reveal: "ranking" });
     return;
   }
   const row = (e.target as HTMLElement).closest<HTMLButtonElement>("button.row");
-  if (row) set({ site: row.dataset.site! }, { reveal: true });
+  if (row) set({ site: row.dataset.site! }, { reveal: "match" });
 });
 
 renderSources(app.querySelector("#data")!, data);
 renderValidation(app.querySelector("#checked")!, data);
 render();
-map = createMap(app.querySelector("#map")!, data.sites, (id) => set({ site: id }, { reveal: true }));
+map = createMap(app.querySelector("#map")!, data.sites, (id) => set({ site: id }, { reveal: "match" }));
 map.update(ranking().slice(0, 10).map((r) => r.site), state.site, state.body);
