@@ -206,11 +206,11 @@ test("keyboard alone reaches the pickers, the top 10, the scorecard and the slid
   test.skip(info.project.name !== "laptop", "keyboard path is a laptop check");
   await ready(page);
   const chips = page.locator(".intro .chip:visible");
-  await chips.nth(0).focus();
+  await chips.nth(1).focus();
   await page.keyboard.press("Tab");
-  await expect(chips.nth(1)).toBeFocused();
-  await chips.nth(1).press("Enter");
-  await expect(chips.nth(1)).toHaveAttribute("aria-pressed", "true");
+  await expect(chips.nth(2)).toBeFocused();
+  await chips.nth(2).press("Enter");
+  await expect(chips.nth(2)).toHaveAttribute("aria-pressed", "true");
   await page.locator("#go").focus();
   await page.keyboard.press("Enter");
   await expect(page.locator("#explore")).toBeInViewport();
@@ -234,7 +234,7 @@ test("keyboard alone reaches the pickers, the top 10, the scorecard and the slid
 
 test("two-column explorer with the match view below it, no inner scroll", async ({ page }, info) => {
   await ready(page);
-  await page.locator("#explore").evaluate((e) => e.scrollIntoView());
+  await page.locator("#explore").evaluate((e) => e.scrollIntoView({ behavior: "instant" }));
   await expect(page.locator(".tglobe, #link")).toHaveCount(0);
   await expect(page.locator("#match .match-head #tcap")).toContainText(main.name);
   await expect(page.locator("#match .ask-note #ask-sub")).toBeAttached();
@@ -253,7 +253,7 @@ test("two-column explorer with the match view below it, no inner scroll", async 
 test("list rows and map pins highlight each other, and the map can fly back to the pick", async ({ page }, info) => {
   test.skip(info.project.name !== "laptop", "hover is a laptop check");
   await ready(page);
-  await page.locator("#explore").evaluate((e) => e.scrollIntoView());
+  await page.locator("#explore").evaluate((e) => e.scrollIntoView({ behavior: "instant" }));
   await expect(page.locator(".pin")).toHaveCount(10);
   const row = rows(page).nth(3);
   const id = await row.getAttribute("data-i");

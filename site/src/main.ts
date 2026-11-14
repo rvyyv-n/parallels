@@ -10,6 +10,7 @@ import { NAV, sections, wire } from "./sections";
 import { esc, latlon, num, reduced, score100, webgl } from "./format";
 import { colour, gradient } from "./ramp";
 import { logo } from "./logo";
+import { icon } from "./icons";
 import type { Intro } from "./intro";
 
 interface State {
@@ -26,6 +27,56 @@ const AI_NOTE =
   "How we used AI: the idea and the key design decisions are our team's. Claude (Anthropic) helped research the challenge, write our planning documents, and write and test the code and data pipeline. Our logo was drawn with AI. We check its work at each checkpoint.";
 
 const WHY = `<a class="why" href="#card">Why it matches<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3 8.5 8 13l5-4.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>`;
+
+const CHAPTERS = [
+  { id: "ch-hero", name: "Start" },
+  { id: "ch-count", name: "All of Earth's land" },
+  { id: "ch-moon", name: "The Moon" },
+  { id: "ch-mars", name: "Mars" },
+  { id: "ch-test", name: "The test" },
+  { id: "ch-answer", name: "Earth's answer" },
+];
+
+const next = (id: string, label: string) =>
+  `<a class="chap-next" href="#${id}"><span>${label}</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3 8.5 8 13l5-4.5" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>`;
+
+function facts(m: Manifest, body: "moon" | "mars") {
+  return `<div class="facts"><p class="facts-k">${icon("cant")}Earth can't copy</p><dl>${m.cant_copy
+    .map((c) => {
+      const text = c[body];
+      const cut = [" (", ": ", ", "].map((k) => text.indexOf(k)).filter((n) => n > 0).sort((x, y) => x - y)[0];
+      const big = cut ? text.slice(0, cut) : text;
+      const rest = cut ? text.slice(cut).replace(/^[\s:(,]+/, "").replace(/\)$/, "") : "";
+      return `<div><dt>${esc(c.name)}</dt><dd><b>${esc(big)}</b>${rest ? `<span>${esc(rest)}</span>` : ""}<small>${esc(c.source)}</small></dd></div>`;
+    })
+    .join("")}</dl></div>`;
+}
+
+const TEST_ICON: Record<string, string> = { rover: "surface", life_support: "resources", habitat: "shelter" };
+
+function thumb(cv: HTMLCanvasElement, t: Target) {
+  const ctx = cv.getContext("2d");
+  if (!ctx) return;
+  const mark = () => {
+    ctx.strokeStyle = "#4fd8ff";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(44, 44, 9, 0, Math.PI * 2);
+    ctx.stroke();
+  };
+  const img = new Image();
+  img.onload = () => {
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    const span = w / 9;
+    if (Math.abs(t.lat) > 75) {
+      const cap = h / 6;
+      ctx.drawImage(img, 0, t.lat < 0 ? h - cap : 0, w, cap, 0, 0, 88, 88);
+    } else ctx.drawImage(img, ((t.lon + 180) / 360) * w - span / 2, ((90 - t.lat) / 180) * h - span / 2, span, span, 0, 0, 88, 88);
+    mark();
+  };
+  img.src = `${import.meta.env.BASE_URL}${TEXTURE[t.body]}`;
+}
 
 const app = document.getElementById("app")!;
 const $ = <T extends HTMLElement>(s: string) => app.querySelector<T>(s)!;
@@ -86,18 +137,71 @@ function shell(m: Manifest) {
     </header>
     <main>
       <section id="intro" class="intro" aria-labelledby="intro-h">
-        <a class="skip-intro" id="skip-intro" href="#explore">Skip intro</a>
-        <div class="intro-view" id="intro-view" aria-hidden="true"><div class="intro-still">${logo()}</div></div>
-        <div class="intro-copy">
-          <p class="intro-k">NASA Space Apps Challenge 2026</p>
-          <h1 id="intro-h">Where on Earth can you rehearse a <span class="w-moon">Moon</span> or <span class="w-mars">Mars</span> base?</h1>
-          <p class="intro-lede">Every patch of land on Earth, in squares about 50 km across, is scored from 0 to 100 for how closely it matches the base site. Each match says why it fits and where it falls short.</p>
-          <div class="step"><h2 id="st-t"><i>1</i>Where is the base?</h2><div class="chips" data-chips="target" role="group" aria-labelledby="st-t"></div></div>
-          <div class="step"><h2 id="st-f"><i>2</i>What are you testing?</h2><div class="chips" data-chips="filter" role="group" aria-labelledby="st-f"></div></div>
-          <div class="intro-go">
-            <a class="go" id="go" href="#explore">See Earth's top 10<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3 8.5 8 13l5-4.500" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>
-            <p class="intro-best" id="intro-best" aria-live="polite"></p>
-          </div>
+        <div class="intro-stage">
+          <div class="intro-view" id="intro-view" aria-hidden="true"><div class="intro-still">${logo()}</div></div>
+          <a class="skip-intro" id="skip-intro" href="#explore">Skip intro</a>
+          <nav class="intro-dots" aria-label="Opening chapters">${CHAPTERS.map((c, i) => `<a href="#${c.id}" data-dot="${i}"><span>${c.name}</span></a>`).join("")}</nav>
+        </div>
+        <div class="chapters">
+          <section class="chap chap-hero" id="ch-hero" data-chap="0">
+            <div class="copy">
+              <p class="intro-k">NASA Space Apps Challenge 2026</p>
+              <h1 id="intro-h">No place on Earth is <span class="w-moon">the Moon.</span> <span class="w-mars">Or Mars.</span></h1>
+              <p class="intro-lede">But every patch of land copies a part of them. Parallels identifies the Earth locations that analog a permanent Moon base and Mars, part by part.</p>
+              ${next("ch-count", "Scroll to begin")}
+            </div>
+          </section>
+          <section class="chap chap-count" id="ch-count" data-chap="1" aria-labelledby="count-h">
+            <div class="copy">
+              <p class="intro-k">All of Earth's land</p>
+              <h2 id="count-h">Every patch, scored. Not just the famous ones.</h2>
+              <dl class="counts">
+                <div><dt data-count="${m.grid.n}">${num(m.grid.n)}</dt><dd>patches of land, each about 50 km across</dd></div>
+                <div><dt id="count-ranked">—</dt><dd id="count-ranked-k">ranked for this base site</dd></div>
+                <div><dt id="count-known">—</dt><dd>places already used as analogs, drawn in amber</dd></div>
+              </dl>
+              ${next("ch-moon", "The Moon")}
+            </div>
+          </section>
+          <section class="chap chap-moon" id="ch-moon" data-chap="2" aria-labelledby="moon-h">
+            <div class="copy">
+              <p class="intro-k"><i>1</i>Where is the base?</p>
+              <h2 id="moon-h" class="w-moon">The Moon</h2>
+              ${facts(m, "moon")}
+              <p class="pick-k" id="st-moon">Choose a base site</p>
+              <div class="chips sites" data-chips="target-moon" role="group" aria-labelledby="st-moon"></div>
+              ${next("ch-mars", "Mars")}
+            </div>
+          </section>
+          <section class="chap chap-mars" id="ch-mars" data-chap="3" aria-labelledby="mars-h">
+            <div class="copy">
+              <p class="intro-k"><i>1</i>Where is the base?</p>
+              <h2 id="mars-h" class="w-mars">Mars</h2>
+              ${facts(m, "mars")}
+              <p class="pick-k" id="st-mars">Choose a base site</p>
+              <div class="chips sites" data-chips="target-mars" role="group" aria-labelledby="st-mars"></div>
+              ${next("ch-test", "The test")}
+            </div>
+          </section>
+          <section class="chap chap-test" id="ch-test" data-chap="4" aria-labelledby="st-f">
+            <div class="copy">
+              <p class="intro-k"><i>2</i>What are you testing?</p>
+              <h2 id="st-f"><span class="ln">A rover.</span> <span class="ln">A crew.</span> <span class="ln">A habitat.</span></h2>
+              <p class="intro-lede">Each test weighs the parts of base-building differently, so each has its own best places on Earth.</p>
+              <div class="chips tests" data-chips="filter-rich" role="group" aria-labelledby="st-f"></div>
+              ${next("ch-answer", "Earth's answer")}
+            </div>
+          </section>
+          <section class="chap chap-answer" id="ch-answer" data-chap="5" aria-labelledby="answer-h">
+            <div class="copy">
+              <p class="intro-k">Earth answers</p>
+              <h2 id="answer-h" aria-live="polite"></h2>
+              <p class="intro-best" id="intro-best" aria-live="polite"></p>
+              <div class="intro-go">
+                <a class="go" id="go" href="#explore">See Earth's top 10<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v11M3 8.5 8 13l5-4.500" fill="none" stroke="currentColor" stroke-width="2"/></svg></a>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
       <section id="explore" class="explore" aria-label="Explore matches">
@@ -209,15 +313,44 @@ async function main() {
           : "";
       })
       .join("");
+  for (const b of ["moon", "mars"] as const)
+    $(`[data-chips="target-${b}"]`).innerHTML = m.targets
+      .filter((t) => t.body === b)
+      .map(
+        (t) =>
+          `<button type="button" class="chip site" data-target="${esc(t.id)}" aria-pressed="false"><canvas class="site-thumb" width="88" height="88" data-thumb="${esc(t.id)}" aria-hidden="true"></canvas><span class="site-n">${esc(t.short)}</span><span class="site-at">${latlon(t.lat, t.lon, 1)}${t.regions?.length ? ` · ${t.regions.length} candidate regions` : ""}</span></button>`,
+      )
+      .join("");
+  for (const t of m.targets) thumb($<HTMLCanvasElement>(`[data-thumb="${t.id}"]`), t);
   for (const el of app.querySelectorAll<HTMLElement>('[data-chips="filter"]'))
     el.innerHTML =
       m.filters.map((f) => `<button type="button" class="chip" data-filter="${esc(f.id)}" aria-pressed="false" title="${esc(f.plain)}">${esc(f.name)}</button>`).join("") +
       `<button type="button" class="chip" data-filter="__hand" aria-pressed="true" hidden>Your own weights</button>`;
+  let richBody = "";
+  const richTests = () => {
+    const body = target().body;
+    if (body === richBody) return;
+    richBody = body;
+    const names = new Map(m.challenges[body].map((c) => [c.id, c.name]));
+    $('[data-chips="filter-rich"]').innerHTML =
+      m.filters
+        .map((f) => {
+          const w = Object.entries(f.weights[body] ?? {})
+            .filter(([id, v]) => v > 0 && names.has(id))
+            .sort((x, y) => y[1] - x[1]);
+          const most = Math.max(1, ...w.map(([, v]) => v));
+          return `<button type="button" class="chip test" data-filter="${esc(f.id)}" aria-pressed="false">${icon(TEST_ICON[f.id] ?? "test")}<span class="test-n">${esc(f.name)}</span><span class="test-p">${esc(f.plain)}</span><span class="test-w">${w
+            .map(([id, v]) => `<span><i style="--w:${(v / most) * 100}%"></i>${esc(names.get(id))}</span>`)
+            .join("")}</span></button>`;
+        })
+        .join("") + `<button type="button" class="chip test" data-filter="__hand" aria-pressed="true" hidden>${icon("test")}<span class="test-n">Your own weights</span><span class="test-p">You set how much each challenge counts.</span></button>`;
+  };
   const yr = $<HTMLInputElement>("#pick-yr");
 
   const named = (i: number) => Number.isFinite(d.cells.region?.[i]) && !!m.regions[d.cells.region[i]];
 
   const renderFilters = () => {
+    richTests();
     for (const b of app.querySelectorAll<HTMLButtonElement>("[data-target]")) b.setAttribute("aria-pressed", String(b.dataset.target === s.target));
     for (const b of app.querySelectorAll<HTMLButtonElement>("[data-filter]")) {
       const hand = b.dataset.filter === "__hand";
@@ -326,11 +459,18 @@ async function main() {
     earth?.paint(score, keep);
     earth?.top(ids);
     intro?.matches(ids.map((i) => ({ lat: d.cells.lat[i], lon: d.cells.lon[i] })));
-    $("#intro-best").innerHTML = ids.length
-      ? `Best match now: <b>${esc(placeName(m, d.cells, ids[0]))}</b>, ${score100(score[ids[0]])} of 100`
+    const far = ids.length ? d.cells.nearest_analog_km?.[ids[0]] : NaN;
+    $("#answer-h").innerHTML = ids.length
+      ? `<span class="ans-score"><b>${score100(score[ids[0]])}</b> of 100</span><span class="ans-name">${esc(placeName(m, d.cells, ids[0]))}</span>`
       : "No ranked land for this choice.";
+    $("#intro-best").innerHTML = ids.length
+      ? `Best match now: <b>${esc(placeName(m, d.cells, ids[0]))}</b>, ${score100(score[ids[0]])} of 100 for ${esc(s.hand ? "your own weights" : filter().name.toLowerCase())} at ${esc(t.name)}.${
+          Number.isFinite(far) && far > 100 ? ` <span class="rare">Rarely used: ${num(far)} km from any known analog</span>` : ""
+        }`
+      : "No ranked land for this choice.";
+    $("#count-ranked").textContent = num(ranked);
+    $("#count-ranked-k").textContent = `ranked for ${t.name}`;
     ledger();
-    void t;
   };
 
   const pick = (i: number, fly: boolean) => {
@@ -388,6 +528,33 @@ async function main() {
     changed();
     if (ids[0] != null) pick(ids[0], true);
   });
+  const chaps = [...app.querySelectorAll<HTMLElement>(".chap")];
+  const dots = [...app.querySelectorAll<HTMLElement>(".intro-dots a")];
+  const topBar = $(".top");
+  new ResizeObserver(() => document.documentElement.style.setProperty("--top-h", `${Math.ceil(topBar.offsetHeight)}px`)).observe(topBar);
+  let ticking = false;
+  const place = () => {
+    ticking = false;
+    const mid = topBar.offsetHeight + (innerHeight - topBar.offsetHeight) / 2;
+    const cs = chaps.map((c) => {
+      const r = c.getBoundingClientRect();
+      return r.top + Math.min(r.height, innerHeight) / 2;
+    });
+    let at = 0;
+    for (let i = 0; i < cs.length - 1; i++) if (mid >= cs[i]) at = i + Math.min(1, (mid - cs[i]) / Math.max(1, cs[i + 1] - cs[i]));
+    intro?.chapter(at);
+    const on = Math.round(at);
+    chaps.forEach((c, i) => c.classList.toggle("in", c.classList.contains("in") || Math.abs(at - i) < 0.62));
+    dots.forEach((a, i) => (i === on ? a.setAttribute("aria-current", "step") : a.removeAttribute("aria-current")));
+  };
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(place);
+  };
+  addEventListener("scroll", onScroll, { passive: true });
+  addEventListener("resize", onScroll, { passive: true });
+  place();
   const go = async () => {
     await intro?.enter();
     $("#explore").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" });
@@ -476,8 +643,15 @@ async function main() {
       wire();
     });
 
+  let known: { lat: number; lon: number }[] = [];
+  const labelsReady = loadLabels().catch(() => []);
+  void labelsReady.then((ls) => {
+    known = ls.filter((l) => l.kind === "known_analog");
+    $("#count-known").textContent = known.length ? num(known.length) : "no data";
+    intro?.known(known);
+  });
   if (webgl())
-    Promise.all([import("./earth"), loadLabels().catch(() => [])])
+    Promise.all([import("./earth"), labelsReady])
       .then(([mod, labels]) => {
         const at = $("#st-at");
         earth = mod.createEarth(earthEl, { lat: d.cells.lat, lon: d.cells.lon, n: d.n }, labels, {
@@ -502,9 +676,11 @@ async function main() {
     import("./intro")
       .then(({ createIntro }) => {
         const view = $("#intro-view");
+        const home = (b: "moon" | "mars") => m.targets.find((t) => t.body === b && t.default) ?? m.targets.find((t) => t.body === b) ?? { lat: 0, lon: 0 };
         intro = createIntro(
           view,
           { earth: `${import.meta.env.BASE_URL}img/blue-marble.jpg`, moon: TEXTURE.moon, mars: TEXTURE.mars },
+          { moon: home("moon"), mars: home("mars") },
           {
             world: (w) => {
               if (target().body === w) return;
@@ -519,6 +695,8 @@ async function main() {
         const t = target();
         intro.target(t.body, t);
         intro.matches(ids.map((i) => ({ lat: d.cells.lat[i], lon: d.cells.lon[i] })));
+        intro.known(known);
+        place();
       })
       .catch(() => {});
 }
