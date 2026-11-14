@@ -16,7 +16,6 @@ Version 1 does not pass every check. It passes 1 of its 4 first checks. In the f
 
 ## What's here
 
-- [docs/workflow.png](docs/workflow.png): our workflow at a glance; start here.
 - [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, a key brief.
 - [docs/challenge.md](docs/challenge.md): the challenge in plain words, and how we meet the guide's six objectives and answer its seven questions.
 - [docs/plan.md](docs/plan.md): the plan: the team's idea, and how we build version 2.
