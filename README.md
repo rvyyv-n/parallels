@@ -24,6 +24,7 @@ Version 1 does not pass every check. It passes 1 of its 4 first checks. In the f
 - [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.
 - `pipeline/`: the Python data pipeline. Its method settings are in `pipeline/config/`.
 - `dataset/`: the pre-computed files the pipeline exports. See [The data files](#the-data-files).
+- `site/`: the version 2 site, in progress on the `v2` branch. It reads the files in `dataset/` and changes none of them. See [The site](#the-site).
 
 ## Run it
 
@@ -45,6 +46,19 @@ Pipeline (Python 3.13). Run each command from the repository root.
 On macOS and Linux, use `.venv/bin/python` in place of `.venv/Scripts/python`.
 
 Version 1 was built with Python 3.13.17 and uv 0.13.7. Never print, copy or commit the Earthdata login.
+
+### The site
+
+The site is static: it has no server and no keys. Run each command from `site/` (Node 24).
+
+| Command | What it does |
+|---|---|
+| `npm ci` | Installs the packages. |
+| `npm run dev` | Copies `dataset/` into the site and starts it locally. |
+| `npm run build` | Checks the types and builds the site into `site/dist`. |
+| `npm test` | Runs the unit tests against the real data files. |
+| `npm run e2e` | Runs the browser tests against the built site. |
+| `node scripts/fetch-textures.mjs` | Rebuilds the globe images from their NASA sources. Run it only when the images must change. |
 
 ## The data files
 
@@ -133,6 +147,19 @@ The datasets come from five main open archives: NASA PDS Geosciences Node, USGS 
 | Library | Licence | Use |
 |---|---|---|
 | numpy, scipy, pandas, xarray, zarr, fsspec, s3fs, aiohttp, netCDF4, h5netcdf, rasterio (GDAL), pyproj, pyshp, requests, earthaccess, pyhdf, pytest | Open-source licences, set by each package | Data pipeline and its tests (see `pyproject.toml`) |
+| three.js, Preact | MIT | The site: 3D globes and the interface |
+| Vite, TypeScript, Vitest, Playwright, sharp | Open-source licences, set by each package | Building and testing the site (see `site/package.json`) |
+| Newsreader, Geist and Geist Mono fonts (Fontsource packages) | SIL Open Font License 1.1 | The site's type, hosted with the site |
+
+### Images on the site
+
+The globes use real images, not AI-made ones. The site bundles them, so it makes no live calls for them. No NASA logo or insignia is used.
+
+| Image | Agency | Licence | Used for |
+|---|---|---|---|
+| [Blue Marble Next Generation, August 2004, from NASA GIBS](https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/wmts.cgi?SERVICE=WMTS&REQUEST=GetCapabilities) | NASA | NASA open data, no restrictions | The Earth globe |
+| [LROC colour map of the Moon, from the NASA SVS CGI Moon Kit](https://svs.gsfc.nasa.gov/4720) | NASA | Public NASA data | The Moon globe |
+| [Viking MDIM 2.1 colour mosaic of Mars, from NASA Mars Trek](https://trek.nasa.gov/mars) | NASA / USGS | Public NASA and USGS data | The Mars globe |
 
 ## Method in short
 

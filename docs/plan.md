@@ -141,64 +141,122 @@ To meet the Challenge Guide's benchmarks:
 
 Written by Claude on Sunday 15 November and kept in step with the site as it is built. Where it differs from part 1, part 1 wins. The method, the data, the limits and the check results are in the [README](../README.md); the test places are in `pipeline/sites.json`.
 
+The site in `site/` is built from scratch for version 2. Every number on screen is read from the files in `dataset/`.
+
 ### The sentence
 
 No place on Earth copies a Moon or Mars base whole, but for each part of a base there is a best place on Earth to practise. The site shows where it matches and where it doesn't. Everything on screen serves that sentence.
 
-### Main flow (a result in two clicks)
+### The look
 
-1. **Open the site.** The globe and the picker are on screen. The Moon's south pole is selected, and its headline find is featured: the Sistan and Baluchestan region of Iran, more than 100 km from every known analog site in our list.
-2. **Pick a target and a mission filter.** The globe colours Earth by match. Five distinct best places appear, at least about 300 km apart, with coordinates and terrain type.
-3. **Open a place.** Its match card shows what is similar and what is different (in real units, Earth against the target), what Earth can't copy, its best, freeze–thaw and rainy months, and what to test there. Every number links to its dataset.
-4. **"How we checked it":** one chart of known analogs against ordinary places and plain deserts, with the honest result: 10 of 15 checks pass, not all of them.
+Cinematic, with real imagery. Earth, the Moon and Mars are 3D globes made from NASA photo maps. One 3D scene stays on screen while the page scrolls through chapters, and the globes move with the scroll. Gold with "=" means a match. Blue with "≠" means a break. Type: Newsreader for headings, Geist for text, Geist Mono for numbers. The team approved this direction on 15 November.
+
+### Main flow (one page, told by scrolling)
+
+1. **Intro.** Earth's horizon with lit matches, the Moon and Mars above it, and the sentence in large type. Two buttons: "Find a place" and "Take the tour".
+2. **Find a place.** Pick a base site and a mission filter. The globe lights the closest 10% of Earth's land and pins the five best distinct places (at least 300 km apart and in different regions). The best place is featured with one number that matches and one that breaks. The Moon's south pole and rover mobility are selected at the start.
+3. **Where it matches.** Earth and the base site face each other. Each row pairs the Earth value with the base-site value, joined by a long "=". A row opens to show both datasets, with links.
+4. **Where it breaks.** The same rows with "≠", places with no data shown as missing, and what no place on Earth can copy (gravity, air, radiation).
+5. **What to test here.** Hardware, tests, why, the best, freeze–thaw and rainy months, coordinates (the middle of a square about 50 km wide), distance to the nearest known analog, terrain type, and the parts we could not score.
+6. **How we checked it.** A few honest lines and one chart of the fourth run: known analogs against ordinary places and plain deserts. 10 of 15 checks pass, not all of them.
 
 Also on the site:
-- **Guided flow:** a short walk-through for first visits, which anyone can start again. The demo video records it.
-- **"For judges" view:** the six benchmarks in the guide's words, the seven questions with our answers, every dataset with its link and licence, "Not in this version", and the AI note.
-- **"Adjust weights"** (extra, outside the main flow): combines the pre-computed challenge scores with the user's weights by the method's own rule. No new data is made.
+- **Guided tour:** plays the page by itself with captions and a progress bar. It never blocks the picker, and anyone can start it again. The demo video records it.
+- **3D terrain close-up:** the chosen place as real terrain with satellite imagery and a low sun, like the light at the Moon's south pole.
+- **"For judges" view:** the six benchmarks in the guide's words, the seven questions with our answers, every dataset with its link and licence, "Not in this version", how the top places shift when weights change, and the AI note.
+- **Terrain filter and year-round switch** next to the picker.
+- **"Adjust weights"** (extra): combines the pre-computed challenge scores with the user's weights by the method's own rule. No new data is made.
 
-Only the Moon's south pole and Jezero have a headline in the data. The other four targets lead with their top place.
+Only the Moon's south pole and Jezero are checked against test places. The other four base sites are marked "scored, not checked". Jezero's card says that the Mars Surface check misses its pass mark.
 
 ### The guide's benchmarks on screen
 
 | # | Benchmark | Where a judge sees it |
 |---|---|---|
-| 1 | At least 3 open archives | The dataset link on every number, and the full list in "For judges" |
-| 2 | At least 4 terrain types | A terrain-type tag on each place, and a terrain filter |
-| 3 | Dashboard with rankings, coordinates and data details | The globe, the top-5 list and the match card |
-| 4 | Weighting and clustering | Mission filters on the main screen; clustering explained in "For judges" |
-| 5 | Seasons | Best, freeze–thaw and rainy months on each match card |
+| 1 | At least 3 open archives | The datasets inside every row, and the full list in "For judges" |
+| 2 | At least 4 terrain types | The terrain type on each place, and the terrain filter |
+| 3 | Dashboard with rankings, coordinates and data details | The globe, the five best places and the match chapters |
+| 4 | Weighting and clustering | Mission filters in the picker; clustering explained in "For judges" |
+| 5 | Seasons | Best, freeze–thaw and rainy months in "What to test here"; the year-round switch |
 | 6 | Mission filters | The picker |
 
 ### Build rules
 
-- Static site in `site/`. It takes `dataset/` in at build time, without a second copy in git, and uses the types in `dataset/contract.ts`.
+- Static site in `site/`: Vite, TypeScript, Preact and three.js. It copies `dataset/` in at build time, with no second copy in git, and uses the types in `dataset/contract.ts`.
 - `pipeline/` and `dataset/` don't change. The browser selects, groups and displays only what is already computed.
-- No keys, no server, and no live calls except map tiles, which have a bundled fallback image.
-- Playwright tests the word and click budgets, the 390 px layout, keyboard use, reduced motion, and every data and link check.
-- Hosting on Vercel. Version 1 stays live and untouched. Version 2 has its own Vercel project, `parallels-v2`, and is deployed from the command line; pushes to `v2` start no build in version 1's project. Version 2 gets a preview link first; a public version 2 link is the team's call.
+- The browser loads only the columns a screen needs, by asking for byte ranges of the `.bin` files. A first result stays within about 2 MB.
+- No keys and no server. The globes use NASA images bundled with the site (`site/scripts/fetch-textures.mjs` builds them; credits are in `site/public/img/CREDITS.md`). The only live calls are open map tiles for the 3D terrain close-up, and the page works without them.
+- Budgets: first screen at most 120 words, a collapsed match at most 60, the main page at most 900 with everything collapsed; any base site and filter in two clicks; no sideways scroll at 390 px; reduced motion and keyboard use respected. A Playwright test enforces them.
+- Hosting on Vercel. Version 1 stays live and untouched. Version 2 has its own Vercel project, `parallels-v2`, and is deployed from the command line with `vercel deploy --target=preview`; pushes to `v2` start no build in version 1's project. A public version 2 link is the team's call.
 
-### Roadmap (Sunday)
+### Who builds what
 
-| By | Step | Check |
-|---|---|---|
-| 04:00 | Questions to the team, a direction screenshot | the team says yes |
-| while waiting | Data loading, distinct-places grouping, tests | no two of the top 5 within 300 km |
-| 09:00 | Main flow on a preview link | **Checkpoint 1:** phone and laptop, a result in two clicks |
-| 13:00 | Match cards, the checked-it chart, "For judges", guided flow | every number traces to a dataset |
-| build done | Polish only from here | budgets pass |
-| 18:00 | **Feature freeze** | **Checkpoint 2:** a fresh model, shown only screenshots, says what the site found and where one match breaks |
-| 18:00–21:00 | Demo video, project page, final README and plan update, the team compares version 1 and version 2, repo rename | every box in [guidelines](guidelines.md) section 7 |
-| 21:59 | Final submission | the success banner shows |
+- **The orchestrator** (Claude Fable, the main thread) owns the plan, the 3D scene and the story chapters. It writes each builder's brief, checks the result against tests and screenshots, commits, deploys and shows the team.
+- **Builders** (Claude Opus at medium effort, high for the hard groups) each build one group in their own files. They don't commit.
+- **Checkers** (Claude Sonnet at medium effort) do mechanical work: running tests and the fresh-eyes check.
+- At most three builders run at once. Each group has its own files, so builders don't collide. Shared files (`app.tsx`, `styles.css`, the scene) are changed only by the orchestrator.
+- After each wave the orchestrator joins the groups, runs every test, takes screenshots at 390×844 and 1440×900, commits, deploys a preview and shows the team, then starts the next wave without waiting.
+- If a session limit stops the work, the next session starts at the first unticked box below.
+
+### Roadmap (Sunday 15 November)
+
+Times are the team's local time. The build machine's clock is 3 hours ahead.
+
+**Done**
+- [x] Data loading by byte range, distinct top places, the match model, with unit tests
+- [x] 3D scene: Earth, Moon and Mars from NASA imagery, lit matches, pins
+- [x] Intro, "Find a place", "Where it matches", "Where it breaks", "What to test here"
+- [x] Vercel project `parallels-v2` with preview deploys
+
+**Wave 1: evidence and controls** (by 05:00)
+
+| | Group | Builder | Files | Check |
+|---|---|---|---|---|
+| [ ] | 1A "How we checked it": honest lines and the fourth-run chart | Opus, medium | `site/src/ui/Checked.tsx`, `checked.css` | every number comes from `validation.json`: 1 of 4, 10 of 15, 6 not counted, used four times |
+| [ ] | 1B "For judges" view | Opus, medium | `site/src/ui/Judges.tsx`, `judges.css` | six benchmarks, seven questions, every dataset with link and licence, stability text, AI note |
+| [ ] | 1C Playwright tests for the budgets, data and links | Sonnet, medium | `site/e2e/` | the tests run and fail only for real faults |
+| [ ] | 1D Terrain filter, year-round switch, terrain type on each place, footer with the AI note and credits | orchestrator | shared files | the filter shows fewer than five places when a type is rare |
+
+**Wave 2: the two big features** (by 10:00)
+
+| | Group | Builder | Files | Check |
+|---|---|---|---|---|
+| [ ] | 2A 3D terrain close-up from open elevation and imagery tiles, with a low-sun setting | Opus, high | `site/src/terrain/`, `site/src/ui/Terrain.tsx`, `terrain.css` | opens for both headline places; the page still works when tiles are blocked |
+| [ ] | 2B Self-playing guided tour with captions, progress, pause and exit | Opus, high | `site/src/ui/Tour.tsx`, `tour.css` | runs start to end in about 28 seconds; any click or scroll by the user takes control back |
+| [ ] | 2C Motion and polish: number count-ups, text reveals, hover and pressed states, the phone layout, a fixed top bar | orchestrator | shared files | screenshots at both sizes; nothing moves with reduced motion on |
+
+**Wave 3: make it safe** (by 14:00)
+
+| | Group | Builder | Check |
+|---|---|---|---|
+| [ ] | 3A A flat picture map when 3D is not available, keyboard reach, colour-blind check, download budget on a phone | orchestrator | budget tests pass |
+| [ ] | 3B Independent review of the code for bugs and wrong numbers | Opus, high | findings fixed or listed |
+| [ ] | 3C "Adjust weights" (extra, first to cut) | Opus, medium | a hand-set mix equal to a mission filter gives the same top place |
+
+**Wave 4: ship** (freeze at 18:00, submit by 21:59)
+
+| | Step | Who | Check |
+|---|---|---|---|
+| [ ] | Fresh-eyes check: a model shown only four screenshots says what the site found and where one match breaks | Sonnet, medium | two correct sentences |
+| [ ] | README rewritten: summary, screenshot grid, contents, what it does, method, data, limits | Opus, medium | every number matches the data files |
+| [ ] | Final plan update; project page text; demo video of the tour with burned-in captions | orchestrator and team | every box in [guidelines](guidelines.md) section 7 |
+| [ ] | The team compares version 1 and version 2 and chooses the public link | team | the link opens in a private window |
+| [ ] | Final submission | team | the success banner shows |
+
+**Needed from the team:** the TEAM RMD member names for the credits; the choice of public link; a check that the Local Event's deadline is in the same time zone as these times.
 
 ### Fallbacks
 
 | Risk | Fallback | Switch by |
 |---|---|---|
-| Globe too slow on a phone | a flat map on phones | 11:00 |
-| Preview link needs a login | a second Vercel project (team's call) | 13:00 |
+| 3D terrain not solid | leave it out; "What to test here" keeps the zoomed globe | 10:00 |
+| Tour not solid | a short captioned walk-through with "Next" buttons | 12:00 |
+| Globe too slow on a phone | a flat picture map on phones | 14:00 |
+| Time runs short | cut in this order: "Adjust weights", extra motion, 3D terrain on phones, the year-round switch, polish on the four unchecked base sites | 16:00 |
 | Version 2 not ready, or not better | submit version 1's link | the team's call at the end |
 | Video fails | 7 slides or fewer | 20:00 |
+
+Never cut: the picker, the five distinct places, the match and break chapters for the two checked base sites, "How we checked it", "For judges", the AI note, the tests.
 
 ### Awards, page and demo
 
@@ -208,9 +266,9 @@ Only the Moon's south pole and Jezero have a headline in the data. The other fou
 | Best Use of Data | five open archives on one comparable scale, every number linked to its dataset |
 | Best Mission Concept | mission filters, and what to test at each place and in which months |
 
-- **Project page:** lead with the headline and the checked-it chart. Paste in three images: the globe, a match card with its "where it breaks" part, and the chart.
-- **Demo (28 seconds):** a screen recording of the guided flow, with captions burned in, in the official timing (team 0:00, challenge 0:02, name and tagline 0:05, how it works with NASA data 0:10, what's next 0:20). Motion graphics go on top of the recording only. If AI makes any graphics, the video carries a visible "Made with AI assistance" mark.
+- **Project page:** lead with the headline and the checked-it chart. Paste in three images: the globe, the "where it breaks" chapter and the chart.
+- **Demo (28 seconds):** a screen recording of the guided tour, with captions burned in, in the official timing (team 0:00, challenge 0:02, name and tagline 0:05, how it works with NASA data 0:10, what's next 0:20). Motion graphics go on top of the recording only. If AI makes any graphics, the video carries a visible "Made with AI assistance" mark.
 
-### Rivals
+### Our edge
 
-A scan on 13 November found at least 22 public repos for this challenge. The three serious ones ([TwinWorlds](https://github.com/JimmyGuajan/twinworlds), [EarthTwin](https://github.com/es-ratt/earthtwin), [terrestrial-analog-finder](https://github.com/shishir-kuet/terrestrial-analog-finder)) show no real check against known analog sites, and none searches all of Earth's land with both a validation and "where it breaks". Those two are our edge.
+We check the method against known analog sites in public, with the rules fixed before each run, and every match shows where it breaks. We search all of Earth's land, not a hand-picked list.
