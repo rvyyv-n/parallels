@@ -10,7 +10,7 @@ What gets built when, and by whom, for version 2 of the site. What the site is l
 - At most three builders at once. Effort never below medium or above high.
 - **Shared files:** `site/src/app.tsx`, `state.ts`, `styles.css`, `scene/`, `data/store.ts`, `data/load.ts`, `site/index.html`, `vite.config.ts`.
 - **A brief** gives the goal, the files the builder may write, the columns and manifest fields it reads, what it exposes, its done check, and the rules: no invented numbers, plain words, the budgets, reduced motion, keyboard use, and the plan's rule on other projects (study approaches, write our own code, copy nothing).
-- **After each group:** `npm test`, `npm run build`, `npm run e2e`; commit the group on its own; push; tick the box. **After each pass:** deploy a preview and send the team the link. Screenshots only for a visual check or the README.
+- **After each group:** `npm test`, `npm run build`, `npm run e2e`; commit the group on its own; push; tick the box. **After each pass:** deploy a preview with `vercel deploy --yes --target=preview`, point the fixed link at it with `vercel alias set <new deployment> parallels-v2-preview.vercel.app`, and tell the team what changed. The team shares https://parallels-v2-preview.vercel.app, which always shows the newest pass. Screenshots only for a visual check or the README.
 
 The passes run in order, with no set times. Inside a pass, the builder groups run side by side and the orchestrator works on its own group at the same time; a pass ends when every box in it is ticked or cut. The only fixed time is the official deadline in the [guidelines](guidelines.md).
 
