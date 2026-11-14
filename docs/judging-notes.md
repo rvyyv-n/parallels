@@ -11,7 +11,7 @@ Sources: the [Judging & Awards Guide](https://www.spaceappschallenge.org/resourc
 | Criterion | Key words from the guide | What it means for us |
 |---|---|---|
 | Impact | "addressing a significant problem"; "benefits a large audience" | Say who uses our matches and what they'd test there |
-| Creativity | "a novel concept that has not been attempted before or ... an improvement upon existing ideas in a meaningful way" | At least eight other teams build a similarity ranker (see [challenge.md](challenge.md)); our angle has to be different |
+| Creativity | "a novel concept that has not been attempted before or ... an improvement upon existing ideas in a meaningful way" | At least 22 other teams build for this challenge, most of them a similarity ranker (see [challenge.md](challenge.md#competition)); our angle has to be different |
 | Validity | "grounded in scientific principles"; "usability and user-friendliness ... influence its practicality" | Show how we checked the method, and make the tool easy for a newcomer |
 | Relevance | "integrates NASA data, utilizing it as a core component ... rather than a superficial addition" | NASA data must do the main work in the scoring, not decorate it |
 | Presentation | "Judges evaluate the demo and full project to compute this score" | The project page and the site count, not just the video |
@@ -62,7 +62,7 @@ Images (JPG, PNG or GIF up to 10 MB) can be pasted into the page. Videos and doc
 
 ## Our local event's Challenge Guide
 
-Our Local Event (Cedar College) gave us a [Challenge Guide](challenge-guide.pdf) for this challenge. It sets six objectives, each with a target benchmark, and seven questions a solution should answer ([challenge.md](challenge.md#the-six-objectives)).
+Our Local Event (Cedar College) gave us a [Challenge Guide](challenge-guide.pdf) for this challenge. It sets six objectives, each with a target benchmark, and seven questions a solution should answer ([challenge.md](challenge.md#the-six-objectives-and-how-we-meet-them)).
 
 Local judges pick the Global Nominees, so the guide is probably what they hold our project against first. That's our inference: the official guides don't say what local judges read. It means each benchmark should be easy to spot on the site and the project page, in the guide's own words where they fit (for example "terrain types", "mission filters", "seasonal fluctuations").
 

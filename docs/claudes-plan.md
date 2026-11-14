@@ -1,21 +1,10 @@
 # Claude's plan
 
-Written by Claude on 13 November 2026, without reading the team's plan, so the two can be compared. Under the Space Apps AI rule the core idea has to come from the team: where the plans differ, the team's wins, and any part of this one is ours to take or leave.
+Build notes for the [team plan](team-plan.md): rivals, method, data, checks, stack, roadmap and fallbacks. Written by Claude on 13 November 2026 and aligned with our local [Challenge Guide](challenge-guide.pdf) on 14 November. Where this file and the team plan differ, the team plan wins.
 
-The plan has two kinds of parts:
+## 1. Rivals
 
-- **Core-idea parts** are what the project is about: the pitch (section 1), the validation framing (section 6) and the anorthosite headline (section 5). If we adopt any of them, we say so in the "How we used AI" note.
-- **Build parts** serve whatever idea the team picks: data, scoring maths, stack, roadmap and fallbacks.
-
-The research came from four subagents: Earth data, Moon and Mars targets, known analog sites, and rival projects. An independent reviewer then checked the draft. Sources are linked in the text and listed at the end.
-
-## 1. The pitch
-
-- **Working name:** Understudy. A placeholder; the team names it.
-- **Tagline:** Earth's stand-ins for the Moon and Mars, tested before we trust them.
-- **One sentence a judge could repeat:** "It searches all of Earth with NASA data for stand-ins for a Moon or Mars site, and proves its method on the analogs NASA already uses."
-
-**Why it's different.** A scan on 13 November found at least 22 public repos for this challenge. Three are serious:
+A scan on 13 November found at least 22 public repos for this challenge. Three are serious:
 
 | Project | Strong point | What it lacks |
 |---|---|---|
@@ -23,7 +12,7 @@ The research came from four subagents: Earth data, Moon and Mars targets, known 
 | [EarthTwin](https://github.com/es-ratt/earthtwin) | Leaves missing data empty, limitations tab, tests, live site | Ranks only 18 hand-picked Earth sites; its own docs say "not a validated ranking" |
 | [terrestrial-analog-finder](https://github.com/shishir-kuet/terrestrial-analog-finder) | Terrain at 30 m in 12 regions | Terrain only, no global search, no live link |
 
-Our four differences:
+Where we can beat them:
 
 1. **We test the method in public.** Known analogs should outrank farmland and rainforest, with plain deserts in between, and we fix the weights before running the test. None of the three rivals does this. Our literature search turned up no published analog method checked this way either.
 2. **Search all of Earth's land, then zoom to one spot.** Screen the globe at 0.5°, then compare terrain at the same scale as the Moon or Mars data, down to one valley, crater or massif. The challenge asks for exactly this ("'The Sahara' is too broad").
@@ -35,46 +24,62 @@ Our four differences:
 The first version has **two targets: the Moon's south pole and Jezero crater on Mars.** Arcadia Planitia (buried ice) comes next, then the rest of section 5.
 
 1. **Open the site.** The map already shows the headline find for the Moon's south pole, with its scorecard open.
-2. **Click a target.** The map colours all land by match, and a list shows the top 10 specific spots. A "rarely used" badge marks spots more than 100 km from every known analog site in our list.
+2. **Pick a target and a mission filter** (rover mobility, life support, habitat structure). The map colours all land by match, and a list shows the top 10 spots with their coordinates and terrain type. A "rarely used" badge marks spots more than 100 km from every known analog site in our list.
 3. **Click a spot.** The scorecard opens:
-    - each trait as a bar of Earth rank, with the real Earth and target values (and their datasets) as the main figure beside it;
-    - an "Earth can't copy" block for gravity, air and radiation;
+    - each trait as a bar of Earth rank, with the real Earth and target values (and their datasets and resolution) as the main figure beside it;
+    - an "Earth can't copy" block for gravity, air, radiation and magnetic shield;
+    - the site's best months to test, freeze–thaw months and rainy months;
     - how hard it is to get there;
     - one line on what to test there;
     - Earth and target images side by side.
 4. **"How we checked it"** shows the validation chart (section 6).
 
-That's two clicks to a result, well under a minute.
+That's two clicks to a result, well under a minute. A terrain-type filter and hand-set weights sit beside the list.
 
 **Extras,** only once that flow works:
 - more targets;
-- task presets that reweight traits (drive a rover, drill for ice, look for life, keep a base warm and powered);
 - a stability badge (section 6);
-- a reverse mode: click any place on Earth and see its closest target;
-- a process layer for dust and freeze–thaw cycles, since the challenge counts "processes as well as places".
+- a reverse mode: click any place on Earth and see its closest target.
 
 ## 3. Method
 
 ### Traits
 
-The first version scores eight traits; wind and dust count for Mars only.
+The first version scores these traits; wind, dust and UV count for Mars only.
 
 | Trait | Earth data | Moon data | Mars data |
 |---|---|---|---|
 | Cold | POWER surface temperature, coldest month | Diviner winter minimum | REMS and MEDA ground temperature |
 | Heat swing | POWER day-to-night and seasonal range | Diviner summer max minus winter min | REMS and MEDA daily swing |
-| Dryness | POWER rain and humidity | dry | MEDA humidity |
+| Thermal inertia | estimated from MODIS day–night temperature (MOD11C3) and albedo (MCD43C3), marked as an estimate | Diviner regolith properties ([Hayne et al. 2017](https://doi.org/10.1002/2017JE005387)) | TES thermal inertia map |
+| Dryness | aridity index: POWER rain (PRECTOTCORR) against evaporation (EVPTRNS) | dry | MEDA humidity |
 | Sunlight and sun height | POWER sunlight; noon sun height, which we compute | PGDA fraction of time lit; sun 2–7° above the horizon | computed from latitude |
 | Bare ground | MODIS vegetation index (MOD13C2) | bare | bare |
 | Terrain | slope and roughness, computed by us from SRTMGL30, NASADEM or Copernicus | slope and roughness, computed by us from LOLA height | slope and roughness from MOLA height |
 | Rock and minerals | Moon: share of the cell in GLiM rock classes like the target's (plutonic for highlands). Mars: EMIT minerals (10 kinds, 55°S–55°N) | anorthosite, low iron | clays, sulfates, carbonates, olivine |
 | Ice and frozen ground | MODIS snow (MOD10CM), POWER soil temperature, Obu 2018 permafrost | ice in shadowed craters (LCROSS, LEND, Mini-RF) | buried ice (SWIM, SHARAD, Odyssey GRS) |
 | Wind and dust (Mars only) | POWER wind | — | MEDA wind; TES dust cover index |
+| UV (Mars only) | POWER UV index (ALLSKY_SFC_UV_INDEX) | — | published surface UV; Earth falls short, shown as a gap |
 
 - **Traits a target lacks score zero weight for that target:** wind on the Moon, for example. Otherwise the calmest rainforest basins would score as "Moon-like".
 - **Labels only, never scored:** lists from papers (anorthosite massifs, lava tubes, impact craters). They explain a match, so a place can't rank high just because we put it on a list.
 - **Not scored:** how hard it is to get there, from SEDAC population (GPWv4) and GRIP4 roads.
+- **Seasons:** from POWER monthly values. A freeze–thaw month has an average daily low below 0 °C and high above it (T2M_MIN, T2M_MAX); a rainy month has well above the site's average rain. Best months are those with neither. Year-round viability is the share of usable months, and it lowers the score only for year-round testing.
 - **Same statistic on both sides where possible.** Where it isn't (Earth monthly climate against a Diviner pixel extreme, for example), the scorecard names each one. Slope is computed with one method from every elevation map, never mixed with ready-made slope products.
+
+### Terrain types and clustering
+
+Each 0.5° cell gets one tag, by rules shown on the site:
+
+| Type | Rule |
+|---|---|
+| Arid basin | aridity index below 0.2 and lower than its surroundings |
+| High-altitude volcanic field | mostly GLiM volcanic rock, above 2,000 m |
+| Salt flat | GLiM evaporites, aridity index below 0.2 |
+| Frozen ground | permafrost (Obu 2018) |
+| Cave or lava tube | point list: USGS Mars cave catalogue, [LROC lunar pits](http://lroc.sese.asu.edu/atlases/pits), Earth caves from papers |
+
+The thresholds are first guesses, fixed before any validation run. Separately, k-means on the trait values groups cells into clusters; the site shows how far clusters and tags agree, as a check on both.
 
 **Shown on every scorecard, never scored**, because nowhere on Earth comes close:
 
@@ -98,7 +103,7 @@ The same rule works whether the target sits inside Earth's range (Mars slopes) o
 
 - **Overall match:** a weighted geometric mean of the trait ranks, each floored at 0.01 so one trait can't zero the total. A weak trait still pulls it down hard. The [Earth Similarity Index](https://arxiv.org/pdf/1507.06293) combines traits this way. Its known flaw is that one number hides which traits match, so we never show the total without the trait bars.
 - **Missing data:** never filled in on screen. The scorecard says "no data". For ranking only, a missing trait counts as the median (0.5), so a gap can't lift a place. A cell where less than 70% of the weight has data isn't ranked at all.
-- **Weights:** one default set per target, chosen from what the target is like and not from the test sites. They're committed before the first validation run.
+- **Weights:** one default set per target and mission filter, chosen from what the target and the hardware need, not from the test sites. They're committed before the first validation run. Users can change them; every filter's scores are pre-computed.
 - **Honest resolution:** POWER's climate values are model output at about 50 km (MERRA-2) and 110 km (CERES), not satellite pixels. The global map is 0.5° and says so. Only the zoom stage claims fine detail, and only for terrain.
 
 ### Zoom stage
@@ -119,12 +124,13 @@ Every dataset below was checked on 13 November: the files answered, or NASA's da
 
 | Dataset | What for | Login? | Size |
 |---|---|---|---|
-| [NASA POWER climatology](https://nasa-power.s3.amazonaws.com/) (MERRA-2 and CERES SYN1deg, Zarr on AWS) | temperature, sunlight, rain, humidity, wind, soil temperature, snow depth | no | about 150 MB |
+| [NASA POWER climatology](https://nasa-power.s3.amazonaws.com/) (MERRA-2 and CERES SYN1deg, Zarr on AWS) | temperature (incl. monthly lows and highs), sunlight, rain, evaporation, UV index, humidity, wind, soil temperature, snow depth | no | about 150 MB |
 | EMIT L3 mineral abundance (EMITL3ASA v002) | 10 surface minerals at 0.5°, 55°S–55°N; no feldspar, so Mars only | Earthdata | 22 MB |
 | SRTMGL30 v002; NASADEM tiles for zoom windows | elevation, slope, roughness, 60°S–60°N | Earthdata | about 250 MB, plus about 1 MB per window |
 | MODIS vegetation index (MOD13C2 v061), 0.05° | bare ground | Earthdata | about 100 MB a month (fewer months will do) |
 | MODIS snow cover (MOD10CM v61) | months with snow | Earthdata | about 15 MB |
-| MODIS land-surface temperature (MOD11C3), upgrade only | sharper temperature, 0.05° | Earthdata | about 0.8 GB a year |
+| MODIS land-surface temperature (MOD11C3 v061) | day–night swing for thermal inertia; sharper temperature | Earthdata | about 0.8 GB a year |
+| MODIS albedo (MCD43C3 v061) | thermal inertia estimate | Earthdata | size to check |
 | SEDAC population (GPWv4 rev11, 1°) | how hard to get there | Earthdata | under 1 MB |
 | [NASA GIBS](https://nasa-gibs.github.io/gibs-api-docs/access-basics/) Blue Marble tiles | map background | no key | streamed |
 
@@ -139,6 +145,9 @@ Every dataset below was checked on 13 November: the files answered, or NASA's da
 | [TES dust cover index](http://www.mars.asu.edu/~ruff/DCI/dci_lo_ice_dust_16ppd_shifted.tif) | Mars dust | 50 MB |
 | [Odyssey GRS water-equivalent hydrogen](https://pds-geosciences.wustl.edu/ody/ody-m-grs-5-elements-v1/odgm_xxxx/data/smoothed/h2o_sr_5x5.tab) | Mars ice | 187 KB |
 | [USGS Mars cave catalogue](https://astrogeology.usgs.gov/search/map/mars_global_cave_candidate_catalog_v1_cushing) | Mars caves (label) | 1.8 MB |
+| TES thermal inertia map (USGS Astrogeology or PDS) | Mars thermal inertia | link to confirm |
+| Diviner regolith properties ([Hayne et al. 2017](https://doi.org/10.1002/2017JE005387)) | Moon thermal inertia | link to confirm |
+| [LROC lunar pit atlas](http://lroc.sese.asu.edu/atlases/pits) | Moon pits (label) | small |
 | [SWIM ice maps](https://swim.psi.edu/SWIM4MIMProducts.php) | Mars buried ice | unknown: site was down; retry |
 | Rover and orbiter results (REMS, RAD, MEDA, LCROSS, LEND, Mini-RF) | target values | from papers (section 5) |
 
@@ -147,17 +156,16 @@ Every dataset below was checked on 13 November: the files answered, or NASA's da
 | Dataset | What for | Licence |
 |---|---|---|
 | Copernicus DEM GLO-90 (ESA, on AWS, no login) | terrain beyond 60°N and 56°S | Copernicus licence |
-| [GLiM rock map](https://doi.org/10.1594/PANGAEA.788537) | rock class for Moon targets, and wherever EMIT doesn't reach | CC-BY 3.0 |
+| [GLiM rock map](https://doi.org/10.1594/PANGAEA.788537) | rock class for Moon targets and wherever EMIT doesn't reach; volcanic and evaporite classes for terrain types | CC-BY 3.0 |
 | [Obu et al. 2018 permafrost](https://doi.org/10.1594/PANGAEA.888600) | frozen ground, Northern Hemisphere | CC-BY 3.0 |
 | [GRIP4 roads](https://www.globio.info/download-grip-dataset) | how hard to get there | check on download |
 | Anorthosite massifs, lava tubes, impact craters | labels | from papers. The Earth Impact Database site looks dead, and no global lava-tube map exists. |
 
-**Totals:** about 1.2 GB before the temperature upgrade, and one free NASA Earthdata account unlocks all of it. Without that account, POWER, Copernicus and the planetary files still cover most traits (section 9).
+**Totals:** about 2 GB, and one free NASA Earthdata account unlocks all of it. Without that account, POWER, Copernicus and the planetary files still cover most traits (section 9).
 
 **Known gaps:**
 - Radiation has never been measured at the Moon's south pole, or anywhere on Mars's surface except Gale. We label stand-in values as such.
 - NASA publishes no per-region values for the Artemis candidates, so we compute them from the LOLA, PGDA and Diviner files.
-- **Setup:** this PC's Python 3.13 has no science packages yet, so installing them is the first build step.
 
 ## 5. Targets and the headline find
 
@@ -262,8 +270,8 @@ The full lists of test places are in appendix A.
 
 ## 7. Tech stack and hosting
 
-- **Pipeline:** Python 3.13 with numpy, xarray, zarr, fsspec, rasterio, netCDF4, earthaccess and pandas, in `pipeline/`. Raw downloads go in `data/` (already gitignored). Outputs are small files in `site/public/data/`. A 0.5° land grid is about 75,000 cells, so eight traits plus the scores come to a few hundred KB per target.
-- **Site:** Vite and TypeScript (no framework unless the interface outgrows it); MapLibre GL JS 6.18 with GIBS Blue Marble tiles (no key; zoom levels up to 8); plain SVG charts. Every score, task presets included, is pre-computed into its own file, so the browser never recalculates anything.
+- **Pipeline:** Python 3.13 with numpy, xarray, zarr, fsspec, rasterio, netCDF4, earthaccess and pandas, in `pipeline/`. Raw downloads go in `data/` (already gitignored). Outputs are small files in `site/public/data/`. A 0.5° land grid is about 75,000 cells, so the traits plus the scores for each mission filter come to under a few MB per target.
+- **Site:** Vite and TypeScript (no framework unless the interface outgrows it); MapLibre GL JS 6.18 with GIBS Blue Marble tiles (no key; zoom levels up to 8); plain SVG charts. Every score, for every mission filter, is pre-computed into its own file, so the browser never recalculates anything.
 - **Tests:**
     - pytest for the pipeline: the scoring rule on hand-made cases, plus the data checks in section 6;
     - Playwright for the main flow and every link.
@@ -281,7 +289,7 @@ Steps in order, each with its check. The site is built on a stub data file from 
     → verify: a download check lists every file and its size; the placeholder opens in a private window on a phone.
 2. **Earth trait grid and target values** for the south pole and Jezero.
     → verify: five random cells match the POWER point API; the Artemis values agree with published ones.
-3. **Scoring and the validation run.** The weights and the held-out split are committed first.
+3. **Scoring, terrain types, seasons and the validation run.** The weights (per mission filter), terrain thresholds and the held-out split are committed first.
     → verify: the section 6 pass marks are met, or the failure is written up honestly.
 4. **Real data in the site.**
     → verify: **Checkpoint 1.** Both of us test on a phone and a laptop, and a newcomer gets a result in under a minute.
@@ -289,7 +297,7 @@ Steps in order, each with its check. The site is built on a stub data file from 
     → verify: the headline clears the section 5 bar, and its scorecard shows every trait or an honest "no data".
 6. **First complete draft submitted (Saturday night).**
     → verify: every form field is filled in, and the site link opens in a private window.
-7. **Sunday: extras, demo and page.** Arcadia and more targets, task presets, the stability badge, the 28-second video and the page images.
+7. **Sunday: extras, demo and page.** Arcadia and more targets, the stability badge, the 28-second video and the page images.
     → verify: **Checkpoint 2.** Same tests as Checkpoint 1, plus the numbers on screen are checked against the source files.
 8. **Final submission by 21:59.**
     → verify: every box in guidelines section 7 is ticked, and the success banner shows.
@@ -320,8 +328,8 @@ Times are in our Local Event's time zone.
 | Award | What on the page makes the case |
 |---|---|
 | Best Use of Science | the validation chart; weights fixed beforehand; a held-out half; trait-by-trait "where it breaks" |
-| Best Use of Data | Earth data (EMIT, POWER, MODIS, SRTM) and Moon and Mars data (LOLA, Diviner, PGDA, MOLA, TES) put on one comparable scale; per-region Artemis values computed by us |
-| Best Mission Concept | the headline's test plan: what to test there, and how it helps the first crewed south-pole landing |
+| Best Use of Data | three archives (NASA PDS, NASA Earthdata, USGS Astrogeology) on one comparable scale; per-region Artemis values computed by us |
+| Best Mission Concept | mission filters and the headline's test plan: what to test there, in which months, and how it helps the first crewed south-pole landing |
 
 **Project page:**
 - Lead with the headline image and the validation chart, then answer the form's questions.
@@ -341,12 +349,9 @@ Times are in our Local Event's time zone.
 
 ## 11. Open questions for the team
 
-- [ ] Which parts of this plan, if any, do we want next to our own? Core-idea parts we adopt get named in the AI note.
-- [ ] What is our Local Event's time zone? It sets every switch time above.
+- [ ] Our Local Event's time zone sets every switch time above. The Challenge Guide comes from Cedar College with Karachi sponsors, so probably Pakistan time (UTC+5): confirm.
 - [ ] Do we make the repo public before submission (for GitHub Pages), or use Vercel?
 - [ ] Who makes the free NASA Earthdata account, and when?
-- [ ] What's the name?
-- [ ] `docs/challenge.md` says at least eight rival repos; the scan found 22. Should we update it?
 
 ## Appendix A. Test places
 

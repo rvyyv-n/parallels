@@ -74,7 +74,7 @@ The challenge says this outright, and it's also how we'll stand out:
 ## 4. What the plan must settle
 
 - A name, a short tagline, and one sentence a judge could repeat.
-- How we meet each of the Challenge Guide's six benchmarks and answer its seven questions ([challenge.md](challenge.md#the-six-objectives)).
+- How we meet each of the Challenge Guide's six benchmarks and answer its seven questions ([challenge.md](challenge.md#the-six-objectives-and-how-we-meet-them)).
 - One main flow a newcomer finishes in under a minute without help. Everything else is extra.
 - The awards we aim at (Best Use of Science, Best Use of Data, Best Mission Concept) and what on the page makes each case.
 - Hosting that keeps working untouched until 26 January 2027: nothing to restart, no keys that expire, no paid service without a spending cap. Pre-computed results on a static site are the safe default.
