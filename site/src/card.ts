@@ -22,7 +22,9 @@ export interface CardInput {
 
 export const BODY = { moon: "Moon", mars: "Mars" };
 
-export const terrainOf = (c: Cols) => c.terrain ?? c.terrain_type;
+export const terrainOf = (c: Cols) => c.terrain_type ?? c.terrain;
+
+export const isIce = (c: Cols, i: number) => (c.ice?.[i] ?? 0) >= 50;
 
 export function placeName(m: Manifest, c: Cols, i: number): string {
   const r = c.region?.[i];
@@ -53,9 +55,44 @@ function row(x: CardInput, id: string): Row | null {
   return { tr, ev, tv: x.target.values[id], rank: x.t[`rank:${id}`]?.[x.i] ?? NaN, lo, hi };
 }
 
+const yesNo = (tr: Trait) => tr.scored_by === "presence" && tr.unit === "%";
+const count = (tr: Trait) => tr.scored_by === "presence" && tr.unit !== "%";
+const side = (x: CardInput, tr: Trait) => (tr.scored_by === "ideal" ? "Ideal" : BODY[x.body]);
+
+function val(tr: Trait, v: number | null | undefined) {
+  if (v == null || !Number.isFinite(v)) return "no data";
+  if (yesNo(tr)) return v >= 50 ? "Yes" : "No";
+  return num(v, tr.digits) + unit(tr.unit);
+}
+
+function flags(r: Row, label: string) {
+  const tv = r.tv!.value!;
+  if (yesNo(r.tr)) {
+    const here = r.ev >= 50;
+    const there = tv >= 50;
+    return `<div class="flags" role="img" aria-label="Here: ${here ? "yes" : "no"}. ${esc(label)}: ${there ? "yes" : "no"}.">
+      <span class="flag${here ? " on" : ""}"><i></i>Here: ${here ? "yes" : "no"}</span>
+      <span class="flag${there ? " on" : ""}"><i></i>${esc(label)}: ${there ? "yes" : "no"}</span>
+      <span class="flag-res">${here === there ? "Same" : "Differs"}</span></div>`;
+  }
+  const n = Math.max(1, Math.round(Math.max(tv, r.ev, Number.isFinite(r.hi) ? r.hi : 0)));
+  const pips = (v: number) => Array.from({ length: n }, (_, k) => `<i class="${k < Math.round(v) ? "on" : ""}"></i>`).join("");
+  return `<div class="pips" role="img" aria-label="Here: ${num(r.ev)}. ${esc(label)}: ${num(tv)}.">
+    <span><b>Here</b>${pips(r.ev)}</span><span><b>${esc(label)}</b>${pips(tv)}</span></div>`;
+}
+
+function notes(x: CardInput, r: Row) {
+  const parts = [
+    r.tr.note ? `<p><b>Earth side.</b> ${esc(r.tr.note)}</p>` : "",
+    r.tv?.note ? `<p><b>${esc(side(x, r.tr))} side.</b> ${esc(r.tv.note)}</p>` : "",
+  ].join("");
+  return parts ? `<details class="t-notes"><summary>Notes</summary>${parts}</details>` : "";
+}
+
 function ruler(r: Row, body: string) {
   const tv = r.tv?.value;
   if (!Number.isFinite(r.ev) || tv == null || !Number.isFinite(r.lo)) return "";
+  if (r.tr.scored_by === "presence") return flags(r, body);
   const a = Math.min(r.lo, tv, r.ev);
   const b = Math.max(r.hi, tv, r.ev);
   const pad = (b - a || 1) * 0.04;
@@ -74,31 +111,33 @@ function ruler(r: Row, body: string) {
 }
 
 function traitHtml(x: CardInput, r: Row, why: string) {
-  const body = BODY[x.body];
+  const label = side(x, r.tr);
   const u = unit(r.tr.unit);
   const d = r.tr.digits;
   const tv = r.tv?.value;
   const missing = !Number.isFinite(r.ev)
-    ? `No Earth data for this place${r.tr.note ? `: ${esc(r.tr.note)}` : "."}`
+    ? `No Earth data for this place.${r.tr.note ? ` ${esc(r.tr.note)}` : ""}`
     : tv == null
-      ? `Not scored: no ${body} value${r.tv?.note ? `: ${esc(r.tv.note)}` : "."}`
+      ? `Not scored: no ${esc(label)} value.${r.tv?.note ? ` ${esc(r.tv.note)}` : ""}`
       : "";
   const gap = Number.isFinite(r.ev) && tv != null ? Math.abs(r.ev - tv) : NaN;
+  const gapText = !Number.isFinite(gap) ? "—" : yesNo(r.tr) ? ((r.ev >= 50) === (tv! >= 50) ? "none" : "differs") : num(gap, d) + u;
   const rank = Number.isFinite(r.rank)
     ? `<span class="t-rank" style="--c:${colour(r.rank)}"><i></i>Earth rank ${score100(r.rank)}</span>`
     : `<span class="t-rank none">not ranked</span>`;
   return `<li class="trait">
     <div class="t-head"><span class="t-name">${esc(r.tr.label)}</span>${rank}</div>
     <p class="t-plain">${esc(why || r.tr.plain)}</p>
-    ${missing ? `<p class="t-missing">${missing}</p>` : ruler(r, body)}
+    ${missing ? `<p class="t-missing">${missing}</p>` : ruler(r, label)}
     <dl class="t-vals">
-      <div><dt>Here</dt><dd>${num(r.ev, d)}${Number.isFinite(r.ev) ? u : ""}</dd></div>
-      <div><dt>Gap</dt><dd>${Number.isFinite(gap) ? num(gap, d) + u : "—"}</dd></div>
-      <div><dt>${esc(body)}</dt><dd>${tv == null ? "no data" : num(tv, d) + u}</dd></div>
+      <div><dt>Here</dt><dd>${val(r.tr, r.ev)}</dd></div>
+      <div><dt>Gap</dt><dd>${gapText}</dd></div>
+      <div><dt>${esc(label)}</dt><dd>${val(r.tr, tv)}</dd></div>
     </dl>
     <p class="t-src">${sourceLine(x.m, "Earth", r.tr.earth_dataset, r.tr.earth_resolution, r.tr.earth_stat)}${
-      r.tv ? sourceLine(x.m, body, r.tv.dataset, r.tv.resolution, r.tv.stat + (r.tv.kind !== "computed" ? ` (${r.tv.kind})` : "")) : ""
+      r.tv ? sourceLine(x.m, label, r.tv.dataset, r.tv.resolution, r.tv.stat + (r.tv.kind !== "computed" ? ` (${r.tv.kind})` : "")) : ""
     }</p>
+    ${missing ? "" : notes(x, r)}
   </li>`;
 }
 
@@ -113,15 +152,21 @@ function breaks(x: CardInput, chs: Challenge[]) {
       const r = row(x, id);
       const tv = r?.tv?.value;
       if (!r || tv == null || !Number.isFinite(r.ev)) continue;
+      const who = side(x, r.tr);
+      if (r.tr.scored_by === "presence") {
+        const short = yesNo(r.tr) ? r.ev >= 50 !== tv >= 50 : r.ev < tv;
+        if (short) out.push({ r, text: `Here <b>${val(r.tr, r.ev)}</b>, ${esc(who)} <b>${val(r.tr, tv)}</b>.` });
+        continue;
+      }
       const beyond = tv < r.lo || tv > r.hi;
       if (!beyond && !(r.rank < 0.5)) continue;
       const d = r.tr.digits;
       const u = unit(r.tr.unit);
-      const side = r.ev > tv ? "above" : "below";
+      const dir = r.ev > tv ? "above" : "below";
       const text = beyond
-        ? `No land on Earth reaches the ${BODY[x.body]} value: Earth's land spans ${num(r.lo, d)} to ${num(r.hi, d)}${u}.`
+        ? `No land on Earth reaches the ${esc(who)} value: Earth's land spans ${num(r.lo, d)} to ${num(r.hi, d)}${u}.`
         : `Weaker than most of Earth's land on this trait (Earth rank ${score100(r.rank)}).`;
-      out.push({ r, text: `<b>${num(Math.abs(r.ev - tv), d)}${u}</b> ${side} the target. ${text}` });
+      out.push({ r, text: `<b>${num(Math.abs(r.ev - tv), d)}${u}</b> ${dir} the ${r.tr.scored_by === "ideal" ? "ideal" : "target"}. ${text}` });
     }
   }
   out.sort((a, b) => (a.r.rank || 0) - (b.r.rank || 0));
@@ -149,10 +194,32 @@ function seasons(x: CardInput) {
     }</p>`;
 }
 
-function shownValue(x: CardInput, key: string, v: TargetValue) {
+const SHOWN: Record<string, string> = {
+  t_min_k: "Winter minimum temperature",
+  t_max_k: "Summer maximum temperature",
+  t_min_coldest_k: "Coldest spot, winter minimum",
+  ground_strength_note: "Ground strength",
+};
+
+const atLimit = (key: string, v: number | null) => v != null && ((key.endsWith("_k") && v < 25) || (key === "cold" && v < 25 - 273.15));
+
+function shownText(x: CardInput, key: string, v: TargetValue) {
   const tr = x.m.traits.find((t) => t.id === key);
-  const val = v.value == null ? "no data" : num(v.value, tr?.digits ?? 2) + unit(tr?.unit ?? "");
-  return `${val} <span class="muted">(${esc(ds(x.m, v.dataset))}, ${esc(v.resolution)}${v.note ? `; ${esc(v.note)}` : ""})</span>`;
+  if (v.value == null) return "no value";
+  if (key.endsWith("_share")) return `${num(v.value * 100, 0)}%`;
+  if (key.endsWith("_k")) return `${num(v.value, 1)} K`;
+  return num(v.value, tr?.digits ?? 2) + unit(tr?.unit ?? "");
+}
+
+function shownHtml(x: CardInput, key: string, v: TargetValue) {
+  const lim = atLimit(key, v.value);
+  const src = `${esc(ds(x.m, v.dataset))} · ${esc(v.resolution)} · ${esc(v.stat)}`;
+  const note = v.note
+    ? v.value == null
+      ? `<span class="s-note">${esc(v.note)}</span>`
+      : `<details class="t-notes"${lim ? " open" : ""}><summary>${lim ? "At the instrument's limit: note" : "Notes"}</summary><p>${esc(v.note)}</p></details>`
+    : "";
+  return `<span class="s-val">${BODY[x.body]}: <b>${shownText(x, key, v)}</b>${lim ? ' <span class="tag warn">limit</span>' : ""}</span><span class="s-src">${src}</span>${note}`;
 }
 
 function unscored(x: CardInput, chs: Challenge[]) {
@@ -163,13 +230,16 @@ function unscored(x: CardInput, chs: Challenge[]) {
   return `<section class="c-block"><h4>Shown, not scored</h4><ul class="labels">
     ${items
       .map(
-        ({ c, l }) => `<li><span class="b-name">${esc(l.name)}</span><span><span class="tag">${esc(c.name)}</span> ${esc(l.reason)}${
-          l.earth_text ? ` <span class="muted">Here: ${esc(l.earth_text)}</span>` : ""
-        }${l.target_key && x.target.shown[l.target_key] ? ` <span class="muted">${BODY[x.body]}: ${shownValue(x, l.target_key, x.target.shown[l.target_key])}</span>` : ""}</span></li>`,
+        ({ c, l }) => `<li><span class="b-name">${esc(l.name)}</span><span class="l-body"><span><span class="tag">${esc(c.name)}</span> ${esc(l.reason)}</span>${
+          l.earth_text ? `<span class="muted">Here: ${esc(l.earth_text)}</span>` : ""
+        }${l.target_key && x.target.shown[l.target_key] ? shownHtml(x, l.target_key, x.target.shown[l.target_key]) : ""}</span></li>`,
       )
       .join("")}
     ${extra
-      .map(([k, v]) => `<li><span class="b-name">${esc(x.m.traits.find((t) => t.id === k)?.label ?? k)}</span><span>${BODY[x.body]}: ${shownValue(x, k, v)}</span></li>`)
+      .map(
+        ([k, v]) =>
+          `<li><span class="b-name">${esc(x.m.traits.find((t) => t.id === k)?.label ?? SHOWN[k] ?? k.replace(/_/g, " "))}</span><span class="l-body">${shownHtml(x, k, v)}</span></li>`,
+      )
       .join("")}
   </ul></section>`;
 }
@@ -179,16 +249,25 @@ function regions(x: CardInput) {
   if (!rs?.length) return "";
   const keys = [...new Set(rs.flatMap((r) => Object.keys(r.values)))];
   const tr = (k: string) => x.m.traits.find((t) => t.id === k);
+  const marks: { region: string; label: string; note: string }[] = [];
+  const cell = (r: (typeof rs)[number], k: string) => {
+    const v = r.values[k];
+    if (v?.value == null) return "no data";
+    let s = val(tr(k) ?? ({ unit: "", digits: 1 } as Trait), v.value).replace(unit(tr(k)?.unit ?? ""), "");
+    if (atLimit(k, v.value) && v.note) {
+      marks.push({ region: r.name, label: tr(k)?.label ?? k, note: v.note });
+      s += `<sup>${marks.length}</sup>`;
+    }
+    return s;
+  };
+  const body = rs
+    .map((r) => `<tr><th scope="row">${esc(r.name)}<span class="muted"> ${latlon(r.lat, r.lon, 1)}</span></th>${keys.map((k) => `<td class="n">${cell(r, k)}</td>`).join("")}</tr>`)
+    .join("");
   return `<details class="c-block regions"><summary>The ${rs.length} regions' own values</summary>
     <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Region</th>${keys
       .map((k) => `<th scope="col">${esc(tr(k)?.label ?? k)}${tr(k)?.unit ? ` <span class="muted">${esc(tr(k)!.unit)}</span>` : ""}</th>`)
-      .join("")}</tr></thead><tbody>${rs
-      .map(
-        (r) => `<tr><th scope="row">${esc(r.name)}<span class="muted"> ${latlon(r.lat, r.lon, 1)}</span></th>${keys
-          .map((k) => `<td class="n">${r.values[k]?.value == null ? "no data" : num(r.values[k].value!, tr(k)?.digits ?? 1)}</td>`)
-          .join("")}</tr>`,
-      )
-      .join("")}</tbody></table></div>
+      .join("")}</tr></thead><tbody>${body}</tbody></table></div>
+    ${marks.length ? `<ol class="marks small">${marks.map((k) => `<li><b>${esc(k.region)}, ${esc(k.label)}:</b> ${esc(k.note)}</li>`).join("")}</ol>` : ""}
     <p class="muted small">Sources per value: ${[...new Set(rs.flatMap((r) => Object.values(r.values).map((v) => ds(x.m, v.dataset))))].map(esc).join(", ")}.</p>
   </details>`;
 }
@@ -200,6 +279,7 @@ export function card(x: CardInput): string {
   const s = x.score[i];
   const ttype = m.terrain_types.find((t) => t.id === terrainOf(cells)?.[i]);
   const far = cells.nearest_analog_km?.[i];
+  const ice = cells.ice?.[i];
   const region = placeName(m, cells, i);
   const head = target.headline?.cell === i ? target.headline : null;
   const lead = chs
@@ -236,7 +316,9 @@ export function card(x: CardInput): string {
   return `<article class="card" aria-labelledby="card-title">
     <header class="c-head">
       <p class="c-kicker">${Number.isFinite(x.place) ? `Match #${num(x.place)} of ${num(x.ranked)} ranked land cells` : "Not ranked for this filter"}${
-        Number.isFinite(far) && far > 100 ? ` · <span class="rare">Rarely used: ${num(far)} km from any known analog</span>` : ""
+        Number.isFinite(far) && far > 100 ? ` <span class="rare">Rarely used: ${num(far)} km from any known analog</span>` : ""
+      }${
+        isIce(cells, i) ? ` <span class="tag ice">Ice sheet: ${num(ice)}% permanent ice</span>` : ""
       }</p>
       <h3 id="card-title">${esc(region)}</h3>
       <p class="c-meta">${region === latlon(cells.lat[i], cells.lon[i], 2) ? "" : `<span>${latlon(cells.lat[i], cells.lon[i])}</span>`}<span>${esc(ttype && ttype.key !== "none" ? ttype.name : "No terrain type")}</span>${
@@ -251,7 +333,7 @@ export function card(x: CardInput): string {
           Number.isFinite(s) ? "100 means closer to the target than all of Earth's land." : "not enough of the weighted challenges have data here."
         }</p>
       </div>
-      <p class="key small muted"><i class="kk band"></i>Earth's land range <i class="kk dot"></i>this place <i class="kk tick"></i>target <i class="kk gap"></i>the gap, in real units</p>
+      <p class="key small muted"><span><i class="kk band"></i>Earth's land range</span><span><i class="kk dot"></i>this place</span><span><i class="kk tick"></i>target</span><span><i class="kk gap"></i>the gap, in real units</span></p>
       <ol class="chs">${chRows}</ol>
     </section>
     ${lead ? `<section class="c-block"><h4>What to test here</h4><p>${esc(lead.what_to_test)} <span class="muted">(${esc(lead.name)})</span></p></section>` : ""}

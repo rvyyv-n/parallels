@@ -110,3 +110,28 @@ test("footer carries the AI note", async ({ page }) => {
   await ready(page);
   await expect(page.locator("footer .ai")).toContainText("How we used AI");
 });
+
+test("sample banner shows only for sample data", async ({ page }) => {
+  await ready(page);
+  await expect(page.locator(".sample")).toHaveCount(m.sample ? 1 : 0);
+  await page.route("**/data/manifest.json", async (r) => r.fulfill({ json: { ...m, sample: true } }));
+  await ready(page);
+  await expect(page.locator(".sample")).toHaveCount(1);
+});
+
+test("validation shows the first run, then later runs when present", async ({ page, request }) => {
+  const v = await (await request.get("/data/validation.json")).json();
+  await ready(page);
+  const checks = v.tests.flatMap((t: { checks: unknown[] }) => t.checks).length;
+  await expect(page.locator("#checked .v-checks").first().locator("tbody tr")).toHaveCount(checks);
+  await expect(page.locator("#second-run")).toHaveCount(v.second_run ? 1 : 0);
+  await expect(page.locator("#third-run")).toHaveCount(0);
+  const base = v.second_run ?? { title: "Run", plain: "", designed_after_first_run: true, config_commit: "x", summary: "", tests: v.tests, unchecked: [] };
+  await page.route("**/data/validation.json", async (r) =>
+    r.fulfill({ json: { ...v, third_run: { ...base, title: "Third run test", method_change: "Changed X", adopted: false, adoption_rule: "Rule Y" } } }),
+  );
+  await ready(page);
+  await expect(page.locator("#third-run")).toContainText("Third run test");
+  await expect(page.locator("#third-run")).toContainText("Changed X");
+  await expect(page.locator("#third-run")).toContainText("Rule Y");
+});

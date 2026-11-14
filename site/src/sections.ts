@@ -46,13 +46,19 @@ export const CODE = [
   { name: "Vite and TypeScript", url: "https://vite.dev/", licence: "MIT / Apache-2.0", use: "Building the site" },
 ];
 
-function chart(t: ValidationTest) {
+const placeName = (t: ValidationTest, id: string) => t.places.find((p) => p.id === id)?.name ?? id;
+
+const outcome = (passed: boolean | null) =>
+  `<td class="${passed ? "pass" : passed === false ? "fail" : ""}">${passed ? "Passed" : passed === false ? "Not passed" : "Not run"}</td>`;
+
+function chart(t: ValidationTest, m: Manifest) {
   const W = 640;
   const L = 12;
   const R = 12;
   const RH = 54;
   const x = (r: number) => L + r * (W - L - R);
   const h = t.groups.length * RH + 34;
+  const chName = (id?: string) => (id ? (Object.values(m.challenges).flat().find((c) => c.id === id)?.name ?? id) : "");
   const grid = [0, 25, 50, 75, 100]
     .map((v) => `<line x1="${x(v / 100)}" x2="${x(v / 100)}" y1="10" y2="${h - 24}" class="v-grid"/><text x="${x(v / 100)}" y="${h - 8}" class="v-tick">${v}</text>`)
     .join("");
@@ -64,7 +70,7 @@ function chart(t: ValidationTest) {
         .map((p, j) => {
           const cx = x(p.land_rank!);
           const cy = y + ((j % 3) - 1) * 6;
-          const title = `<title>${esc(p.name)}: Earth rank ${num(p.land_rank! * 100, 0)}${p.blind ? ", blind" : ""}${p.held_out ? ", held out" : ""}</title>`;
+          const title = `<title>${esc(p.name)}${p.challenge ? ` (${esc(chName(p.challenge))})` : ""}: Earth rank ${num(p.land_rank! * 100, 0)}${p.blind ? ", blind" : ""}${p.held_out ? ", held out" : ""}</title>`;
           return p.blind
             ? `<rect x="${cx - 4.5}" y="${cy - 4.5}" width="9" height="9" class="v-dot g${k} blind" transform="rotate(45 ${cx} ${cy})">${title}</rect>`
             : `<circle cx="${cx}" cy="${cy}" r="4.5" class="v-dot g${k}${p.held_out ? " held" : ""}">${title}</circle>`;
@@ -73,48 +79,93 @@ function chart(t: ValidationTest) {
       return `<text x="${L}" y="${y - 16}" class="v-glabel">${esc(g.name)} <tspan class="v-count">${pts.length} scored</tspan></text><line x1="${L}" x2="${W - R}" y1="${y}" y2="${y}" class="v-row"/>${dots}`;
     })
     .join("");
-  return `<svg viewBox="0 0 ${W} ${h}" class="v-chart" role="img" aria-label="${esc(t.title)}: each test place on a 0 to 100 Earth-rank line, one row per group">${grid}${rows}</svg>`;
+  const table = `<details class="v-table"><summary>Every place as a table</summary><div class="scroll-x"><table class="data">
+    <thead><tr><th scope="col">Place</th><th scope="col">Group</th>${t.places.some((p) => p.challenge) ? '<th scope="col">Checked on</th>' : ""}<th scope="col">Earth rank</th><th scope="col">Held out</th><th scope="col">Blind</th></tr></thead>
+    <tbody>${[...t.places]
+      .sort((a, b) => (b.land_rank ?? -1) - (a.land_rank ?? -1))
+      .map(
+        (p) => `<tr><th scope="row">${esc(p.name)}</th><td>${esc(t.groups.find((g) => g.id === p.group)?.name ?? p.group)}</td>${
+          t.places.some((q) => q.challenge) ? `<td>${esc(chName(p.challenge))}</td>` : ""
+        }<td class="n">${p.land_rank == null ? "not scored" : num(p.land_rank * 100, 0)}</td><td>${p.held_out ? "yes" : ""}</td><td>${p.blind ? "yes" : ""}</td></tr>`,
+      )
+      .join("")}</tbody></table></div></details>`;
+  return `<div class="scroll-x"><svg viewBox="0 0 ${W} ${h}" class="v-chart" role="img" aria-label="${esc(t.title)}: each test place on a 0 to 100 Earth-rank line, one row per group">${grid}${rows}</svg></div>${table}`;
 }
 
-function test(t: ValidationTest) {
+function test(t: ValidationTest, m: Manifest) {
   const off = t.places.filter((p) => p.land_rank == null);
   return `<article class="v-test">
     <h3>${esc(t.title)}</h3>
     <p>${esc(t.plain)}</p>
     <ul class="v-groups">${t.groups.map((g, k) => `<li><i class="sw g${k}"></i><b>${esc(g.name)}.</b> ${esc(g.plain)}</li>`).join("")}</ul>
-    <div class="scroll-x">${chart(t)}</div>
-    <p class="small muted">Position: Earth rank of the place's match score, from 0 (worse than all land) to 100 (better than all land). Circles: scored places; open circles: the held-out half; diamonds: blind places never scored before.</p>
-    <div class="scroll-x"><table class="data">
-      <thead><tr><th scope="col">Check</th><th scope="col">Result</th><th scope="col">Pass mark</th><th scope="col">Held-out half</th><th scope="col">Blind only</th><th scope="col">Pairs</th><th scope="col">Outcome</th></tr></thead>
-      <tbody>${t.checks
-        .map(
-          (c) => `<tr><th scope="row">${esc(c.name)}</th><td class="n">${pct(c.result)}</td><td class="n">${pct(c.pass_mark)}</td><td class="n">${pct(c.held_out_only)}</td><td class="n">${pct(c.blind_only)}</td><td class="n">${num(c.n_pairs)}</td><td class="${
-            c.passed ? "pass" : c.passed === false ? "fail" : ""
-          }">${c.passed ? "Passed" : c.passed === false ? "Not passed" : "Not run"}</td></tr>`,
-        )
-        .join("")}</tbody>
-    </table></div>
-    <p class="small muted">A result is the share of random pairs where the first group's place ranks higher than the second's.</p>
-    ${t.misses.length ? `<h4>Misses, explained</h4><ul class="plain">${t.misses.map((m) => `<li><b>${esc(m.place)}:</b> ${esc(m.why)}</li>`).join("")}</ul>` : ""}
-    ${
-      off.length
-        ? `<details><summary>${off.length} test places not on the chart</summary><ul class="plain">${off.map((p) => `<li><b>${esc(p.name)}:</b> ${esc(p.note ?? "Not scored.")}</li>`).join("")}</ul></details>`
-        : ""
-    }
+    ${chart(t, m)}
+    <p class="small muted">Position: Earth rank of the place's match score, from 0 (worse than all land) to 100 (better than all land). Filled circles: scored places; open circles: the held-out half; diamonds: blind places never scored before.</p>
+    ${t.misses.length ? `<h4>Misses, explained</h4><ul class="plain">${t.misses.map((x) => `<li><b>${esc(placeName(t, x.place))}:</b> ${esc(x.why)}</li>`).join("")}</ul>` : ""}
+    ${off.length ? `<h4>Could not be scored</h4><ul class="plain">${off.map((p) => `<li><b>${esc(p.name)}:</b> ${esc(p.note ?? "Not scored.")}</li>`).join("")}</ul>` : ""}
   </article>`;
 }
 
-function checked(v: Validation | null) {
+function checksTable(tests: ValidationTest[]) {
+  return `<div class="scroll-x"><table class="data v-checks">
+    <thead><tr><th scope="col">Check</th><th scope="col">Pass mark</th><th scope="col">All sites</th><th scope="col">Held-out half</th><th scope="col">Blind sites</th><th scope="col">Pairs</th><th scope="col">Outcome</th></tr></thead>
+    <tbody>${tests
+      .flatMap((t) => t.checks)
+      .map(
+        (c) => `<tr><th scope="row">${esc(c.name)}</th><td class="n">${pct(c.pass_mark)}</td><td class="n big">${pct(c.result)}</td><td class="n">${pct(c.held_out_only)}</td><td class="n">${pct(c.blind_only)}</td><td class="n">${num(c.n_pairs)}</td>${outcome(c.passed)}</tr>`,
+      )
+      .join("")}</tbody>
+  </table></div>
+  <p class="small muted">A result is the share of pairs where the first group's place ranks higher than the second's (ties count half). "Held-out half" uses only the analogs set aside in a fixed split; "blind sites" uses only analogs never scored before this run.</p>`;
+}
+
+function verdict(tests: ValidationTest[], summary?: string) {
+  const all = tests.flatMap((t) => t.checks);
+  const passed = all.filter((c) => c.passed).length;
+  return `<div class="verdict${passed === all.length ? " ok" : ""}">
+    <p class="v-count-big"><b>${num(passed)} of ${num(all.length)}</b> checks passed</p>
+    ${summary ? `<p class="v-summary">${esc(summary)}</p>` : ""}
+  </div>`;
+}
+
+type Later = NonNullable<Validation["second_run"]> & { method_change?: string; adopted?: boolean | string; adoption_rule?: string };
+
+function later(r: Later, id: string, m: Manifest) {
+  const extra = [
+    r.method_change ? `<p><b>Method change.</b> ${esc(r.method_change)}</p>` : "",
+    r.adoption_rule ? `<p><b>Adoption rule.</b> ${esc(r.adoption_rule)}</p>` : "",
+    r.adopted != null ? `<p><b>Adopted.</b> ${esc(r.adopted === true ? "Yes" : r.adopted === false ? "No" : r.adopted)}</p>` : "",
+  ].join("");
+  return `<div class="second" id="${id}">
+      <h3 class="run-h">${esc(r.title)}</h3>
+      <p class="note"><b>Designed after seeing the first run.</b> Its design was chosen knowing the first run's result, so it can't confirm the method the way the first run could. Config fixed at commit ${esc(r.config_commit)}.</p>
+      <p>${esc(r.plain)}</p>
+      ${extra}
+      ${verdict(r.tests, r.summary)}
+      ${checksTable(r.tests)}
+      <div class="v-tests">${r.tests.map((t) => test(t, m)).join("")}</div>
+      ${r.unchecked.length ? `<h4>Not checked in this run</h4><ul class="plain">${r.unchecked.map((u) => `<li><b>${esc(u.place)}:</b> ${esc(u.why)}</li>`).join("")}</ul>` : ""}
+    </div>`;
+}
+
+function checked(v: Validation | null, m: Manifest) {
   if (!v) return `<p>The validation file is missing from this build, so no check results are shown.</p>`;
+  const s = v.second_run;
+  const v3 = (v as Validation & { third_run?: Later }).third_run;
   return `<p class="lede">If the method works, places NASA already trusts should score higher than ordinary farmland, and higher than big deserts that are dry but not analogs. The pass marks were set in our plan before any data came in.</p>
-    <p class="note"><b>Not a blind first run.</b> ${esc(v.not_blind_note)}</p>
-    ${v.prototype_runs.length ? `<p class="small muted">Earlier prototype runs: ${v.prototype_runs.map((r) => `${esc(r.date)}: ${esc(r.result)}`).join("; ")}. Weights fixed at commit ${esc(v.weights_commit)}.</p>` : ""}
-    <div class="v-tests">${v.tests.map(test).join("")}</div>
+    <h3 class="run-h">First run</h3>
+    ${verdict(v.tests, v.summary)}
+    ${checksTable(v.tests)}
+    <p class="note"><b>Not a blind first run.</b> ${esc(v.not_blind_note)}${
+      v.prototype_runs.length ? ` Earlier prototype runs: ${v.prototype_runs.map((r) => `${esc(r.date)}, ${esc(r.result)}`).join("; ")}.` : ""
+    } Weights and pass marks fixed at commit ${esc(v.weights_commit)}.</p>
+    <div class="v-tests">${v.tests.map((t) => test(t, m)).join("")}</div>
     ${v.stability ? `<p>${esc(v.stability)}</p>` : ""}
     <h3>Data checks</h3>
     <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Check</th><th scope="col">Result</th><th scope="col">Outcome</th></tr></thead><tbody>${v.data_checks
-      .map((c) => `<tr><th scope="row">${esc(c.name)}</th><td class="n">${esc(c.result)}</td><td class="${c.passed ? "pass" : "fail"}">${c.passed ? "Passed" : "Not passed"}</td></tr>`)
-      .join("")}</tbody></table></div>`;
+      .map((c) => `<tr><th scope="row">${esc(c.name)}</th><td class="n">${esc(c.result)}</td>${outcome(c.passed)}</tr>`)
+      .join("")}</tbody></table></div>
+    ${s ? later(s, "second-run", m) : ""}
+    ${v3 ? later(v3, "third-run", m) : ""}`;
 }
 
 function terrain(m: Manifest) {
@@ -133,12 +184,19 @@ function terrain(m: Manifest) {
 function data(m: Manifest) {
   const order = ["NASA", "USGS", "computed", "ESA", "partner", "other"];
   const ds = [...m.datasets].sort((a, b) => order.indexOf(a.agency) - order.indexOf(b.agency));
+  const archives = [...new Set(ds.map((d) => d.archive).filter((a): a is string => !!a && !/^(computed|published paper)$/i.test(a)))];
+  const b1 = m.benchmarks.find((b) => b.n === 1);
   return `<p class="lede">Every number on this site traces to one of these. NASA data does the main scoring work; partner data is marked.</p>
-    <div class="scroll-x"><table class="data ds"><thead><tr><th scope="col">Dataset</th><th scope="col">Agency</th><th scope="col">Licence</th><th scope="col">Used for</th></tr></thead><tbody>${ds
+    ${
+      b1
+        ? `<div class="archives"><p class="guide">${esc(b1.guide_words)}</p><p>${num(archives.length)} open data archives feed this site: ${archives.map(esc).join(", ")}.</p></div>`
+        : ""
+    }
+    <div class="scroll-x"><table class="data ds"><thead><tr><th scope="col">Dataset</th><th scope="col">Agency</th><th scope="col">Archive</th><th scope="col">Licence</th><th scope="col">Used for</th></tr></thead><tbody>${ds
       .map(
-        (d) => `<tr><th scope="row">${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>` : esc(d.name)}${d.archive ? `<span class="muted small"> ${esc(d.archive)}</span>` : ""}</th><td>${esc(d.agency)}${
+        (d) => `<tr><th scope="row">${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>` : esc(d.name)}</th><td>${esc(d.agency)}${
           d.agency === "partner" ? ' <span class="tag">partner</span>' : ""
-        }</td><td>${esc(d.licence)}</td><td>${esc(d.used_for)}</td></tr>`,
+        }</td><td>${esc(d.archive ?? "")}</td><td>${esc(d.licence)}</td><td>${esc(d.used_for)}</td></tr>`,
       )
       .join("")}</tbody></table></div>
     <h3>Imagery shown, not scored</h3>
@@ -150,7 +208,7 @@ function data(m: Manifest) {
 export function sections(m: Manifest, v: Validation | null) {
   const sec = (id: string, title: string, body: string) => `<section id="${id}" class="page-sec" aria-labelledby="${id}-h"><h2 id="${id}-h">${esc(title)}</h2>${body}</section>`;
   return [
-    sec("checked", "How we checked it", checked(v)),
+    sec("checked", "How we checked it", checked(v, m)),
     sec("terrain", "Terrain types and clusters", terrain(m)),
     sec(
       "benchmarks",

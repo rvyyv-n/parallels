@@ -56,9 +56,15 @@ async function json<T>(url: string): Promise<T | null> {
   return r.ok ? r.json() : null;
 }
 
-export async function load(base = `${import.meta.env.BASE_URL}data/`): Promise<Data> {
+export const BASE = `${import.meta.env?.BASE_URL ?? "/"}data/`;
+
+export async function manifest(base = BASE): Promise<Manifest> {
   const m = await json<Manifest>(`${base}manifest.json`);
   if (!m) throw new Error("manifest.json is missing");
+  return m;
+}
+
+export async function load(m: Manifest, base = BASE): Promise<Data> {
   const [cells, labels, validation] = await Promise.all([
     bytes(base + m.grid.file).then((b) => decode(b, m.grid)),
     json<LabelPoint[]>(`${base}labels.json`),
@@ -69,7 +75,7 @@ export async function load(base = `${import.meta.env.BASE_URL}data/`): Promise<D
 
 const cache = new Map<string, Promise<Cols>>();
 
-export function targetCols(d: Data, t: Target): Promise<Cols> {
-  if (!cache.has(t.id)) cache.set(t.id, bytes(d.base + t.bin.file).then((b) => decode(b, t.bin, true)));
+export function targetCols(base: string, t: Target): Promise<Cols> {
+  if (!cache.has(t.id)) cache.set(t.id, bytes(base + t.bin.file).then((b) => decode(b, t.bin, true)));
   return cache.get(t.id)!;
 }

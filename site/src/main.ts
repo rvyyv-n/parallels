@@ -1,10 +1,10 @@
 import "@fontsource-variable/archivo/wdth.css";
 import "./style.css";
-import type { Target } from "./contract";
-import { load, targetCols, type Cols, type Data } from "./data";
+import type { Manifest, Target } from "./contract";
+import { BASE, load, manifest, targetCols, type Cols, type Data } from "./data";
 import { handScore, rankOf, top } from "./score";
 import { createEarth, webgl, type Earth } from "./earth";
-import { BODY, card, placeName, terrainOf } from "./card";
+import { BODY, card, isIce, placeName, terrainOf } from "./card";
 import { NAV, sections } from "./sections";
 import { esc, latlon, num, reduced, score100 } from "./format";
 import { colour, gradient } from "./ramp";
@@ -26,9 +26,8 @@ const AI_NOTE =
 const app = document.getElementById("app")!;
 const $ = <T extends HTMLElement>(s: string) => app.querySelector<T>(s)!;
 
-function readUrl(d: Data): State {
+function readUrl(m: Manifest): State {
   const q = new URLSearchParams(location.search);
-  const m = d.m;
   const target = m.targets.find((t) => t.id === q.get("t"))?.id ?? (m.targets.find((t) => t.default) ?? m.targets[0]).id;
   const filter = m.filters.find((f) => f.id === q.get("f"))?.id ?? m.filters[0].id;
   const type = q.get("type") != null && m.terrain_types.some((t) => String(t.id) === q.get("type")) ? Number(q.get("type")) : null;
@@ -42,7 +41,7 @@ function readUrl(d: Data): State {
       )
     : null;
   const c = Number(q.get("c"));
-  return { target, filter, yr: q.get("yr") === "1", type, hand, cell: q.has("c") && c >= 0 && c < d.n ? c : -1 };
+  return { target, filter, yr: q.get("yr") === "1", type, hand, cell: q.has("c") && c >= 0 && c < m.grid.n ? c : -1 };
 }
 
 function writeUrl(s: State) {
@@ -115,6 +114,7 @@ function shell(d: Data) {
               <div class="lg-bar" style="background:${gradient()}"></div>
               <div class="lg-ticks"><span>0</span><span>50</span><span>100</span></div>
               <p class="lg-text">100: closer to the target than all of Earth's land. Grey: not ranked.</p>
+              <p class="lg-pole">The map layer stops at 85° N and S; the list still ranks land beyond it.</p>
               <div class="lg-keys">
                 <label><input type="checkbox" id="pick-labels" checked> <i class="k-analog"></i>Known analogs <i class="k-cave"></i>caves</label>
                 <label><input type="checkbox" id="pick-flat"> Flat map</label>
@@ -143,15 +143,18 @@ function shell(d: Data) {
 
 async function main() {
   let d: Data;
+  let s: State;
   try {
-    d = await load();
+    const mf = await manifest();
+    s = readUrl(mf);
+    void targetCols(BASE, mf.targets.find((t) => t.id === s.target)!);
+    d = await load(mf);
   } catch (e) {
     app.innerHTML = `<p class="fatal">The data files could not be loaded (${esc((e as Error).message)}). Please reload the page.</p>`;
     return;
   }
   shell(d);
   const m = d.m;
-  const s = readUrl(d);
   const rng = ranges(d);
   const terr = terrainOf(d.cells);
   const keep = (i: number) => s.type == null || terr?.[i] === s.type;
@@ -182,7 +185,7 @@ async function main() {
   const fit = (sel: HTMLSelectElement) => {
     ruler.textContent = sel.selectedOptions[0]?.textContent ?? "";
     sel.style.width = `${Math.ceil(ruler.getBoundingClientRect().width) + 4}px`;
-    sel.style.width = `calc(${sel.style.width} + 1.1em)`;
+    sel.style.width = `calc(${sel.style.width} + 1.5em)`;
   };
   document.fonts?.ready.then(() => {
     fit(fSel);
@@ -234,7 +237,7 @@ async function main() {
             const far = d.cells.nearest_analog_km?.[i];
             return `<li data-i="${i}"><button type="button" class="row${i === s.cell ? " on" : ""}" aria-pressed="${i === s.cell}">
               <span class="r-n">${r + 1}</span>
-              <span class="r-name">${esc(placeName(m, d.cells, i))}${Number.isFinite(far) && far > 100 ? ` <span class="rare" title="${num(far)} km from the nearest known analog">rarely used</span>` : ""}</span>
+              <span class="r-name">${esc(placeName(m, d.cells, i))}${Number.isFinite(far) && far > 100 ? ` <span class="rare" title="${num(far)} km from the nearest known analog">rarely used</span>` : ""}${isIce(d.cells, i) ? ` <span class="tag ice">ice sheet</span>` : ""}</span>
               <span class="r-meta">${named(i) ? `${latlon(d.cells.lat[i], d.cells.lon[i], 2)} · ` : ""}${esc(tt && tt.key !== "none" ? tt.name : "No terrain type")}</span>
               <span class="r-score"><b>${score100(score[i])}</b><i style="--w:${score[i] * 100}%;--c:${colour(score[i])}"></i></span>
             </button></li>`;
@@ -314,7 +317,7 @@ async function main() {
 
   const setTarget = async (first: boolean) => {
     const t: Target = target();
-    cols = await targetCols(d, t);
+    cols = await targetCols(d.base, t);
     if (s.hand) s.hand = Object.fromEntries(m.challenges[t.body].map((c) => [c.id, s.hand![c.id] ?? 0]));
     renderFilters();
     renderSliders();

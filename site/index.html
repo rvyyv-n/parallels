@@ -6,10 +6,21 @@
     <meta name="theme-color" content="#050607" />
     <meta name="description" content="Parallels ranks all of Earth's land as test sites for a Moon south-pole base and for Mars, challenge by challenge, and says honestly how close each match is and where it breaks." />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/data/manifest.json" as="fetch" crossorigin="anonymous" />
+    <link rel="preload" href="/data/cells.bin" as="fetch" crossorigin="anonymous" />
     <title>Parallels: Earth's closest parallels to every part of a Moon or Mars base</title>
+    <style>
+      body { margin: 0; background: #050607; color: #eef1f4; font: 15px/1.5 system-ui, sans-serif; }
+      .boot { padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,.13); }
+      .boot b { display: inline-block; font: 800 19px/1 "Arial Black", system-ui, sans-serif; letter-spacing: .14em; padding: 5px 0 4px; border-top: 1px solid #eef1f4; border-bottom: 1px solid #eef1f4; }
+      .boot-msg { padding: 28px 20px; color: #b2bac4; }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div class="boot"><b>PARALLELS</b></div>
+      <p class="boot-msg" role="status">Loading Earth's land, cell by cell. On a slow connection this takes a few seconds.</p>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
