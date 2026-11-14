@@ -4,7 +4,7 @@ import type { Target } from "../../../dataset/contract";
 import type { Listing, PlaceInfo } from "../data/load";
 import { CHAPTERS, entrance, keyframe, mix, smooth, WIDE_FROM } from "../scene/keyframes";
 import { matchPixels } from "../scene/match-map";
-import { Scene } from "../scene/scene";
+import { Scene, type World as SceneWorld } from "../scene/scene";
 
 interface Props {
   story: RefObject<HTMLDivElement | null>;
@@ -30,7 +30,7 @@ export function World({ story, target, listing, selected, onSelect }: Props) {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let s: Scene;
     try {
-      s = new Scene(el, import.meta.env.BASE_URL + "img/", reduced);
+      s = new Scene(el, import.meta.env.BASE_URL + "img/", reduced, innerWidth < WIDE_FROM);
     } catch {
       setFailed(true);
       return;
@@ -93,7 +93,7 @@ export function World({ story, target, listing, selected, onSelect }: Props) {
   }, []);
 
   useEffect(() => {
-    scene.current?.setBody(target.body, target.lat, target.lon);
+    scene.current?.setSite(target.body, target.lat, target.lon);
     dispatchEvent(new Event("scroll"));
   }, [target]);
 
@@ -121,7 +121,7 @@ export function World({ story, target, listing, selected, onSelect }: Props) {
       for (const el of Array.from(box.children) as HTMLElement[]) {
         const lat = Number(el.dataset.lat);
         const lon = Number(el.dataset.lon);
-        const p = el.dataset.on === "companion" ? s.projectCompanion(lat, lon) : s.projectEarth(lat, lon);
+        const p = s.project(el.dataset.on as SceneWorld, lat, lon);
         el.style.transform = `translate(${p.x.toFixed(1)}px, ${p.y.toFixed(1)}px)`;
         el.classList.toggle("hidden", !p.visible);
       }
@@ -137,6 +137,7 @@ export function World({ story, target, listing, selected, onSelect }: Props) {
           <button
             key={p.cell}
             class="pin"
+            data-on="earth"
             data-lat={p.lat}
             data-lon={p.lon}
             aria-current={p.cell === selected?.cell || undefined}
@@ -147,7 +148,7 @@ export function World({ story, target, listing, selected, onSelect }: Props) {
             <span>{i + 1}</span>
           </button>
         ))}
-        <div class="pin target-pin" data-on="companion" data-lat={target.lat} data-lon={target.lon} aria-hidden="true">
+        <div class="pin target-pin" data-on={target.body} data-lat={target.lat} data-lon={target.lon} aria-hidden="true">
           <span>Base site</span>
         </div>
       </div>

@@ -61,7 +61,7 @@ const earth = await mosaic({
   url: (x, y) =>
     `https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/BlueMarble_NextGeneration/default/2004-08-01/500m/3/${y}/${x}.jpeg`,
 });
-await write(earth, "earth", [2048, 4096]);
+await write(earth, "earth", [1024, 2048, 4096]);
 
 const mars = await mosaic({
   name: "trek_mars_viking_z3",
@@ -73,7 +73,7 @@ const mars = await mosaic({
   url: (x, y) =>
     `https://trek.nasa.gov/tiles/Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m/1.0.0/default/default028mm/3/${y}/${x}.jpg`,
 });
-await write(mars, "mars", [2048, 4096]);
+await write(mars, "mars", [1024, 2048, 4096]);
 
 const moon = await get("https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_4k.tif", "lroc_color_poles_4k.tif");
-await write(moon, "moon", [2048, 4096]);
+await write(moon, "moon", [1024, 2048, 4096]);

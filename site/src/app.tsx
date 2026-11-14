@@ -69,11 +69,39 @@ export function App() {
         <div class="story" ref={story}>
           <World story={story} target={target} listing={listing} selected={selected} onSelect={(cell) => setView({ place: cell })} />
           <div class="chapters">
-            <section class="chapter" data-chapter="find" id="find">
-              <div class="copy lead">
-                <h1 class="claim">
-                  No place on Earth copies a Moon or Mars base whole. <em>Each part of a base has a best place to practise.</em>
+            <section class="chapter" data-chapter="intro" id="intro">
+              <div class="copy hero">
+                <h1>
+                  No place on Earth copies a Moon or Mars base. <em>But each part of a base has a best place to practise.</em>
                 </h1>
+                <p class="hero-sub">
+                  We searched all of Earth’s land with NASA data. Every match shows where it holds and where it breaks.
+                </p>
+                <div class="hero-actions">
+                  <button class="cta" onClick={() => scrollToId("find")}>
+                    Find a place
+                    <span aria-hidden="true">↓</span>
+                  </button>
+                  <button class="ghost">Take the tour</button>
+                </div>
+                <dl class="hero-stats">
+                  <div>
+                    <dt>squares of land searched</dt>
+                    <dd>{manifest.grid.n.toLocaleString("en")}</dd>
+                  </div>
+                  <div>
+                    <dt>base sites</dt>
+                    <dd>{manifest.targets.length}</dd>
+                  </div>
+                  <div>
+                    <dt>mission filters</dt>
+                    <dd>{manifest.filters.length}</dd>
+                  </div>
+                </dl>
+              </div>
+            </section>
+            <section class="chapter" data-chapter="find" id="find" aria-label="Find a place">
+              <div class="copy lead">
                 <Picker manifest={manifest} view={view} onChange={setView} />
                 {selected && (
                   <Feature
@@ -105,7 +133,7 @@ export function App() {
               </div>
               <p class="legend">
                 <i aria-hidden="true" />
-                {manifest.grid.n.toLocaleString("en")} squares of land searched. Lit: the closest {percent(1 - SHOWN_FROM)}.
+                Lit land: the closest {percent(1 - SHOWN_FROM)} of matches.
               </p>
             </section>
             {chapter && <MatchChapter {...chapter} />}

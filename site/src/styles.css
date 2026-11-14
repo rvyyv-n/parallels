@@ -194,6 +194,7 @@ p {
 }
 
 .pin.hidden,
+.story[data-at="intro"] .pin,
 .story:not([data-at="find"]) .pin:not([aria-current], .target-pin) {
   opacity: 0;
   pointer-events: none;
@@ -249,8 +250,118 @@ p {
   --show: 1;
 }
 
+.chapter[data-chapter="intro"],
 .chapter[data-chapter="find"] {
   min-height: 100svh;
+}
+
+.copy.hero {
+  position: relative;
+  top: auto;
+  width: min(100%, 900px);
+  padding: clamp(84px, 13svh, 150px) var(--pad) 0;
+}
+
+.hero h1 {
+  font: 350 clamp(36px, min(4.8vw, 8.2svh), 68px) / 1 var(--serif);
+  font-variation-settings: "opsz" 72;
+  letter-spacing: -0.028em;
+  color: var(--dim);
+  text-wrap: balance;
+}
+
+.hero h1 em {
+  display: block;
+  margin-top: 0.14em;
+  font-style: normal;
+  color: var(--ink);
+}
+
+.hero-sub {
+  margin-top: 26px;
+  max-width: 46ch;
+  font-size: clamp(15px, 1.25vw, 18px);
+  line-height: 1.5;
+  color: var(--dim);
+}
+
+.hero-actions {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-actions .cta {
+  margin-top: 0;
+  min-height: 48px;
+  padding: 0 22px;
+  font-size: 15.5px;
+}
+
+.ghost {
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: 500;
+  background: rgba(5, 6, 7, 0.5);
+  transition: border-color 0.15s;
+}
+
+.ghost:hover {
+  border-color: var(--ink);
+}
+
+.hero-stats {
+  margin: 34px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 36px;
+}
+
+.hero-stats div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.hero-stats dt {
+  font-size: 12.5px;
+  color: var(--dim);
+}
+
+.hero-stats,
+.hero-sub {
+  text-shadow: 0 0 10px var(--bg), 0 0 3px var(--bg);
+}
+
+.hero-stats dd {
+  margin: 0;
+  font: 400 clamp(24px, 2.4vw, 34px) / 1.1 var(--serif);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero > * {
+  animation: rise 0.9s var(--ease) both;
+}
+
+.hero > :nth-child(1) {
+  animation-delay: 0.25s;
+}
+
+.hero > :nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.hero > :nth-child(3) {
+  animation-delay: 0.65s;
+}
+
+.hero > :nth-child(4) {
+  animation-delay: 0.8s;
 }
 
 .copy {
@@ -283,26 +394,6 @@ p {
 .copy.side {
   width: min(100%, 540px);
   padding-left: var(--pad);
-}
-
-.lead > * {
-  animation: rise 0.8s var(--ease) both;
-}
-
-.lead > :nth-child(1) {
-  animation-delay: 0.15s;
-}
-
-.lead > :nth-child(2) {
-  animation-delay: 0.3s;
-}
-
-.lead > :nth-child(3) {
-  animation-delay: 0.45s;
-}
-
-.lead > :nth-child(4) {
-  animation-delay: 0.6s;
 }
 
 @keyframes rise {
@@ -990,7 +1081,16 @@ p {
     padding: 0 var(--pad) 64px;
   }
 
+  .hero h1 {
+    font-size: 36px;
+  }
+
+  .hero-stats {
+    gap: 10px 24px;
+  }
+
   .copy,
+  .copy.hero,
   .copy.lead,
   .copy.mid,
   .copy.side {
