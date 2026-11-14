@@ -1,0 +1,136 @@
+{
+  "version": "v1",
+  "note": "Proposed defaults, chosen from what each target and the test hardware need, before any v1 score existed. Not tuned on the test places.",
+  "land_rule": {"min_land_frac": 0.05, "plain": "A cell counts as land when at least 5% of it is land."},
+  "scoring": {
+    "floor": 0.01,
+    "missing_rank": 0.5,
+    "min_weight_with_data": 0.7,
+    "yearround_share": 0.25,
+    "yearround_reason": "A quarter of the year-round score: enough that a place usable only a few months drops clearly, not so much that season alone outranks the match."
+  },
+  "default_targets": ["moon-south-pole", "mars-jezero"],
+  "trait_weights": {
+    "moon": {
+      "surface": {
+        "slope": [2, "Slope limits rovers and landers before anything else does."],
+        "safe10": [2, "NASA's lander limit is 10°, so the share of ground under it decides where a lander can touch down."],
+        "relief": [1, "Height range matters for long drives and line of sight, less than the local slope."],
+        "highland_rock": [1, "Rock family matters for digging and building, but the rock map is coarse and only knows \"plutonic\"."],
+        "bare": [1, "Rovers and builders work on open ground; at the pole there is nothing else."]
+      },
+      "resources": {
+        "frozen": [2, "Ice-cemented ground is the base's main water source, the first resource to practise on."],
+        "highland_rock": [1, "Oxygen comes from the highland rock; the rock map only finds its family."]
+      },
+      "dryness": {"dry": [1, "The only trait in this challenge."]},
+      "heat": {
+        "cold": [1, "Deep cold drains batteries and stiffens seals."],
+        "season_swing": [1, "The yearly swing cycles every joint and seal; as important as the cold itself."]
+      },
+      "light": {"sun_height": [1, "The only trait in this challenge."]},
+      "industrial": {
+        "flat5": [2, "Pads, roads and solar farms need ground under 5°."],
+        "low_relief": [1, "Long straight strips, like a railgun, also need little height change."]
+      }
+    },
+    "mars": {
+      "surface": {
+        "slope": [2, "Slope limits rovers and landers before anything else does."],
+        "safe10": [2, "Lander safety is judged on the share of ground under 10°."],
+        "relief": [1, "Height range matters for long drives, less than the local slope."],
+        "minerals": [1, "Mineral-bearing ground is what Mars rovers drive to; EMIT covers only dry land, so it gets one share."],
+        "bare": [1, "Mars ground is all bare; plants change how wheels grip and dust lifts."]
+      },
+      "resources": {
+        "frozen": [1, "Water: frozen ground is where teams practise drilling for buried ice. Used when the target has a frozen-months value; otherwise Resources is minerals alone."],
+        "minerals": [1, "Water-bearing clays and sulfates are the other water source on Mars."]
+      },
+      "dryness": {"dry": [1, "The only trait in this challenge."]},
+      "heat": {
+        "cold": [1, "Cold nights drain batteries and stiffen seals."],
+        "day_swing_ground": [1, "The daily swing cycles every joint and seal every sol; ground is matched to ground."],
+        "day_swing_air": [1, "Used when the target has an air value instead; air is matched to air."]
+      },
+      "atmosphere": {
+        "dust": [2, "Dust in the air is what coats solar panels and clogs filters."],
+        "bare": [1, "Dust is lifted from bare ground; plants hold it down."]
+      },
+      "life": {
+        "minerals": [1, "Water-made minerals are where traces of past life are kept. One share, not more, because EMIT sees only dry land, so most places have no mineral data."],
+        "dry": [1, "Dryness preserves traces and slows decay."],
+        "cold": [1, "Cold slows decay too."],
+        "bare": [1, "Bare ground lets instruments reach the rock."]
+      }
+    }
+  },
+  "filter_weights": {
+    "rover": {
+      "moon": {"surface": [1, "On the Moon only Surface can be scored for driving; Moon dust is a label."]},
+      "mars": {
+        "surface": [2, "Slope and footing decide where a rover can drive."],
+        "atmosphere": [1, "Dust and haze wear down wheels, joints and solar power, but slope comes first."]
+      }
+    },
+    "life_support": {
+      "moon": {
+        "resources": [1, "Water and oxygen from the ground."],
+        "heat": [1, "Heating and cooling are the main load on life support."],
+        "light": [1, "Power at the pole comes from a low sun."]
+      },
+      "mars": {
+        "resources": [1, "Water from the ground."],
+        "heat": [1, "Heating and cooling are the main load on life support."],
+        "atmosphere": [1, "Dust on solar panels and in air filters."]
+      }
+    },
+    "habitat": {
+      "moon": {
+        "surface": [1, "The habitat stands on this ground."],
+        "heat": [1, "The structure expands and shrinks with every temperature swing."]
+      },
+      "mars": {
+        "surface": [1, "The habitat stands on this ground."],
+        "heat": [1, "The structure expands and shrinks with every temperature swing."]
+      }
+    }
+  },
+  "terrain": {
+    "order": ["cave", "salt_flat", "volcanic_high", "arid_basin", "frozen_ground"],
+    "order_reason": "A cell gets at most one type: the first rule it meets, in this order. The narrowest rules go first, so a salt flat inside a dry basin is called a salt flat.",
+    "arid_basin": {"max_aridity": 0.2, "window_deg": 2.0, "min_drop_m": 100},
+    "volcanic_high": {"min_volcanic_pct": 50, "min_elev_m": 2000},
+    "salt_flat": {"min_evaporite_pct": 20, "max_aridity": 0.2},
+    "frozen_ground": {"max_annual_ground_c": 0.0}
+  },
+  "clustering": {
+    "k": 8,
+    "seed": 2026,
+    "inputs": ["ts_coldest", "swing_year", "aridity", "sun_height", "slope_240", "relief_240", "bare_share", "frozen_months", "elev_mean"],
+    "log_inputs": ["aridity", "relief_240"]
+  },
+  "rare_km": 100,
+  "validation": {
+    "seed": 2026,
+    "pool": ["argentine-puna", "askja", "black-point-lava-flow", "bletterbach", "bockfjorden-svalbard", "chill-ice-lava-tube", "cinder-lake-crater-field", "craters-of-the-moon", "death-valley", "etna", "gros-morne", "gypsum-hill-axel-heiberg", "haughton-crater-devon-island", "kangerlussuaq", "kilauea-iki", "kilbourne-hole", "laguna-de-tirez", "lanzarote", "lofoten", "makgadikgadi", "mauna-kea", "mcmurdo-dry-valleys", "mdrs-utah", "meteor-crater", "mistastin-crater", "pavilion-lake", "puga-valley", "qaidam-dalangtan", "ries-crater", "rio-tinto", "salar-de-pajonales", "sedan-crater", "spotted-lake", "sudbury", "teide", "tso-kar", "yungay-atacama"],
+    "held_out": ["bletterbach", "chill-ice-lava-tube", "cinder-lake-crater-field", "etna", "gros-morne", "gypsum-hill-axel-heiberg", "haughton-crater-devon-island", "laguna-de-tirez", "makgadikgadi", "mcmurdo-dry-valleys", "mistastin-crater", "pavilion-lake", "qaidam-dalangtan", "salar-de-pajonales", "sudbury", "teide", "tso-kar", "yungay-atacama"],
+    "mars_target": "mars-jezero",
+    "moon_target": "moon-south-pole",
+    "pass_marks": {
+      "mars_vs_ordinary": 0.8,
+      "mars_vs_desert": 0.6,
+      "moon_vs_ordinary": 0.8,
+      "basalt_terrain_vs_ordinary": 0.8
+    },
+    "pass_marks_note": "All pass marks were set on 15 November 2026, before any v1 run. Moon part 2 uses 0.8, the same mark as every other analog-against-ordinary comparison, instead of the plan's example of beating every ordinary place.",
+    "aridity_checks": [
+      {"site": "yungay-atacama", "name": "Aridity index at Yungay (Atacama) is below 0.05", "below": 0.05},
+      {"site": "iowa-corn-belt", "name": "Aridity index in the Iowa corn belt is above 0.65", "above": 0.65}
+    ],
+    "basalt_terrain_traits": ["slope", "relief", "safe10"],
+    "prototype_runs": [
+      {"date": "2026-11-14", "result": "Moon: 67% against a pass mark of 80%"},
+      {"date": "2026-11-14", "result": "Mars: 79% against 80% (ordinary places) and 54% against 60% (plain deserts)"}
+    ]
+  }
+}

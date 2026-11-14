@@ -118,7 +118,7 @@ export interface Manifest {
   traits: Trait[];
   challenges: Record<Body, Challenge[]>;
   filters: MissionFilter[];
-  scoring: { floor: number; missing_rank: number; min_weight_with_data: number; rule: string; yearround_rule: string };
+  scoring: { floor: number; missing_rank: number; min_weight_with_data: number; rule: string; layout?: string; yearround_rule: string };
   terrain_types: TerrainType[];
   clustering: { k: number; method: string; inputs: string[]; agreement: { cluster: number; cells: number; top_type: string; share: number }[]; summary: string };
   targets: Target[];
@@ -163,7 +163,7 @@ export interface ValidationTest {
   plain: string;
   groups: { id: string; name: string; plain: string }[];
   places: ValidationPlace[];
-  checks: { name: string; pass_mark: number; result: number | null; passed: boolean | null; n_pairs: number; blind_only?: number | null }[];
+  checks: { name: string; pass_mark: number; result: number | null; passed: boolean | null; n_pairs: number; held_out_only?: number | null; blind_only?: number | null }[];
   misses: { place: string; why: string }[];
 }
 
