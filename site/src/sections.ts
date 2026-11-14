@@ -5,6 +5,7 @@ import { esc, num } from "./format";
 const pct = (v: number | null | undefined) => (v == null ? "not run" : `${num(v * 100, 0)}%`);
 
 export const NAV = [
+  ["worlds", "Worlds"],
   ["checked", "Checks"],
   ["challenge", "Challenge"],
   ["data", "Data"],

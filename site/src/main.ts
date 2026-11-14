@@ -12,6 +12,7 @@ import { esc, latlon, num, reduced, score100, webgl } from "./format";
 import { colour, gradient } from "./ramp";
 import { logo } from "./logo";
 import { icon } from "./icons";
+import { fillAnalogs, headline, wireWorlds, worlds } from "./worlds";
 import type { Intro } from "./intro";
 
 interface State {
@@ -44,10 +45,7 @@ const next = (id: string, label: string) =>
 function facts(m: Manifest, body: "moon" | "mars") {
   return `<div class="facts"><p class="facts-k">${icon("cant")}Earth can't copy</p><dl>${m.cant_copy
     .map((c) => {
-      const text = c[body];
-      const cut = [" (", ": ", ", "].map((k) => text.indexOf(k)).filter((n) => n > 0).sort((x, y) => x - y)[0];
-      const big = cut ? text.slice(0, cut) : text;
-      const rest = cut ? text.slice(cut).replace(/^[\s:(,]+/, "").replace(/\)$/, "") : "";
+      const [big, rest] = headline(c[body]);
       return `<div><dt>${esc(c.name)}</dt><dd><b>${esc(big)}</b>${rest ? `<span>${esc(rest)}</span>` : ""}<small>${esc(c.source)}</small></dd></div>`;
     })
     .join("")}</dl></div>`;
@@ -143,7 +141,7 @@ function ranges(d: Data) {
   return out;
 }
 
-function shell(m: Manifest) {
+function shell(m: Manifest, body: "moon" | "mars") {
   app.innerHTML = `
     ${m.sample ? `<p class="sample" role="note"><b>Sample data.</b> Every number on this page is a made-up test value while the real data is processed. Nothing here is a result yet.</p>` : ""}
     <header class="top">
@@ -272,6 +270,7 @@ function shell(m: Manifest) {
           <div class="card-wrap" id="card" tabindex="-1" aria-live="polite"></div>
         </div>
       </section>
+      ${worlds(m, body)}
       <div id="sections"></div>
     </main>
     <footer class="foot">
@@ -294,7 +293,7 @@ async function main() {
     s = readUrl(mf);
     shared = new URLSearchParams(location.search).has("c") && !location.hash;
     void targetCols(BASE, mf.targets.find((t) => t.id === s.target)!).catch(() => {});
-    shell(mf);
+    shell(mf, mf.targets.find((t) => t.id === s.target)!.body);
     d = await load(mf);
   } catch (e) {
     fail(e);
@@ -668,6 +667,11 @@ async function main() {
     known = ls.filter((l) => l.kind === "known_analog");
     $("#count-known").textContent = known.length ? num(known.length) : "no data";
     intro?.known(known);
+    fillAnalogs(app, ls);
+  });
+  wireWorlds($("#worlds"));
+  $("#worlds").addEventListener("click", (e) => {
+    if ((e.target as HTMLElement).closest(".w-go")) $("#explore").scrollIntoView({ behavior: reduced() ? "auto" : "smooth" });
   });
   if (webgl())
     Promise.all([import("./earth"), labelsReady])

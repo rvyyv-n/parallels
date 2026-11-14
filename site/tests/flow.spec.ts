@@ -290,12 +290,12 @@ test("section nav fits, marks the current section, and links open folded blocks"
   await ready(page);
   await page.locator("#checked").waitFor();
   const nav = page.locator(".top nav a");
-  await expect(nav).toHaveText(["Checks", "Challenge", "Data", "Limits"]);
+  await expect(nav).toHaveText(["Worlds", "Checks", "Challenge", "Data", "Limits"]);
   for (const box of await nav.evaluateAll((as) => as.map((a) => a.getBoundingClientRect().toJSON())))
     expect(box.height).toBeGreaterThanOrEqual(44);
   expect(await page.locator(".top nav").evaluate((n) => n.scrollWidth <= n.clientWidth + 1)).toBe(true);
-  await nav.nth(2).click();
-  await expect(nav.nth(2)).toHaveAttribute("aria-current", /.+/);
+  await nav.nth(3).click();
+  await expect(nav.nth(3)).toHaveAttribute("aria-current", /.+/);
   await expect(page.locator(".top nav a[aria-current]")).toHaveCount(1);
   await expect(page.locator("#benchmarks")).not.toHaveAttribute("open", "");
   await page.locator("#benchmarks > summary").click();
