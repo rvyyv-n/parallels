@@ -1,0 +1,57 @@
+[
+ {
+  "id": "surtshellir",
+  "name": "Surtshellir",
+  "country": "Iceland",
+  "lat": 64.7842,
+  "lon": -20.7277,
+  "kind": "lava tube",
+  "coord_source": "https://en.wikipedia.org/wiki/Surtshellir",
+  "analog_source": "https://meetingorganizer.copernicus.org/EGU21/EGU21-16189.html",
+  "note": "Wikipedia point; the CHILL-ICE lunar-analog habitat campaigns used this system and the neighbouring Stefánshellir. The chill-ice entry in sites.json is 1.5 km from this point."
+ },
+ {
+  "id": "umm-jirsan",
+  "name": "Umm Jirsan lava tube",
+  "country": "Saudi Arabia",
+  "lat": 25.5888,
+  "lon": 39.757,
+  "kind": "lava tube",
+  "coord_source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11023468",
+  "analog_source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11023468",
+  "note": "Same point as sites.json, from Stewart et al. 2024, which studies it as a lava-tube analog for Moon and Mars."
+ },
+ {
+  "id": "cueva-de-los-verdes",
+  "name": "Cueva de los Verdes",
+  "country": "Spain",
+  "lat": 29.1611,
+  "lon": -13.4389,
+  "kind": "lava tube",
+  "coord_source": "https://en.wikipedia.org/wiki/Cueva_de_los_Verdes",
+  "analog_source": "https://www.esa.int/ESA_Multimedia/Images/2018/03/Volcanic_wormhole",
+  "note": "Part of the La Corona tube on Lanzarote; ESA mapped 1.3 km of it in 2017 (PANGAEA-X) as a model for Moon and Mars lava tubes."
+ },
+ {
+  "id": "valentine-cave",
+  "name": "Valentine Cave, Lava Beds",
+  "country": "USA",
+  "lat": 41.7093,
+  "lon": -121.4778,
+  "kind": "lava tube",
+  "coord_source": "https://www.wikidata.org/wiki/Q124749732",
+  "analog_source": "https://www.geekwire.com/2019/rover-teams-practice-spelunking-moon-mars-california-lava-tubes/",
+  "note": "Cave where NASA Ames drove the CaveR rover in the BRAILLE project, practising cave exploration for Moon and Mars."
+ },
+ {
+  "id": "lava-beds-national-monument",
+  "name": "Lava Beds National Monument",
+  "country": "USA",
+  "lat": 41.7139,
+  "lon": -121.5083,
+  "kind": "lava tube",
+  "coord_source": "https://en.wikipedia.org/wiki/Lava_Beds_National_Monument",
+  "analog_source": "https://www.nasa.gov/feature/ames/braille",
+  "note": "Monument point, not a single tube; North America's largest lava-tube network and the home of NASA BRAILLE."
+ }
+]

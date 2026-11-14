@@ -6,11 +6,10 @@ Our NASA Space Apps 2026 entry for **Identify Earth Locations that Analog the Pe
 
 ## Layout
 
-- `docs/`: our rules and working guidelines (`guidelines.md`), our local event's Challenge Guide (`challenge-guide.pdf`, the main brief: its six benchmarks and seven questions are what we build to), the challenge in plain words (`challenge.md`), how judging works (`judging-notes.md`), our workflow chart (`workflow.png`) and, once written, the plan, which sets the tech stack and roadmap.
+- `docs/`: our rules and working guidelines (`guidelines.md`), our local event's Challenge Guide (`challenge-guide.pdf`, the main brief: its six benchmarks and seven questions are what we build to), the challenge in plain words (`challenge.md`), how judging works (`judging-notes.md`), our workflow chart (`workflow.png`), and the plans: the team's idea (`team-plan.md`) and Claude's method, data, checks and roadmap, with the data checks made before the v1 build (`claudes-plan.md`).
+- `pipeline/`: the Python data pipeline. Raw downloads go in the gitignored `data/`.
+- `dataset/`: the pre-computed data files the pipeline exports, described by `dataset/contract.ts`.
 - `assets/`: logo and other images.
-- `retired/`: earlier candidate challenges. Reference only; don't edit or build on them.
-
-Code goes where the plan's tech stack puts it.
 
 ## How Claude works here
 
@@ -18,3 +17,4 @@ Code goes where the plan's tech stack puts it.
 - **The core idea comes from the team** (official AI rule). Building and polishing it is Claude's job. Propose improvements to the idea and the project wherever you see one, without waiting to be asked, and say when an idea is Claude's own.
 - **Keep the "How we used AI" note accurate** in the README, the site's footer and the project description, because judges don't see the form's AI answer. Mention AI use only in those places, not throughout. This replaces the global "no AI attribution" rule for this repo only. Still no `Co-Authored-By` trailers or "Generated with" footers in commits or PRs.
 - **Plain language** in chat and user-facing text; exact values belong in technical docs.
+- **Use T3 Code to its full potential.** When a chart, diagram, table or picture explains a result better than text, show it inline with T3 Code's tools (`html_preview`, then `html_render`) instead of describing it. This applies to every agent and subagent working here.

@@ -1,0 +1,10 @@
+{
+  "version": "v1.2",
+  "inherits": "v1.1.json, which inherits v1.json: everything not listed here (the parts and trait weights of version 1.1, filter weights, pass marks, the second run's rules, thresholds, the held-out split, the floor and the other scoring constants) is unchanged.",
+  "why": "Version 1.1's results for places a newcomer would recognise showed the Amazon near Manaus scoring above 90% of land for rover mobility at Jezero. The cause is how tied values are ranked. The plan's rule is that a place's rank on a trait is the share of Earth's land that is further from the target than it is. Versions 1.0 and 1.1 also gave a place half credit for land exactly as far away as itself. Where most of Earth shares the worst possible value (no bare ground at all, never frozen, not the target's kind of rock), that half credit lifts the worst value to a middling rank: a rainforest ranked about 0.3 on bare ground although no land is further from Mars's bare surface, and the more of Earth is covered in plants, the higher it ranked. Version 1.2 applies the plan's rule as written: only land that is strictly further away counts. A place tied with the worst gets rank 0, which the existing floor turns into 0.01. The Amazon cell that exposed this is one of the ordinary test places, so this change was prompted by a test place's result; read the fourth run with that in mind.",
+  "scoring": {
+    "ties": "none",
+    "ties_rule": "Rank = share of Earth's land area strictly further from the target value. Land exactly as far away earns no credit."
+  },
+  "adoption_rule": "Version 1.2 replaces version 1.1 on the site only if, on the held-out half, its pooled result against ordinary places (each analog on the challenges it is used for) is at least as high as version 1.1's for both the Moon and Mars. Otherwise version 1.1 stays and version 1.2 is reported as tried and not adopted. This is the last method version checked against these test places: they have now been used four times, so no further change will be judged on them."
+}

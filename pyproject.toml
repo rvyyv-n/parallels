@@ -1,0 +1,30 @@
+[project]
+name = "parallels-pipeline"
+version = "1.0.0"
+description = "Data pipeline for Parallels: Earth analogs for a Moon south-pole base and Mars"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "numpy",
+    "scipy",
+    "pandas",
+    "xarray",
+    "zarr",
+    "fsspec",
+    "s3fs",
+    "aiohttp",
+    "netCDF4",
+    "h5netcdf",
+    "rasterio",
+    "pyproj",
+    "pyshp",
+    "requests",
+    "earthaccess",
+    "pyhdf",
+    "pytest",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["pipeline/tests"]

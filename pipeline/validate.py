@@ -1,0 +1,550 @@
+import argparse
+import json
+
+import numpy as np
+
+from pipeline.assemble import cell_of, index_of
+from pipeline.score import challenge, earth_rank, overall
+from pipeline.traits import CHALLENGES, TRAITS
+
+GROUPS = {
+    "mars-analog": ("Known Mars analogs", "Places already used to test Mars missions."),
+    "moon-analog": ("Polar and highland Moon analogs", "Places used to train for the Moon's highlands and poles."),
+    "moon-basalt": ("Basalt and crater training sites", "Places used to train for the Moon's dark plains and craters, not its pole."),
+    "ordinary": ("Ordinary places", "Farmland, forest and cities that nobody uses as an analog."),
+    "desert": ("Plain deserts", "Big deserts that aren't analogs. They catch a method that only rewards dry, bare ground."),
+}
+
+WHY = {
+    "mars": {
+        "arkaroola": "Its hills are far rougher than Jezero's flat crater floor, and its air is clearer than Jezero's dusty sky.",
+        "argentine-puna": "The point stands for a whole high plateau, with far more height range than Jezero's floor and clear mountain air.",
+        "puga-valley": "It sits in a steep Himalayan valley: almost all land on Earth is flatter.",
+        "spotted-lake": "Its cell is steep valley country, and EMIT has no mineral data there, so the lake's salts can't count.",
+        "pavilion-lake": "Its cell is steep valley country, and EMIT has no mineral data there.",
+        "kangerlussuaq": "Its ground is rough, its sun is low and its air is clear, all far from Jezero.",
+        "haughton-crater-devon-island": "Arctic: a small day-to-night swing, a low sun and clear air, far from Jezero. Polar air also reads as wet on the aridity index because so little water can evaporate.",
+        "bletterbach": "An Alpine gorge: steep, high-relief ground in a mostly green cell.",
+        "gros-morne": "A wet, rugged coast with a small day-to-night swing.",
+        "mcmurdo-dry-valleys": "The valleys are smaller than a 0.5° cell, and the cell is mostly ice sheet. Polar air reads as wet on the aridity index because so little water can evaporate, and its sun is low.",
+        "chill-ice-lava-tube": "Iceland's cool, wet climate has a small day-to-night swing; the lava tube itself can't be seen by any trait.",
+        "gypsum-hill-axel-heiberg": "High Arctic: steep ground, a tiny day-to-night swing and a low sun.",
+        "kilauea-iki": "Half of its cell is sea, and the tropical climate is warm with a small day-to-night swing.",
+        "bockfjorden-svalbard": "Most of its cell is glacier, its day-to-night swing is tiny and polar air reads as wet on the aridity index.",
+        "rio-tinto": "Rio Tinto is an analog for its acid water chemistry, which no trait measures.",
+        "don-juan-pond": "Not ranked: the pond sits on an Antarctic cell with no aridity value (ice sheet) and no EMIT minerals, so under 70% of the weight has data.",
+    },
+    "moon-polar": {
+        "lofoten": "Only a small part of its cell is land; the rest is fjord and sea. Its terrain is steep and its sea climate is mild and wet, with a small yearly swing.",
+        "stillwater-complex": "At 0.5° the rock map's main rock for its cell isn't plutonic, and the steep mountain ground scores very low on flat industrial strips.",
+    },
+    "moon-terrain": {
+        "kilbourne-hole": "The crater is a hole in a flat desert plain; at 0.5° the cell is mostly flat, while the south-pole target is rugged.",
+        "miyake-jima": "Not scored: the island is less than 5% of its cell, the rest is sea.",
+    },
+}
+
+LABELS = {t["id"]: t["label"] for t in TRAITS}
+
+NOT_BLIND = (
+    "This is not a blind first run. A throwaway prototype scored the same test places twice on 14 November, "
+    "and two lessons from it shaped this version. The weights and pass marks below were committed before this run, "
+    "and the places marked blind had never been scored before."
+)
+
+
+def win_rate(a, b):
+    a = np.asarray(a, float)
+    b = np.asarray(b, float)
+    if not len(a) or not len(b):
+        return None, 0
+    d = a[:, None] - b[None, :]
+    return float(((d > 0) + 0.5 * (d == 0)).mean()), int(d.size)
+
+
+def locate(sites, cells, idx):
+    out = {}
+    for s in sites:
+        r, c = cell_of(s["lat"], s["lon"])
+        i = int(idx[r, c])
+        out[s["id"]] = None if i < 0 else i
+    return out
+
+
+def place_rows(sites, group, where, score, land_rank, held, target_id):
+    rows = []
+    for s in sites:
+        if group not in s["groups"]:
+            continue
+        i = where[s["id"]]
+        v = None if i is None or not np.isfinite(score[i]) else round(float(score[i]), 4)
+        row = {
+            "id": s["id"],
+            "name": s["name"],
+            "lat": s["lat"],
+            "lon": s["lon"],
+            "group": group,
+            "cell": i,
+            "score": v,
+            "land_rank": None if v is None else round(float(land_rank[i]), 4),
+            "best_target": target_id,
+            "held_out": s["id"] in held,
+            "blind": bool(s.get("blind")),
+        }
+        if i is None:
+            row["note"] = "Not scored: the place's cell is less than 5% land on our grid."
+        elif v is None:
+            row["note"] = "Not scored: the cell has data for less than 70% of the weight."
+        rows.append(row)
+    return rows
+
+
+def check(name, rows, analog, other, mark):
+    a = [r for r in rows if r["group"] == analog and r["score"] is not None]
+    b = [r["score"] for r in rows if r["group"] == other and r["score"] is not None]
+    res, n = win_rate([r["score"] for r in a], b)
+    held, _ = win_rate([r["score"] for r in a if r["held_out"]], b)
+    blind, _ = win_rate([r["score"] for r in a if r["blind"]], b)
+    r3 = lambda x: None if x is None else round(x, 3)
+    return {
+        "name": name,
+        "pass_mark": mark,
+        "result": r3(res),
+        "passed": None if res is None else res >= mark,
+        "n_pairs": n,
+        "held_out_only": r3(held),
+        "blind_only": r3(blind),
+    }
+
+
+def miss_text(tid, p, cells, ranks):
+    parts = [WHY.get(tid, {}).get(p["id"], "")]
+    i = p["cell"]
+    if i is not None:
+        low = sorted((float(r[i]), k) for k, r in ranks.items() if np.isfinite(r[i]))[:3]
+        facts = [f"{LABELS[k].lower()} {v:.2f}" for v, k in low]
+        land, ice = float(cells["land_frac"][i]), float(cells["ice"][i])
+        extra = []
+        if land < 0.5:
+            extra.append(f"only {land:.0%} of the cell is land")
+        if ice > 50:
+            extra.append(f"{ice:.0f}% of the cell is permanent ice")
+        parts.append("Lowest trait ranks: " + ", ".join(facts) + ("; " + "; ".join(extra) if extra else "") + ".")
+    return " ".join(x for x in parts if x)
+
+
+def test(tid, title, body, plain, sites, groups, score, cells, where, held, target_id, checks, ranks):
+    land_rank = earth_rank(score, 1.0, cells["area"])
+    places = []
+    for g in groups:
+        places += place_rows(sites, g, where, score, land_rank, held, target_id)
+    misses = [
+        {"place": p["id"], "why": miss_text(tid, p, cells, ranks)}
+        for p in places
+        if p["group"] == groups[0] and (p["land_rank"] is None or p["land_rank"] < 0.5)
+    ]
+    return {
+        "id": tid,
+        "title": title,
+        "body": body,
+        "plain": plain,
+        "groups": [{"id": g, "name": GROUPS[g][0], "plain": GROUPS[g][1]} for g in groups],
+        "places": places,
+        "checks": [check(n, places, a, o, m) for n, a, o, m in checks],
+        "misses": misses,
+    }
+
+
+def terrain_score(scored, cfg, body):
+    tw = cfg["trait_weights"][body]["surface"]
+    keys = [k for k in cfg["validation"]["basalt_terrain_traits"] if k in scored["ranks"]]
+    sc = cfg["scoring"]
+    w = {k: tw[k][0] for k in keys}
+    s, cov = challenge({k: scored["ranks"][k] for k in keys}, w, sc["floor"], sc["missing_rank"])
+    return overall({"terrain": s}, {"terrain": cov}, {"terrain": 1.0}, sc["floor"], sc["missing_rank"], sc["min_weight_with_data"])
+
+
+def data_checks(cells, where, checks):
+    out = []
+    for c in checks:
+        i = where.get(c["site"])
+        v = None if i is None else float(cells["aridity"][i])
+        if v is None or not np.isfinite(v):
+            out.append({"name": c["name"], "result": "no data in the cell", "passed": False})
+        else:
+            ok = v < c["below"] if "below" in c else v > c["above"]
+            out.append({"name": c["name"], "result": f"{v:.3f}", "passed": bool(ok)})
+    return out
+
+
+def run(cells, scored, sites, cfg, commit, with_misses=False):
+    v = cfg["validation"]
+    pm = v["pass_marks"]
+    held = set(v["held_out"])
+    where = locate(sites, cells, index_of(cells))
+    mars, moon = scored[v["mars_target"]], scored[v["moon_target"]]
+    rule = "Each place is scored on its 0.5° cell against {t}, with every scored challenge weighted equally (a weighted geometric mean of the challenge scores, under the same 70% data rule as the map). A pair counts as a win when the analog scores higher; a pair with exactly equal scores counts as half a win."
+    tests = [
+        test(
+            "mars", "Mars test", "mars",
+            "Known Mars analogs should beat ordinary places and plain deserts. " + rule.format(t="Jezero crater"),
+            sites, ["mars-analog", "ordinary", "desert"], mars["equal"], cells, where, held, v["mars_target"],
+            [
+                ("Known Mars analogs beat ordinary places", "mars-analog", "ordinary", pm["mars_vs_ordinary"]),
+                ("Known Mars analogs beat plain deserts", "mars-analog", "desert", pm["mars_vs_desert"]),
+            ],
+            mars["ranks"],
+        ),
+        test(
+            "moon-polar", "Moon test, part 1", "moon",
+            "Polar and highland analogs should beat ordinary places. It's a small group, and we say so. " + rule.format(t="the Moon's south pole"),
+            sites, ["moon-analog", "ordinary"], moon["equal"], cells, where, held, v["moon_target"],
+            [("Polar and highland analogs beat ordinary places", "moon-analog", "ordinary", pm["moon_vs_ordinary"])],
+            moon["ranks"],
+        ),
+        test(
+            "moon-terrain", "Moon test, part 2", "moon",
+            "Basalt and crater training sites stand in for the Moon's dark plains, not its pole, so they are checked only on terrain "
+            "(slope, height range and ground under 10° against the south pole), with the same pass mark as the other tests. "
+            "Ranking low on rock is expected, not a failure.",
+            sites, ["moon-basalt", "ordinary"], terrain_score(moon, cfg, "moon"), cells, where, held, v["moon_target"],
+            [("Basalt and crater sites beat ordinary places on terrain", "moon-basalt", "ordinary", pm["basalt_terrain_vs_ordinary"])],
+            {k: moon["ranks"][k] for k in v["basalt_terrain_traits"] if k in moon["ranks"]},
+        ),
+    ]
+    second = second_run(cells, scored, sites, cfg, where, held, with_misses)
+    return {
+        "weights_commit": commit,
+        "summary": result_line(tests) + " " + second["summary"],
+        "not_blind_note": NOT_BLIND,
+        "prototype_runs": v["prototype_runs"],
+        "tests": tests,
+        "second_run": second,
+        "data_checks": data_checks(cells, where, v["aridity_checks"]),
+    }
+
+
+SECOND_COMMIT = "d48b9ab"
+
+
+def uses(site, body):
+    u = site.get("used_for")
+    if u is None:
+        return None
+    if isinstance(u, dict):
+        return u.get(body)
+    return u
+
+
+def entries(sites, body, groups, scored_ids):
+    out, unchecked = [], []
+    for s in sites:
+        if not set(s["groups"]) & set(groups):
+            continue
+        u = uses(s, body)
+        if not u:
+            unchecked.append({"place": s["id"], "why": f"No use is tagged for the {body.capitalize()}, so there is no challenge to check it on."})
+            continue
+        for c in u:
+            if c in ("shelter", "other"):
+                unchecked.append({"place": s["id"], "why": f"Used for {c}, which we do not score."})
+            elif c not in scored_ids:
+                unchecked.append({"place": s["id"], "why": f"Used for {c}, which is not a scored challenge for the {body.capitalize()}."})
+            else:
+                out.append((s, c))
+    return out, unchecked
+
+
+def pair_counts(a, b):
+    r, n = win_rate(a, b)
+    return (0.0, 0) if r is None else (r * n, n)
+
+
+def tally(rows, other, mark, name, min_sites, pooled=False):
+    def rate(sel):
+        wins = pairs = 0
+        for c in {r["challenge"] for r in rows}:
+            a = [r["score"] for r in rows if r["challenge"] == c and sel(r)]
+            b = [o["score"] for o in other if o["challenge"] == c]
+            w, n = pair_counts(a, b)
+            wins += w
+            pairs += n
+        return (None if pairs == 0 else round(wins / pairs, 3)), pairs
+
+    res, n = rate(lambda r: True)
+    few = not pooled and len(rows) < min_sites
+    return {
+        "name": name + (f" (too few sites: {len(rows)}, fewer than {min_sites}, so no pass or fail)" if few else ""),
+        "pass_mark": mark,
+        "result": res,
+        "passed": None if few or res is None else res >= mark,
+        "n_pairs": n,
+        "held_out_only": rate(lambda r: r["held_out"])[0],
+        "blind_only": rate(lambda r: r["blind"])[0],
+    }
+
+
+def challenge_miss(r, cells, ranks, traits, name):
+    i = r["cell"]
+    if i is None or r["score"] is None:
+        return r.get("note", "Not scored.")
+    low = sorted((float(ranks[k][i]), k) for k in traits if k in ranks and np.isfinite(ranks[k][i]))[:3]
+    extra = []
+    if float(cells["land_frac"][i]) < 0.5:
+        extra.append(f"only {float(cells['land_frac'][i]):.0%} of the cell is land")
+    if float(cells["ice"][i]) > 50:
+        extra.append(f"{float(cells['ice'][i]):.0f}% of the cell is permanent ice")
+    text = f"In the bottom half of land on {name}. Its lowest trait ranks there: " + ", ".join(f"{LABELS[k].lower()} {v:.2f}" for v, k in low)
+    return text + ("; " + "; ".join(extra) if extra else "") + "."
+
+
+def second_test(body, target_id, sc, cells, sites, groups, where, held, cfg, with_misses=False):
+    sr = cfg["validation"]["second_run"]
+    names = {c["id"]: c["name"] for c in CHALLENGES[body]}
+    ch = sc["challenges"]
+    found, unchecked = entries(sites, body, groups, set(ch))
+    land = {}
+    places = []
+
+    def row(s, c, group):
+        if c not in land:
+            land[c] = earth_rank(ch[c], 1.0, cells["area"])
+        i = where[s["id"]]
+        v = None if i is None or not np.isfinite(ch[c][i]) else round(float(ch[c][i]), 4)
+        return {
+            "id": s["id"], "name": s["name"], "lat": s["lat"], "lon": s["lon"], "group": group, "challenge": c,
+            "cell": i, "score": v, "land_rank": None if v is None else round(float(land[c][i]), 4),
+            "best_target": target_id, "held_out": s["id"] in held, "blind": bool(s.get("blind")),
+        }
+
+    analogs = []
+    for s, c in found:
+        r = row(s, c, f"analog:{c}")
+        if r["score"] is None:
+            why = "its cell is less than 5% land on our grid" if r["cell"] is None else "its cell has no data for this challenge"
+            unchecked.append({"place": s["id"], "why": f"Used for {names[c]}, but {why}."})
+            r["note"] = "Not scored: " + why + "."
+        analogs.append(r)
+    used = [c for c in ch if any(r["challenge"] == c for r in analogs)]
+    controls = {"ordinary": [s for s in sites if "ordinary" in s["groups"]]}
+    if body == "mars":
+        controls["desert"] = [s for s in sites if "desert" in s["groups"]]
+    others = {g: [row(s, c, g) for c in used for s in ss] for g, ss in controls.items()}
+    scored_a = [r for r in analogs if r["score"] is not None]
+    scored_o = {g: [r for r in rs if r["score"] is not None] for g, rs in others.items()}
+    pm, k = sr["pass_marks"], sr["min_sites_per_challenge"]
+    checks = []
+    for c in used:
+        a = [r for r in scored_a if r["challenge"] == c]
+        checks.append(tally(a, scored_o["ordinary"], pm["vs_ordinary"], f"{names[c]}: analogs used for it beat ordinary places", k))
+        if body == "mars":
+            checks.append(tally(a, scored_o["desert"], pm["vs_desert"], f"{names[c]}: analogs used for it beat plain deserts", k))
+    checks.append(tally(scored_a, scored_o["ordinary"], pm["vs_ordinary"], "All challenges pooled: analogs beat ordinary places on the challenges they are used for", k, pooled=True))
+    groups_out = [{"id": f"analog:{c}", "name": f"Analogs used for {names[c]}", "plain": f"Known analogs whose papers say they are used for {names[c]}, scored on {names[c]} alone."} for c in used]
+    groups_out += [{"id": g, "name": GROUPS[g][0], "plain": GROUPS[g][1]} for g in controls]
+    title = "Moon, challenge by challenge" if body == "moon" else "Mars, challenge by challenge"
+    misses = []
+    if with_misses:
+        tw = cfg["trait_weights"][body]
+        misses = [
+            {"place": r["id"], "why": challenge_miss(r, cells, sc["ranks"], tw.get(r["challenge"], {}), names[r["challenge"]])}
+            for r in analogs
+            if r["land_rank"] is None or r["land_rank"] < 0.5
+        ]
+    test_ = {
+        "id": f"second-{body}", "title": title, "body": body,
+        "plain": sr["rule"] + " " + sr["pooled_rule"] + " " + sr["few_sites_note"],
+        "groups": groups_out, "places": analogs + [r for rs in others.values() for r in rs],
+        "checks": checks, "misses": misses,
+    }
+    return test_, unchecked
+
+
+def second_run(cells, scored, sites, cfg, where, held, with_misses=False):
+    v = cfg["validation"]
+    sr = v["second_run"]
+    tests, unchecked = [], []
+    for body, tid, groups in (("moon", v["moon_target"], sr["moon_groups"]), ("mars", v["mars_target"], sr["mars_groups"])):
+        t, u = second_test(body, tid, scored[tid], cells, sites, groups, where, held, cfg, with_misses)
+        tests.append(t)
+        unchecked += [dict(x, place=f"{x['place']} ({body.capitalize()})") for x in u]
+    return {
+        "title": "Second run: each analog on what it is used for",
+        "plain": (
+            "The first run scored every known analog on its overall match, but no place on Earth copies everything, and analogs are "
+            "chosen for particular jobs. This run checks each analog only on the challenges its papers say it is used for, against "
+            "ordinary places on the same challenge. We designed it after seeing the first run's totals, so it helps explain the first "
+            "result and is not independent proof."
+        ),
+        "designed_after_first_run": True,
+        "config_commit": SECOND_COMMIT,
+        "summary": second_line(tests),
+        "tests": tests,
+        "unchecked": unchecked,
+    }
+
+
+def pooled(second, body):
+    t = next(t for t in second["tests"] if t["body"] == body)
+    return next(c for c in t["checks"] if c["name"].startswith("All challenges pooled"))
+
+
+def adopt(second_old, second_new):
+    for body in ("moon", "mars"):
+        old, new = pooled(second_old, body)["held_out_only"], pooled(second_new, body)["held_out_only"]
+        if old is None or new is None or new < old:
+            return False
+    return True
+
+
+def base_name(name):
+    return name.split(" (too few sites")[0]
+
+
+def beside(tests_new, tests_old, prefix, old_name="1.0", new_name="1.1"):
+    old = {(t["body"], base_name(c["name"])): c for t in tests_old for c in t["checks"]}
+    pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
+    out = []
+    for t in tests_new:
+        lines = []
+        for c in t["checks"]:
+            o = old.get((t["body"], base_name(c["name"])))
+            if o:
+                lines.append(f"{base_name(c['name'])}: version {old_name} {pct(o['result'])} (held-out {pct(o['held_out_only'])}), version {new_name} {pct(c['result'])} (held-out {pct(c['held_out_only'])}).")
+        out.append(dict(t, id=f"{prefix}-{t['id']}", plain=t["plain"] + f" Beside version {old_name}: " + " ".join(lines)))
+    return out
+
+
+def third_run(val_old, val_new, cfg, commit):
+    so, sn = val_old["second_run"], val_new["second_run"]
+    ok = adopt(so, sn)
+    pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
+    held = "; ".join(
+        f"{b.capitalize()} {pct(pooled(sn, b)['held_out_only'])} against {pct(pooled(so, b)['held_out_only'])} for version 1.0"
+        for b in ("moon", "mars")
+    )
+    checks = [c for t in val_new["tests"] + sn["tests"] for c in t["checks"] if c["passed"] is not None]
+    summary = (
+        f"A third run tried method version 1.1 ({cfg['rule'].lower().rstrip('.')}, plus a volcanic rock trait for Mars): "
+        f"{sum(bool(c['passed']) for c in checks)} of {len(checks)} checks with enough sites pass"
+        + (", so version 1.1 does not pass in full either. " if sum(bool(c['passed']) for c in checks) < len(checks) else ". ")
+        + 
+        f"On the held-out half, pooled against ordinary places: {held}. "
+        + ("By the rule fixed before the run, version 1.1 is adopted and the map shows it." if ok else "By the rule fixed before the run, version 1.1 is not adopted and the map keeps version 1.0.")
+    )
+    return {
+        "title": "Third run: method version 1.1",
+        "plain": (
+            "After the second run showed that Mars Surface failed, we changed the method by rule, not by fitting the test places, and fixed "
+            "the rule for adopting it before running it. This run repeats the first run's four checks and the second run's challenge-by-challenge "
+            "checks under version 1.1, each beside its version 1.0 figure. It was designed after seeing the earlier results, so it is not independent proof."
+        ),
+        "designed_after_first_run": True,
+        "config_commit": commit,
+        "summary": summary,
+        "tests": beside(val_new["tests"], val_old["tests"], "third") + beside(sn["tests"], so["tests"], "third"),
+        "unchecked": sn["unchecked"],
+        "method_change": cfg["why"],
+        "adopted": ok,
+        "adoption_rule": cfg["adoption_rule"],
+    }
+
+
+ORDINALS = {3: "third", 4: "fourth", 5: "fifth"}
+
+
+def later_run(val_old, val_new, cfg, commit, n, old_name, new_name, shown_name, change):
+    so, sn = val_old["second_run"], val_new["second_run"]
+    ok = adopt(so, sn)
+    pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
+    held = "; ".join(
+        f"{b.capitalize()} {pct(pooled(sn, b)['held_out_only'])} against {pct(pooled(so, b)['held_out_only'])} for version {old_name}"
+        for b in ("moon", "mars")
+    )
+    checks = [c for t in val_new["tests"] + sn["tests"] for c in t["checks"] if c["passed"] is not None]
+    passed = sum(bool(c["passed"]) for c in checks)
+    word = ORDINALS[n]
+    summary = (
+        f"A {word} run tried method version {new_name} ({change}): "
+        f"{passed} of {len(checks)} checks with enough sites pass"
+        + (f", so version {new_name} does not pass in full either. " if passed < len(checks) else ". ")
+        + f"On the held-out half, pooled against ordinary places: {held}. "
+        + (f"By the rule fixed before the run, version {new_name} is adopted and the map shows it." if ok else f"By the rule fixed before the run, version {new_name} is not adopted and the map keeps version {shown_name}.")
+        + " This is the last method version judged on these test places: they have now been used four times, so no further change will be judged on them."
+    )
+    return {
+        "title": f"{word.capitalize()} run: method version {new_name}",
+        "plain": (
+            f"This run repeats the first run's four checks and the second run's challenge-by-challenge checks under version {new_name}, "
+            f"each beside its version {old_name} figure, and applies an adoption rule fixed before the run. The change was prompted by a "
+            "test place's result, so this run is not independent proof."
+        ),
+        "designed_after_first_run": True,
+        "config_commit": commit,
+        "summary": summary,
+        "tests": beside(val_new["tests"], val_old["tests"], word, old_name, new_name) + beside(sn["tests"], so["tests"], word, old_name, new_name),
+        "unchecked": sn["unchecked"],
+        "method_change": cfg["why"],
+        "adopted": ok,
+        "adoption_rule": cfg["adoption_rule"],
+    }
+
+
+def second_line(tests):
+    checks = [c for t in tests for c in t["checks"] if c["passed"] is not None]
+    passed = [c for c in checks if c["passed"]]
+    pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
+    pooled = [f"{t['body'].capitalize()} {pct(c['result'])}" for t in tests for c in t["checks"] if c["name"].startswith("All challenges pooled")]
+    head = (
+        f"In a second run, designed after seeing those totals, each analog was checked only on the challenges it is used for: "
+        f"{len(passed)} of {len(checks)} checks with enough sites pass"
+    )
+    tail = "." if len(passed) == len(checks) else ", so the second run does not pass in full either."
+    return head + tail + " Pooled against ordinary places (pass mark 80%): " + ", ".join(pooled) + "."
+
+
+def result_line(tests):
+    checks = [c for t in tests for c in t["checks"]]
+    passed = [c for c in checks if c["passed"]]
+    pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
+    head = "Version 1 passes its own check." if len(passed) == len(checks) else f"Version 1 passes {len(passed)} of its {len(checks)} checks, so it does not pass its own test yet."
+    body = " ".join(f"{c['name']}: {pct(c['result'])} of pairs (pass mark {pct(c['pass_mark'])})." for c in checks)
+    why = (
+        " Most misses are small, rugged or icy analogs that fill only part of a 50 km cell, or polar sites whose cold matches "
+        "but whose small day-to-night swing, low sun and clear air do not match Jezero. We publish the result as it came out; "
+        "the weights and pass marks were fixed before the run."
+    ) if len(passed) < len(checks) else ""
+    return head + " " + body + why
+
+
+def summary(val):
+    lines = [f"weights commit {val['weights_commit']}", val.get("summary", "")]
+    for t in val["tests"]:
+        for c in t["checks"]:
+            lines.append(f"{t['title']}: {c['name']}: {c['result']} (pass {c['pass_mark']}, held-out {c['held_out_only']}, blind {c['blind_only']}, pairs {c['n_pairs']})")
+        for p in t["places"]:
+            if p["score"] is None:
+                lines.append(f"  unscored: {p['id']} ({p['note']})")
+    sr = val.get("second_run")
+    if sr:
+        lines.append(sr["summary"])
+        for t in sr["tests"]:
+            for c in t["checks"]:
+                lines.append(f"{t['title']}: {c['name']}: {c['result']} (pass {c['pass_mark']}, passed {c['passed']}, held-out {c['held_out_only']}, blind {c['blind_only']}, pairs {c['n_pairs']})")
+        for u in sr["unchecked"]:
+            lines.append(f"  unchecked: {u['place']}: {u['why']}")
+    tr = val.get("third_run")
+    if tr:
+        lines.append(tr["summary"])
+        for t in tr["tests"]:
+            for c in t["checks"]:
+                lines.append(f"{t['title']}: {c['name']}: {c['result']} (pass {c['pass_mark']}, passed {c['passed']}, held-out {c['held_out_only']}, blind {c['blind_only']})")
+    for d in val["data_checks"]:
+        lines.append(f"data check: {d['name']}: {d['result']} {'pass' if d['passed'] else 'FAIL'}")
+    return "\n".join(lines)
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--file", default="dataset/validation.json")
+    print(summary(json.load(open(ap.parse_args().file, encoding="utf8"))))

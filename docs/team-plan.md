@@ -14,9 +14,11 @@ Users pick what they're testing, and the challenges below are weighted to match:
 
 - **Rover mobility:** Surface, Dust
 - **Life support:** Resources, Heat swing, Polar light and power (Moon), Atmosphere and dust (Mars)
-- **Habitat structure:** ground strength, Shelter, Heat swing
+- **Habitat structure:** Surface, Heat swing (scored), plus ground strength and Shelter as labels
 
-Users can also set the weights by hand.
+Users can also set the weights by hand. Dryness, Industrial sites and Signs of life are in no filter and count only under hand-set weights.
+
+**Default set for the build on 15 November; the team can overrule.** Three points above are not yet a team decision: that mission filters weight the challenges (not the traits), the make-up of Habitat structure, and that Dryness, Industrial sites and Signs of life count only under hand-set weights.
 
 ## Terrain types
 
@@ -34,7 +36,7 @@ Users can filter matches by type. A clustering step also groups Earth places wit
 
 **Surface** (shared)
 - Ruggedness: rover ops, construction stability
-- Ground strength: load from builds and landers (estimated from stand-in data, and marked as an estimate)
+- Ground strength: load from builds and landers (label only, not scored: no direct data on any of the three worlds)
 - Landing safety: slope and rockiness, against NASA's landing limit of slopes under 10°
 - Rock type: the pale highland rock of the south pole
 
@@ -67,7 +69,7 @@ Users can filter matches by type. A clustering step also groups Earth places wit
 
 **Surface** (shared)
 - Ruggedness: rover ops, construction stability
-- Ground strength: load from builds and landers (estimated from stand-in data, and marked as an estimate)
+- Ground strength: load from builds and landers (label only, not scored: no direct data on any of the three worlds)
 - Landing safety: slope and rockiness
 - Minerals: clays, sulfates, carbonates, olivine
 
@@ -104,7 +106,7 @@ Users can filter matches by type. A clustering step also groups Earth places wit
 
 - **Same scale on both sides.** The global search runs on one 0.5° grid. Terrain is compared at the planet map's own scale. Every value shows its resolution.
 - **Per trait:** how close a place gets to the target, ranked against all of Earth's land.
-- **Overall:** the trait scores combined with the mission filter's weights. The total is never shown without the trait bars.
+- **Overall:** each challenge's score combines its traits; the mission filter's weights then combine the challenge scores. The total is never shown without the trait bars.
 - **Checked on known analogs** before we trust it ([guidelines](guidelines.md#2-doing-the-science-honestly)).
 
 Details: [Claude's plan](claudes-plan.md#3-method).
