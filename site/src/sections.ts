@@ -19,27 +19,42 @@ export const IMAGERY = [
     by: "NASA Earth Observatory via NASA GIBS",
     url: "https://nasa-gibs.github.io/gibs-api-docs/",
     licence: "NASA open data, no restrictions",
-    use: "Earth globe background. A bundled copy of the same imagery takes over if the tile service is down.",
+    use: "Earth map background, the 3D Earth in the intro, and the base layer of the Earth close-up. A bundled copy of the same imagery takes over if the tile service is down.",
+  },
+  {
+    name: "Landsat WELD true colour, global annual mosaic (Earth close-up, live tiles)",
+    by: "NASA / USGS Landsat, via NASA GIBS",
+    url: "https://nasa-gibs.github.io/gibs-api-docs/",
+    licence: "NASA open data, no restrictions",
+    use: "Earth side of the close-up in each match. Display only, not scored. Blue Marble shows where it has no data.",
+  },
+  {
+    name: "LOLA south-pole shaded relief, 87.5° S to the pole (Moon close-up, live tiles)",
+    by: "NASA LRO LOLA, via NASA Moon Trek tiles",
+    url: "https://trek.nasa.gov/moon/",
+    licence: "Public domain (NASA)",
+    use: "Moon side of the close-up. Shaded relief from laser altimetry, not a photo. Display only, not scored.",
   },
   {
     name: "CGI Moon Kit: LROC colour map with filled poles",
     by: "NASA Scientific Visualization Studio (LRO data)",
     url: "https://svs.gsfc.nasa.gov/4720",
     licence: "Public domain (NASA)",
-    use: "Surface of the 3D Moon globe. Display only, not scored.",
+    use: "Surface of the 3D Moon in the intro, and the bundled fallback for the Moon close-up. Display only, not scored.",
   },
   {
     name: "Viking MDIM 2.1 global colour mosaic",
     by: "NASA / USGS Astrogeology, via NASA Mars Trek tiles",
     url: "https://trek.nasa.gov/mars/",
     licence: "Public domain (NASA / USGS)",
-    use: "Surface of the 3D Mars globe. Display only, not scored.",
+    use: "Surface of the 3D Mars in the intro, and the Mars side of the close-up (live tiles, with a bundled copy as fallback). Display only, not scored.",
   },
 ];
 
 export const CODE = [
   { name: "MapLibre GL JS", url: "https://maplibre.org/", licence: "BSD-3-Clause", use: "Earth globe and map" },
-  { name: "three.js", url: "https://threejs.org/", licence: "MIT", use: "3D Moon and Mars globes" },
+  { name: "three.js", url: "https://threejs.org/", licence: "MIT", use: "3D Earth, Moon and Mars in the intro" },
+  { name: "Lucide icons 1.73.0", url: "https://lucide.dev/", licence: "ISC", use: "Icons in the match view" },
   { name: "Archivo (variable font, by Omnibus-Type)", url: "https://fontsource.org/fonts/archivo", licence: "SIL Open Font Licence 1.1", use: "Headings, labels and numbers" },
   { name: "Vite and TypeScript", url: "https://vite.dev/", licence: "MIT / Apache-2.0", use: "Building the site" },
 ];

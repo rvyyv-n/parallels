@@ -199,7 +199,7 @@ test("works with NASA GIBS tiles blocked, and makes no other outside calls", asy
   await expect(page.locator(".card .eimg.fb")).toHaveCount(1);
   await page.locator("#checked").waitFor();
   expect(errors).toEqual([]);
-  expect([...new Set(outside)].filter((h) => h !== "gibs.earthdata.nasa.gov")).toEqual([]);
+  expect([...new Set(outside)].filter((h) => h !== "gibs.earthdata.nasa.gov" && h !== "trek.nasa.gov")).toEqual([]);
 });
 
 test("keyboard alone reaches the pickers, the top 10, the scorecard and the sliders", async ({ page }, info) => {

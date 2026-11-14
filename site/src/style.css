@@ -2153,7 +2153,7 @@ ul.plain li {
 }
 
 #card {
-  padding: 0 20px;
+  padding: 0 2px;
   outline: none;
 }
 
@@ -2187,7 +2187,7 @@ ul.plain li {
   }
 
   #card {
-    padding: 0 14px;
+    padding: 0;
   }
 
   .back {
