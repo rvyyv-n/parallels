@@ -25,5 +25,6 @@ function preload(): Plugin {
 
 export default defineConfig({
   plugins: [preload()],
-  build: { chunkSizeWarningLimit: 1200 },
+  // Compile down to 2020-era syntax so older browsers (Chrome 87, Safari 14, Firefox 78 and up) can run the site.
+  build: { chunkSizeWarningLimit: 1200, target: ["es2020", "chrome87", "edge88", "firefox78", "safari14"], cssTarget: ["chrome87", "edge88", "firefox78", "safari14"] },
 });

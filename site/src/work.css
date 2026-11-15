@@ -116,6 +116,7 @@
 
 @media (min-width: 760px) {
   .stage {
+    height: clamp(420px, calc(100vh - var(--top-h, 62px) - var(--bar, 120px) - 118px), 1100px);
     height: clamp(420px, calc(100svh - var(--top-h, 62px) - var(--bar, 120px) - 118px), 1100px);
   }
 
@@ -303,7 +304,7 @@
   height: 20px;
   padding: 4px;
   border-radius: 50%;
-  color: #000;
+  color: var(--space);
   background: var(--ink-2);
 }
 
