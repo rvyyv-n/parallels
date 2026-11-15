@@ -32,6 +32,7 @@ export interface Earth {
   flat(on: boolean): void;
   hover(i: number | null): void;
   back(): void;
+  resize(): void;
 }
 
 export interface Hooks {
@@ -361,6 +362,9 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
     },
     back() {
       if (selected >= 0) goTo(selected, true);
+    },
+    resize() {
+      map.resize();
     },
   };
 }

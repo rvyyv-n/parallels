@@ -3,10 +3,10 @@ import type { Body, LabelPoint, Manifest, Target } from "./contract";
 import { esc, latlon, num, unit } from "./format";
 import { icon } from "./icons";
 
-const NAME: Record<Body, string> = { moon: "the Moon", mars: "Mars" };
-const TITLE: Record<Body, string> = { moon: "The Moon", mars: "Mars" };
+export const TEXTURE = { moon: "img/moon.jpg", mars: "img/mars.jpg" };
+export const NAME: Record<Body, string> = { moon: "the Moon", mars: "Mars" };
+export const TITLE: Record<Body, string> = { moon: "The Moon", mars: "Mars" };
 const SITE_TRAITS = ["cold", "season_swing", "day_swing_air", "slope", "safe10", "relief", "sun_height", "dust"];
-const CANT_ICON: Record<string, string> = { gravity: "gravity", air: "air" };
 
 const home = (m: Manifest, b: Body) => m.targets.find((t) => t.body === b && t.default) ?? m.targets.find((t) => t.body === b);
 
@@ -15,13 +15,28 @@ export function headline(text: string): [string, string] {
   return cut ? [text.slice(0, cut), text.slice(cut).replace(/^[\s:(,]+/, "").replace(/\)$/, "")] : [text, ""];
 }
 
-function cant(m: Manifest, b: Body) {
-  return m.cant_copy
-    .map((c) => {
-      const [big, rest] = headline(c[b]);
-      return `<div class="w-fact">${icon(CANT_ICON[c.name.toLowerCase()] ?? "radiation")}<dt>${esc(c.name)}</dt><dd><b>${esc(big)}</b>${rest ? `<span>${esc(rest)}</span>` : ""}<span>Earth: ${esc(c.earth)}</span><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.source)}</a></dd></div>`;
-    })
-    .join("");
+export function thumb(cv: HTMLCanvasElement, t: Target) {
+  const ctx = cv.getContext("2d");
+  if (!ctx) return;
+  const mark = () => {
+    ctx.strokeStyle = "#5bbbe9";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(44, 44, 9, 0, Math.PI * 2);
+    ctx.stroke();
+  };
+  const img = new Image();
+  img.onload = () => {
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    const span = w / 9;
+    if (Math.abs(t.lat) > 75) {
+      const cap = h / 6;
+      ctx.drawImage(img, 0, t.lat < 0 ? h - cap : 0, w, cap, 0, 0, 88, 88);
+    } else ctx.drawImage(img, ((t.lon + 180) / 360) * w - span / 2, ((90 - t.lat) / 180) * h - span / 2, span, span, 0, 0, 88, 88);
+    mark();
+  };
+  img.src = `${import.meta.env.BASE_URL}${TEXTURE[t.body]}`;
 }
 
 function site(m: Manifest, t: Target) {
@@ -38,7 +53,7 @@ function site(m: Manifest, t: Target) {
   const facts = t.facts
     .map((f) => `<li>${esc(f.text)} <a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.source)}</a></li>`)
     .join("");
-  return `<h4>${icon("site")}At the base site: ${esc(t.name)} <span class="muted">${latlon(t.lat, t.lon, 2)}</span></h4>
+  return `<h2>${icon("site")}At the base site: ${esc(t.name)} <span class="muted">${latlon(t.lat, t.lon, 2)}</span></h2>
     ${rows ? `<dl class="w-vals">${rows}</dl>` : `<p class="muted">No measured values for this site.</p>`}
     ${facts ? `<ul class="w-known">${facts}</ul>` : ""}`;
 }
@@ -49,37 +64,37 @@ function solve(m: Manifest, b: Body) {
     .join("");
 }
 
-function panel(m: Manifest, b: Body, on: boolean) {
+export function worldPage(m: Manifest, b: Body): string {
   const t = home(m, b);
-  return `<div class="w-panel" id="w-${b}" data-world="${b}"${on ? "" : " hidden"}>
-    <div class="w-lead">
+  const ts = m.targets.filter((x) => x.body === b);
+  return `<section class="page-sec band worlds" aria-labelledby="${b}-h">
+    <header class="w-lead">
       <div class="w-disc w-disc-${b}" aria-hidden="true"></div>
       <div>
-        <h3>${TITLE[b]}</h3>
-        <h4>${icon("cant")}What Earth can't copy</h4>
-        <dl class="w-facts">${cant(m, b)}</dl>
+        <p class="sec-k">Where is the base?</p>
+        <h1 id="${b}-h" tabindex="-1">${TITLE[b]}</h1>
+        <p class="lede">Choose a base site on ${NAME[b]} to see the places on Earth that match it best.</p>
+        <ul class="chips sites" aria-label="Base sites on ${NAME[b]}">${ts
+          .map(
+            (x) =>
+              `<li><a class="chip site" href="#/find?t=${esc(x.id)}" data-site="${esc(x.id)}"><canvas class="site-thumb" width="88" height="88" data-thumb="${esc(x.id)}" aria-hidden="true"></canvas><span class="site-n">${esc(
+                x.short,
+              )}</span><span class="site-at">${latlon(x.lat, x.lon, 1)}${x.regions?.length ? ` · ${x.regions.length} candidate regions` : ""}</span></a></li>`,
+          )
+          .join("")}</ul>
       </div>
+    </header>
+    <div class="w-panel" id="w-${b}" data-world="${b}">
+      <div class="w-cols">
+        <section class="w-site">${t ? site(m, t) : ""}</section>
+        <section class="w-solve"><h2>${icon("test")}What a base there must solve</h2><ul>${solve(m, b)}</ul></section>
+      </div>
+      <section class="w-tested"><h2>${icon("pin")}Tested on Earth first</h2>
+        <p class="w-sub">Places already used to rehearse for ${NAME[b]}. Parallels checks its scores against them, then looks at all the land nobody uses yet.</p>
+        <div class="w-analogs" data-analogs="${b}"><p class="muted">Loading the known analog sites…</p></div>
+      </section>
+      ${t ? `<p class="w-cta"><a class="go w-go" href="#/find?t=${esc(t.id)}">Find Earth's matches for ${esc(t.name)}${icon("chevron")}</a></p>` : ""}
     </div>
-    <div class="w-cols">
-      <section class="w-site">${t ? site(m, t) : ""}</section>
-      <section class="w-solve"><h4>${icon("test")}What a base there must solve</h4><ul>${solve(m, b)}</ul></section>
-    </div>
-    <section class="w-tested"><h4>${icon("pin")}Tested on Earth first</h4>
-      <p class="w-sub">Places already used to rehearse for ${NAME[b]}. Parallels checks its scores against them, then looks at all the land nobody uses yet.</p>
-      <div class="w-analogs" data-analogs="${b}"><p class="muted">Loading the known analog sites…</p></div>
-    </section>
-    ${t ? `<p class="w-cta"><button type="button" class="go w-go" data-target="${esc(t.id)}">Find Earth's matches for ${NAME[b]}${icon("chevron")}</button></p>` : ""}
-  </div>`;
-}
-
-export function worlds(m: Manifest, first: Body): string {
-  return `<section id="worlds" class="page-sec band worlds" aria-labelledby="worlds-h">
-    <header class="sec-head"><p class="sec-k">Worlds</p><h2 id="worlds-h">Meet the Moon and Mars</h2>
-      <p class="lede">What a base there faces, where crews and rovers already rehearse on Earth, and what no place on Earth can copy. Every value names its source.</p></header>
-    <div class="w-tabs" role="group" aria-label="Choose a world">${(["moon", "mars"] as const)
-      .map((b) => `<button type="button" class="w-tab w-tab-${b}" data-show="${b}" aria-pressed="${b === first}">${TITLE[b]}</button>`)
-      .join("")}</div>
-    ${(["moon", "mars"] as const).map((b) => panel(m, b, b === first)).join("")}
   </section>`;
 }
 
@@ -96,7 +111,7 @@ export function fillAnalogs(root: HTMLElement, labels: LabelPoint[]): void {
       const cut = note.indexOf(". ");
       const used = cut > 0 ? note.slice(0, cut + 1) : note;
       const rest = cut > 0 ? note.slice(cut + 2) : "";
-      return `<article class="w-analog"><h5>${esc(l.name)}</h5><p class="w-where">${l.country ? `${esc(l.country)} · ` : ""}${latlon(l.lat, l.lon, 1)}</p>
+      return `<article class="w-analog"><h3>${esc(l.name)}</h3><p class="w-where">${l.country ? `${esc(l.country)} · ` : ""}${latlon(l.lat, l.lon, 1)}</p>
         ${used ? `<p class="w-used">${esc(used)}</p>` : ""}
         ${rest ? `<details><summary>More</summary><p>${esc(rest)}</p></details>` : ""}
         <a href="${esc(l.analog_source ?? l.source)}" target="_blank" rel="noopener">Source</a></article>`;
@@ -105,13 +120,4 @@ export function fillAnalogs(root: HTMLElement, labels: LabelPoint[]): void {
       list.slice(0, 6).map(cardOf).join("") +
       (list.length > 6 ? `<details class="w-all"><summary>Show ${num(list.length - 6)} more places</summary><div class="w-analogs">${list.slice(6).map(cardOf).join("")}</div></details>` : "");
   }
-}
-
-export function wireWorlds(root: HTMLElement): void {
-  root.addEventListener("click", (e) => {
-    const tab = (e.target as HTMLElement).closest<HTMLElement>("[data-show]");
-    if (!tab) return;
-    for (const b of root.querySelectorAll<HTMLElement>("[data-show]")) b.setAttribute("aria-pressed", String(b === tab));
-    for (const p of root.querySelectorAll<HTMLElement>("[data-world]")) p.hidden = p.dataset.world !== tab.dataset.show;
-  });
 }
