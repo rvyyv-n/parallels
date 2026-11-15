@@ -13,6 +13,7 @@ import { homePage } from "./pages/home";
 import { finder } from "./pages/find";
 import { place } from "./pages/place";
 import { about } from "./pages/about";
+import { learnPage } from "./pages/learn";
 
 const AI_NOTE =
   "How we used AI: the idea and the key design decisions are our team's. Claude (Anthropic) helped research the challenge, write our planning documents, and write and test the code and data pipeline. Our logo was drawn with AI. We check its work at each checkpoint.";
@@ -20,6 +21,7 @@ const AI_NOTE =
 const NAV = [
   ["", "Home"],
   ["find", "Finder"],
+  ["learn", "Learn"],
   ["about", "About"],
 ];
 
@@ -86,6 +88,7 @@ async function main() {
       "": () => homePage(ctx),
       find: () => finder(ctx),
       place: () => place(ctx),
+      learn: () => learnPage(ctx),
       about: () => about(ctx),
     },
     (path) => {
