@@ -58,7 +58,7 @@ function thumb(cv: HTMLCanvasElement, t: Target) {
   const ctx = cv.getContext("2d");
   if (!ctx) return;
   const mark = () => {
-    ctx.strokeStyle = "#4fd8ff";
+    ctx.strokeStyle = "#5bbbe9";
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.arc(44, 44, 9, 0, Math.PI * 2);
@@ -702,10 +702,15 @@ async function main() {
     import("./intro")
       .then(({ createIntro }) => {
         const view = $("#intro-view");
+        const img = (f: string) => `${import.meta.env.BASE_URL}${f.startsWith("img/") ? f : `img/${f}`}`;
         const home = (b: "moon" | "mars") => m.targets.find((t) => t.body === b && t.default) ?? m.targets.find((t) => t.body === b) ?? { lat: 0, lon: 0 };
         intro = createIntro(
           view,
-          { earth: `${import.meta.env.BASE_URL}img/blue-marble${innerWidth >= 900 ? "-4k" : ""}.jpg`, moon: TEXTURE.moon, mars: TEXTURE.mars },
+          {
+            earth: innerWidth >= 900 ? [img("blue-marble-4k.jpg"), img("blue-marble-8k.jpg")] : [img("blue-marble.jpg"), img("blue-marble-4k.jpg")],
+            moon: [img(TEXTURE.moon), img("moon-4k.jpg")],
+            mars: [img(TEXTURE.mars), img("mars-4k.jpg")],
+          },
           { moon: home("moon"), mars: home("mars") },
           {
             world: (w) => {

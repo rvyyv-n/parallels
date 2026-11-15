@@ -24,6 +24,7 @@ interface Key {
   earth: Place;
   moon: Place;
   mars: Place;
+  lon: number;
   free: number;
   tilt: number;
   link: number;
@@ -41,33 +42,53 @@ interface Globe {
   goal: { x: number; y: number };
   r: number;
   grow: number;
+  vis: number;
+}
+
+export interface Textures {
+  earth: [string, string?];
+  moon: [string, string?];
+  mars: [string, string?];
 }
 
 const rad = (d: number) => (d * Math.PI) / 180;
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const mix = (a: number, b: number, s: number) => a + (b - a) * s;
-const SIGNAL = 0x4fd8ff;
+// Palette: accent #0297DE. Thin lines drawn over the globes use a lighter tint of it so they stay visible on blue oceans.
+const SIGNAL = 0x5bbbe9;
+const MARS = 0xfc734d;
 const ARC = 48;
 const FAR = 10;
+// A planet whose path between two chapters is longer than this shrinks away and grows back in place, so planets never fly across the text or each other.
+const HOP = 1.2;
+// Each body sits at its own depth so overlapping bodies hide each other cleanly instead of cutting into each other. Positions are corrected so the layout on screen is unchanged.
+const DEPTH: Record<Body, number> = { earth: -3, moon: 0.8, mars: 0.4 };
+// Sharper textures need a GPU that can hold them comfortably; older GPUs keep the lighter copies.
+const NEED: Record<Body, number> = { earth: 16384, moon: 8192, mars: 8192 };
 
+// x and y are fractions of the half-width and half-height of the view; the third value is the radius as a fraction of the half-height.
+// After the opening, chapter text sits on the left and the bodies on the right. The Moon and Mars take turns in the same spot (a radius of 0 hides one),
+// and the Earth faces land (lon) while it turns freely.
 const WIDE: Key[] = [
-  { earth: [0, -2.12, 2], moon: [-0.62, 0.66, 0.085], mars: [0.66, 0.5, 0.06], free: 1, tilt: -0.62, link: 0, pins: 0, known: 0, dim: 1 },
-  { earth: [0, -0.04, 0.8], moon: [-0.8, 0.62, 0.07], mars: [0.82, 0.5, 0.055], free: 1, tilt: 0.3, link: 0, pins: 0, known: 1, dim: 0.34 },
-  { earth: [-1.5, -1.6, 0.5], moon: [0.66, 0.12, 1.22], mars: [1.5, 1.4, 0.1], free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 1 },
-  { earth: [1.6, -1.6, 0.5], moon: [1.6, 1.4, 0.1], mars: [-0.64, -0.02, 1.26], free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 1 },
-  { earth: [0.5, -0.06, 0.72], moon: [0.86, 0.66, 0.15], mars: [0.86, 0.66, 0.15], free: 0, tilt: 0.3, link: 1, pins: 0, known: 0, dim: 1 },
-  { earth: [0.44, -0.04, 0.9], moon: [0.9, 0.72, 0.13], mars: [0.9, 0.72, 0.13], free: 0, tilt: 0.3, link: 1, pins: 1, known: 0, dim: 1 },
+  { earth: [0, -2.24, 2], moon: [-0.62, 0.66, 0.085], mars: [0.66, 0.5, 0.06], lon: 62, free: 1, tilt: -0.62, link: 0, pins: 0, known: 0, dim: 1 },
+  { earth: [0, -0.04, 0.8], moon: [-0.8, 0.62, 0.07], mars: [0.82, 0.5, 0.055], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 1, dim: 0.34 },
+  { earth: [0.95, -1.45, 0.5], moon: [0.58, 0.02, 0.94], mars: [0.58, 0.02, 0], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
+  { earth: [0.95, -1.45, 0.5], moon: [0.58, 0.02, 0], mars: [0.58, 0.02, 0.94], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
+  { earth: [0.5, -0.08, 0.7], moon: [0.9, 0.7, 0.14], mars: [0.9, 0.7, 0.14], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 0, known: 0, dim: 1 },
+  { earth: [0.44, -0.06, 0.88], moon: [0.92, 0.74, 0.12], mars: [0.92, 0.74, 0.12], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 1, known: 0, dim: 1 },
 ];
 
 const TALL: Key[] = [
-  { earth: [0, -1.62, 1.1], moon: [-0.55, -0.12, 0.05], mars: [0.6, -0.2, 0.036], free: 1, tilt: -0.62, link: 0, pins: 0, known: 0, dim: 1 },
-  { earth: [0, -0.5, 0.36], moon: [-0.7, -0.05, 0.04], mars: [0.72, -0.12, 0.03], free: 1, tilt: 0.3, link: 0, pins: 0, known: 1, dim: 0.7 },
-  { earth: [-2, -1.6, 0.3], moon: [0.5, -0.62, 0.52], mars: [2, 1.4, 0.05], free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.75 },
-  { earth: [2, -1.6, 0.3], moon: [2, 1.4, 0.05], mars: [-0.5, -0.62, 0.52], free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.75 },
-  { earth: [0, -0.6, 0.34], moon: [0.66, -0.2, 0.07], mars: [0.66, -0.2, 0.07], free: 0, tilt: 0.3, link: 1, pins: 0, known: 0, dim: 0.8 },
-  { earth: [0, -0.55, 0.4], moon: [0.68, -0.14, 0.06], mars: [0.68, -0.14, 0.06], free: 0, tilt: 0.3, link: 1, pins: 1, known: 0, dim: 1 },
+  { earth: [0, -1.62, 1.1], moon: [-0.55, -0.12, 0.05], mars: [0.6, -0.2, 0.036], lon: 62, free: 1, tilt: -0.62, link: 0, pins: 0, known: 0, dim: 1 },
+  { earth: [0, -0.5, 0.36], moon: [-0.7, -0.05, 0.04], mars: [0.72, -0.12, 0.03], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 1, dim: 0.7 },
+  { earth: [1.2, -1.3, 0.36], moon: [0, -0.6, 0.42], mars: [0, -0.6, 0], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
+  { earth: [1.2, -1.3, 0.36], moon: [0, -0.6, 0], mars: [0, -0.6, 0.42], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
+  { earth: [0, -0.6, 0.34], moon: [0.66, -0.2, 0.07], mars: [0.66, -0.2, 0.07], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 0, known: 0, dim: 0.8 },
+  { earth: [0, -0.55, 0.4], moon: [0.68, -0.14, 0.06], mars: [0.68, -0.14, 0.06], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 1, known: 0, dim: 1 },
 ];
+
+const wrap = (d: number) => ((((d + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
 
 function onSphere(lat: number, lon: number, r: number) {
   const a = rad(lat);
@@ -118,13 +139,16 @@ function glow(tint: [number, number, number], reach: number) {
 
 export function createIntro(
   el: HTMLElement,
-  textures: { earth: string; moon: string; mars: string },
+  textures: Textures,
   homes: Record<World, Spot>,
   on: { world(w: World): void; earth(): void },
 ): Intro {
   const still = reduced();
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  const big = renderer.capabilities.maxTextureSize;
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
+  let ratio = Math.min(devicePixelRatio, big >= 16384 ? 2 : 1.5);
+  renderer.setPixelRatio(ratio);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   el.append(renderer.domElement);
   const scene = new THREE.Scene();
@@ -138,7 +162,29 @@ export function createIntro(
 
   const loader = new THREE.TextureLoader();
   let loaded = 0;
-  const globe = (flat: number, url: string, face: { x: number; y: number }): Globe => {
+  // Draw the light copy first so the globe appears quickly, then swap in the sharp copy when the GPU can hold it.
+  const paint = (id: Body, mat: THREE.MeshStandardMaterial) => {
+    const [lo, hi] = textures[id];
+    const use = (tex: THREE.Texture) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      const old = mat.map;
+      mat.map = tex;
+      mat.needsUpdate = true;
+      old?.dispose();
+    };
+    loader.load(
+      lo,
+      (tex) => {
+        use(tex);
+        loaded++;
+        if (hi && big >= NEED[id] && memory >= 4) loader.load(hi, use, undefined, () => {});
+      },
+      undefined,
+      () => loaded++,
+    );
+  };
+  const globe = (id: Body, flat: number, face: { x: number; y: number }): Globe => {
     const tilt = new THREE.Group();
     const spin = new THREE.Group();
     tilt.add(spin);
@@ -146,28 +192,22 @@ export function createIntro(
     const mat = new THREE.MeshStandardMaterial({ roughness: 1, metalness: 0, color: 0x000000, emissive: flat, emissiveIntensity: 1 });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 160, 120), mat);
     spin.add(mesh);
-    loader.load(url, (tex) => {
-      tex.colorSpace = THREE.SRGBColorSpace;
-      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-      mat.map = tex;
-      mat.needsUpdate = true;
-      loaded++;
-    });
-    return { tilt, spin, mesh, mat, cur: { ...face }, goal: { ...face }, r: 1, grow: 1 };
+    paint(id, mat);
+    return { tilt, spin, mesh, mat, cur: { ...face }, goal: { ...face }, r: 1, grow: 1, vis: 1 };
   };
-  const earth = globe(0x3f7fd6, textures.earth, { x: 0.3, y: -2.2 });
+  const earth = globe("earth", 0x0297de, { x: 0.3, y: -2.2 });
   const worlds: Record<World, Globe> = {
-    moon: globe(0xd3d0c8, textures.moon, facing(homes.moon, 0.8)),
-    mars: globe(0xc4471f, textures.mars, facing(homes.mars, 0.8)),
+    moon: globe("moon", 0xd3d0c8, facing(homes.moon, 0.8)),
+    mars: globe("mars", MARS, facing(homes.mars, 0.8)),
   };
   const bodies: [Body, Globe][] = [
     ["earth", earth],
     ["moon", worlds.moon],
     ["mars", worlds.mars],
   ];
-  const air = glow([0.31, 0.68, 1], 1.09);
+  const air = glow([0.2, 0.62, 0.96], 1.09);
   earth.tilt.add(air.mesh);
-  const haze = glow([1, 0.42, 0.2], 1.05);
+  const haze = glow([0.99, 0.45, 0.3], 1.05);
   worlds.mars.tilt.add(haze.mesh);
 
   const line = new THREE.LineBasicMaterial({ color: SIGNAL, transparent: true, opacity: 0.95 });
@@ -208,6 +248,8 @@ export function createIntro(
   let keys = WIDE;
   let at = 0;
   let atGoal = 0;
+  let frames = 0;
+  let spent = 0;
 
   const size = () => {
     const w = el.clientWidth;
@@ -248,9 +290,10 @@ export function createIntro(
     const s = ease(clamp((at - i - 0.18) / 0.64));
     const k0 = keys[i];
     const k1 = keys[i + 1];
-    const val = (n: "free" | "tilt" | "link" | "pins" | "known" | "dim") => mix(k0[n], k1[n], s);
+    const val = (n: "lon" | "free" | "tilt" | "link" | "pins" | "known" | "dim") => mix(k0[n], k1[n], s);
     const free = val("free");
     const dim = val("dim");
+    const link0 = val("link");
     const rise = still ? 0 : (1 - ease(clamp(t / 2.4))) * 0.5;
 
     for (const [id, g] of bodies) {
@@ -259,12 +302,36 @@ export function createIntro(
       g.cur.x += (g.goal.x - g.cur.x) * f;
       g.cur.y += (g.goal.y - g.cur.y) * f;
       g.grow += ((hover === id && id !== "earth" ? 1.06 : 1) - g.grow) * f;
-      g.r = mix(from[2], to[2], s) * hh * g.grow;
-      g.tilt.position.set(mix(from[0], to[0], s) * hw, mix(from[1], to[1], s) * hh - (id === "earth" ? rise * hh : 0), 0);
-      g.tilt.scale.setScalar(g.r);
-      const drift = still ? 0 : id === "earth" ? t * 0.035 * free : Math.sin(t * 0.2 + (id === "moon" ? 1 : 4)) * (id === world ? 0.06 : 0.3);
+      // In the last two chapters only the chosen world stays; the other one shrinks away.
+      const away = id !== "earth" && id !== world ? link0 : 0;
+      g.vis = still ? 1 - away : g.vis + (1 - away - g.vis) * f;
+      let x = mix(from[0], to[0], s);
+      let y = mix(from[1], to[1], s);
+      let r = mix(from[2], to[2], s);
+      if (id !== "earth" && id !== world && k1.link > 0) {
+        // The world you did not pick shrinks where it is instead of travelling next to the one you did.
+        x = from[0];
+        y = from[1];
+        r = k0.link > 0 ? 0 : from[2] * ease(Math.max(0, 1 - 2 * s));
+      } else if (id !== "earth" && (!from[2] || !to[2] || Math.hypot(to[0] - from[0], to[1] - from[1]) > HOP)) {
+        // Shrink away in the first half of the scroll, grow back at the new spot in the second.
+        const h = s < 0.5 ? from : to;
+        x = h[0];
+        y = h[1];
+        r = h[2] * ease(Math.abs(1 - 2 * s));
+      }
+      const k = (FAR - DEPTH[id]) / FAR;
+      g.r = r * hh * g.grow * g.vis;
+      g.tilt.visible = g.r > 1e-3;
+      g.tilt.position.set(x * hw * k, (y - (id === "earth" ? rise : 0)) * hh * k, DEPTH[id]);
+      g.tilt.scale.setScalar(Math.max(1e-4, g.r * k));
       g.tilt.rotation.x = id === "earth" ? mix(g.cur.x, val("tilt"), free) : g.cur.x;
-      g.spin.rotation.y = g.cur.y + drift;
+      if (id === "earth") {
+        // While the Earth turns freely it faces land, with a slow sway, instead of drifting onto the dark Pacific.
+        const face = -Math.PI / 2 - rad(val("lon"));
+        const sway = still ? 0 : Math.sin(t * 0.12) * 0.2;
+        g.spin.rotation.y = mix(g.cur.y, g.cur.y + wrap(face - g.cur.y) + sway, free);
+      } else g.spin.rotation.y = g.cur.y + (still ? 0 : Math.sin(t * 0.2 + (id === "moon" ? 1 : 4)) * (id === world ? 0.06 : 0.3));
       const lit = id === "earth" ? dim : id === world || at < 3.5 ? 1 : 0.4;
       g.mat.color.setScalar(p * lit);
       g.mat.emissiveIntensity = (1 - p) * 0.8;
@@ -308,9 +375,19 @@ export function createIntro(
     }
 
     const e = earth.tilt.position;
-    camera.position.set(e.x * dive + (still ? 0 : px * 0.18), e.y * dive + (still ? 0 : -py * 0.12), FAR * (1 - 0.5 * dive));
-    camera.lookAt(e.x * dive, e.y * dive, 0);
+    camera.position.set(e.x * dive + (still ? 0 : px * 0.18), e.y * dive + (still ? 0 : -py * 0.12), mix(FAR, e.z + (FAR - e.z) * 0.5, dive));
+    camera.lookAt(e.x * dive, e.y * dive, e.z * dive);
     renderer.render(scene, camera);
+    // On a slow GPU, drop to one pixel per CSS pixel after the opening settles.
+    if (p >= 1 && frames < 90) {
+      frames++;
+      spent += dt;
+      if (frames === 90 && spent / 90 > 1 / 30 && ratio > 1) {
+        ratio = 1;
+        renderer.setPixelRatio(1);
+        size();
+      }
+    }
     raf = requestAnimationFrame(frame);
   };
   const run = () => {

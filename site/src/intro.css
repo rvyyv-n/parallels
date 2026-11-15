@@ -1,7 +1,13 @@
 .intro {
-  --stage-h: calc(100svh - var(--top-h, 62px));
+  --stage-h: calc(100vh - var(--top-h, 62px));
   position: relative;
   border-bottom: 1px solid var(--rule);
+}
+
+@supports (height: 100svh) {
+  .intro {
+    --stage-h: calc(100svh - var(--top-h, 62px));
+  }
 }
 
 .intro-stage {
@@ -96,6 +102,7 @@
 
 .chap-hero {
   align-items: flex-start;
+  padding-top: clamp(40px, 11vh, 120px);
   padding-top: clamp(40px, 11svh, 120px);
 }
 
@@ -105,10 +112,6 @@
 
 .chap-count .copy {
   width: min(100%, 900px);
-}
-
-.chap-mars {
-  justify-content: flex-end;
 }
 
 .intro-k {
@@ -135,7 +138,7 @@
   height: 20px;
   font-style: normal;
   letter-spacing: 0;
-  color: #000;
+  color: var(--space);
   background: var(--signal);
 }
 
@@ -147,6 +150,10 @@
   letter-spacing: -0.005em;
   text-transform: uppercase;
   text-wrap: balance;
+}
+
+.intro h1 {
+  font-size: clamp(44px, min(6.6vw, 11.5vh), 104px);
 }
 
 .intro h2 {
@@ -162,11 +169,11 @@
 }
 
 .intro .w-moon {
-  color: #d3d0c8;
+  color: var(--moon);
 }
 
 .intro .w-mars {
-  color: #f0734a;
+  color: var(--mars);
 }
 
 .intro-lede {
@@ -196,7 +203,7 @@
   color: var(--ink);
   border: 1px solid var(--rule-2);
   border-radius: 999px;
-  background: rgba(5, 6, 7, 0.55);
+  background: rgba(2, 7, 10, 0.55);
   transition:
     border-color 0.15s,
     color 0.15s;
@@ -329,11 +336,11 @@
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #d3d0c8;
+  background: var(--moon);
 }
 
 .chip-k.k-mars::before {
-  background: #c4471f;
+  background: var(--mars);
 }
 
 .chip {
@@ -341,7 +348,7 @@
   padding: 5px 11px;
   font: 600 13.5px/1.2 var(--body, inherit);
   color: var(--ink);
-  background: rgba(5, 6, 7, 0.7);
+  background: rgba(2, 7, 10, 0.7);
   border: 1px solid var(--rule-2);
   cursor: pointer;
   text-align: left;
@@ -359,7 +366,7 @@
 .chip[aria-pressed="true"] {
   background: var(--signal);
   border-color: var(--signal);
-  color: #000;
+  color: var(--space);
 }
 
 .chip[hidden] {
@@ -402,6 +409,7 @@
 
 .tests {
   display: grid;
+  align-items: stretch;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin-top: 22px;
@@ -413,6 +421,11 @@
   align-items: flex-start;
   gap: 6px;
   padding: 12px;
+}
+
+.chip.test[aria-pressed="true"] .test-p,
+.chip.test[aria-pressed="true"] .test-w span {
+  opacity: 1;
 }
 
 .chip.test[hidden] {
@@ -502,7 +515,7 @@
   font-stretch: 90%;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #000;
+  color: var(--space);
   background: var(--signal);
   border-radius: 999px;
   text-decoration: none;
@@ -511,7 +524,7 @@
 
 .go:hover {
   background: var(--ink);
-  color: #000;
+  color: var(--space);
 }
 
 .go svg {
@@ -574,16 +587,14 @@
 @media (max-width: 899px) {
   .chap {
     align-items: flex-start;
+    padding: 60px 14px 46vh;
     padding: 60px 14px 46svh;
-    background: linear-gradient(180deg, rgba(5, 6, 7, 0.82) 0, rgba(5, 6, 7, 0.82) calc(100% - 52svh), rgba(5, 6, 7, 0) calc(100% - 30svh));
+    background: linear-gradient(180deg, rgba(2, 7, 10, 0) 0, rgba(2, 7, 10, 0.82) 90px, rgba(2, 7, 10, 0.82) calc(100% - 52vh), rgba(2, 7, 10, 0) calc(100% - 30vh));
+    background: linear-gradient(180deg, rgba(2, 7, 10, 0) 0, rgba(2, 7, 10, 0.82) 90px, rgba(2, 7, 10, 0.82) calc(100% - 52svh), rgba(2, 7, 10, 0) calc(100% - 30svh));
   }
 
   .chap-hero {
     padding-top: 60px;
-  }
-
-  .chap-mars {
-    justify-content: flex-start;
   }
 
   .counts,
