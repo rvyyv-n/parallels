@@ -9,3 +9,18 @@ Real images, not AI-made. `site/scripts/fetch-textures.mjs` builds every file in
 | `mars-*.jpg` | Viking MDIM 2.1 colour mosaic, layer `Mars_Viking_MDIM21_ClrMosaic_global_232m` on [NASA Mars Trek](https://trek.nasa.gov/mars) | NASA / USGS | Public NASA and USGS data |
 
 The site changes these images only in size, and in the browser it adds lighting and the lit match layer on top.
+
+# Learn page photos
+
+Real photos, not AI-made and not artist's concepts. `site/scripts/fetch-photos.mjs` downloads them from the [NASA Image and Video Library](https://images.nasa.gov) by NASA id, checks each record's credit, and resizes them; it changes nothing else. No NASA logo, flag or insignia is in frame, and no people.
+
+| File | Title | NASA id | Link | Credit | Licence |
+|---|---|---|---|---|---|
+| `learn/dust-earth.jpg` | Earth: Dust Storm, Sahara Desert, Algeria/Niger Border, Africa | `s49-92-071` | [record](https://images.nasa.gov/details/s49-92-071) | NASA (STS-49 crew) | NASA media are generally not copyrighted. The record states no copyright. |
+| `learn/dust-mars.jpg` | Mars: The Devil is in the Details | `PIA23736` | [record](https://images.nasa.gov/details/PIA23736) | NASA/JPL-Caltech/University of Arizona | NASA media are generally not copyrighted. The record states no copyright. |
+| `learn/ice-earth.jpg` | Earth: Jakobshavn Calving Front | `GSFC_20171208_Archive_e001754` | [record](https://images.nasa.gov/details/GSFC_20171208_Archive_e001754) | NASA/GSFC/Jefferson Beck | NASA media are generally not copyrighted. The record links NASA's image use policy. |
+| `learn/ice-mars.jpg` | Mars: Underground Martian Ice Deposit Exposed at Scarp | `PIA22077` | [record](https://images.nasa.gov/details/PIA22077) | NASA/JPL-Caltech/UA/USGS | NASA media are generally not copyrighted. The record states no copyright. |
+| `learn/volcano-earth.jpg` | Earth: iss068e068973 | `iss068e068973` | [record](https://images.nasa.gov/details/iss068e068973) | NASA (Expedition 68 crew) | NASA media are generally not copyrighted. The record states no copyright. |
+| `learn/volcano-mars.jpg` | Mars: Olympus Mons | `PIA00300` | [record](https://images.nasa.gov/details/PIA00300) | NASA/JPL/USGS | NASA media are generally not copyrighted. The record states no copyright. |
+| `learn/tube-earth.jpg` | Earth: Earth Observation | `iss045e112699` | [record](https://images.nasa.gov/details/iss045e112699) | NASA (Kjell Lindgren, Expedition 45) | NASA media are generally not copyrighted. The record states no copyright. |
+| `learn/tube-moon.jpg` | Moon: Marius Hills Pit -- Lava Tube Skylight? | `PIA12954` | [record](https://images.nasa.gov/details/PIA12954) | NASA/GSFC/Arizona State University | NASA media are generally not copyrighted. The record states no copyright. |

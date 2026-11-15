@@ -1,0 +1,98 @@
+[
+  {
+    "pair": "dust",
+    "line": "Wind lifts dust: a dust storm in the Sahara, and a dust devil on Mars.",
+    "photos": [
+      {
+        "file": "dust-earth.jpg",
+        "nasa_id": "s49-92-071",
+        "title": "Dust Storm, Sahara Desert, Algeria/Niger Border, Africa",
+        "world": "Earth",
+        "alt": "A wall of brown dust rolling across the Sahara, seen from orbit, with small clouds above its front.",
+        "credit": "NASA (STS-49 crew)",
+        "record_credit": "STS049-92-071"
+      },
+      {
+        "file": "dust-mars.jpg",
+        "nasa_id": "PIA23736",
+        "title": "The Devil is in the Details",
+        "world": "Mars",
+        "alt": "A pale dust devil on orange Martian plains, seen from above, with its long dark shadow.",
+        "credit": "NASA/JPL-Caltech/University of Arizona",
+        "record_credit": "NASA/JPL-Caltech/University of Arizona"
+      }
+    ]
+  },
+  {
+    "pair": "ice",
+    "line": "Thick ice in layers: a Greenland glacier, and buried ice in a cliff on Mars (colours enhanced).",
+    "photos": [
+      {
+        "file": "ice-earth.jpg",
+        "nasa_id": "GSFC_20171208_Archive_e001754",
+        "title": "Jakobshavn Calving Front",
+        "world": "Earth",
+        "alt": "The broken white edge of Jakobshavn Glacier in Greenland, seen from a NASA aircraft.",
+        "credit": "NASA/GSFC/Jefferson Beck",
+        "record_credit": "NASA/GSFC/Jefferson Beck"
+      },
+      {
+        "file": "ice-mars.jpg",
+        "nasa_id": "PIA22077",
+        "title": "Underground Martian Ice Deposit Exposed at Scarp",
+        "world": "Mars",
+        "alt": "A steep Martian slope seen from above, where a thick band of buried ice shows as bright blue.",
+        "credit": "NASA/JPL-Caltech/UA/USGS",
+        "record_credit": "NASA/JPL-Caltech/UA/USGS"
+      }
+    ]
+  },
+  {
+    "pair": "volcanoes",
+    "line": "Runny lava builds wide, gentle volcanoes: Hawaii, and Olympus Mons on Mars.",
+    "photos": [
+      {
+        "file": "volcano-earth.jpg",
+        "nasa_id": "iss068e068973",
+        "title": "iss068e068973",
+        "world": "Earth",
+        "alt": "The island of Hawaii in a blue ocean, seen from the space station, with snow on its two big volcanoes.",
+        "credit": "NASA (Expedition 68 crew)",
+        "record_credit": "iss068e068973"
+      },
+      {
+        "file": "volcano-mars.jpg",
+        "nasa_id": "PIA00300",
+        "title": "Olympus Mons",
+        "world": "Mars",
+        "alt": "Olympus Mons on Mars seen from above: a huge round volcano with a crater at its top and a cliff around its base.",
+        "credit": "NASA/JPL/USGS",
+        "record_credit": "NASA/JPL/USGS"
+      }
+    ]
+  },
+  {
+    "pair": "lava tubes",
+    "line": "Lava flows on Mauna Loa in Hawaii, and a pit on the Moon that may open into a lava tube.",
+    "photos": [
+      {
+        "file": "tube-earth.jpg",
+        "nasa_id": "iss045e112699",
+        "title": "Earth Observation",
+        "world": "Earth",
+        "alt": "Dark lava flows spreading down the slopes of Mauna Loa from its summit crater, seen from the space station.",
+        "credit": "NASA (Kjell Lindgren, Expedition 45)",
+        "record_credit": "Kjell Lindgren"
+      },
+      {
+        "file": "tube-moon.jpg",
+        "nasa_id": "PIA12954",
+        "title": "Marius Hills Pit -- Lava Tube Skylight?",
+        "world": "Moon",
+        "alt": "A small, dark, round hole in the grey cratered ground of the Moon's Marius Hills, seen from above.",
+        "credit": "NASA/GSFC/Arizona State University",
+        "record_credit": "NASA/GSFC/Arizona State University"
+      }
+    ]
+  }
+]

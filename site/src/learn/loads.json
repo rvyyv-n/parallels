@@ -1,0 +1,26 @@
+[
+  {
+    "id": "suit",
+    "name": "ISS spacesuit with its life-support backpack, without the astronaut",
+    "short": "Spacesuit",
+    "mass_kg": 145,
+    "source": "NASA EMU fact sheet",
+    "url": "https://www.nasa.gov/wp-content/uploads/2015/07/2019_07_ea_emu.pdf"
+  },
+  {
+    "id": "rover",
+    "name": "Perseverance rover",
+    "short": "Rover",
+    "mass_kg": 1025,
+    "source": "NASA Perseverance rover components",
+    "url": "https://science.nasa.gov/mission/mars-2020-perseverance/rover-components/"
+  },
+  {
+    "id": "module",
+    "name": "BEAM, a habitat module tested on the space station",
+    "short": "Habitat module",
+    "mass_kg": 1413,
+    "source": "NASA SpaceX CRS-8 mission overview",
+    "url": "https://www.nasa.gov/wp-content/uploads/2018/07/spacex_crs-8_mission_overview.pdf"
+  }
+]
