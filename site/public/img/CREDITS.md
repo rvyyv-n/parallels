@@ -24,3 +24,15 @@ Real photos, not AI-made and not artist's concepts. `site/scripts/fetch-photos.m
 | `learn/volcano-mars.jpg` | Mars: Olympus Mons | `PIA00300` | [record](https://images.nasa.gov/details/PIA00300) | NASA/JPL/USGS | NASA media are generally not copyrighted. The record states no copyright. |
 | `learn/tube-earth.jpg` | Earth: Earth Observation | `iss045e112699` | [record](https://images.nasa.gov/details/iss045e112699) | NASA (Kjell Lindgren, Expedition 45) | NASA media are generally not copyrighted. The record states no copyright. |
 | `learn/tube-moon.jpg` | Moon: Marius Hills Pit -- Lava Tube Skylight? | `PIA12954` | [record](https://images.nasa.gov/details/PIA12954) | NASA/GSFC/Arizona State University | NASA media are generally not copyrighted. The record states no copyright. |
+
+# 3D terrain close-up
+
+Loaded live from open map tiles when a visitor opens the close-up; nothing here is bundled, and the rest of the site works without it. No key is needed.
+
+| Used for | Source | Agency | Licence |
+|---|---|---|---|
+| Heights | Terrain Tiles (Terrarium format) on [AWS Open Data](https://registry.opendata.aws/terrain-tiles/), built from NASA SRTM, USGS GMTED2010 and 3DEP, NOAA ETOPO1 and others ([full list](https://github.com/tilezen/joerd/blob/master/docs/attribution.md)) | NASA / USGS / NOAA and others | Open data, attribution per source |
+| Image | Landsat WELD true colour, 2000, layer `Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual` on [NASA GIBS](https://gibs.earthdata.nasa.gov) | NASA / USGS | NASA open data, no restrictions |
+| Image, when the first is missing | Sentinel-2 cloudless 2016 by [EOX IT Services GmbH](https://s2maps.eu) (contains modified Copernicus Sentinel data 2016) | EOX / ESA Copernicus | CC BY 4.0 |
+
+We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).
