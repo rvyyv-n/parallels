@@ -28,21 +28,21 @@ The passes run in order, with no set times. Inside a pass, the builder groups ru
 
 **Goal:** every guide benchmark can be found on the site, the method check is on screen, and tests guard the budgets and the numbers.
 
-- [ ] **1A "How we checked it"** · Opus, medium · `ui/Checked.tsx`, `checked.css`, a unit test
+- [x] **1A "How we checked it"** · Opus, medium · `ui/Checked.tsx`, `checked.css`, a unit test
   - Fill the empty `#checked` section with a component that reads `loadValidation()`.
   - One chart in SVG, no chart library: the fourth run's test places for the Moon and Jezero, known analogs against ordinary places and plain deserts, with each check's pass mark.
   - Three honest lines from `validation.json`: 1 of 4 first checks passed; 10 of 15 checks pass in the fourth run, 6 not counted; the test places were used four times. The commit that fixed the weights shows as text until the repo is public.
   - Done when every number on it is read from the file and the unit test pins them.
-- [ ] **1B "For judges" view** · Opus, medium · `ui/Judges.tsx`, `judges.css`
+- [x] **1B "For judges" view** · Opus, medium · `ui/Judges.tsx`, `judges.css`
   - Shown when `view.page === "judges"` (the address already supports it), with a way back.
   - Sections from the manifest: `benchmarks` (the guide's words), `questions`, `datasets` grouped by agency with link, licence and use, `clustering` (summary and agreement), `not_in_version`; stability from `validation.json`; the AI note.
   - Done when all 31 datasets show and each link has a licence.
-- [ ] **1C Browser tests** · Sonnet, medium · `site/e2e/`
+- [x] **1C Browser tests** · Sonnet, medium · `site/e2e/`
   - `budgets.spec.ts`: word counts (first screen 120, collapsed match 60, main page 900), any base site and filter in two clicks, no sideways scroll at 390 px, nothing moves with reduced motion.
   - `numbers.spec.ts`: the featured numbers equal the values decoded in Node with `tests/node-source.ts`.
   - `links.spec.ts`: every dataset link answers; no console errors on any chapter.
   - Done when the tests fail only for real faults.
-- [ ] **1D Controls and footer** · orchestrator · shared files
+- [x] **1D Controls and footer** · orchestrator · shared files
   - Terrain chips (`manifest.terrain_types` except "none", with cell counts) and a year-round switch in `Picker`, wired to `view.terrain` and `view.yearRound`; `listPlaces` already filters by both.
   - A clear line when a rare terrain type gives fewer than five places.
   - Terrain type and "new place" tags on each row of the five best places.
