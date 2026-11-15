@@ -1,3 +1,4 @@
+import "./compare.css";
 import type { Body, Target } from "./contract";
 import { esc, latlon, num } from "./format";
 import { icon } from "./icons";
@@ -129,7 +130,7 @@ function eqView(body: Body, lat: number, lon: number, url: string, maxZ: number)
 
 function fbNote(body: Body | "earth") {
   const km = ((360 / FALLBACK_PX[body]) * Math.PI * RADIUS[body]) / 180;
-  return `<span class="fb-note"> The live tiles did not load. This is the low-resolution copy that comes with the site (approximately ${num(km, 0)} km for each pixel), at the same scale.</span>`;
+  return `<span class="fb-note">Live tiles did not load: low-resolution copy, about ${num(km, 0)} km per pixel, same scale.</span>`;
 }
 
 export interface CompareInput {
@@ -173,11 +174,16 @@ export function compareHtml(x: CompareInput): string {
       <span class="cmp-knob" aria-hidden="true"></span>
       <input class="cmp-range" type="range" min="0" max="100" value="50" step="1" aria-label="Wipe divider: Earth on the left, ${esc(bodyName)} on the right" aria-valuetext="Divider at 50%">
     </div>
-    <div class="cmp-scale"><span class="cmp-sb" aria-hidden="true"><i></i></span><span><b>${BAR_KM} km</b>. Both images are ${VIEW_KM} km wide, at the same ground scale. We calculate the scales from the radius of each body (Earth ${num(RADIUS.earth)} km, ${esc(bodyName)} ${num(RADIUS[x.body], 1)} km) and from the map projection at the centre.</span></div>
+    <div class="cmp-scale"><span class="cmp-sb" aria-hidden="true"><i></i></span><span><b>${BAR_KM} km</b> · both images ${VIEW_KM} km wide, same ground scale</span></div>
     <figcaption class="cmp-caps">
-      <p class="eimg-cap"><b>Earth: ${esc(x.place)}</b> <span class="muted">${latlon(x.lat, x.lon)}</span><br><span class="live-note">${e ? eLayer : "Mercator map tiles stop at 85° latitude."}</span>${e ? fbNote("earth") : ""}</p>
-      <p class="timg-cap"><b>${esc(bodyName)}: ${esc(x.target.name)}</b> <span class="muted">${latlon(x.target.lat, x.target.lon)}</span><br><span class="live-note">${tLayer}</span>${fbNote(x.body)}</p>
+      <p class="eimg-cap"><b>Earth</b> ${esc(x.place)} <span class="muted">${latlon(x.lat, x.lon)}</span>${e ? fbNote("earth") : ""}</p>
+      <p class="timg-cap"><b>${esc(bodyName)}</b> ${esc(x.target.name)} <span class="muted">${latlon(x.target.lat, x.target.lon)}</span>${fbNote(x.body)}</p>
     </figcaption>
+    <details class="cmp-about"><summary>About these images</summary>
+      <p><b>Earth:</b> ${e ? eLayer : "Mercator map tiles stop at 85° latitude, so there is no live image this near the pole."}</p>
+      <p><b>${esc(bodyName)}:</b> ${tLayer}</p>
+      <p>We calculate both scales from the radius of each body (Earth ${num(RADIUS.earth)} km, ${esc(bodyName)} ${num(RADIUS[x.body], 1)} km) and from the map projection at the centre.</p>
+    </details>
   </figure>`;
 }
 
