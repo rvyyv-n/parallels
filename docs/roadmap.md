@@ -88,14 +88,14 @@ The passes run in order, with no set times. Inside a pass, the builder groups ru
   - Captions, a progress bar, pause and exit; Escape, a wheel, a touch or a key gives control back.
   - `?tour=1` starts it at once, for the video recording.
   - Done when it runs from start to end on a laptop and a phone width, and stops for any user input.
-- [ ] **3B Check it yourself** · Opus, medium · `data/sheet.ts` with a unit test, `ui/CheckIt.tsx`
+- [x] **3B Check it yourself** · Opus, medium · `data/sheet.ts` with a unit test, `ui/CheckIt.tsx`
   - A CSV of the place: trait, Earth value, base-site value, units, both datasets, resolution.
   - Links: NASA Worldview framed on the place, and Moon Trek or Mars Trek for the base site.
   - Done when the CSV matches the screen and every link opens.
 - [ ] **3C Code review** · Opus, high · read only
   - Bugs, numbers that differ from the data, budget breaks, keyboard and screen-reader gaps.
   - Done when each finding is fixed or listed here.
-- [ ] **3D Hardening** · orchestrator · shared files
+- [x] **3D Hardening** · orchestrator · shared files
   - A flat picture map with pins when WebGL is missing; keyboard order; a colour-blind check of gold and blue; smaller textures on phones.
   - Page title, description, share image, icon.
 

@@ -75,7 +75,15 @@ export function App() {
   useReveal();
   const scrolled = useScrolled();
 
-  if (!manifest || !target || !filter) return <div class="loading">Parallels</div>;
+  const [broken, setBroken] = useState(false);
+  useEffect(() => void loadManifest().catch(() => setBroken(true)), []);
+
+  if (!manifest || !target || !filter)
+    return (
+      <div class="loading" role={broken ? "alert" : undefined}>
+        {broken ? "We could not load the data files. Check your connection and load the page again." : "Parallels"}
+      </div>
+    );
 
   const chapter = selected && { manifest, target, filter, place: selected, match };
 

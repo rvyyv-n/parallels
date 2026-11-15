@@ -74,7 +74,9 @@ p {
   min-height: 100svh;
   display: grid;
   place-items: center;
-  font: 400 28px var(--serif);
+  padding: 24px;
+  font: 400 28px/1.25 var(--serif);
+  text-align: center;
   color: var(--dim);
 }
 
@@ -235,6 +237,37 @@ p {
 .story[data-at="base"] .base-pin:not(.hidden) {
   opacity: 1;
   pointer-events: auto;
+}
+
+.world[data-failed] canvas {
+  display: none;
+}
+
+.world[data-failed] .pins {
+  inset: 50% var(--pad) auto auto;
+  width: min(54vw, 980px);
+  aspect-ratio: 2 / 1;
+  overflow: visible;
+  transform: translateY(-50%);
+  border-radius: 6px;
+  background: center / 100% 100% no-repeat;
+  transition: opacity 0.3s;
+}
+
+.story[data-at="intro"] .world[data-failed] .pins {
+  opacity: 0.3;
+}
+
+.world[data-failed] .pin {
+  margin: -14px 0 0 -14px;
+}
+
+.flat-note {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  font-size: 12px;
+  color: var(--faint);
 }
 
 .target-pin {
@@ -429,7 +462,7 @@ p {
 }
 
 .chapter[data-away] .copy {
-  visibility: hidden;
+  pointer-events: none;
 }
 
 .copy.lead {
@@ -1263,6 +1296,18 @@ p {
     height: 64px;
     background: linear-gradient(transparent, var(--bg));
     pointer-events: none;
+  }
+
+  .world[data-failed] .pins {
+    inset: 50px 0 auto 0;
+    width: 100%;
+    transform: none;
+    border-radius: 0;
+  }
+
+  .world[data-failed]::after,
+  .flat-note {
+    display: none;
   }
 
   .chapters {

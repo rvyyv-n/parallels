@@ -7,6 +7,13 @@ import { CHAPTERS, entrance, keyframe, mix, smooth, WIDE_FROM } from "../scene/k
 import { matchPixels } from "../scene/match-map";
 import { Scene, type World as SceneWorld } from "../scene/scene";
 
+const IMG = import.meta.env.BASE_URL + "img/";
+
+const onMap = ({ lat, lon }: { lat: number; lon: number }) => ({
+  left: `${((lon + 180) / 360) * 100}%`,
+  top: `${((90 - lat) / 180) * 100}%`,
+});
+
 interface Props {
   story: RefObject<HTMLDivElement | null>;
   target: Target;
@@ -43,12 +50,11 @@ export function World({ story, target, listing, selected, plan, peek, onSelect }
     const el = canvas.current!;
     const root = story.current!;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let s: Scene;
+    let s: Scene | undefined;
     try {
-      s = new Scene(el, import.meta.env.BASE_URL + "img/", reduced, innerWidth < WIDE_FROM);
+      s = new Scene(el, IMG, reduced, innerWidth < WIDE_FROM);
     } catch {
       setFailed(true);
-      return;
     }
     scene.current = s;
 
@@ -74,7 +80,7 @@ export function World({ story, target, listing, selected, plan, peek, onSelect }
         keyframe(CHAPTERS[next], width, height, targetRef.current),
         t,
       );
-      s.setLayout(to, entered.current ? undefined : entrance(to, height));
+      s?.setLayout(to, entered.current ? undefined : entrance(to, height));
       entered.current = true;
 
       root.dataset.at = CHAPTERS[t > 0.5 ? next : index];
@@ -96,19 +102,25 @@ export function World({ story, target, listing, selected, plan, peek, onSelect }
       queued ||= requestAnimationFrame(update);
     };
     const size = () => {
-      s.resize(el.clientWidth, el.clientHeight);
+      s?.resize(el.clientWidth, el.clientHeight);
       update();
+    };
+    const reach = (e: FocusEvent) => {
+      const chapter = (e.target as HTMLElement).closest<HTMLElement>(".chapter[data-away]");
+      chapter?.scrollIntoView({ block: "start" });
     };
     const watch = new ResizeObserver(size);
     watch.observe(el);
     watch.observe(root);
     addEventListener("scroll", queue, { passive: true });
+    root.addEventListener("focusin", reach);
     size();
     return () => {
       cancelAnimationFrame(queued);
       removeEventListener("scroll", queue);
+      root.removeEventListener("focusin", reach);
       watch.disconnect();
-      s.dispose();
+      s?.dispose();
     };
   }, []);
 
@@ -154,7 +166,7 @@ export function World({ story, target, listing, selected, plan, peek, onSelect }
   return (
     <div class="world" data-failed={failed || undefined}>
       <canvas ref={canvas} aria-hidden="true" />
-      <div class="pins" ref={pins}>
+      <div class="pins" ref={pins} style={failed ? { backgroundImage: `url(${IMG}earth-1024.jpg)` } : undefined}>
         {places.map((p, i) => (
           <button
             key={p.cell}
@@ -162,6 +174,7 @@ export function World({ story, target, listing, selected, plan, peek, onSelect }
             data-on="earth"
             data-lat={p.lat}
             data-lon={p.lon}
+            style={failed ? onMap(p) : undefined}
             aria-current={p.cell === selected?.cell || undefined}
             tabIndex={-1}
             aria-hidden="true"
@@ -171,7 +184,15 @@ export function World({ story, target, listing, selected, plan, peek, onSelect }
           </button>
         ))}
         {selected && !places.some((p) => p.cell === selected.cell) && (
-          <div class="pin" data-on="earth" data-lat={selected.lat} data-lon={selected.lon} aria-current="true" aria-hidden="true" />
+          <div
+            class="pin"
+            data-on="earth"
+            data-lat={selected.lat}
+            data-lon={selected.lon}
+            style={failed ? onMap(selected) : undefined}
+            aria-current="true"
+            aria-hidden="true"
+          />
         )}
         {plan?.places.map((p) => (
           <button
@@ -180,6 +201,7 @@ export function World({ story, target, listing, selected, plan, peek, onSelect }
             data-on="earth"
             data-lat={p.lat}
             data-lon={p.lon}
+            style={failed ? onMap(p) : undefined}
             aria-current={p.cell === selected?.cell || undefined}
             tabIndex={-1}
             aria-hidden="true"
@@ -188,9 +210,13 @@ export function World({ story, target, listing, selected, plan, peek, onSelect }
             <span>{p.n}</span>
           </button>
         ))}
-        <div class="pin target-pin" data-on={target.body} data-lat={target.lat} data-lon={target.lon} aria-hidden="true">
-          <span>Base site</span>
-        </div>
+        {failed ? (
+          <p class="flat-note">A flat map: this browser cannot draw the 3D globes.</p>
+        ) : (
+          <div class="pin target-pin" data-on={target.body} data-lat={target.lat} data-lon={target.lon} aria-hidden="true">
+            <span>Base site</span>
+          </div>
+        )}
       </div>
     </div>
   );
