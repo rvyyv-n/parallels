@@ -3,13 +3,14 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import type { LabelPoint } from "./contract";
 import { LUT } from "./ramp";
-import { reduced } from "./format";
+import { esc, reduced } from "./format";
 
 const GIBS =
   "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg";
 const MAXLAT = 85.051129;
 const W = 720;
 const H = 1024;
+const DIM = 80;
 const WORLD: [[number, number], [number, number], [number, number], [number, number]] = [
   [-180, MAXLAT],
   [180, MAXLAT],
@@ -24,20 +25,29 @@ export interface Grid {
 }
 
 export interface Earth {
-  paint(score: Float32Array, keep: (i: number) => boolean): void;
+  paint(score: Float32Array, mask: Uint8Array, focused: boolean, outline: number[]): void;
   select(i: number, fly: boolean): void;
-  top(ids: number[]): void;
+  top(rows: Top[]): void;
   strength(v: number): void;
   labels(on: boolean): void;
   flat(on: boolean): void;
   hover(i: number | null): void;
+  at(i: number): { x: number; y: number } | null;
   back(): void;
   resize(): void;
+}
+
+export interface Top {
+  i: number;
+  name: string;
+  score: string;
 }
 
 export interface Hooks {
   pick(i: number): void;
   pin(i: number | null): void;
+  over(i: number | null, x: number, y: number, pin: boolean): void;
+  moved(): void;
   away(on: boolean): void;
   pointer(at: { lat: number; lon: number } | null): void;
   scale: HTMLElement;
@@ -75,12 +85,15 @@ function painter(far: HTMLCanvasElement, near: HTMLCanvasElement, px: Int32Array
   const e = imgN.data;
   let shown = new Float32Array(0);
   let raf = 0;
-  const draw = (s: Float32Array, keep: Uint8Array) => {
+  const draw = (s: Float32Array, keep: Uint8Array, focused: boolean) => {
     for (let p = 0; p < px.length; p++) {
       const i = px[p];
       const o = p * 4;
-      if (i < 0) {
-        d[o + 3] = e[o + 3] = 0;
+      if (i < 0 || (focused && !keep[i])) {
+        d[o] = e[o] = 2;
+        d[o + 1] = e[o + 1] = 7;
+        d[o + 2] = e[o + 2] = 10;
+        d[o + 3] = e[o + 3] = focused ? DIM : 0;
         continue;
       }
       const v = s[i];
@@ -102,13 +115,13 @@ function painter(far: HTMLCanvasElement, near: HTMLCanvasElement, px: Int32Array
     gf.putImageData(imgF, 0, 0);
     gn.putImageData(imgN, 0, 0);
   };
-  return (score: Float32Array, keep: Uint8Array, tick: () => void, done: () => void) => {
+  return (score: Float32Array, keep: Uint8Array, focused: boolean, tick: () => void, done: () => void) => {
     cancelAnimationFrame(raf);
     const from = shown.length === score.length ? shown.slice() : score;
     const to = score;
     shown = new Float32Array(to);
     if (reduced() || from === to) {
-      draw(to, keep);
+      draw(to, keep, focused);
       tick();
       done();
       return;
@@ -123,7 +136,7 @@ function painter(far: HTMLCanvasElement, near: HTMLCanvasElement, px: Int32Array
         const b = to[i];
         mix[i] = Number.isNaN(a) || Number.isNaN(b) ? (t < 0.5 ? a : b) : a + (b - a) * k;
       }
-      draw(mix, keep);
+      draw(mix, keep, focused);
       tick();
       if (t < 1) raf = requestAnimationFrame(step);
       else done();
@@ -177,6 +190,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           attribution: '<a href="https://nasa-gibs.github.io/gibs-api-docs/" target="_blank" rel="noopener">NASA GIBS Blue Marble</a>',
         },
         sel: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
+        zone: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
         pts: {
           type: "geojson",
           data: {
@@ -189,6 +203,8 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         { id: "space", type: "background", paint: { "background-color": "#02070a" } },
         { id: "fallback", type: "raster", source: "fallback", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.9, "raster-fade-duration": 0 } },
         { id: "bm", type: "raster", source: "bm", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.9, "raster-contrast": 0.05 } },
+        { id: "zone-glow", type: "line", source: "zone", layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-color": "#ffc24a", "line-width": 5, "line-blur": 4, "line-opacity": 0.55 } },
+        { id: "zone-line", type: "line", source: "zone", layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-color": "#ffe08a", "line-width": 1.1, "line-opacity": 0.95 } },
         { id: "par", type: "line", source: "sel", filter: ["==", ["get", "k"], "par"], paint: { "line-color": "#5bbbe9", "line-width": 1, "line-dasharray": [2, 3], "line-opacity": 0.75 } },
         { id: "cell", type: "line", source: "sel", filter: ["==", ["get", "k"], "cell"], paint: { "line-color": "#5bbbe9", "line-width": 2.5 } },
         {
@@ -227,26 +243,57 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
     map.once("load", () => {
       for (const id of LAYERS) {
         map.addSource(id, { type: "canvas", canvas: id === "match-far" ? farCanvas : nearCanvas, coordinates: WORLD, animate: false });
-        map.addLayer({ id, type: "raster", source: id, paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": fade(id, 1) } }, "par");
+        map.addLayer({ id, type: "raster", source: id, paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": fade(id, 1) } }, "zone-glow");
       }
       r();
     }),
   );
   let selected = -1;
   let centred = false;
+  let mask: Uint8Array = new Uint8Array(0);
   const markers: maplibregl.Marker[] = [];
+  const tags: maplibregl.Marker[] = [];
 
   const wrap = (lng: number) => ((((lng + 180) % 360) + 360) % 360) - 180;
-  map.on("click", (e) => {
+  const hit = (e: maplibregl.MapMouseEvent) => {
     const k = cellAt(e.lngLat.lat, wrap(e.lngLat.lng));
-    if (k >= 0 && at[k] >= 0) on.pick(at[k]);
+    const i = k >= 0 ? at[k] : -1;
+    return i >= 0 && mask[i] ? i : -1;
+  };
+  const onPin = (e: maplibregl.MapMouseEvent) => !!(e.originalEvent.target as HTMLElement).closest?.(".pin, .pin-tag");
+  map.on("click", (e) => {
+    if (!onPin(e)) on.pick(hit(e));
   });
   map.on("mousemove", (e) => {
-    const k = cellAt(e.lngLat.lat, wrap(e.lngLat.lng));
-    map.getCanvas().style.cursor = k >= 0 && at[k] >= 0 ? "pointer" : "";
+    if (onPin(e)) return;
+    const i = hit(e);
+    map.getCanvas().style.cursor = i >= 0 ? "pointer" : "";
     on.pointer({ lat: e.lngLat.lat, lon: wrap(e.lngLat.lng) });
+    on.over(i >= 0 ? i : null, e.point.x, e.point.y, false);
   });
-  map.on("mouseout", () => on.pointer(null));
+  map.on("mouseout", () => {
+    on.pointer(null);
+    on.over(null, 0, 0, false);
+  });
+  const facing = (lat: number, lon: number) => {
+    if (map.getProjection()?.type === "mercator") return true;
+    const c = map.getCenter();
+    const r = Math.PI / 180;
+    return Math.sin(lat * r) * Math.sin(c.lat * r) + Math.cos(lat * r) * Math.cos(c.lat * r) * Math.cos((lon - c.lng) * r) > 0.05;
+  };
+  const declutter = () => {
+    const boxes: DOMRect[] = markers.map((m) => m.getElement().getBoundingClientRect());
+    for (const t of tags.map((m) => m.getElement())) {
+      t.hidden = false;
+      const b = t.getBoundingClientRect();
+      const i = Number(t.dataset.i);
+      const lap = boxes.some((o) => b.left < o.right && b.right > o.left && b.top < o.bottom && b.bottom > o.top);
+      t.hidden = lap || !facing(g.lat[i], g.lon[i]);
+      if (!t.hidden) boxes.push(b);
+    }
+  };
+  map.on("move", () => on.moved());
+  map.on("moveend", declutter);
 
   const visible = () => {
     if (selected < 0) return true;
@@ -279,13 +326,19 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
   };
 
   return {
-    paint(score, keep) {
-      const k = new Uint8Array(score.length);
-      for (let i = 0; i < k.length; i++) k[i] = keep(i) ? 1 : 0;
-      ready.then(() =>
+    paint(score, keep, focused, outline) {
+      mask = keep;
+      const lines: number[][][] = [];
+      for (let j = 0; j < outline.length; j += 4) lines.push([[outline[j], outline[j + 1]], [outline[j + 2], outline[j + 3]]]);
+      ready.then(() => {
+        (map.getSource("zone") as maplibregl.GeoJSONSource).setData({
+          type: "FeatureCollection",
+          features: lines.length ? [{ type: "Feature", properties: {}, geometry: { type: "MultiLineString", coordinates: lines } }] : [],
+        });
         paint(
           score,
-          k,
+          keep,
+          focused,
           () => {
             for (const c of srcs()) c?.play();
           },
@@ -293,8 +346,8 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
             requestAnimationFrame(() => {
               for (const c of srcs()) c?.pause();
             }),
-        ),
-      );
+        );
+      });
     },
     select(i, fly) {
       selected = i;
@@ -318,10 +371,11 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         else check();
       });
     },
-    top(ids) {
+    top(rows) {
       ready.then(() => {
         for (const m of markers.splice(0)) m.remove();
-        ids.forEach((i, r) => {
+        for (const t of tags.splice(0)) t.remove();
+        rows.forEach(({ i }, r) => {
           const b = document.createElement("button");
           b.type = "button";
           b.className = "pin";
@@ -334,10 +388,29 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
             e.stopPropagation();
             on.pick(i);
           });
-          b.addEventListener("mouseenter", () => on.pin(i));
-          b.addEventListener("mouseleave", () => on.pin(null));
+          b.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+          b.addEventListener("mouseenter", () => {
+            on.pin(i);
+            const p = map.project([g.lon[i], g.lat[i]]);
+            on.over(i, p.x, p.y, true);
+          });
+          b.addEventListener("mouseleave", () => {
+            on.pin(null);
+            on.over(null, 0, 0, true);
+          });
           markers.push(new maplibregl.Marker({ element: b, opacityWhenCovered: "0" }).setLngLat([g.lon[i], g.lat[i]]).addTo(map));
         });
+        rows.slice(0, 3).forEach(({ i, name, score }) => {
+          const t = document.createElement("span");
+          t.className = "pin-tag";
+          t.dataset.i = String(i);
+          t.setAttribute("aria-hidden", "true");
+          t.innerHTML = `${esc(name)} <b>${esc(score)}</b>`;
+          tags.push(
+            new maplibregl.Marker({ element: t, anchor: "left", offset: [15, 0], opacityWhenCovered: "0" }).setLngLat([g.lon[i], g.lat[i]]).addTo(map),
+          );
+        });
+        requestAnimationFrame(declutter);
       });
     },
     strength(v) {
@@ -359,6 +432,12 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
     },
     hover(i) {
       for (const m of markers) m.getElement().classList.toggle("hot", i != null && Number(m.getElement().dataset.i) === i);
+    },
+    at(i) {
+      if (!facing(g.lat[i], g.lon[i])) return null;
+      const p = map.project([g.lon[i], g.lat[i]]);
+      const b = el.getBoundingClientRect();
+      return p.x >= 0 && p.y >= 0 && p.x <= b.width && p.y <= b.height ? { x: p.x, y: p.y } : null;
     },
     back() {
       if (selected >= 0) goTo(selected, true);
