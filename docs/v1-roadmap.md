@@ -119,9 +119,9 @@ Owner files: `site/src/earth.ts`, `site/src/zones.ts`, `site/src/hovercard.ts`, 
 
 Owner files: `site/src/sitepages.ts`, `site/src/pages/moon.ts`, `site/src/pages/mars.ts`, `site/src/intro.ts`, `site/src/intro.css`, `site/tests/sites.spec.ts`.
 
-- [ ] **A1. Title page.** A large "THE MOON" or "MARS" heading, one line ("Choose a lunar site to see how Earth compares"), then a list with a square image and the name of every target on that body, with the planet large on the right half (the existing 3D scene). On a phone the list sits under a smaller planet.
-- [ ] **A2. Site images.** Each square shows real imagery of that site, cropped from the shipped Moon (LRO) or Mars texture and centred on the target. Use a polar view for the south-pole sites so they don't smear. Credit the imagery on the About page.
-- [ ] **A3. Hover, focus and pick.** Hovering or focusing a site lights its spot on the planet with a ring, turns the planet towards it, and shows that site's measured values, what a base there must solve, and where crews rehearse on Earth (from the old Worlds section). "Find Earth's matches" opens the Finder for that site. Keyboard: the arrow keys move through the list, Enter picks.
+- [x] **A1. Title page.** A large "THE MOON" or "MARS" heading, one line ("Choose a lunar site to see how Earth compares"), then a list with a square image and the name of every target on that body, with the planet large on the right half (the existing 3D scene). On a phone the list sits under a smaller planet.
+- [x] **A2. Site images.** Each square shows real imagery of that site, cropped from the shipped Moon (LRO) or Mars texture and centred on the target. Use a polar view for the south-pole sites so they don't smear. Credit the imagery on the About page.
+- [x] **A3. Hover, focus and pick.** Hovering or focusing a site lights its spot on the planet with a ring, turns the planet towards it, and shows that site's measured values, what a base there must solve, and where crews rehearse on Earth (from the old Worlds section). "Find Earth's matches" opens the Finder for that site. Keyboard: the arrow keys move through the list, Enter picks.
   → verify: the page lists every target of the body in `manifest.targets`; picking the third Moon site opens `#/find?t=<its id>`; at 390 px nothing overflows.
 
 **Checkpoint 2.** Preview link and the flow from Home to a Place on a phone and on a laptop. Ask what to change.
