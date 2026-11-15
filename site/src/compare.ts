@@ -129,7 +129,7 @@ function eqView(body: Body, lat: number, lon: number, url: string, maxZ: number)
 
 function fbNote(body: Body | "earth") {
   const km = ((360 / FALLBACK_PX[body]) * Math.PI * RADIUS[body]) / 180;
-  return `<span class="fb-note"> The live tiles did not load, so this is the bundled low-resolution copy (about ${num(km, 0)} km per pixel), stretched to the same scale.</span>`;
+  return `<span class="fb-note"> The live tiles did not load. This is the low-resolution copy that comes with the site (approximately ${num(km, 0)} km for each pixel), at the same scale.</span>`;
 }
 
 export interface CompareInput {
@@ -146,20 +146,20 @@ export function compareHtml(x: CompareInput): string {
   const polar = x.body === "moon" && x.target.lat <= -90 + (SP_EDGE_KM - VIEW_KM / 2) / ((Math.PI * RADIUS.moon) / 180);
   const tv = polar ? polarView(x.target) : x.body === "moon" ? eqView("moon", x.target.lat, x.target.lon, WAC, 8) : eqView("mars", x.target.lat, x.target.lon, VIKING, 7);
   const tLayer = polar
-    ? `LRO LOLA shaded relief of the south pole (87.5° S to the pole), NASA Moon Trek, drawn at about ${metres(tv.kmPerPx)} per pixel. Made from laser altimetry: it shows the shape of the ground lit by a computer sun, not a photo. Dots mark the Artemis III regions in view; the cross is the pole.`
+    ? `LRO LOLA shaded relief of the south pole (87.5° S to the pole), NASA Moon Trek, at approximately ${metres(tv.kmPerPx)} for each pixel. This is not a photo. It comes from laser altimetry and shows the shape of the ground with light from a computer sun. The dots show the Artemis III regions. The cross shows the pole.`
     : x.body === "moon"
-      ? `LRO WAC global mosaic, NASA Moon Trek, drawn at about ${metres(tv.kmPerPx)} per pixel.`
-      : `Viking MDIM 2.1 colour mosaic (NASA/USGS), NASA Mars Trek, drawn at about ${metres(tv.kmPerPx)} per pixel north to south. The cross is the target point.`;
+      ? `LRO WAC global mosaic, NASA Moon Trek, at approximately ${metres(tv.kmPerPx)} for each pixel.`
+      : `Viking MDIM 2.1 colour mosaic (NASA/USGS), NASA Mars Trek, at approximately ${metres(tv.kmPerPx)} for each pixel from north to south. The cross shows the target point.`;
   const eLayer = !e
     ? ""
     : e.high
-      ? `Landsat true colour, yearly composite for 2000 (Landsat/WELD via NASA GIBS), drawn at about ${metres(e.kmPerPx)} per pixel, over NASA Blue Marble (about ${metres(e.lowKm)} per pixel) where Landsat has no data. The square is this 0.5° cell.`
-      : `NASA Blue Marble shaded relief (GIBS), drawn at about ${metres(e.kmPerPx)} per pixel. The square is this 0.5° cell.`;
+      ? `Landsat true colour, yearly composite for 2000 (Landsat/WELD through NASA GIBS), at approximately ${metres(e.kmPerPx)} for each pixel. Where Landsat has no data, NASA Blue Marble shows (approximately ${metres(e.lowKm)} for each pixel). The square shows this 0.5° cell.`
+      : `NASA Blue Marble shaded relief (GIBS), at approximately ${metres(e.kmPerPx)} for each pixel. The square shows this 0.5° cell.`;
   const frac = (BAR_KM / VIEW_KM) * 100;
   const earthPanel = e
     ? `<div class="cmp-p eimg" data-body="earth" data-lat="${x.lat}" data-lon="${x.lon}" role="img" aria-label="Earth around ${esc(x.place)}, ${VIEW_KM} km across, with the 0.5 degree cell outlined">
         <div class="cmp-tiles">${e.tiles}</div><canvas class="cmp-fb" width="256" height="256"></canvas>${e.marks}<span class="cmp-tag">Earth</span></div>`
-    : `<div class="cmp-p eimg none" role="img" aria-label="No Earth image this close to the pole"><p>No live map image this close to the pole.</p><span class="cmp-tag">Earth</span></div>`;
+    : `<div class="cmp-p eimg none" role="img" aria-label="No Earth image this near the pole"><p>There is no live map image this near the pole.</p><span class="cmp-tag">Earth</span></div>`;
   const targetPanel = `<div class="cmp-p timg" data-body="${x.body}" data-proj="${polar ? "sp" : "eq"}" data-lat="${x.target.lat}" data-lon="${x.target.lon}" role="img" aria-label="${esc(bodyName)} at ${esc(x.target.name)}, ${VIEW_KM} km across">
       <div class="cmp-tiles">${tv.tiles}</div><canvas class="cmp-fb" width="256" height="256"></canvas><i class="cmp-x" style="left:50%;top:50%"></i>${tv.marks}<span class="cmp-tag">${esc(bodyName)}</span></div>`;
   return `<figure class="cmp" data-mode="split" style="--wipe:50%;--bar:${frac.toFixed(3)}%">
@@ -173,7 +173,7 @@ export function compareHtml(x: CompareInput): string {
       <span class="cmp-knob" aria-hidden="true"></span>
       <input class="cmp-range" type="range" min="0" max="100" value="50" step="1" aria-label="Wipe divider: Earth on the left, ${esc(bodyName)} on the right" aria-valuetext="Divider at 50%">
     </div>
-    <div class="cmp-scale"><span class="cmp-sb" aria-hidden="true"><i></i></span><span><b>${BAR_KM} km</b>. Both images are ${VIEW_KM} km across, at the same ground scale. Scales come from each body's radius (Earth ${num(RADIUS.earth)} km, ${esc(bodyName)} ${num(RADIUS[x.body], 1)} km) and the map projection at the centre.</span></div>
+    <div class="cmp-scale"><span class="cmp-sb" aria-hidden="true"><i></i></span><span><b>${BAR_KM} km</b>. Both images are ${VIEW_KM} km wide, at the same ground scale. We calculate the scales from the radius of each body (Earth ${num(RADIUS.earth)} km, ${esc(bodyName)} ${num(RADIUS[x.body], 1)} km) and from the map projection at the centre.</span></div>
     <figcaption class="cmp-caps">
       <p class="eimg-cap"><b>Earth: ${esc(x.place)}</b> <span class="muted">${latlon(x.lat, x.lon)}</span><br><span class="live-note">${e ? eLayer : "Mercator map tiles stop at 85° latitude."}</span>${e ? fbNote("earth") : ""}</p>
       <p class="timg-cap"><b>${esc(bodyName)}: ${esc(x.target.name)}</b> <span class="muted">${latlon(x.target.lat, x.target.lon)}</span><br><span class="live-note">${tLayer}</span>${fbNote(x.body)}</p>

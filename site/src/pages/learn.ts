@@ -14,15 +14,15 @@ const NAME = { earth: "Earth", moon: "Moon", mars: "Mars" };
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const CLOSE = 0.8;
 const TEMPS: Record<string, [string, string]> = {
-  cold: ["Coldest", "The coldest the ground gets."],
-  season_swing: ["Summer to winter", "How far the ground's temperature swings over a year."],
-  day_swing_air: ["Day to night", "How far the air's temperature swings between day and night."],
-  day_swing_ground: ["Day to night, ground", "How far the ground's temperature swings between day and night."],
+  cold: ["Coldest", "The lowest temperature of the ground."],
+  season_swing: ["Summer to winter", "How much the ground temperature changes in one year."],
+  day_swing_air: ["Day to night", "How much the air temperature changes between day and night."],
+  day_swing_ground: ["Day to night, ground", "How much the ground temperature changes between day and night."],
 };
 const KELVIN: Record<string, string> = { cold: "t_min_k" };
 const LEDE: Record<Body, (t: Target) => string> = {
-  moon: () => "A base at the Moon's south pole must live with weak gravity, no air, deep cold and strong radiation. Earth can practise some of this, not all.",
-  mars: (t) => `A base at ${t.short} must live with weak gravity, thin air, cold nights, dust and radiation. Earth can practise some of this, not all.`,
+  moon: () => "A base at the south pole of the Moon has low gravity, no air, very low temperatures and strong radiation. On Earth, crews can practise for some of these conditions, but not for all.",
+  mars: (t) => `A base at ${t.short} has low gravity, thin air, cold nights, dust and radiation. On Earth, crews can practise for some of these conditions, but not for all.`,
 };
 const STATS = [
   ["Gravity", "Gravity"],
@@ -118,7 +118,7 @@ function meet(m: Manifest, t: Target, w: Body) {
   return `<section class="ln-sec ln-meet" data-testid="learn-meet" aria-labelledby="meet-h">
     <div class="ln-globe" role="img" aria-label="${esc(`${NAME[w]}, turning: a NASA photo map`)}" style="--map:url('${IMG}${w}.jpg')"></div>
     <div class="ln-copy">
-      <p class="ln-k">New to ${esc(WORLD[w])}?</p>
+      <p class="ln-k">First time with ${esc(WORLD[w])}?</p>
       <h1 id="meet-h" tabindex="-1">Meet ${esc(WORLD[w])}</h1>
       <p class="ln-lede">${esc(LEDE[w](t))}</p>
       <dl class="ln-stats">${rows
@@ -141,10 +141,10 @@ function cant(m: Manifest, w: Body) {
     .map(([n, label]) => ({ r: m.cant_copy.find((x) => x.name === n), label }))
     .filter((x) => x.r);
   return `<section class="ln-sec ln-cant" data-testid="learn-cant" aria-labelledby="cant-h">
-    ${heading("cant-h", 3, "What Earth can't copy")}
+    ${heading("cant-h", 3, "What Earth cannot copy")}
     ${
       g
-        ? `<p class="ln-lede">Weight is how hard gravity pulls: mass × gravity, in newtons (N). Pick a load.</p>
+        ? `<p class="ln-lede">Weight is the force of gravity on a mass: mass × gravity, in newtons (N). Select a load.</p>
       <div class="chips ln-switch" role="group" aria-label="Load">${LOADS.map(
         (l, k) => `<button type="button" class="chip" data-load="${esc(l.id)}" aria-pressed="${k === 0}">${esc(l.short)}</button>`,
       ).join("")}</div>
@@ -184,7 +184,7 @@ function weights(m: Manifest, w: Body, id: string) {
 function photos() {
   return `<section class="ln-sec ln-photos" data-testid="learn-photos" aria-labelledby="photos-h">
     ${heading("photos-h", 5, "Same process, two worlds")}
-    <p class="ln-lede">The same forces shape Earth and its neighbours. NASA photos, one pair per process.</p>
+    <p class="ln-lede">The same forces change the surface of Earth and of its neighbours. These NASA photos show one pair for each process.</p>
     <div class="ln-pairs-grid">${PHOTOS.map(
       (p) => `<figure class="ln-pair" data-pair="${esc(p.pair)}"><div class="ln-pair-imgs">${p.photos
         .map(
@@ -231,7 +231,7 @@ export function learnPage(ctx: Ctx): Page {
     box.innerHTML = `<p class="ln-note">${esc(TEMPS[p.trait.id][1])}</p>
       <ul class="ln-rows">${row("world", target.short, p.world)}${row("earth", bestName, p.earth)}</ul>
       <p class="ln-verdict ${p.close ? "is-match" : "is-break"}"><span aria-hidden="true">${p.close ? "=" : "≠"}</span>${
-        p.close ? "Close: Earth can practise this." : "Far apart: Earth can't copy this."
+        p.close ? "Near: crews can practise this on Earth." : "Far apart: Earth cannot copy this."
       }</p>`;
   };
 
@@ -287,23 +287,23 @@ export function learnPage(ctx: Ctx): Page {
       tempPairs = pairs(m, t, cells, cols, i);
       const { name, country } = split(bestName);
       tempsBox.innerHTML = tempPairs.length
-        ? `<p class="ln-lede">The base site against its best place on Earth for the ${esc(filter.name.toLowerCase())} test: <b>${esc(name)}</b>${country ? `, ${esc(country)}` : ""}.</p>
+        ? `<p class="ln-lede">The base site and its best place on Earth for the ${esc(filter.name.toLowerCase())} test: <b>${esc(name)}</b>${country ? `, ${esc(country)}` : ""}.</p>
           <div class="chips ln-switch" role="group" aria-label="Temperature to show">${tempPairs
             .map((p, k) => `<button type="button" class="chip" data-temp="${k}" aria-pressed="${k === 0}">${esc(TEMPS[p.trait.id][0])}</button>`)
             .join("")}</div><div id="ln-temp"></div>`
-        : `<p class="ln-lede">No measured temperatures for this base site.</p>`;
+        : `<p class="ln-lede">There are no measured temperatures for this base site.</p>`;
       drawTemp(0);
-    } else tempsBox.innerHTML = `<p class="ln-lede">No ranked land for this base site.</p>`;
+    } else tempsBox.innerHTML = `<p class="ln-lede">There is no ranked land for this base site.</p>`;
     $("#ln-temps")!.setAttribute("aria-busy", "false");
 
     const yr = $("#ln-year")!;
     masks = ids.map((i) => ({ name: placeName(m, cells, i), best: cells.m_best?.[i] ?? NaN, freeze: cells.m_freeze?.[i] ?? NaN, rain: cells.m_rain?.[i] ?? NaN }));
-    $("#ln-year-lede")!.textContent = `Seasons decide when a test can run. Slide through the year for the five best places for ${t.short} (${filter.name.toLowerCase()} test).`;
+    $("#ln-year-lede")!.textContent = `The season sets when a test can start. Move the slider to see each month at the five best places for ${t.short} (${filter.name.toLowerCase()} test).`;
     drawYear();
     yr.setAttribute("aria-busy", "false");
 
     points = labels.filter((l) => l.kind === "known_analog" && l.groups?.some((g) => g.startsWith(`${w}-`))).sort((a, b) => a.lon - b.lon);
-    $("#ln-analog-lede")!.textContent = `Teams already practise for ${WORLD[w]} at these ${points.length} places. Choose one.`;
+    $("#ln-analog-lede")!.textContent = `Teams practise for ${WORLD[w]} at these ${points.length} places. Select a place.`;
     $("#ln-pins")!.innerHTML = points
       .map(
         (p) =>
@@ -327,26 +327,26 @@ export function learnPage(ctx: Ctx): Page {
       ${meet(m, target, w)}
       <section class="ln-sec" id="ln-temps" data-testid="learn-temps" aria-labelledby="temps-h" aria-busy="true">
         ${heading("temps-h", 1, "Hot and cold")}
-        <div id="ln-temps-body"><p class="ln-wait">Loading the measured temperatures…</p></div>
+        <div id="ln-temps-body"><p class="ln-wait">The measured temperatures are loading…</p></div>
       </section>
       <section class="ln-sec" id="ln-year" data-testid="learn-year" aria-labelledby="year-h" aria-busy="true">
         ${heading("year-h", 2, "A year on Earth")}
-        <p class="ln-lede" id="ln-year-lede">Seasons decide when a test can run.</p>
+        <p class="ln-lede" id="ln-year-lede">The season sets when a test can start.</p>
         <div class="ln-month">
           <label for="ln-month" class="sr">Month</label>
           <input id="ln-month" class="ln-slider" type="range" min="0" max="11" step="1" value="${month}" aria-valuetext="${MONTHS[month]}">
           <output for="ln-month" class="ln-month-name" id="ln-month-name" data-testid="month-name">${MONTHS[month]}</output>
         </div>
-        <p class="ln-key"><span><i data-best></i>Best month: no freeze–thaw, rain or frost</span><span><i data-avoid></i>Freeze–thaw, rainy or frozen</span></p>
+        <p class="ln-key"><span><i data-best></i>Best month: no freeze–thaw, no rain and no frost</span><span><i data-avoid></i>Freeze–thaw, rainy or frozen</span></p>
         <ol class="ln-places" id="ln-places"></ol>
-        <p class="ln-src">Months from ${ext(m.datasets.find((x) => x.id === "power_merra2")?.url ?? "https://power.larc.nasa.gov/", "NASA POWER climatology (MERRA-2)")}, per patch of about 50 km. Places ranked with the ${esc(
+        <p class="ln-src">Months from ${ext(m.datasets.find((x) => x.id === "power_merra2")?.url ?? "https://power.larc.nasa.gov/", "NASA POWER climatology (MERRA-2)")}, for each patch of approximately 50 km. We rank the places with the ${esc(
           filter.name.toLowerCase(),
-        )} test, as in the Finder.</p>
+        )} test, as the Finder does.</p>
       </section>
       ${cant(m, w)}
       <section class="ln-sec" id="ln-analogs" data-testid="learn-analogs" aria-labelledby="analogs-h" aria-busy="true">
-        ${heading("analogs-h", 4, "Tested on Earth first")}
-        <p class="ln-lede" id="ln-analog-lede">Teams already practise at these places.</p>
+        ${heading("analogs-h", 4, "First tested on Earth")}
+        <p class="ln-lede" id="ln-analog-lede">Teams practise at these places.</p>
         <div class="ln-map-wrap">
           <div class="ln-map"><img src="${IMG}blue-marble-4k.jpg" alt="" width="4096" height="2048" loading="lazy" decoding="async"><div class="ln-pins" id="ln-pins"></div></div>
           <div class="ln-analog" id="ln-analog" data-testid="analog-card" aria-live="polite"></div>
@@ -354,9 +354,9 @@ export function learnPage(ctx: Ctx): Page {
       </section>
       ${photos()}
       <section class="ln-sec ln-end" aria-labelledby="end-h">
-        <h2 id="end-h" class="ln-h">Your turn</h2>
-        <p class="ln-lede">See where Earth matches ${esc(target.short)}, and where it breaks.</p>
-        <a class="ln-cta" data-testid="learn-find" href="#/find?t=${encodeURIComponent(target.id)}">Find Earth's matches <span aria-hidden="true">→</span></a>
+        <h2 id="end-h" class="ln-h">Now you try</h2>
+        <p class="ln-lede">See where Earth matches ${esc(target.short)}, and where the match breaks.</p>
+        <a class="ln-cta" data-testid="learn-find" href="#/find?t=${encodeURIComponent(target.id)}">Find the matches on Earth <span aria-hidden="true">→</span></a>
       </section>
     </div>`;
     drawLoad(LOADS[0].id);
@@ -365,7 +365,7 @@ export function learnPage(ctx: Ctx): Page {
       if (mine !== seq) return;
       for (const id of ["ln-temps-body", "ln-places"]) {
         const box = $(`#${id}`);
-        if (box) box.innerHTML = `<p class="ln-wait">The data files could not be loaded. Please reload the page.</p>`;
+        if (box) box.innerHTML = `<p class="ln-wait">The data files did not load. Reload the page.</p>`;
       }
     });
   }

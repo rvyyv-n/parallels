@@ -120,7 +120,7 @@ export function createHoverCard(el: HTMLElement, hooks: HoverHooks): HoverCard {
         card.innerHTML = `${img ? `<span class="hc-fig">${img}<span class="hc-credit">${CREDIT}</span></span>` : ""}
           <span class="hc-name">${p.list ? `<b>#${p.list}</b> ` : ""}${esc(p.name)}</span>
           <span class="hc-ll">${latlon(p.lat, p.lon, 2)}${badge(p)}</span>
-          ${p.list ? "" : `<span class="hc-rank">#${num(p.rank)} of ${num(p.of)} ranked land cells</span>`}
+          ${p.list ? "" : `<span class="hc-rank">Rank ${num(p.rank)} of ${num(p.of)} ranked land cells</span>`}
           <span class="hc-foot"><span class="hc-score"><b>${score100(p.score)}</b> / 100 match score</span><span class="hc-open">Click to open</span></span>`;
       }
       card.hidden = false;

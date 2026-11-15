@@ -6,7 +6,7 @@ test("every source link answers", async ({ page, request }, info) => {
   test.skip(info.project.name !== "laptop", "links are the same on every screen size");
   test.setTimeout(600_000);
   await page.goto("/#/find");
-  await expect(page.locator("#ledger li[data-i]")).toHaveCount(10);
+  await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
   for (const h of ["#/", "#/checks", "#/about"]) await page.evaluate((x) => (location.hash = x), h);
   await expect(page.locator("table.ds")).toBeAttached();
   await expect(page.locator("#checked .run-hist")).toBeAttached();

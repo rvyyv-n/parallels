@@ -138,14 +138,24 @@
   }
 }
 
-@media (min-width: 1100px) {
-  .bar .now {
-    grid-row: 1;
-    grid-column: 1;
-  }
+.hero-go {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 26px;
+}
 
-  .bar .tour-btn {
-    grid-row: 2;
-    grid-column: 1;
-  }
+.hero-go .chap-next {
+  margin-top: 0;
+}
+
+.hero-go .tour-btn {
+  min-height: 44px;
+  background: rgba(2, 7, 10, 0.55);
+}
+
+.touring .hovercard {
+  z-index: 61;
 }
