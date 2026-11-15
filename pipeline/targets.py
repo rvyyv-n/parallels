@@ -102,7 +102,7 @@ DATASETS = {
     "usgs-gazetteer": dict(
         name="USGS Gazetteer of Planetary Nomenclature (lunar feature positions)", agency="USGS",
         url="https://planetarynames.wr.usgs.gov/", licence="Open lookup; no licence stated",
-        used_for="Anchor positions of the nine Artemis III regions.", archive="USGS Astrogeology",
+        used_for="Anchor positions of the nine Artemis III regions and the Shackleton rim.", archive="USGS Astrogeology",
         resolution="feature centre"),
     "artemis-overview": dict(
         name="NASA Artemis overview for Space Apps 2025", agency="NASA", url=ARTEMIS_URL, licence="NASA public document",
@@ -144,6 +144,7 @@ GAZETTEER = {
     "Mons Malapert": (-85.98, 358.33, 67.0, 16338),
     "Mons Mouton": (-84.6, 31.0, 130.0, 16070),
     "Nobile": (-85.2752, 53.2725, 79.272, 4321),
+    "Shackleton": (-89.67, 129.78, 20.92, 5450),
     "de Gerlache": (-88.4849, 271.6553, 32.705, 1439),
     "Slater": (-88.0792, 111.2881, 25.119, 15325),
 }
@@ -169,6 +170,14 @@ MOON = [
     ("Slater Plain", "Slater", "centre",
      "USGS Gazetteer centre of Slater crater; the window samples the crater, not a mapped plain."),
 ]
+
+MORE_MOON = [
+    ("Shackleton rim", "Shackleton", "rim_pole",
+     "Point on Shackleton's rim facing the pole: Gazetteer centre moved one radius (half the Gazetteer diameter) toward the pole. "
+     "The crater's centre lies about 10 km from the pole, so this point sits next to the pole itself; the window takes in the rim, part of the crater's inner wall and the ground outside. "
+     "Shackleton is not one of NASA's nine Artemis III regions, so it is not part of the combined south-pole target."),
+]
+POLAR_MAPS = ("slope_median_deg", "relief_m", "share_under_10", "t_min_k", "t_max_k", "lit_share", "psr_share")
 
 MARS = [
     ("Jezero", 18.38, 77.58, "Centre of Jezero crater; the window samples the crater floor. Perseverance landed about 8 km to the north-west."),
@@ -378,7 +387,7 @@ def terrain_values(dem, spacing_m, px, ds, note):
     return {k: val(v, ds, TERRAIN_STATS[k], "computed", note) for k, v in terrain_metrics(dem, px).items()}
 
 
-def moon_region(name, feature, rule, anchor_note, files):
+def moon_region(name, feature, rule, anchor_note, files, artemis=True):
     lat, lon = moon_anchor(feature, rule)
     gaz = GAZETTEER_URL.format(GAZETTEER[feature][3])
     values = {}
@@ -434,14 +443,22 @@ def moon_region(name, feature, rule, anchor_note, files):
          "url": "https://doi.org/10.3847/PSJ/ac532c"},
         {"text": "Landing needs slopes under 10°; walking under 20°", "source": "NASA Artemis overview for Space Apps 2025",
          "url": ARTEMIS_URL},
-        {"text": "One of NASA's nine Artemis III candidate landing regions", "source": "NASA, 28 Oct 2024",
-         "url": REGIONS_URL},
     ]
+    if artemis:
+        facts.append({"text": "One of NASA's nine Artemis III candidate landing regions", "source": "NASA, 28 Oct 2024",
+                      "url": REGIONS_URL})
     if feature == "Cabeus B":
         facts.insert(0, {"text": "LCROSS found 5.6 ± 2.9% water by weight in soil thrown up from nearby Cabeus crater",
                          "source": "Colaprete et al. 2010", "url": "https://doi.org/10.1126/science.1186986"})
     return {"id": "moon-" + kebab(name), "body": "moon", "name": name, "lat": round(lat, 4), "lon": round(lon, 4),
             "anchor_note": anchor_note + f" Gazetteer: {gaz}", "values": values, "facts": facts}
+
+
+def every_map(region):
+    missing = [k for k in POLAR_MAPS if region["values"][k]["value"] is None]
+    if missing:
+        print(f"dropped {region['id']}: no value for " + ", ".join(missing))
+    return not missing
 
 
 def moon_target(regions):
@@ -625,7 +642,8 @@ def main():
     dci = load_dci(fetch(DCI_URL, "mars/dci_lo_ice_dust_16ppd_shifted.pds"))
     tes = load_tes(fetch(TES_NIGHT_URL, "mars/global_ti_night_2007.img"), fetch(TES_MASK_URL, "mars/global_ti_msk_night_2007.img"))
     regions = [moon_region(*m, files) for m in MOON]
-    targets = [moon_target(regions)] + regions
+    more = [r for r in (moon_region(*m, files, artemis=False) for m in MORE_MOON) if every_map(r)]
+    targets = [moon_target(regions)] + regions + more
     targets += [mars_target(*m, grs, dci, tes) for m in MARS]
     for t in targets:
         t.setdefault("default", False)

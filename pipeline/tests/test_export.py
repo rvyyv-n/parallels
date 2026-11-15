@@ -39,6 +39,7 @@ TARGET = {
     "values": rec(TVALUE), "shown": rec(TVALUE), "facts": [{"text": S, "source": S, "url": S}],
     "regions": opt([{"id": S, "name": S, "lat": N, "lon": N, "anchor_note": S, "values": rec(TVALUE)}]),
     "headline": opt({"cell": I, "title": S, "why": S, "what_to_test": S}),
+    "check_note": opt(S),
 }
 CANT = {"name": S, "earth": S, "moon": S, "mars": S, "source": S, "url": S}
 MANIFEST = {
@@ -59,7 +60,7 @@ LABEL = {"id": S, "name": S, "kind": enum("known_analog", "cave", "ordinary", "p
 PLACE = {"id": S, "name": S, "lat": N, "lon": N, "group": S, "challenge": opt(S), "cell": null(I), "score": null(N), "land_rank": null(N), "best_target": opt(S), "held_out": B, "blind": B, "note": opt(S)}
 CHECK = {"name": S, "pass_mark": N, "result": null(N), "passed": null(B), "n_pairs": I, "held_out_only": opt(null(N)), "blind_only": opt(null(N))}
 TEST = {"id": S, "title": S, "body": enum("moon", "mars"), "plain": S, "groups": [{"id": S, "name": S, "plain": S}], "places": [PLACE], "checks": [CHECK], "misses": [{"place": S, "why": S}]}
-VALIDATION = {"weights_commit": S, "summary": opt(S), "not_blind_note": S, "prototype_runs": [{"date": S, "result": S}], "tests": [TEST], "second_run": opt({"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}]}), "third_run": opt({"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}], "method_change": S, "adopted": B, "adoption_rule": S}), "more_runs": opt([{"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}], "method_change": S, "adopted": B, "adoption_rule": S}]), "stability": opt(S), "data_checks": [{"name": S, "result": S, "passed": B}]}
+VALIDATION = {"weights_commit": S, "summary": opt(S), "not_blind_note": S, "prototype_runs": [{"date": S, "result": S}], "tests": [TEST], "second_run": opt({"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}]}), "third_run": opt({"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}], "method_change": S, "adopted": B, "adoption_rule": S}), "more_runs": opt([{"title": S, "plain": S, "designed_after_first_run": enum(True), "config_commit": S, "summary": S, "tests": [TEST], "unchecked": [{"place": S, "why": S}], "method_change": S, "adopted": B, "adoption_rule": S, "preset": opt(S)}]), "stability": opt(S), "data_checks": [{"name": S, "result": S, "passed": B}]}
 
 KINDS = {
     S: lambda v: isinstance(v, str),

@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from pipeline.assemble import load_config
-from pipeline.publish import filter_scores, headline, inputs, stability, weight_tables
+from pipeline.assemble import load_config, load_publishing, with_publishing
+from pipeline.publish import filter_groups, filter_scores, headline, inputs, stability, weight_tables
 from pipeline.score import score_target
 from pipeline.traits import FILTERS
 
@@ -16,20 +16,45 @@ def world(n=60, seed=3):
     return cells, target
 
 
+def published_cfg():
+    cfg = load_config(method="1.2")
+    return with_publishing(cfg, load_publishing("1.3", cfg))
+
+
 def test_unchanged_weights_reproduce_the_published_scores():
     cells, target = world()
-    cfg = load_config(method="1.2")
+    cfg = published_cfg()
     s = score_target(cells, target, cfg)
-    traits, chs, wc, wf = weight_tables(cfg, "mars", s["ranks"])
-    logs, have = inputs(s, traits, cfg["scoring"])
-    out = filter_scores(logs, have, wc, wf, cfg["scoring"])
-    for i, f in enumerate(FILTERS):
-        assert np.allclose(np.nan_to_num(out[i], nan=-1), np.nan_to_num(s["scores"][f["id"]], nan=-1))
+    seen = []
+    for group in filter_groups(cfg):
+        traits, chs, wc, wf = weight_tables(cfg, "mars", s["ranks"], group)
+        logs, have = inputs(s, traits, cfg["scoring"])
+        out = filter_scores(logs, have, wc, wf, cfg["scoring"])
+        for i, f in enumerate(group):
+            assert np.allclose(np.nan_to_num(out[i], nan=-1), np.nan_to_num(s["scores"][f["id"]], nan=-1))
+            seen.append(f["id"])
+    assert seen == [f["id"] for f in FILTERS]
+
+
+def test_balanced_is_every_challenge_weighted_the_same():
+    cells, target = world()
+    s = score_target(cells, target, published_cfg())
+    assert np.array_equal(np.nan_to_num(s["scores"]["balanced"], nan=-1), np.nan_to_num(s["equal"], nan=-1))
+
+
+def test_adding_balanced_leaves_the_mission_stability_unchanged():
+    cells, target = world()
+    old, new = load_config(method="1.2"), published_cfg()
+    a = stability(score_target(cells, target, old), old, "mars", runs=50)
+    b = stability(score_target(cells, target, new), new, "mars", runs=50)
+    assert set(a) == {"rover", "life_support", "habitat"} and set(b) == set(a) | {"balanced"}
+    for k in a:
+        assert np.array_equal(a[k]["top"], b[k]["top"]) and np.array_equal(a[k]["share"], b[k]["share"])
 
 
 def test_stability_is_repeatable_and_counts_top_cells():
     cells, target = world()
-    cfg = load_config(method="1.2")
+    cfg = published_cfg()
     s = score_target(cells, target, cfg)
     a, b = stability(s, cfg, "mars", runs=50), stability(s, cfg, "mars", runs=50)
     for f in FILTERS:

@@ -20,6 +20,8 @@ def load_config(path=CONFIG, method=None):
     if method is None:
         return json.loads(path.read_text(encoding="utf8"))
     over = json.loads((path.parent / f"v{method}.json").read_text(encoding="utf8"))
+    if over.get("kind") == "publishing":
+        raise ValueError(f"v{method}.json is a publishing config, not a method version")
     parent = over["inherits"].split(":")[0].split(",")[0].strip()
     cfg = load_config(path) if parent == path.name else load_config(path, parent[1:-5])
     for body, chs in over.get("trait_weights", {}).items():
@@ -29,6 +31,20 @@ def load_config(path=CONFIG, method=None):
         if k in over:
             cfg[k] = over[k]
     return cfg
+
+
+def load_publishing(name, cfg, path=CONFIG):
+    pub = json.loads((Path(path).parent / f"v{name}.json").read_text(encoding="utf8"))
+    if pub.get("kind") != "publishing":
+        raise ValueError(f"v{name}.json is a method version, not a publishing config")
+    method = pub["inherits"].split(":")[0].split(",")[0].strip()
+    if method != cfg.get("version", "v1") + ".json":
+        raise ValueError(f"v{name}.json publishes {method}, but the method in use is {cfg.get('version', 'v1')}")
+    return pub
+
+
+def with_publishing(cfg, pub):
+    return dict(cfg, filter_weights=cfg["filter_weights"] | pub["filter_weights"])
 
 
 def load_stage(name, root=DERIVED):

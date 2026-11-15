@@ -154,6 +154,8 @@ def score_target(cells, target, cfg):
     usable_rank = earth_rank(cells["usable"], 12.0, cells["area"], ties)
     scores = {}
     for f in FILTERS:
+        if f["id"] not in cfg["filter_weights"]:
+            continue
         w = {k: v[0] for k, v in cfg["filter_weights"][f["id"]][body].items() if k in ch}
         s = overall(ch, cov, w, min_share=sc["min_weight_with_data"], **opts) if w else np.full(len(cells["area"]), np.nan)
         scores[f["id"]] = s
