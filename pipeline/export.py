@@ -477,7 +477,7 @@ def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sa
         "traits": trait_entries(metas),
         "challenges": challenge_entries(cfg),
         "filters": filter_entries(cfg),
-        "scoring": {"floor": cfg["scoring"]["floor"], "missing_rank": cfg["scoring"]["missing_rank"], "min_weight_with_data": cfg["scoring"]["min_weight_with_data"], "rule": RULE, "layout": LAYOUT, "yearround_rule": yearround_rule(cfg["scoring"]["yearround_share"])},
+        "scoring": {"floor": cfg["scoring"]["floor"], "missing_rank": cfg["scoring"]["missing_rank"], "min_weight_with_data": cfg["scoring"]["min_weight_with_data"], "rule": RULE, "layout": LAYOUT, "yearround_rule": yearround_rule(cfg["scoring"]["yearround_share"]), "rare_km": cfg["rare_km"]},
         "terrain_types": [{"id": i, "key": k, "name": name, "rule": rules[k], "cells": int((cells["terrain_type"] == i).sum())} for i, k, name in TERRAIN_TYPES],
         "clustering": {"k": cfg["clustering"]["k"], "method": f"k-means on standardised trait values (seed {cfg['clustering']['seed']}); cells missing any input are left out", "inputs": cfg["clustering"]["inputs"], "agreement": info["agreement"], "summary": info["summary"]},
         "targets": entries,

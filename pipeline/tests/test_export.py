@@ -48,7 +48,7 @@ MANIFEST = {
     "regions": [S], "datasets": [DATASET], "traits": [TRAIT],
     "challenges": {"moon": [CHALLENGE], "mars": [CHALLENGE]},
     "filters": [FILTER],
-    "scoring": {"floor": N, "missing_rank": N, "min_weight_with_data": N, "rule": S, "layout": opt(S), "yearround_rule": S},
+    "scoring": {"floor": N, "missing_rank": N, "min_weight_with_data": N, "rule": S, "layout": opt(S), "yearround_rule": S, "rare_km": N},
     "terrain_types": [TERRAIN],
     "clustering": {"k": I, "method": S, "inputs": [S], "agreement": [{"cluster": I, "cells": I, "top_type": S, "share": N}], "summary": S},
     "targets": [TARGET], "cant_copy": [CANT],
