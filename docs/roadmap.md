@@ -60,13 +60,13 @@ The passes run in order, with no set times. Inside a pass, the builder groups ru
   - The chapter (id `base`, after "What to test here"): one row per part with its pin number, place, and the one trait that matches best there; challenges with only labels are listed as not scored, with the reason.
   - Choosing a part opens that place in the chapters above.
   - Done when the unit test confirms each pin is the maximum of its column on the real data files.
-- [ ] **2B 3D terrain close-up** · Opus, high · `terrain/`, `ui/Terrain.tsx`, `terrain.css`
+- [x] **2B 3D terrain close-up** · Opus, high · `terrain/`, `ui/Terrain.tsx`, `terrain.css`
   - `terrain/tiles.ts`: open elevation tiles with no key (Terrarium tiles on AWS Open Data), decoded to heights, for a box about 50 km wide around the place.
   - Imagery draped on the mesh: NASA GIBS first, Sentinel-2 cloudless as the fallback; both credited.
   - `terrain/view.ts`: a three.js mesh with a light whose height can be dragged from a low sun to noon; a "south pole light" setting uses the Moon target's measured `sun_height`.
   - Opens from a button in "What to test here", loads as a separate chunk so the first screen stays within budget, and shows a clear message when tiles are blocked.
   - Done when it opens for both headline places and the page still works offline.
-- [ ] **2C Learn page** · Opus, high · `site/learn.html`, `src/learn/`, `scripts/fetch-photos.mjs`, `public/img/learn/`
+- [x] **2C Learn page** · Opus, high · `site/learn.html`, `src/learn/`, `scripts/fetch-photos.mjs`, `public/img/learn/`
   - The six sections in the plan, with one view for the Moon and one for Mars (`learn.html?world=moon`).
   - `fetch-photos.mjs`: downloads eight NASA Image Library photos by their NASA id, resizes them with sharp, and adds their credits to `CREDITS.md`. Photos are bundled; the page makes no live calls.
   - The month slider reads `m_best`, `m_freeze` and `m_rain` for the five best places; the weight calculator uses the gravity in `cant_copy`; the analog map places `labels.json` points on the bundled Earth image.
