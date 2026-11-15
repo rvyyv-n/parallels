@@ -379,40 +379,6 @@
   display: none;
 }
 
-.sites {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(238px, 1fr));
-  gap: 8px;
-}
-
-.chip.site {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  grid-template-rows: auto auto;
-  align-items: center;
-  column-gap: 11px;
-  min-height: 60px;
-  padding: 7px 10px 7px 7px;
-}
-
-.site-thumb {
-  grid-row: 1 / 3;
-  width: 44px;
-  height: 44px;
-  background: #15181c;
-}
-
-.site-n {
-  align-self: end;
-  font-size: 14.5px;
-}
-
-.site-at {
-  align-self: start;
-  font: 400 12px/1.3 var(--body);
-  opacity: 0.75;
-}
-
 .tests {
   display: grid;
   align-items: stretch;
