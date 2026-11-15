@@ -15,6 +15,7 @@ import { Judges } from "./ui/Judges";
 import { CountUp, useReveal, useScrolled } from "./ui/motion";
 import { isChecked, Picker } from "./ui/Picker";
 import type { TerrainProps } from "./ui/Terrain";
+import { Tour } from "./ui/Tour";
 import { World } from "./ui/World";
 
 function caution(target: Target, validation: Validation | undefined): string | undefined {
@@ -64,6 +65,11 @@ export function App() {
   const [Closeup, setCloseup] = useState<ComponentType<TerrainProps>>();
   const [closeup, setCloseupOpen] = useState(false);
   const [peek, setPeek] = useState<number>();
+  const [touring, setTouring] = useState(() => new URLSearchParams(location.search).get("tour") === "1");
+  const startTour = () => {
+    if (view.page !== "main") setView({ page: "main" });
+    setTouring(true);
+  };
 
   useEffect(() => scrollTo(0, 0), [view.page]);
   useReveal();
@@ -94,7 +100,9 @@ export function App() {
         <button class="link" aria-current={view.page === "judges" ? "page" : undefined} onClick={toJudges}>
           For judges
         </button>
-        <button class="link">Tour</button>
+        <button class="link" data-testid="tour-start" onClick={startTour}>
+          Tour
+        </button>
       </nav>
     </header>
   );
@@ -135,7 +143,9 @@ export function App() {
                     Find a place
                     <span aria-hidden="true">↓</span>
                   </button>
-                  <button class="ghost">Take the tour</button>
+                  <button class="ghost" onClick={startTour}>
+                    Take the tour
+                  </button>
                   <a class="text-link learn-link" href="learn.html">
                     New to the Moon and Mars?
                   </a>
@@ -233,6 +243,19 @@ export function App() {
         <Checked onJudges={toJudges} />
       </main>
       <Footer manifest={manifest} onJudges={toJudges} />
+      {touring && (
+        <Tour
+          manifest={manifest}
+          target={target}
+          filter={filter}
+          places={places}
+          selected={selected}
+          plan={plan}
+          chrome={new URLSearchParams(location.search).get("chrome") !== "0"}
+          setView={setView}
+          onExit={() => setTouring(false)}
+        />
+      )}
       {closeup && Closeup && selected && <Closeup place={selected} target={target} onClose={() => setCloseupOpen(false)} />}
     </>
   );

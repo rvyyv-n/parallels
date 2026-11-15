@@ -3,6 +3,7 @@ import type { Dataset, Manifest, MissionFilter, Target } from "../../../dataset/
 import type { PlaceInfo } from "../data/load";
 import { formatCoords, formatValue, monthsOf, percent, type Match, type TraitRow } from "../data/match";
 import { scrollToId } from "../state";
+import { CheckIt } from "./CheckIt";
 import { bodyName, Distance, placeName } from "./Feature";
 import { shortName } from "./Picker";
 
@@ -238,6 +239,7 @@ export function TestChapter({ manifest, target, filter, place, match, onCloseup 
         <button class="ghost closeup" data-testid="terrain-open" onClick={onCloseup}>
           See this ground in 3D
         </button>
+        <CheckIt manifest={manifest} target={target} filter={filter} place={place} match={match} />
         {match && match.labels.length > 0 && (
           <details class="unscored">
             <summary>What we could not score ({match.labels.length})</summary>
