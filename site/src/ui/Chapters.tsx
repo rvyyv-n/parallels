@@ -189,7 +189,7 @@ function Months({ match }: { match: Match }) {
   );
 }
 
-export function TestChapter({ manifest, target, filter, place, match }: Props) {
+export function TestChapter({ manifest, target, filter, place, match, onCloseup }: Props & { onCloseup: () => void }) {
   const none = manifest.terrain_types.find((t) => t.key === "none");
   const type = manifest.terrain_types.find((t) => t.name === match?.terrain);
   return (
@@ -235,6 +235,9 @@ export function TestChapter({ manifest, target, filter, place, match }: Props) {
             </li>
           )}
         </ul>
+        <button class="ghost closeup" data-testid="terrain-open" onClick={onCloseup}>
+          See this ground in 3D
+        </button>
         {match && match.labels.length > 0 && (
           <details class="unscored">
             <summary>What we could not score ({match.labels.length})</summary>

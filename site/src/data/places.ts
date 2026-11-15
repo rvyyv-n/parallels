@@ -31,18 +31,22 @@ export function kmBetween(lat1: number, lon1: number, lat2: number, lon2: number
   return 12742 * Math.asin(Math.sqrt(a));
 }
 
-export function distinctPlaces({ score, lat, lon, region, regions, keep, max = MAX_PLACES, minKm = MIN_KM_APART }: PlacesInput): Place[] {
+export function placeAt({ score, lat, lon, region, regions }: Pick<PlacesInput, "score" | "lat" | "lon" | "region" | "regions">, cell: number): Place {
+  const name = region[cell] >= 0 ? (regions[region[cell]] ?? null) : null;
+  return { cell, score: score[cell] / 10000, lat: lat[cell] / 100, lon: lon[cell] / 100, region: name };
+}
+
+export function distinctPlaces(input: PlacesInput): Place[] {
+  const { score, keep, max = MAX_PLACES, minKm = MIN_KM_APART } = input;
   const order: number[] = [];
   for (let i = 0; i < score.length; i++) if (score[i] !== NOT_RANKED && (!keep || keep(i))) order.push(i);
   order.sort((a, b) => score[b] - score[a] || a - b);
 
   const picks: Place[] = [];
   for (const i of order) {
-    const la = lat[i] / 100;
-    const lo = lon[i] / 100;
-    const name = region[i] >= 0 ? (regions[region[i]] ?? null) : null;
-    if (picks.some((p) => (name !== null && p.region === name) || kmBetween(la, lo, p.lat, p.lon) < minKm)) continue;
-    picks.push({ cell: i, score: score[i] / 10000, lat: la, lon: lo, region: name });
+    const place = placeAt(input, i);
+    if (picks.some((p) => (place.region !== null && p.region === place.region) || kmBetween(place.lat, place.lon, p.lat, p.lon) < minKm)) continue;
+    picks.push(place);
     if (picks.length === max) break;
   }
   return picks;

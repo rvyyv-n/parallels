@@ -3,6 +3,6 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [preact()],
-  build: { target: "es2022" },
+  build: { target: "es2022", rollupOptions: { input: ["index.html", "learn.html"] } },
   test: { include: ["tests/**/*.test.ts"] },
 });

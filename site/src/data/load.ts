@@ -1,7 +1,8 @@
-import type { Manifest, MissionFilter, Target, TerrainType, Validation } from "../../../dataset/contract";
+import type { LabelPoint, Manifest, MissionFilter, Target, TerrainType, Validation } from "../../../dataset/contract";
+import { bestPerChallenge } from "./base";
 import type { Raw } from "./bin";
 import { buildMatch, gridColumns, targetColumns, type Match } from "./match";
-import { distinctPlaces, type Place } from "./places";
+import { distinctPlaces, placeAt, type Place } from "./places";
 import { httpSource, Store } from "./store";
 
 const DATA = import.meta.env.BASE_URL + "data/";
@@ -22,6 +23,8 @@ function loadJson<T>(name: string): Promise<T> {
 
 export const loadManifest = () => loadJson<Manifest>("manifest.json");
 export const loadValidation = () => loadJson<Validation>("validation.json");
+export const loadLabels = () => loadJson<LabelPoint[]>("labels.json");
+export const loadBase = (manifest: Manifest, target: Target) => bestPerChallenge(store, manifest, target);
 
 export interface PlaceInfo extends Place {
   terrain: TerrainType;
@@ -57,17 +60,22 @@ export async function listPlaces(manifest: Manifest, q: Query): Promise<Listing>
   ]);
   const kept = terrainType && q.terrain ? (cell: number) => terrainType[cell] === q.terrain!.id : undefined;
   const picks = distinctPlaces({ score, lat, lon, region, regions: manifest.regions, keep: kept });
-  const places = await Promise.all(
-    picks.map(async (p) => {
-      const extra = await store.cell(grid, ["terrain_type", "nearest_analog_km"], p.cell);
-      return {
-        ...p,
-        terrain: manifest.terrain_types.find((t) => t.id === extra.terrain_type) ?? manifest.terrain_types[0],
-        nearestAnalogKm: extra.nearest_analog_km,
-      };
-    }),
-  );
+  const places = await Promise.all(picks.map((p) => withInfo(manifest, p)));
   return { key: queryKey(q), places, score, lat, lon, kept };
+}
+
+async function withInfo(manifest: Manifest, place: Place): Promise<PlaceInfo> {
+  const extra = await store.cell(manifest.grid, ["terrain_type", "nearest_analog_km"], place.cell);
+  return {
+    ...place,
+    terrain: manifest.terrain_types.find((t) => t.id === extra.terrain_type) ?? manifest.terrain_types[0],
+    nearestAnalogKm: extra.nearest_analog_km,
+  };
+}
+
+export async function loadPlace(manifest: Manifest, listing: Listing, cell: number): Promise<PlaceInfo> {
+  const region = await store.column(manifest.grid, "region");
+  return withInfo(manifest, placeAt({ score: listing.score, lat: listing.lat, lon: listing.lon, region, regions: manifest.regions }, cell));
 }
 
 export async function loadMatch(manifest: Manifest, target: Target, filter: MissionFilter, cell: number): Promise<Match> {

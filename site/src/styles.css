@@ -201,6 +201,17 @@ p {
   pointer-events: none;
 }
 
+.story:not([data-at="base"]) .base-pin,
+.story[data-at="base"] .pin:not(.base-pin, .target-pin) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.story[data-at="base"] .base-pin:not(.hidden) {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .target-pin {
   top: -8px;
   left: -8px;
@@ -314,6 +325,13 @@ p {
 
 .ghost:hover {
   border-color: var(--ink);
+}
+
+.ghost.closeup {
+  margin-top: 18px;
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
 }
 
 .hero-stats {

@@ -1,16 +1,19 @@
-import { useEffect, useRef } from "preact/hooks";
+import type { ComponentType } from "preact";
+import { useEffect, useRef, useState } from "preact/hooks";
 import type { Target, Validation } from "../../dataset/contract";
-import { listPlaces, loadManifest, loadMatch, loadValidation, queryKey, type Query } from "./data/load";
+import { listPlaces, loadBase, loadManifest, loadMatch, loadPlace, loadValidation, queryKey, type PlaceInfo, type Query } from "./data/load";
 import { percent } from "./data/match";
 import { MAX_PLACES } from "./data/places";
 import { SHOWN_FROM } from "./scene/match-map";
 import { scrollToId, useAsync, useView } from "./state";
+import { Base } from "./ui/Base";
 import { BreaksChapter, MatchChapter, TestChapter } from "./ui/Chapters";
 import { Checked } from "./ui/Checked";
 import { Feature, NEW_FROM_KM, placeName } from "./ui/Feature";
 import { Footer } from "./ui/Footer";
 import { Judges } from "./ui/Judges";
 import { isChecked, Picker } from "./ui/Picker";
+import type { TerrainProps } from "./ui/Terrain";
 import { World } from "./ui/World";
 
 function caution(target: Target, validation: Validation | undefined): string | undefined {
@@ -39,7 +42,14 @@ export function App() {
   const listing = useAsync(() => manifest && query && listPlaces(manifest, query), [key]);
   const fresh = listing?.key === key ? listing : undefined;
   const places = fresh?.places ?? [];
-  const selected = places.find((p) => p.cell === view.place) ?? places[0];
+  const listed = places.find((p) => p.cell === view.place);
+  const wanted =
+    manifest && fresh && view.place !== null && !listed && view.place >= 0 && view.place < manifest.grid.n ? view.place : undefined;
+  const opened = useAsync(() => (wanted === undefined ? undefined : loadPlace(manifest!, fresh!, wanted)), [key, wanted]);
+  const held = useRef<PlaceInfo | undefined>(undefined);
+  const found = wanted === undefined ? (listed ?? places[0]) : opened?.cell === wanted ? opened : undefined;
+  if (found || wanted === undefined) held.current = found;
+  const selected = found ?? held.current;
   const rank = selected ? places.indexOf(selected) + 1 : 0;
   const loaded = useAsync(
     () => manifest && target && filter && selected && loadMatch(manifest, target, filter, selected.cell),
@@ -47,6 +57,11 @@ export function App() {
   );
   const match = loaded?.cell === selected?.cell ? loaded : undefined;
   const validation = useAsync(() => (target?.body === "mars" ? loadValidation() : undefined), [target?.body]);
+  const planned = useAsync(() => (manifest && target && listing ? loadBase(manifest, target) : undefined), [target?.id, !!listing]);
+  const plan = planned?.target === target?.id ? planned : undefined;
+  const bestFor = rank === 0 ? plan?.places.find((p) => p.cell === selected?.cell)?.parts.map((p) => p.challenge.name) : undefined;
+  const [Closeup, setCloseup] = useState<ComponentType<TerrainProps>>();
+  const [closeup, setCloseupOpen] = useState(false);
 
   useEffect(() => scrollTo(0, 0), [view.page]);
 
@@ -55,6 +70,10 @@ export function App() {
   const chapter = selected && { manifest, target, filter, place: selected, match };
 
   const toJudges = () => setView({ page: "judges" });
+  const openCloseup = () => {
+    setCloseupOpen(true);
+    if (!Closeup) import("./ui/Terrain").then((m) => setCloseup(() => m.default));
+  };
 
   const top = (
     <header class="top">
@@ -89,7 +108,14 @@ export function App() {
       {top}
       <main>
         <div class="story" ref={story}>
-          <World story={story} target={target} listing={listing} selected={selected} onSelect={(cell) => setView({ place: cell })} />
+          <World
+            story={story}
+            target={target}
+            listing={listing}
+            selected={selected}
+            plan={plan}
+            onSelect={(cell) => setView({ place: cell })}
+          />
           <div class="chapters">
             <section class="chapter" data-chapter="intro" id="intro">
               <div class="copy hero">
@@ -131,6 +157,7 @@ export function App() {
                     filter={filter}
                     place={selected}
                     rank={rank}
+                    bestFor={bestFor}
                     match={match}
                     caution={caution(target, validation)}
                     onOpen={() => scrollToId("match")}
@@ -172,12 +199,25 @@ export function App() {
             </section>
             {chapter && <MatchChapter {...chapter} />}
             {chapter && <BreaksChapter {...chapter} />}
-            {chapter && <TestChapter {...chapter} />}
+            {chapter && <TestChapter {...chapter} onCloseup={openCloseup} />}
+            {chapter && (
+              <Base
+                manifest={manifest}
+                target={target}
+                plan={plan}
+                selected={selected.cell}
+                onOpen={(cell) => {
+                  setView({ place: cell });
+                  scrollToId("find");
+                }}
+              />
+            )}
           </div>
         </div>
         <Checked onJudges={toJudges} />
       </main>
       <Footer manifest={manifest} onJudges={toJudges} />
+      {closeup && Closeup && selected && <Closeup place={selected} target={target} onClose={() => setCloseupOpen(false)} />}
     </>
   );
 }

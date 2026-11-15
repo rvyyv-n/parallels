@@ -1,7 +1,7 @@
 import type { Body, Target } from "../../../dataset/contract";
 import type { Disc, Layout } from "./scene";
 
-export const CHAPTERS = ["intro", "find", "match", "breaks", "test"] as const;
+export const CHAPTERS = ["intro", "find", "match", "breaks", "test", "base"] as const;
 export type ChapterId = (typeof CHAPTERS)[number];
 
 export const WIDE_FROM = 900;
@@ -73,12 +73,19 @@ export function keyframe(id: ChapterId, width: number, height: number, target: T
           height,
         );
       }
+      case "base": {
+        const whole = height * 0.43;
+        const earth = { x: Math.max(width * 0.68, 600 + whole), y: height * 0.53, r: whole, ax: 0, ay: 0 };
+        const cr = whole * SITE_SIZE[target.body];
+        return withSite(target, earth, site({ x: earth.x + whole * 0.78, y: earth.y - whole * 0.86, r: cr }), width, height);
+      }
     }
   }
 
   const r = Math.min(width * 0.4, height * 0.52);
   switch (id) {
-    case "find": {
+    case "find":
+    case "base": {
       const cr = r * Math.min(SITE_SIZE[target.body], 0.3);
       return withSite(target, { x: width * 0.43, y: 52 + r, r, ax: 0, ay: 0 }, site({ x: width - cr - 18, y: cr + 62, r: cr }), width, height);
     }

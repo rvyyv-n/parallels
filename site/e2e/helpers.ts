@@ -9,7 +9,7 @@ export const expect = base.configure({ timeout: 20_000 });
 
 export const manifest = await readManifest();
 export const validation = await readJson<Validation>("validation.json");
-const store = new Store(nodeSource);
+export const store = new Store(nodeSource);
 
 export const CHAPTERS = ["intro", "find", "match", "breaks", "test"];
 

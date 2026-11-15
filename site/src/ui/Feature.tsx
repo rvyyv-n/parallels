@@ -57,12 +57,18 @@ interface Props {
   filter: MissionFilter;
   place: PlaceInfo;
   rank: number;
+  bestFor: string[] | undefined;
   match: Match | undefined;
   caution: string | undefined;
   onOpen: () => void;
 }
 
-export function Feature({ target, filter, place, rank, match, caution, onOpen }: Props) {
+function kicker(rank: number, bestFor: string[] | undefined, filter: MissionFilter) {
+  if (rank === 0) return bestFor ? `Best place on Earth for ${bestFor.join(" and ").toLowerCase()}` : "A place opened by its address";
+  return `${rank === 1 ? "Best place on Earth" : `No. ${rank} on Earth`} to practise ${filter.name.toLowerCase()}`;
+}
+
+export function Feature({ target, filter, place, rank, bestFor, match, caution, onOpen }: Props) {
   const { name, country } = placeName(place.region);
   const pairs = [
     match?.bestMatch && { row: match.bestMatch, kind: "match" as const },
@@ -70,9 +76,7 @@ export function Feature({ target, filter, place, rank, match, caution, onOpen }:
   ].filter((p) => !!p);
   return (
     <article class="feature" data-testid="feature" key={place.cell}>
-      <p class="kicker">
-        {rank === 1 ? "Best place on Earth" : `No. ${rank} on Earth`} to practise {filter.name.toLowerCase()}
-      </p>
+      <p class="kicker">{kicker(rank, bestFor, filter)}</p>
       <h2 class="place-name">{name}</h2>
       <p class="meta">
         <span class="coords">

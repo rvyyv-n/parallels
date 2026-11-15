@@ -1,6 +1,7 @@
 import type { RefObject } from "preact";
 import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import type { Target } from "../../../dataset/contract";
+import type { BasePlan } from "../data/base";
 import type { Listing, PlaceInfo } from "../data/load";
 import { CHAPTERS, entrance, keyframe, mix, smooth, WIDE_FROM } from "../scene/keyframes";
 import { matchPixels } from "../scene/match-map";
@@ -11,10 +12,11 @@ interface Props {
   target: Target;
   listing: Listing | undefined;
   selected: PlaceInfo | undefined;
+  plan: BasePlan | undefined;
   onSelect: (cell: number) => void;
 }
 
-export function World({ story, target, listing, selected, onSelect }: Props) {
+export function World({ story, target, listing, selected, plan, onSelect }: Props) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const pins = useRef<HTMLDivElement>(null);
   const scene = useRef<Scene | undefined>(undefined);
@@ -146,6 +148,24 @@ export function World({ story, target, listing, selected, onSelect }: Props) {
             onClick={() => onSelect(p.cell)}
           >
             <span>{i + 1}</span>
+          </button>
+        ))}
+        {selected && !places.some((p) => p.cell === selected.cell) && (
+          <div class="pin" data-on="earth" data-lat={selected.lat} data-lon={selected.lon} aria-current="true" aria-hidden="true" />
+        )}
+        {plan?.places.map((p) => (
+          <button
+            key={`base-${p.cell}`}
+            class="pin base-pin"
+            data-on="earth"
+            data-lat={p.lat}
+            data-lon={p.lon}
+            aria-current={p.cell === selected?.cell || undefined}
+            tabIndex={-1}
+            aria-hidden="true"
+            onClick={() => onSelect(p.cell)}
+          >
+            <span>{p.n}</span>
           </button>
         ))}
         <div class="pin target-pin" data-on={target.body} data-lat={target.lat} data-lon={target.lon} aria-hidden="true">
