@@ -233,16 +233,6 @@ a.chip {
   text-decoration: none;
 }
 
-.worlds .sites {
-  list-style: none;
-  margin: 18px 0 0;
-  padding: 0;
-}
-
-.worlds .sites .chip.site {
-  height: 100%;
-}
-
 .bar h1.now {
   font-weight: 450;
 }
