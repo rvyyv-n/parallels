@@ -20,6 +20,7 @@ export interface PlacesInput {
 }
 
 export const MIN_KM_APART = 300;
+export const MAX_PLACES = 5;
 const NOT_RANKED = 65535;
 
 export function kmBetween(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -30,7 +31,7 @@ export function kmBetween(lat1: number, lon1: number, lat2: number, lon2: number
   return 12742 * Math.asin(Math.sqrt(a));
 }
 
-export function distinctPlaces({ score, lat, lon, region, regions, keep, max = 5, minKm = MIN_KM_APART }: PlacesInput): Place[] {
+export function distinctPlaces({ score, lat, lon, region, regions, keep, max = MAX_PLACES, minKm = MIN_KM_APART }: PlacesInput): Place[] {
   const order: number[] = [];
   for (let i = 0; i < score.length; i++) if (score[i] !== NOT_RANKED && (!keep || keep(i))) order.push(i);
   order.sort((a, b) => score[b] - score[a] || a - b);

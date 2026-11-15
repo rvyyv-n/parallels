@@ -115,7 +115,8 @@ p {
   transition: color 0.15s;
 }
 
-.top nav .link:hover {
+.top nav .link:hover,
+.top nav .link[aria-current] {
   color: var(--ink);
 }
 
@@ -482,6 +483,99 @@ p {
   border-color: var(--ink);
 }
 
+.chip .count {
+  margin-left: 7px;
+  font: 400 11px/1 var(--mono);
+  opacity: 0.62;
+}
+
+.refine summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  font-size: 12.5px;
+  color: var(--dim);
+  cursor: pointer;
+  list-style: none;
+  transition: color 0.15s;
+}
+
+.refine summary::-webkit-details-marker {
+  display: none;
+}
+
+.refine summary::before {
+  content: "+";
+  width: 10px;
+  font: 500 14px/1 var(--mono);
+  color: var(--faint);
+}
+
+.refine[open] summary::before {
+  content: "−";
+}
+
+.refine summary:hover {
+  color: var(--ink);
+}
+
+.refine summary b {
+  font-weight: 500;
+  color: var(--match);
+}
+
+.refine .pick-row {
+  margin: 6px 0 8px;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 28px;
+  font-size: 12.5px;
+  color: var(--dim);
+  transition: color 0.15s;
+}
+
+.switch i {
+  position: relative;
+  width: 30px;
+  height: 17px;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  background: rgba(5, 6, 7, 0.5);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.switch i::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--dim);
+  transition: transform 0.18s var(--ease), background 0.15s;
+}
+
+.switch:hover,
+.switch[aria-checked="true"] {
+  color: var(--ink);
+}
+
+.switch[aria-checked="true"] i {
+  background: var(--match);
+  border-color: var(--match);
+}
+
+.switch[aria-checked="true"] i::after {
+  transform: translateX(13px);
+  background: #1a1204;
+}
+
 .feature {
   border-top: 1px solid var(--line);
   padding-top: 20px;
@@ -624,9 +718,6 @@ p {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 20px;
   border-top: 1px solid var(--line);
 }
 
@@ -635,7 +726,7 @@ p {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  padding: 7px 0;
+  padding: 6px 0;
   border-bottom: 1px solid var(--line);
   text-align: left;
   white-space: nowrap;
@@ -658,6 +749,28 @@ p {
 
 .runners .country {
   font-size: 12.5px;
+  color: var(--dim);
+}
+
+.runners .tags {
+  margin-left: auto;
+  display: flex;
+  align-items: baseline;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--dim);
+}
+
+.runners .terrain {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.few {
+  padding-left: 10px;
+  border-left: 2px solid var(--break);
+  font-size: 12.5px;
+  line-height: 1.45;
   color: var(--dim);
 }
 
@@ -1047,13 +1160,39 @@ p {
   letter-spacing: -0.02em;
 }
 
+.foot {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1.7fr;
+  gap: 28px clamp(28px, 5vw, 72px);
+  padding: 44px var(--pad) 56px;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--dim);
+}
+
+.foot h2 {
+  margin-bottom: 8px;
+  font: 500 11px/1 var(--sans);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.foot p {
+  max-width: 62ch;
+}
+
 @media (max-width: 899px) {
   .top {
     padding-top: 14px;
     justify-content: space-between;
   }
 
-  .top nav .link:first-child {
+  .top nav .wide-only {
     display: none;
   }
 
@@ -1171,6 +1310,15 @@ p {
 
   .after {
     padding: 64px var(--pad);
+  }
+
+  .foot {
+    grid-template-columns: 1fr;
+    padding: 36px var(--pad) 48px;
+  }
+
+  .runners .name {
+    flex: 0 1 auto;
   }
 }
 

@@ -1,11 +1,15 @@
-import { useRef } from "preact/hooks";
+import { useEffect, useRef } from "preact/hooks";
 import type { Target, Validation } from "../../dataset/contract";
 import { listPlaces, loadManifest, loadMatch, loadValidation, queryKey, type Query } from "./data/load";
 import { percent } from "./data/match";
+import { MAX_PLACES } from "./data/places";
 import { SHOWN_FROM } from "./scene/match-map";
 import { scrollToId, useAsync, useView } from "./state";
 import { BreaksChapter, MatchChapter, TestChapter } from "./ui/Chapters";
-import { Feature, placeName } from "./ui/Feature";
+import { Checked } from "./ui/Checked";
+import { Feature, NEW_FROM_KM, placeName } from "./ui/Feature";
+import { Footer } from "./ui/Footer";
+import { Judges } from "./ui/Judges";
 import { isChecked, Picker } from "./ui/Picker";
 import { World } from "./ui/World";
 
@@ -44,27 +48,45 @@ export function App() {
   const match = loaded?.cell === selected?.cell ? loaded : undefined;
   const validation = useAsync(() => (target?.body === "mars" ? loadValidation() : undefined), [target?.body]);
 
+  useEffect(() => scrollTo(0, 0), [view.page]);
+
   if (!manifest || !target || !filter) return <div class="loading">Parallels</div>;
 
   const chapter = selected && { manifest, target, filter, place: selected, match };
 
-  return (
-    <>
-      <header class="top">
-        <a class="wordmark" href="#">
-          <i aria-hidden="true" />
-          Parallels
-        </a>
-        <nav>
-          <button class="link" onClick={() => scrollToId("checked")}>
+  const toJudges = () => setView({ page: "judges" });
+
+  const top = (
+    <header class="top">
+      <a class="wordmark" href="#">
+        <i aria-hidden="true" />
+        Parallels
+      </a>
+      <nav>
+        {view.page === "main" && (
+          <button class="link wide-only" onClick={() => scrollToId("checked")}>
             How we checked it
           </button>
-          <button class="link" onClick={() => setView({ page: "judges" })}>
-            For judges
-          </button>
-          <button class="link">Tour</button>
-        </nav>
-      </header>
+        )}
+        <button class="link" aria-current={view.page === "judges" ? "page" : undefined} onClick={toJudges}>
+          For judges
+        </button>
+        <button class="link">Tour</button>
+      </nav>
+    </header>
+  );
+
+  if (view.page === "judges")
+    return (
+      <>
+        {top}
+        <Judges manifest={manifest} onBack={() => setView({ page: "main" })} />
+      </>
+    );
+
+  return (
+    <>
+      {top}
       <main>
         <div class="story" ref={story}>
           <World story={story} target={target} listing={listing} selected={selected} onSelect={(cell) => setView({ place: cell })} />
@@ -124,11 +146,23 @@ export function App() {
                             <span class="n">{i + 1}</span>
                             <span class="name">{name}</span>
                             {country && <span class="country">{country}</span>}
+                            <span class="tags">
+                              {p.terrain.key !== "none" && <span class="terrain">{p.terrain.name}</span>}
+                              {p.nearestAnalogKm !== null && p.nearestAnalogKm >= NEW_FROM_KM && <em class="new">new</em>}
+                            </span>
                           </button>
                         </li>
                       );
                     })}
                   </ol>
+                )}
+                {fresh && terrain && places.length < MAX_PLACES && (
+                  <p class="few" data-testid="few">
+                    {places.length === 0
+                      ? `No ${terrain.name.toLowerCase()} place has enough data to be ranked here.`
+                      : `Only ${places.length} distinct ${terrain.name.toLowerCase()} ${places.length === 1 ? "place" : "places"} can be ranked here.`}{" "}
+                    This type covers {terrain.cells.toLocaleString("en")} of {manifest.grid.n.toLocaleString("en")} squares of land.
+                  </p>
                 )}
               </div>
               <p class="legend">
@@ -141,10 +175,9 @@ export function App() {
             {chapter && <TestChapter {...chapter} />}
           </div>
         </div>
-        <section class="after" id="checked">
-          <h2>How we checked it</h2>
-        </section>
+        <Checked onJudges={toJudges} />
       </main>
+      <Footer manifest={manifest} onJudges={toJudges} />
     </>
   );
 }
