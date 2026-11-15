@@ -15,8 +15,9 @@ const h1 = (p: Page) => here(p).locator("h1");
 const ROUTES = [
   { path: "", h: /No place on Earth is/, title: /^Parallels: / },
   { path: "find", h: /Earth's best places/, title: /^Finder · Parallels$/ },
-  { path: "checks", h: /How we checked it/, title: /^How we checked it · Parallels$/ },
+  { path: "learn", h: /Meet /, title: /^Learn · Parallels$/ },
   { path: "about", h: /About Parallels/, title: /^About · Parallels$/ },
+  { path: "checks", h: /About Parallels/, title: /^About · Parallels$/ },
 ];
 
 test("every route opens its page with its heading, focus and title", async ({ page }) => {
@@ -43,31 +44,30 @@ test("the nav moves between pages and Back returns to the previous page", async 
     if (info.project.name === "phone") await page.locator("#menu-btn").click();
     await page.locator(".top nav a", { hasText: name }).click();
   };
-  await nav("Checks");
-  await expect(page).toHaveURL(/#\/checks$/);
-  await expect(h1(page)).toHaveText(/How we checked it/);
-  await expect(page.locator('.top nav a[aria-current="page"]')).toHaveText("Checks");
+  await nav("Learn");
+  await expect(page).toHaveURL(/#\/learn/);
+  await expect(h1(page)).toHaveText(/Meet /);
+  await expect(page.locator('.top nav a[aria-current="page"]')).toHaveText("Learn");
   await nav("About");
   await expect(h1(page)).toHaveText(/About Parallels/);
   await expect(page).toHaveTitle(/^About/);
   await page.goBack();
-  await expect(page).toHaveURL(/#\/checks$/);
-  await expect(h1(page)).toHaveText(/How we checked it/);
-  await expect(page).toHaveTitle(/^How we checked it/);
+  await expect(page).toHaveURL(/#\/learn/);
+  await expect(h1(page)).toHaveText(/Meet /);
+  await expect(page).toHaveTitle(/^Learn/);
   await page.goBack();
   await expect(h1(page)).toHaveText(ROUTES[0].h);
   await page.goForward();
-  await expect(h1(page)).toHaveText(/How we checked it/);
+  await expect(h1(page)).toHaveText(/Meet /);
 });
 
 test("each page leaves out what belongs on other pages", async ({ page }) => {
   const c = best()[0];
   const NOT: [string, string[]][] = [
-    ["", ["#rank", ".card", "#earth", ".run-hist", ".v-checks", "table.ds", "[data-filter]", ".w-analogs"]],
-    ["find", [".card", ".run-hist", ".v-checks", "table.ds", ".w-analogs"]],
-    [`place?t=${main.id}&f=${f0.id}&c=${c}`, ["#rank", "#earth", ".run-hist", ".v-checks", "table.ds", ".w-analogs"]],
-    ["checks", ["#rank", ".card", "#earth", "table.ds", ".w-analogs"]],
-    ["about", ["#rank", ".card", "#earth", ".run-hist", ".v-checks", ".w-analogs"]],
+    ["", ["#rank", ".card", "#earth", ".ab-chart", ".ab-table", "[data-filter]", ".w-analogs"]],
+    ["find", [".card", ".ab-chart", ".ab-table", ".w-analogs"]],
+    [`place?t=${main.id}&f=${f0.id}&c=${c}`, ["#rank", "#earth", ".ab-chart", ".ab-table", ".w-analogs"]],
+    ["about", ["#rank", ".card", "#earth", ".w-analogs"]],
   ];
   for (const [path, sels] of NOT) {
     await page.goto("about:blank");
@@ -75,8 +75,7 @@ test("each page leaves out what belongs on other pages", async ({ page }) => {
     await expect(h1(page)).toBeVisible();
     if (path.startsWith("place")) await expect(page.locator(".card")).toHaveCount(1);
     if (path === "find") await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
-    if (path === "checks") await expect(page.locator(".run-hist li").first()).toBeVisible();
-    if (path === "about") await expect(page.locator("table.ds")).toBeAttached();
+    if (path === "about") await expect(page.locator(".ab-table")).toBeAttached();
     for (const s of sels) expect(await page.locator(s).count(), `${s} on #/${path}`).toBe(0);
   }
   await page.goto("/#/");
@@ -94,7 +93,7 @@ test("Home and About don't wait for the land file", async ({ page }) => {
   await expect(page.locator(".places button")).toHaveCount(6);
   await expect(page.locator("#count-ranked")).toHaveText(/^[\d,]+$/);
   await page.locator('.top nav a[data-route="about"]').evaluate((a) => (a as HTMLElement).click());
-  await expect(page.locator("table.ds tbody tr")).toHaveCount(m.datasets.length);
+  await expect(page.locator(".ab-table tbody tr:not(.ab-tg)")).toHaveCount(m.datasets.length);
 });
 
 test("each data file loads once, and the map and intro are made once", async ({ page }) => {
@@ -114,13 +113,13 @@ test("each data file loads once, and the map and intro are made once", async ({ 
   await expect(page.locator("#earth canvas.maplibregl-canvas")).toHaveCount(1);
   await go(`#/place?t=${main.id}&f=${f0.id}&c=${c}`);
   await expect(page.locator(".card")).toHaveCount(1);
-  await go("#/checks");
-  await expect(page.locator(".run-hist li").first()).toBeVisible();
+  await go("#/learn");
+  await expect(page.locator(".page:not([hidden]) h1")).toHaveText(/Meet /);
   await go(`#/find?t=${main.id}`);
   await expect(page.locator("#earth canvas.maplibregl-canvas")).toBeVisible();
   await go("#/");
   await go("#/about");
-  await expect(page.locator("table.ds")).toBeAttached();
+  await expect(page.locator("#checked .ab-chart")).toBeAttached();
   await expect(page.locator("canvas.maplibregl-canvas")).toHaveCount(1);
   expect(await page.locator(".intro-view canvas").count()).toBeLessThanOrEqual(1);
   expect(await page.locator(".page").count()).toBe(5);
@@ -168,12 +167,12 @@ test("old shared links open the new pages and leave no old URL behind", async ({
 });
 
 test("a plain anchor to another page opens that page at the anchor", async ({ page }) => {
-  await page.goto("/#/checks");
+  await page.goto("/#/learn");
   await page.locator('footer a[href="#data"]').click();
   await expect(page).toHaveURL(/#\/about$/);
   await expect(page.locator("#data")).toBeInViewport();
   await page.goBack();
-  await expect(h1(page)).toHaveText(/How we checked it/);
+  await expect(h1(page)).toHaveText(/Meet /);
 });
 
 test("at 390 px every nav item is reachable through the menu and no page scrolls sideways", async ({ page }) => {
@@ -185,7 +184,7 @@ test("at 390 px every nav item is reachable through the menu and no page scrolls
   await expect(links.first()).toBeHidden();
   await btn.click();
   await expect(btn).toHaveAttribute("aria-expanded", "true");
-  await expect(links).toHaveText(["Home", "Finder", "Checks", "About"]);
+  await expect(links).toHaveText(["Home", "Finder", "Learn", "About"]);
   for (const b of await links.evaluateAll((as) => as.map((a) => a.getBoundingClientRect().toJSON()))) {
     expect(b.height).toBeGreaterThanOrEqual(44);
     expect(b.right).toBeLessThanOrEqual(390);
@@ -197,17 +196,16 @@ test("at 390 px every nav item is reachable through the menu and no page scrolls
   await expect(btn).toBeFocused();
   await expect(links.first()).toBeHidden();
   const c = best()[0];
-  for (const path of ["", `find?t=${main.id}`, `place?t=${main.id}&f=${f0.id}&c=${c}`, "checks", "about"]) {
+  for (const path of ["", `find?t=${main.id}`, `place?t=${main.id}&f=${f0.id}&c=${c}`, "learn", "about"]) {
     await page.goto(`/#/${path}`);
     await expect(h1(page)).toBeVisible();
     if (path.startsWith("place")) await expect(page.locator(".card")).toHaveCount(1);
     if (path.startsWith("find")) await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
-    if (path === "checks") await expect(page.locator(".run-hist li").first()).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth), `#/${path}`).toBeLessThanOrEqual(390);
   }
   await btn.click();
-  await links.filter({ hasText: "Checks" }).click();
-  await expect(h1(page)).toHaveText(/How we checked it/);
+  await links.filter({ hasText: "About" }).click();
+  await expect(h1(page)).toHaveText(/About Parallels/);
   await expect(btn).toHaveAttribute("aria-expanded", "false");
 });
 
@@ -224,25 +222,14 @@ test("the top bar shows the current site once one is picked", async ({ page }) =
   await expect(page.locator("footer .ai")).toContainText("How we used AI");
 });
 
-test("a check of a preset shows as that, never as adopted or used now", async ({ page, request }) => {
+test("a check of a preset shows only as that preset's total on About", async ({ page, request }) => {
   const v = await (await request.get("/data/validation.json")).json();
   const base = v.second_run ?? { title: "Run", plain: "", designed_after_first_run: true, config_commit: "x", summary: "", tests: v.tests, unchecked: [] };
-  const run = { ...base, title: "Balanced preset check test", summary: "Summary of the preset check.", preset: "balanced", adopted: false, method_change: "", adoption_rule: "" };
+  const run = { ...base, title: "Balanced preset check test", preset: "balanced", adopted: true, tests: base.tests.map((t: { checks: { passed: boolean | null }[] }) => ({ ...t, checks: t.checks.map((c) => ({ ...c, passed: c.passed == null ? null : false })) })) };
   const more = [...(v.more_runs ?? []).filter((r: { preset?: string }) => !r.preset), run];
   await page.route("**/data/validation.json", (r) => r.fulfill({ json: { ...v, more_runs: more } }));
-  await page.goto("/#/checks");
-  const n = [v.tests, v.second_run, v.third_run].filter(Boolean).length + more.length;
-  const box = page.locator(`#run-${n}`);
-  await expect(box).toContainText("Balanced preset check test");
-  await expect(box).toContainText(/check of the balanced preset/i);
-  await expect(box).not.toContainText("Adopted");
-  await expect(box.locator(".v-checks tbody tr")).toHaveCount(run.tests.flatMap((t: { checks: { passed: boolean | null }[] }) => t.checks).filter((c: { passed: boolean | null }) => c.passed != null).length);
-  await box.locator("summary", { hasText: "What this run found" }).click();
-  await expect(box).toContainText("Summary of the preset check.");
-  const hist = page.locator(".run-hist li").nth(n - 1);
-  await expect(hist).toContainText(/check of the balanced preset/i);
-  await expect(hist).not.toContainText("Used now");
-  await expect(hist).not.toContainText("Not used now");
-  await expect(page.locator(".run-hist .rh-now")).not.toContainText("Balanced preset check test");
-  await expect(page.locator(".chk-head + div")).not.toHaveAttribute("id", `run-${n}`);
+  await page.goto("/#/about");
+  const n = run.tests.flatMap((t: { checks: { passed: boolean | null }[] }) => t.checks).filter((c: { passed: boolean | null }) => c.passed != null).length;
+  await expect(page.locator("#checked .ab-total")).toContainText(`the Balanced preset passes 0 of ${n}`);
+  await expect(page.locator("#checked .ab-total")).not.toContainText(`, 0 of ${n} checks pass`);
 });

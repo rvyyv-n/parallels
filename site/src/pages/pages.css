@@ -167,22 +167,3 @@ h1.tcap {
   font-weight: 400;
 }
 
-.page-sec .sec-head h1 {
-  margin: 0;
-  font: 800 clamp(40px, 5vw, 72px) / 1.03 var(--display);
-  font-stretch: 88%;
-  letter-spacing: -0.015em;
-}
-
-.steps {
-  max-width: 72ch;
-  padding-left: 1.4em;
-}
-
-.steps li {
-  margin: 10px 0;
-}
-
-.preset-run {
-  margin-top: 36px;
-}

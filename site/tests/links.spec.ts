@@ -7,9 +7,9 @@ test("every source link answers", async ({ page, request }, info) => {
   test.setTimeout(600_000);
   await page.goto("/#/find");
   await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
-  for (const h of ["#/", "#/checks", "#/about"]) await page.evaluate((x) => (location.hash = x), h);
-  await expect(page.locator("table.ds")).toBeAttached();
-  await expect(page.locator("#checked .run-hist")).toBeAttached();
+  for (const h of ["#/", "#/learn", "#/about"]) await page.evaluate((x) => (location.hash = x), h);
+  await expect(page.locator(".ab-table")).toBeAttached();
+  await expect(page.locator("#checked .ab-chart")).toBeAttached();
   const urls = new Set<string>(await page.locator("a[href^='http']").evaluateAll((as) => as.map((a) => a.getAttribute("href")!)));
   for (const f of ["manifest.json", "labels.json", "validation.json"]) {
     const text = await (await request.get(`/data/${f}`)).text();

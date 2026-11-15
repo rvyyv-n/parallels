@@ -129,12 +129,12 @@ test("no horizontal scroll at 375 px", async ({ page }) => {
 test("every internal link resolves to a page or an anchor", async ({ page }) => {
   await ready(page);
   const c = await rows(page).first().getAttribute("data-i");
-  for (const h of ["#/", `#/place?t=${main.id}&c=${c}`, "#/checks", "#/about"]) await page.evaluate((x) => (location.hash = x), h);
+  for (const h of ["#/", `#/place?t=${main.id}&c=${c}`, "#/learn", "#/about"]) await page.evaluate((x) => (location.hash = x), h);
   await expect(page.locator(".card")).toHaveCount(1);
-  await expect(page.locator("#checked .run-hist")).toBeAttached();
+  await expect(page.locator("#checked .ab-chart")).toBeAttached();
   await expect(page.locator(".page")).toHaveCount(5);
   const hrefs = await page.locator("a[href^='#']").evaluateAll((as) => as.map((a) => a.getAttribute("href")!));
-  const routes = ["", "find", "place", "checks", "about"];
+  const routes = ["", "find", "place", "learn", "about"];
   const badRoutes = hrefs.filter((h) => h.startsWith("#/")).filter((h) => !routes.includes(h.slice(2).split("?")[0]));
   expect(badRoutes).toEqual([]);
   const missing = await page.evaluate((hs) => hs.filter((h) => !h.startsWith("#/")).map((h) => h.slice(1)).filter((id) => !id || !document.getElementById(id)), hrefs);
@@ -142,7 +142,7 @@ test("every internal link resolves to a page or an anchor", async ({ page }) => 
 });
 
 test("footer carries the AI note on every page", async ({ page }) => {
-  for (const h of ["", "find", "checks", "about"]) {
+  for (const h of ["", "find", "learn", "about"]) {
     await page.goto(`/#/${h}`);
     await expect(page.locator("footer .ai")).toContainText("How we used AI");
     await expect(page.locator("footer .ai")).toHaveCount(1);
@@ -158,49 +158,31 @@ test("sample banner shows only for sample data", async ({ page }) => {
   await expect(page.locator(".sample")).toHaveCount(1);
 });
 
-test("validation shows the first run, then later runs when present", async ({ page, request }) => {
+test("About shows the current run's held-out results and its honest totals", async ({ page, request }) => {
+  type C = { name: string; result: number | null; held_out_only: number | null; pass_mark: number; passed: boolean | null };
+  type R = { title: string; tests: { title: string; checks: C[] }[]; adopted?: boolean; preset?: string };
   const v = await (await request.get("/data/validation.json")).json();
-  const checks = async () => {
-    await page.goto("about:blank");
-    await page.goto("/#/checks");
-    await page.locator("#first-run").waitFor({ state: "attached" });
+  const runs: R[] = [{ title: "First run", tests: v.tests }, ...[v.second_run, v.third_run, ...(v.more_runs ?? [])].filter(Boolean)];
+  const now = [...runs].reverse().find((r) => r.adopted && !r.preset) ?? runs[0];
+  const bal = [...runs].reverse().find((r) => r.preset === "balanced");
+  const tally = (r: R) => {
+    const cs = r.tests.flatMap((t) => t.checks).filter((c) => c.passed != null);
+    return `${cs.filter((c) => c.passed).length} of ${cs.length}`;
   };
-  await checks();
-  const count = (r: { tests: { checks: { passed: boolean | null }[] }[] }) => r.tests.flatMap((t) => t.checks).filter((c) => c.passed != null).length;
-  await expect(page.locator("#first-run .v-checks tbody tr")).toHaveCount(count(v));
-  const now = nowRun(v);
-  if (now) {
-    const id = now === v.third_run ? "third-run" : `run-${[v.second_run, v.third_run].filter(Boolean).length + 2 + (v.more_runs ?? []).indexOf(now)}`;
-    await expect(page.locator(".chk-head + div")).toHaveAttribute("id", id);
-    await expect(page.locator(`#${id} .v-checks`).first().locator("tbody tr")).toHaveCount(count(now));
-    await expect(page.locator(`#${id}`)).toContainText(now.title);
-    const big = page.locator(".chk-score .v-count-big");
-    await expect(big).toBeVisible();
-    await expect(big).toContainText(`${now.tests.flatMap((t) => t.checks).filter((c) => c.passed).length} of ${count(now)}`);
-    const fails = page.locator(`#${id} .v-fail-list`);
-    const failed = (now.tests as { checks: { name: string; pass_mark: number; passed: boolean | null }[] }[]).flatMap((t) => t.checks).filter((c) => c.passed === false);
-    await expect(fails.locator(".cbar")).toHaveCount(failed.length);
-    for (const c of failed) {
-      await expect(fails).toBeVisible();
-      await expect(fails).toContainText(c.name);
-      await expect(fails).toContainText(`against a pass mark of ${Math.round(c.pass_mark * 100)}%`);
-    }
-    await expect(fails.locator(".cbar-st").first()).toContainText("Not passed");
-    await expect(page.locator(".current-box")).toContainText(now.title.match(/method version ([\d.]+)/i)?.[1] ?? now.title);
-    await expect(page.locator(".run-hist li")).toHaveCount([v.tests, v.second_run, v.third_run, ...(v.more_runs ?? [])].filter(Boolean).length);
-    await expect(page.locator(".run-hist .rh-now")).toContainText("Used now");
+  const pc = (x: number) => `${Math.floor(x * 100 + 1e-9)}%`;
+  await page.goto("/#/about");
+  const box = page.locator("#checked");
+  await expect(box.locator(".ab-chart")).toBeVisible();
+  for (const b of ["moon", "mars"]) {
+    const t = now.tests.find((x) => x.title.toLowerCase().startsWith(b) && x.title.toLowerCase().includes("challenge by challenge"));
+    const c = t?.checks.find((x) => /^all challenges pooled/i.test(x.name));
+    if (!c?.held_out_only) continue;
+    await expect(box.locator(`.ab-tile[data-body="${b}"] b`)).toHaveText(pc(c.held_out_only));
+    expect(await box.locator(`.ab-fill[data-body="${b}"]`).first().evaluate((e) => parseFloat((e as HTMLElement).style.width))).toBeCloseTo(c.held_out_only * 100, 1);
   }
-  for (const [i, r] of (v.more_runs ?? []).entries()) await expect(page.locator(`#run-${[v.second_run, v.third_run].filter(Boolean).length + 2 + i}`)).toContainText(r.title);
-  await expect(page.locator("#second-run")).toHaveCount(v.second_run ? 1 : 0);
-  await expect(page.locator("#third-run")).toHaveCount(v.third_run ? 1 : 0);
-  const base = v.second_run ?? { title: "Run", plain: "", designed_after_first_run: true, config_commit: "x", summary: "", tests: v.tests, unchecked: [] };
-  await page.route("**/data/validation.json", async (r) =>
-    r.fulfill({ json: { ...v, third_run: { ...base, title: "Third run test", method_change: "Changed X", adopted: false, adoption_rule: "Rule Y" } } }),
-  );
-  await checks();
-  await expect(page.locator("#third-run")).toContainText("Third run test");
-  await expect(page.locator("#third-run")).toContainText("Changed X");
-  await expect(page.locator("#third-run")).toContainText("Rule Y");
+  await expect(box.locator(".ab-total")).toContainText(`${tally(now)} checks pass`);
+  if (bal) await expect(box.locator(".ab-total")).toContainText(`the Balanced preset passes ${tally(bal)}`);
+  await expect(box).not.toContainText("ML");
 });
 
 test("works with NASA GIBS tiles blocked, and makes no other outside calls", async ({ page }) => {
@@ -217,8 +199,8 @@ test("works with NASA GIBS tiles blocked, and makes no other outside calls", asy
   await rows(page).first().locator(".rk-row").click();
   await page.locator(".card .eimg").scrollIntoViewIfNeeded();
   await expect(page.locator(".card .eimg.fb")).toHaveCount(1);
-  await page.evaluate(() => (location.hash = "#/checks"));
-  await page.locator("#checked .run-hist").waitFor();
+  await page.evaluate(() => (location.hash = "#/about"));
+  await page.locator("#checked .ab-chart").waitFor();
   await page.evaluate(() => (location.hash = "#/"));
   await expect(page.locator("#intro-h")).toBeVisible();
   expect(errors).toEqual([]);
@@ -320,55 +302,29 @@ test("page nav fits, marks the current page, and links open folded blocks", asyn
   await page.goto("/#/about");
   const nav = page.locator(".top nav a");
   if (info.project.name === "phone") await page.locator("#menu-btn").click();
-  await expect(nav).toHaveText(["Home", "Finder", "Checks", "About"]);
+  await expect(nav).toHaveText(["Home", "Finder", "Learn", "About"]);
   for (const box of await nav.evaluateAll((as) => as.map((a) => a.getBoundingClientRect().toJSON()))) expect(box.height).toBeGreaterThanOrEqual(44);
   expect(await page.locator(".top nav").evaluate((n) => n.scrollWidth <= n.clientWidth + 1)).toBe(true);
   await expect(nav.nth(3)).toHaveAttribute("aria-current", "page");
   await expect(page.locator(".top nav a[aria-current]")).toHaveCount(1);
   if (info.project.name === "phone") await page.keyboard.press("Escape");
-  await expect(page.locator("#benchmarks")).not.toHaveAttribute("open", "");
-  await page.locator("#benchmarks > summary").click();
-  await page.locator("#benchmarks a[href='#terrain']").first().click();
+  await expect(page.locator("#terrain")).not.toHaveAttribute("open", "");
+  await page.locator(".ab-toc a[href='#challenge']").click();
+  await expect(page.locator("#challenge")).toBeInViewport();
+  await page.locator("#terrain > summary").click();
   await expect(page.locator("#terrain")).toHaveAttribute("open", "");
-  await expect(page.locator("#terrain")).toBeInViewport();
-  await page.locator("#benchmarks a[href='#explore']").first().click();
+  await page.locator("#terrain a[href='#/find']").click();
   await expect(page).toHaveURL(/#\/find/);
   await expect(rows(page)).toHaveCount(20);
   await page.goto("/#/checks");
-  await page.locator(".run-hist a[href='#second-run']").click();
-  await expect(page.locator("#second-run")).toBeVisible();
-  await expect(page.locator("#second-run")).toBeInViewport();
+  await expect(page).toHaveURL(/#\/about$/);
+  await expect(page.locator("#checked")).toBeInViewport();
 });
 
-test("a link with a hash to a folded block opens it on load", async ({ page }) => {
+test("an old link to a validation run lands on About's How we checked it", async ({ page }) => {
   await page.goto("/#third-run");
-  await expect(page.locator("#third-run")).toBeVisible();
-  await expect(page.locator("#third-run")).toBeInViewport();
-});
-
-test("each check of the current run is a bar against its pass mark, failed first and visible", async ({ page, request }) => {
-  type C = { name: string; pass_mark: number; result: number | null; passed: boolean | null };
-  const v = await (await request.get("/data/validation.json")).json();
-  const now = nowRun(v) ?? { tests: v.tests };
-  const cs = (now.tests as { checks: C[] }[]).flatMap((t) => t.checks);
-  const failed = cs.filter((c) => c.passed === false);
-  const passed = cs.filter((c) => c.passed === true);
-  await page.goto("/#/checks");
-  const box = page.locator(".chk-head + div");
-  const bars = box.locator(".verdict > .v-fail-list .cbar");
-  await expect(bars).toHaveCount(failed.length);
-  for (const [i, c] of failed.entries()) {
-    const b = bars.nth(i);
-    await expect(b).toBeVisible();
-    await expect(b.locator(".cbar-st")).toHaveText(/Not passed/);
-    if (c.result != null) expect(await b.locator(".cbar-fill").evaluate((e) => parseFloat((e as HTMLElement).style.width))).toBeCloseTo(c.result * 100, 3);
-    expect(await b.locator(".cbar-mark").evaluate((e) => parseFloat((e as HTMLElement).style.left))).toBeCloseTo(c.pass_mark * 100, 3);
-  }
-  const ok = box.locator(".verdict > .v-passed");
-  await expect(ok.locator("summary")).toContainText(`Passed (${passed.length})`);
-  await ok.locator("summary").click();
-  await expect(ok.locator(".cbar .cbar-st", { hasText: "Passed" })).toHaveCount(passed.length);
-  if (cs.some((c) => c.passed == null)) await expect(box.locator(".not-run")).toBeVisible();
+  await expect(page.locator("#checked")).toBeVisible();
+  await expect(page.locator("#checked")).toBeInViewport();
 });
 
 test("the guided tour starts from the Finder, steps on, and closes on Escape", async ({ page }) => {

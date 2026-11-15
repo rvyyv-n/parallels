@@ -19,6 +19,10 @@ const HOLDS: [RegExp, string][] = [
 
 const ALIAS: Record<string, string> = { moon: "ch-moon", mars: "ch-mars" };
 
+const MOVED: Record<string, [string, string]> = { checks: ["about", "checked"] };
+
+const RUN = /^(first-run|second-run|third-run|run-\d+)$/;
+
 const HOME_TITLE = "Parallels: Earth's closest parallels to every part of a Moon or Mars base";
 
 let pages: Record<string, () => Page> = {};
@@ -43,7 +47,7 @@ export const hrefFor = (path: string) => last.get(path) ?? `#/${path}`;
 export const at = () => shown;
 
 export function reveal(id: string, smooth: boolean) {
-  const el = document.getElementById(id);
+  const el = document.getElementById(RUN.test(id) ? "checked" : id);
   if (!el) return false;
   if (el instanceof HTMLDetailsElement) el.open = true;
   for (let p = el.parentElement; p; p = p.parentElement) if (p instanceof HTMLDetailsElement) p.open = true;
@@ -58,9 +62,15 @@ const name = (p: Page) => {
 };
 
 async function open(hash: string, how: How, anchor?: string) {
-  const { path: raw, q } = parse(hash);
+  const { path: was, q } = parse(hash);
+  const moved = MOVED[was];
+  const raw = moved ? moved[0] : was;
+  if (moved) {
+    hash = `#/${raw}`;
+    if (how === "pop") how = "replace";
+  }
   const path = raw in pages ? raw : "";
-  anchor ??= ALIAS[raw];
+  anchor ??= ALIAS[raw] ?? moved?.[1];
   if (path !== raw) {
     hash = "#/";
     if (how === "pop") how = "replace";

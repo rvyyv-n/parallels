@@ -26,16 +26,15 @@ const shareTitle = (v: number) => (v >= 1 ? "All ranked land" : `Best ${SHARES.f
 const presets = (m: Manifest) => [...m.filters].sort((a, b) => Number(b.id === "balanced") - Number(a.id === "balanced"));
 
 const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby="find-h">
-  <aside class="fd-side" aria-label="Ranked places and controls">
+  <aside class="fd-side" id="fd-side" aria-label="Ranked places and controls">
     <span class="fd-grip" aria-hidden="true"></span>
     <header class="fd-head">
       <h1 id="find-h" tabindex="-1">Earth's best places for this base site</h1>
-      <button type="button" class="tour-btn" id="tour"><i aria-hidden="true"></i>Guided tour</button>
       <div class="fd-site">
         <label class="fd-pick"><span class="sr">Base site</span><i class="fd-dot" aria-hidden="true"></i><select id="pick-target">${(["moon", "mars"] as const)
           .map((b) => `<optgroup label="${BODY[b]}">${m.targets.filter((t) => t.body === b).map((t) => `<option value="${esc(t.id)}">${esc(t.short)}</option>`).join("")}</optgroup>`)
-          .join("")}</select></label>
-        <a class="fd-change" id="now-change" href="#ch-moon">Change</a>
+          .join("")}</select>${icon("chevron")}</label>
+        <a class="fd-change" id="now-change" href="#ch-moon">${icon("site")}<span>All sites</span></a>
       </div>
     </header>
     <div class="fd-block fd-sum" id="summary" aria-live="polite"><p class="sum-k">The list is loading…</p></div>
@@ -62,7 +61,13 @@ const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby=
     <div class="fd-cmp" id="compare" hidden></div>
   </aside>
   <div class="earth-col">
+    <button type="button" class="fd-fold" id="fold" aria-controls="fd-side" aria-expanded="true" title="Hide the list"><span class="sr">Hide the list</span>${icon("chevron")}</button>
     <div class="earth" id="earth" role="region" aria-label="Map of the land on Earth. The colour shows the match score. Use the ranked list with the keyboard."></div>
+    <div class="map-bar">
+      <div class="seg" role="group" aria-label="Map view"><button type="button" data-view="globe" aria-pressed="true">Globe</button><button type="button" data-view="flat" aria-pressed="false">Flat<span class="long"> map</span></button></div>
+      <label class="tog"><input type="checkbox" id="pick-labels" checked><span class="tog-box">${icon("check")}</span><i class="k-analog" aria-hidden="true"></i>Known analogs<span class="tog-more"><i class="k-cave" aria-hidden="true"></i>caves</span></label>
+      <button type="button" class="tour-btn" id="tour" title="Guided tour"><i aria-hidden="true"></i><span class="long">Guided tour</span></button>
+    </div>
     <button type="button" class="back" id="back" hidden>Go back to the selected place</button>
     <div class="status" id="status"><span class="st-scale" id="st-scale"></span><span class="st-at" id="st-at" aria-hidden="true"></span></div>
     <div class="legend" id="legend">
@@ -78,10 +83,6 @@ const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby=
         <p class="lg-faint">When the map shows all land, weak matches are pale so that you can see the ground. Grey land has no rank.</p>
         <p class="lg-pole">The map layer stops at 85° N and 85° S. The list also ranks the land past this limit.</p>
       </div></details>
-    </div>
-    <div class="lg-keys">
-      <label><input type="checkbox" id="pick-labels" checked> <i class="k-analog"></i>Known analogs <i class="k-cave"></i>caves</label>
-      <label><input type="checkbox" id="pick-flat"> Flat map</label>
     </div>
   </div>
 </section>`;
@@ -109,6 +110,7 @@ export function finder(ctx: Ctx): Page {
   const shut = new Set<string>();
   let moved = new Map<number, number>();
   let fade = 0;
+  let flat = false;
 
   const $ = <T extends HTMLElement>(q: string) => el.querySelector<T>(q)!;
   const target = () => targetOf(m, s);
@@ -194,7 +196,7 @@ export function finder(ctx: Ctx): Page {
       ? "We calculated year-round scores only for the presets. This switch is off when you set the weights."
       : m.scoring.yearround_rule;
     $("#w-mine").hidden = !s.hand;
-    $("#find-h").innerHTML = `Earth's best places for <b>${esc(t.name)}</b>`;
+    $("#find-h").innerHTML = `<span>Earth's best places for</span> <b>${esc(t.name)}</b>`;
     $<HTMLAnchorElement>("#now-change").href = `#ch-${t.body}`;
     $<HTMLAnchorElement>("#now-change").setAttribute("aria-label", `Select a different base site in the ${BODY[t.body]} part of Home`);
   };
@@ -360,6 +362,7 @@ export function finder(ctx: Ctx): Page {
       const v = Number(t.value);
       weigh(t.dataset.ch, v);
       t.parentElement!.querySelector("output")!.textContent = fmtMul(v);
+      t.style.setProperty("--v", `${v * 50}%`);
       changed();
     });
     $("#w-reset").addEventListener("click", () => {
@@ -433,7 +436,27 @@ export function finder(ctx: Ctx): Page {
       $("#strength-out").textContent = `${v}%`;
       earth?.strength(v / 100);
     });
-    $<HTMLInputElement>("#pick-flat").addEventListener("change", (e) => earth?.flat((e.target as HTMLInputElement).checked));
+    $(".seg").addEventListener("click", (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-view]");
+      if (!b || (b.dataset.view === "flat") === flat) return;
+      flat = !flat;
+      for (const x of el.querySelectorAll<HTMLElement>("[data-view]")) x.setAttribute("aria-pressed", String((x.dataset.view === "flat") === flat));
+      earth?.flat(flat);
+    });
+    $("#fold").addEventListener("click", () => {
+      const open = !$("#explore").classList.toggle("wide");
+      $<HTMLElement>("#fd-side").inert = !open;
+      const b = $("#fold");
+      const word = open ? "Hide the list" : "Show the list";
+      b.setAttribute("aria-expanded", String(open));
+      b.title = word;
+      b.querySelector(".sr")!.textContent = word;
+      card?.hide();
+      pop?.hide(false);
+    });
+    $("#explore").addEventListener("transitionend", (e) => {
+      if (e.target === e.currentTarget) earth?.resize();
+    });
     tourButton($("#tour"), "find");
   };
 
@@ -470,7 +493,7 @@ export function finder(ctx: Ctx): Page {
         }
         if (s.cell >= 0) earth.select(s.cell, false);
         earth.labels($<HTMLInputElement>("#pick-labels").checked);
-        earth.flat($<HTMLInputElement>("#pick-flat").checked);
+        earth.flat(flat);
         earth.strength(Number($<HTMLInputElement>("#pick-strength").value) / 100);
       })
       .catch(() => (earthEl.innerHTML = `<p class="nogl">The map did not load. The ranked list and the match pages work.</p>`));
