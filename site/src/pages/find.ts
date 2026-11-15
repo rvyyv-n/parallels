@@ -1,16 +1,25 @@
 import type { Manifest } from "../contract";
 import type { Cols, Data } from "../data";
-import type { Earth } from "../earth";
+import type { Earth, Top } from "../earth";
 import { BODY, isIce, placeName, terrainOf } from "../card";
 import { esc, latlon, num, reduced, score100, webgl } from "../format";
 import { colour, gradient } from "../ramp";
 import { icon } from "../icons";
 import { rankOf, top } from "../score";
 import { focus, type Zones } from "../zones";
-import { createHoverCard, type HoverCard } from "../hovercard";
+import { createHoverCard, createPopup, type HoverCard, type Popup } from "../hovercard";
 import { tour } from "../tour";
 import { go, setQuery, type Page } from "../router";
 import { filterOf, query, rankedOf, readState, scoreOf, targetOf, weightsOf, type Ctx, type State } from "./ctx";
+
+const SHARES: [number, string][] = [
+  [0.01, "1%"],
+  [0.02, "2%"],
+  [0.05, "5%"],
+  [0.1, "10%"],
+  [1, "All land"],
+];
+const shareTitle = (v: number) => (v >= 1 ? "All ranked land" : `Best ${SHARES.find(([x]) => x === v)?.[1] ?? `${v * 100}%`} of land`);
 
 const TEST_ICON: Record<string, string> = { rover: "surface", life_support: "resources", habitat: "shelter" };
 const GIBS_BM = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8";
@@ -68,12 +77,16 @@ const html = (m: Manifest) => `<section id="explore" class="explore" aria-labell
       <button type="button" class="back" id="back" hidden>Back to selected</button>
       <div class="status" id="status"><span class="st-scale" id="st-scale"></span><span class="st-at" id="st-at" aria-hidden="true"></span></div>
       <div class="legend" id="legend">
-        <p class="lg-title">Match, 0–100</p>
+        <p class="lg-title" id="lg-title">${shareTitle(0.02)}</p>
+        <div class="lg-share" role="group" aria-labelledby="lg-title">${SHARES.map(
+          ([v, t]) => `<button type="button" data-share="${v}" aria-pressed="${v === 0.02}">${t}</button>`,
+        ).join("")}</div>
         <div class="lg-scale"><div class="lg-bar" style="background:${gradient()}"></div><div class="lg-ticks"><span>0</span><span>50</span><span>100</span></div></div>
         <label class="lg-range"><span>Match layer</span><input type="range" id="pick-strength" min="0" max="100" step="5" value="100"><output id="strength-out">100%</output></label>
         <details class="lg-more"><summary>${icon("info")}About the colours</summary><div class="lg-pop">
-          <p class="lg-text">A weighted mix of the challenge scores. Each comes from how the place's traits rank against all of Earth's land. Grey: not ranked.</p>
-          <p class="lg-faint">Weak matches are drawn faint so the ground shows.</p>
+          <p class="lg-text">Only the best places are coloured: the share of ranked land you pick above, with a glowing line around each zone. Pick "All land" to colour every ranked cell.</p>
+          <p class="lg-text">The colour is the match score: a weighted mix of the challenge scores, each from how the place's traits rank against all of Earth's land.</p>
+          <p class="lg-faint">With all land shown, weak matches are drawn faint so the ground shows, and grey means not ranked.</p>
           <p class="lg-pole">The map layer stops at 85° N and S; the list still ranks land beyond it.</p>
         </div></details>
       </div>
@@ -97,9 +110,12 @@ export function finder(ctx: Ctx): Page {
   let near: number[] = [];
   let ranked = 0;
   let earth: Earth | null = null;
-  let share = 1;
+  let share = 0.02;
   let zones: Zones = { keep: new Uint8Array(0), outline: [] };
+  let mask: Uint8Array = new Uint8Array(0);
   let card: HoverCard | null = null;
+  let pop: Popup | null = null;
+  const hovers = matchMedia("(hover: hover)");
   let terr: Float32Array | undefined;
   let picking = 0;
   let richBody = "";
@@ -113,11 +129,46 @@ export function finder(ctx: Ctx): Page {
   };
   const open = (i: number) => go(`#/place?${query(s, i)}`);
   const href = (i: number) => `#/place?${esc(query(s, i))}`;
-  const shown = (i: number) => keep(i) && zones.keep[i] === 1;
-  const info = (i: number) =>
-    d && Number.isFinite(score[i])
-      ? { rank: rankOf(score, i), name: placeName(m, d.cells, i), lat: d.cells.lat[i], lon: d.cells.lon[i], score: score[i], far: d.cells.nearest_analog_km?.[i] ?? NaN }
-      : null;
+  const info = (i: number) => {
+    if (!d || !Number.isFinite(score[i])) return null;
+    const far = d.cells.nearest_analog_km?.[i];
+    return {
+      list: ids.indexOf(i) + 1,
+      rank: rankOf(score, i),
+      of: ranked,
+      name: placeName(m, d.cells, i),
+      lat: d.cells.lat[i],
+      lon: d.cells.lon[i],
+      score: score[i],
+      fresh: Number.isFinite(far) && far > (m.scoring.rare_km ?? 100),
+    };
+  };
+  const paint = () => {
+    const focused = share < 1;
+    mask = new Uint8Array(score.length);
+    let painted = 0;
+    for (let i = 0; i < score.length; i++) {
+      if (!keep(i) || (focused && !zones.keep[i])) continue;
+      mask[i] = 1;
+      if (!Number.isNaN(score[i])) painted++;
+    }
+    const lg = $("#legend");
+    lg.dataset.painted = String(painted);
+    lg.dataset.ranked = String(ranked);
+    lg.dataset.edges = String(zones.outline.length / 4);
+    $("#lg-title").textContent = shareTitle(share);
+    for (const b of lg.querySelectorAll<HTMLButtonElement>("[data-share]")) b.setAttribute("aria-pressed", String(Number(b.dataset.share) === share));
+    earth?.paint(score, mask, focused, zones.outline);
+  };
+  const tops = (): Top[] => ids.map((i) => ({ i, name: placeName(m, d!.cells, i), score: `${score100(score[i])} / 100` }));
+  const popAt = (i: number) => {
+    const p = earth?.at(i);
+    if (!p) return;
+    card?.hide();
+    s.cell = i;
+    select(false);
+    pop?.show(i, p.x, p.y);
+  };
   const named = (i: number) => Number.isFinite(d!.cells.region?.[i]) && !!m.regions[d!.cells.region[i]];
 
   const richTests = () => {
@@ -213,9 +264,11 @@ export function finder(ctx: Ctx): Page {
     score = scoreOf(m, cols, s, d!.n);
     ranked = rankedOf(score);
     ({ ids, near } = top(score, 10, d!.cells, keep));
-    zones = focus(score, share);
-    earth?.paint(score, shown);
-    earth?.top(ids);
+    zones = focus(score, share, { lat: d!.cells.lat, lon: d!.cells.lon });
+    pop?.hide(false);
+    card?.hide();
+    paint();
+    earth?.top(tops());
     ledger();
   };
 
@@ -316,9 +369,31 @@ export function finder(ctx: Ctx): Page {
     const rowOf = (e: Event) => (e.target as HTMLElement).closest<HTMLElement>("#ledger li[data-i]");
     ledgerEl.addEventListener("mouseover", (e) => {
       const li = rowOf(e);
-      earth?.hover(li ? Number(li.dataset.i) : null);
+      const i = li ? Number(li.dataset.i) : null;
+      earth?.hover(i);
+      const p = i != null && hovers.matches && (!pop || pop.open < 0) ? earth?.at(i) : null;
+      if (i != null && p) card?.show(i, p.x, p.y);
+      else card?.hide();
     });
     card = createHoverCard($(".earth-col"), { info, open });
+    pop = createPopup($(".earth-col"), { info, open, closed: () => {} });
+    $("#legend").addEventListener("click", (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-share]");
+      if (!b || !d || Number(b.dataset.share) === share) return;
+      share = Number(b.dataset.share);
+      zones = focus(score, share, { lat: d.cells.lat, lon: d.cells.lon });
+      pop?.hide(false);
+      paint();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape" || el.closest("[hidden]") || el.hidden) return;
+      card?.hide();
+      pop?.hide();
+    });
+    document.addEventListener("click", (e) => {
+      const t = e.target as HTMLElement;
+      if (pop && pop.open >= 0 && t.isConnected && !t.closest(".mpop, #earth")) pop.hide(false);
+    });
     ledgerEl.addEventListener("mouseleave", () => {
       earth?.hover(null);
       card?.hide();
@@ -354,15 +429,23 @@ export function finder(ctx: Ctx): Page {
       .then(([mod, labels]) => {
         const at = $("#st-at");
         earth = mod.createEarth(earthEl, { lat: data.cells.lat, lon: data.cells.lon, n: data.n }, labels, {
-          pick: open,
+          pick: (i) => (i >= 0 ? popAt(i) : pop?.hide(false)),
           pin: hot,
+          over: (i, x, y) => {
+            if (i == null || !hovers.matches || (pop && pop.open >= 0)) card?.hide();
+            else card?.show(i, x, y);
+          },
+          moved: () => {
+            card?.hide();
+            if (pop && pop.open >= 0) pop.move(earth!.at(pop.open));
+          },
           away: (on) => ($("#back").hidden = !on),
           pointer: (p) => (at.textContent = p ? latlon(p.lat, p.lon, 2) : ""),
           scale: $("#st-scale"),
         });
         if (score.length) {
-          earth.paint(score, shown);
-          earth.top(ids);
+          paint();
+          earth.top(tops());
         }
         if (s.cell >= 0) earth.select(s.cell, false);
         earth.labels($<HTMLInputElement>("#pick-labels").checked);
@@ -375,6 +458,10 @@ export function finder(ctx: Ctx): Page {
   let ready: Promise<Data | null> = Promise.resolve(null);
   return {
     title: () => "Finder",
+    hide() {
+      card?.hide();
+      pop?.hide(false);
+    },
     mount(root) {
       el = root;
       el.innerHTML = html(m);
