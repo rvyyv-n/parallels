@@ -25,7 +25,7 @@ Four gates, in this order. The site's interface waits for the user's yes on gate
 
 ### Gate 2. Research and a UI design
 
-- **Rivals:** use [plan §1](claudes-plan.md#1-rivals).
+- **Our edge:** use [plan §1](claudes-plan.md#1-our-edge).
 - **Our earlier draft:** the prototype on `main` is retired and kept as the tag `archive/prototype`. v1 replaces it. Reuse any piece that saves time (`scoring.py`, `terrain.py` and `planets.py` match the plan and have tests), but nothing has to be kept. Two things must not come across: the hand-picked list as the thing being ranked, and the sample values.
 - **Recommend one UI design**, as ambitious as it can be while staying clear, that:
   - is easy to understand at a glance;

@@ -1,22 +1,14 @@
 # Claude's plan
 
-Build notes for the [team plan](team-plan.md): rivals, method, data, checks, stack, roadmap and fallbacks. Written by Claude on 13 November 2026 and aligned with our local [Challenge Guide](challenge-guide.pdf) on 14 November. Where this file and the team plan differ, the team plan wins.
+Build notes for the [team plan](team-plan.md): our edge, method, data, checks, stack, roadmap and fallbacks. Written by Claude on 13 November 2026 and aligned with our local [Challenge Guide](challenge-guide.pdf) on 14 November. Where this file and the team plan differ, the team plan wins.
 
 This is the plan from before the build. What version 1 ships (its targets, data, method and limits) is in the [README](../README.md). Where the two differ, the README has the current state.
 
-## 1. Rivals
+## 1. Our edge
 
-A scan on 13 November found at least 22 public repos for this challenge. Three are serious:
+Where we can stand out:
 
-| Project | Strong point | What it lacks |
-|---|---|---|
-| [TwinWorlds](https://github.com/JimmyGuajan/twinworlds) | 15-trait fingerprint, a mission picker, "what it cannot simulate", a 2.5° global map, live site | Its only check on known sites is an anecdote; global map is coarse; some traits are literature estimates |
-| [EarthTwin](https://github.com/es-ratt/earthtwin) | Leaves missing data empty, limitations tab, tests, live site | Ranks only 18 hand-picked Earth sites; its own docs say "not a validated ranking" |
-| [terrestrial-analog-finder](https://github.com/shishir-kuet/terrestrial-analog-finder) | Terrain at 30 m in 12 regions | Terrain only, no global search, no live link |
-
-Where we can beat them:
-
-1. **We test the method in public.** Known analogs should outrank farmland and rainforest, with plain deserts in between, and we commit the weights before the v1 run. A throwaway prototype ran the same test places first, so v1's run isn't blind (section 6). None of the three rivals shows a check like this. Our literature search turned up no published analog method checked this way either.
+1. **We test the method in public.** Known analogs should outrank farmland and rainforest, with plain deserts in between, and we commit the weights before the v1 run. A throwaway prototype ran the same test places first, so v1's run isn't blind (section 6). Our literature search turned up no published analog method checked this way either.
 2. **Search all of Earth's land, then zoom to one spot.** Screen the globe at 0.5°, then compare terrain at the same scale as the Moon or Mars data, down to one valley, crater or massif. The challenge asks for exactly this ("'The Sahara' is too broad").
 3. **Rank by "Earth rank", show the real gap.** Nowhere on Earth is as cold as a lunar crater, so we rank places by how far toward the target they get. Next to that rank we always show the real gap in units, e.g. how far the coldest month falls short of −248 °C.
 4. **A headline that fills a real gap.** The Moon's south pole is pale anorthosite highland rock ([Lemelin et al. 2022](https://api.crossref.org/works/10.3847/PSJ/ac532c)), but most lunar analogs in use are dark basalt. Mistastin crater, where Artemis crews trained, is the exception ([NASA, LPSC 2024](https://ntrs.nasa.gov/api/citations/20230018695/downloads/LPSC2024_Evans_draft2.pdf)). We headline a highland stand-in only if NASA data alone ranks it high (section 5).
@@ -313,7 +305,7 @@ Times are in our Local Event's time zone.
 | Vercel limits or pause | move to GitHub Pages (public repo) | Saturday 12:00 |
 | Rock trait unworkable | drop it from the score and keep it as an explanation | Saturday 14:00 |
 | Map library trouble | static map image plus a clickable list | Saturday 15:00 |
-| Validation fails | publish the honest result and the reasons, never hidden. It's still more than any rival shows. | write-up by Saturday 16:00 |
+| Validation fails | publish the honest result and the reasons, never hidden. | write-up by Saturday 16:00 |
 | Moon ranking is all polar ice | already handled: GLiM's ice class scores low on rock, and headlines exclude Antarctica | built in |
 | Zoom stage too slow | ship the 0.5° screen; headline at cell level with imagery | Saturday 20:00 |
 | No headline clears the bar | headline the validation: "it finds the analogs NASA uses, and ranks these next" | Saturday 22:00 |
@@ -362,7 +354,7 @@ Sources for the known analogs:
 
 ## Sources
 
-Rivals and hosting (opened 13 Nov):
+Hosting (opened 13 Nov):
 - the [challenge page](https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/), last edited 13 Nov
 - [GitHub plans](https://docs.github.com/en/get-started/learning-about-github/githubs-plans)
 - Vercel: [Hobby plan](https://vercel.com/docs/plans/hobby), [Git deploys](https://vercel.com/docs/git), [terms](https://vercel.com/legal/terms)
