@@ -2,6 +2,7 @@
   --side: 400px;
   display: grid;
   grid-template-columns: var(--side) minmax(0, 1fr);
+  transition: grid-template-columns 0.32s var(--ease);
   height: calc(100vh - var(--top-h, 62px));
   height: calc(100svh - var(--top-h, 62px));
   min-height: 520px;
@@ -27,15 +28,10 @@
   min-height: 0;
 }
 
+
 .fd-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 8px 12px;
-}
-
-.fd-head .tour-btn {
-  margin-top: 2px;
+  gap: 10px;
 }
 
 .fd-grip {
@@ -43,34 +39,57 @@
 }
 
 .fd-head h1 {
-  margin: 0 0 8px;
-  font: 450 19px/1.25 var(--display);
+  margin: 0;
+  font: 750 21px/1.2 var(--display);
   font-stretch: 88%;
+  color: var(--ink);
+}
+
+.fd-head h1 span {
+  display: block;
+  margin-bottom: 3px;
+  font: 600 11.5px/1.2 var(--display);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 
 .fd-head h1 b {
   font-weight: 750;
-  color: var(--signal-2);
 }
 
 .fd-site {
-  grid-column: 1 / -1;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
+  align-items: stretch;
+  gap: 8px;
 }
 
 .fd-pick {
+  position: relative;
   flex: 1 1 auto;
   min-width: 0;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
-  padding-left: 10px;
+  padding-left: 12px;
   border: 1px solid var(--rule-2);
   border-radius: 8px;
   background: var(--raise);
+  transition: border-color 0.15s;
+}
+
+.fd-pick:hover,
+.fd-pick:focus-within {
+  border-color: var(--signal);
+}
+
+.fd-pick > .ic {
+  position: absolute;
+  right: 10px;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-2);
+  pointer-events: none;
 }
 
 .fd-dot {
@@ -86,15 +105,24 @@
 }
 
 .fd-pick select {
-  min-height: 36px;
+  appearance: none;
+  min-height: 40px;
   width: 100%;
   min-width: 0;
-  padding: 4px 8px 4px 0;
+  padding: 4px 34px 4px 0;
   font: 600 14px/1.2 var(--body);
   color: var(--ink);
   background: transparent;
   border: 0;
+  outline: none;
   cursor: pointer;
+  text-overflow: ellipsis;
+}
+
+.fd-pick select option,
+.fd-pick select optgroup {
+  color: var(--ink);
+  background: #0b151b;
 }
 
 .fd-pick select[aria-busy="true"] {
@@ -103,8 +131,27 @@
 }
 
 .fd-change {
-  font-size: 13px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  font: 600 13px/1 var(--body);
   color: var(--ink-2);
+  text-decoration: none;
+  border: 1px solid var(--rule-2);
+  border-radius: 8px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.fd-change:hover {
+  color: var(--ink);
+  border-color: var(--ink-2);
+}
+
+.fd-change .ic {
+  width: 15px;
+  height: 15px;
 }
 
 .fd-block {
@@ -281,6 +328,14 @@
   border-radius: 8px;
 }
 
+.fd-w-in .switch input {
+  border-radius: 999px;
+}
+
+.fd-w-in .switch input::after {
+  border-radius: 50%;
+}
+
 .w-head {
   display: flex;
   align-items: baseline;
@@ -317,11 +372,76 @@
 }
 
 .w-row input {
+  --v: 50%;
   grid-column: 1 / -1;
+  appearance: none;
   width: 100%;
-  min-height: 30px;
+  height: 30px;
   margin: 0;
-  accent-color: var(--signal);
+  background: none;
+  cursor: pointer;
+}
+
+.w-row input::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--signal) var(--v), rgba(255, 255, 255, 0.12) var(--v));
+}
+
+.w-row input::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.w-row input::-moz-range-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--signal);
+}
+
+.w-row input::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: #fff;
+  border: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  transition: transform 0.15s var(--ease);
+}
+
+.w-row input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: 0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.w-row input:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+.w-row input:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.w-row input:disabled {
+  cursor: default;
+}
+
+.w-row input:disabled::-webkit-slider-thumb {
+  background: var(--ink-3);
+  box-shadow: none;
+}
+
+.w-row input:disabled::-moz-range-thumb {
+  background: var(--ink-3);
 }
 
 .w-row.off label,
@@ -549,10 +669,19 @@
 
 .rk-chips {
   grid-area: chips;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr));
   gap: 3px;
-  margin-top: 2px;
+  margin-top: 4px;
+}
+
+.rk-chips .fc {
+  display: block;
+  min-width: 0;
+  padding: 3px 4px;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
 }
 
 .rk-score {
@@ -570,21 +699,34 @@
 
 .rk-tick {
   position: absolute;
-  left: 14px;
-  bottom: 10px;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
+  right: 12px;
+  top: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 4px;
+  font-size: 12px;
+  color: var(--ink-3);
   cursor: pointer;
 }
 
+.rk-tick:hover,
+.rk-tick:has(input:checked) {
+  color: var(--ink);
+}
+
 .rk-tick input {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
   margin: 0;
   accent-color: var(--signal);
   cursor: pointer;
+}
+
+.rk-tick:has(input:disabled) {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .fd-cmp {
@@ -733,10 +875,8 @@
   }
 
   .rk-tick {
-    width: 44px;
-    height: 44px;
-    left: 7px;
-    bottom: 4px;
+    min-height: 44px;
+    top: 30px;
   }
 }
 

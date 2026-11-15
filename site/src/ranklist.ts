@@ -29,7 +29,9 @@ const chipOf = (v: View, c: Challenge, i: number, text?: string) => {
   return `<span class="fc ${b ? b.cls : "b-na"}" role="img" aria-label="${esc(label)}" title="${esc(label)}">${esc(text ?? shortName(c.id, c.name))}</span>`;
 };
 
-export const chips = (v: View, i: number) => `<span class="rk-chips">${v.chs.map((c) => chipOf(v, c, i)).join("")}</span>`;
+const across = (n: number) => (n > 5 ? Math.ceil(n / 2) : n);
+
+export const chips = (v: View, i: number) => `<span class="rk-chips" style="--n:${across(v.chs.length)}">${v.chs.map((c) => chipOf(v, c, i)).join("")}</span>`;
 
 export function summary(v: View): string {
   const { m, cells, ids } = v;
@@ -80,7 +82,7 @@ export function list(v: View, shut: Set<string>, moved: Map<number, number>): st
             }${isIce(cells, i) ? `<span class="rk-ice">Ice sheet</span>` : ""}${d ? `<span class="rk-move ${d > 0 ? "up" : "down"}" title="${d > 0 ? "Up" : "Down"} ${Math.abs(d)}">${d > 0 ? "▲" : "▼"}${Math.abs(d)}</span>` : ""}</span>
             ${chips(v, i)}
             <span class="rk-score"><b>${score100(v.score[i])}</b> / 100</span>
-          </a><label class="rk-tick" title="Compare"><input type="checkbox" data-cmp="${i}"${on ? " checked" : full ? " disabled" : ""}><span class="sr">Compare ${esc(name)}</span></label></li>`;
+          </a><label class="rk-tick"><input type="checkbox" data-cmp="${i}"${on ? " checked" : full ? " disabled" : ""}><span aria-hidden="true">Compare</span><span class="sr">Compare ${esc(name)}</span></label></li>`;
         })
         .join("");
       return `<details class="rk-grp" data-group="${esc(g)}"${shut.has(g) ? "" : " open"}><summary><span class="g-n">${esc(g)}</span><span class="g-m">${rs.length} ${rs.length === 1 ? "site" : "sites"} · best ${score100(v.score[rs[0]])}</span>${icon("chevron")}</summary><ol class="rk-list">${rows}</ol></details>`;
@@ -119,7 +121,7 @@ export function sliders(ss: Slider[]): string {
       const off = !has || !base;
       const note = !has ? "n/a: not used for this site" : !base ? "This preset does not use this challenge. Select Balanced to use it." : "";
       return `<div class="w-row${off ? " off" : ""}"><label for="w-${esc(c.id)}">${esc(c.name)}</label><output for="w-${esc(c.id)}">${!has ? "n/a" : !base ? "off" : fmtMul(mul)}</output>
-        <input type="range" id="w-${esc(c.id)}" min="0" max="2" step="0.1" value="${off ? 0 : mul}" data-ch="${esc(c.id)}"${off ? " disabled" : ""}${note ? ` aria-describedby="wn-${esc(c.id)}"` : ""}>
+        <input type="range" id="w-${esc(c.id)}" min="0" max="2" step="0.1" value="${off ? 0 : mul}" style="--v:${off ? 0 : mul * 50}%" data-ch="${esc(c.id)}"${off ? " disabled" : ""}${note ? ` aria-describedby="wn-${esc(c.id)}"` : ""}>
         ${note ? `<p class="w-note" id="wn-${esc(c.id)}">${note}</p>` : ""}</div>`;
     })
     .join("");

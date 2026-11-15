@@ -174,6 +174,11 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
   const paint = painter(farCanvas, nearCanvas, px);
   const pts = labels.filter((l) => l.kind === "known_analog" || l.kind === "cave");
   const phone = matchMedia("(max-width: 759px)").matches;
+  const fit = () => {
+    const b = el.getBoundingClientRect();
+    const d = Math.min(b.width, b.height || b.width) * (phone ? 0.92 : 0.88);
+    return Math.max(0, Math.min(3, Math.log2((d * Math.PI) / 512)));
+  };
 
   const map = new maplibregl.Map({
     container: el,
@@ -225,7 +230,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
       sky: { "atmosphere-blend": 0 },
     },
     center: [10, 15],
-    zoom: phone ? 0.2 : 1.1,
+    zoom: fit(),
     minZoom: 0,
     maxZoom: 7.5,
     cooperativeGestures: phone,
@@ -233,6 +238,22 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
     fadeDuration: 0,
   });
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+  map.addControl(
+    {
+      onAdd() {
+        const box = document.createElement("div");
+        box.className = "maplibregl-ctrl maplibregl-ctrl-group";
+        box.innerHTML = `<button type="button" class="ctl-fit" title="Reset the view" aria-label="Reset the view"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg></button>`;
+        box.firstElementChild!.addEventListener("click", () => {
+          const c: [number, number] = selected >= 0 ? [g.lon[selected], Math.max(-60, Math.min(60, g.lat[selected]))] : [10, 15];
+          map.flyTo({ center: c, zoom: fit(), duration: reduced() ? 0 : 900, essential: false });
+        });
+        return box;
+      },
+      onRemove() {},
+    },
+    "top-right",
+  );
   on.scale.append(new maplibregl.ScaleControl({ unit: "metric", maxWidth: 110 }).onAdd(map));
 
   const LAYERS = ["match-far", "match-near"] as const;
@@ -317,7 +338,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
     if (away && visible()) on.away((away = false));
   });
   const goTo = (i: number, animate: boolean) => {
-    const z = Math.max(map.getZoom(), phone ? 1.1 : 1.8);
+    const z = Math.max(map.getZoom(), fit());
     const center: [number, number] = [g.lon[i], Math.max(-60, Math.min(60, g.lat[i]))];
     if (!animate || reduced()) {
       map.jumpTo({ center, zoom: z });
