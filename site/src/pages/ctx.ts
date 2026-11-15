@@ -11,6 +11,7 @@ export interface State {
   cell: number;
   known: boolean;
   cmp: number[];
+  byRegion: boolean;
 }
 
 export interface Ctx {
@@ -79,7 +80,7 @@ export function readState(m: Manifest, q: URLSearchParams): State {
   const c = Number(q.get("c"));
   const ok = (v: number) => Number.isInteger(v) && v >= 0 && v < m.grid.n;
   const cmp = [...new Set((q.get("cmp") ?? "").split(",").filter(Boolean).map(Number))].filter(ok).slice(0, 3);
-  return { target, filter, yr: q.get("yr") === "1", type, hand, cell: q.has("c") && ok(c) ? c : -1, known: q.get("known") === "1", cmp };
+  return { target, filter, yr: q.get("yr") === "1", type, hand, cell: q.has("c") && ok(c) ? c : -1, known: q.get("known") === "1", cmp, byRegion: q.get("by") === "region" };
 }
 
 export function query(s: State, cell = s.cell) {
@@ -91,6 +92,7 @@ export function query(s: State, cell = s.cell) {
   if (s.hand) q.set("w", Object.entries(s.hand).map(([k, v]) => `${k}:${Math.round(v * 100) / 100}`).join(","));
   if (s.known) q.set("known", "1");
   if (s.cmp.length) q.set("cmp", s.cmp.join(","));
+  if (s.byRegion) q.set("by", "region");
   if (cell >= 0) q.set("c", String(cell));
   return q.toString();
 }

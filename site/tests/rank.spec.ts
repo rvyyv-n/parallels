@@ -53,12 +53,18 @@ test("C1: the summary card counts come from the data", async ({ page }) => {
   await expect.poll(() => order(page)).toEqual(spread(m, s, cells, () => true, true).ids);
 });
 
-test("C2: top 20 with spread, grouped by world region, with the rules note", async ({ page }) => {
+test("C2: top 20 with spread, one list by rank by default, grouped by world region on request, with the rules note", async ({ page }) => {
   for (const tg of [main, m.targets.find((x) => x.body === "mars")!]) {
     await ready(page, `t=${tg.id}`);
     const { cells, t } = cols(m, tg.id);
     const s = t[`score:${balanced.id}`];
     const want = spread(m, s, cells, () => true, false);
+    await expect(page.locator(".rk-grp")).toHaveCount(0);
+    await expect(page.locator('[data-sort="rank"]')).toHaveAttribute("aria-pressed", "true");
+    expect(await rows(page).evaluateAll((els) => els.map((e) => Number((e as HTMLElement).dataset.i)))).toEqual(want.ids);
+    await page.locator('[data-sort="region"]').click();
+    await expect(page).toHaveURL(/by=region/);
+    await expect(page.locator(".rk-grp").first()).toBeVisible();
     const ids = await order(page);
     expect(ids).toEqual(want.ids);
     for (let a = 0; a < ids.length; a++) for (let b = a + 1; b < ids.length; b++) expect(km(cells.lat[ids[a]], cells.lon[ids[a]], cells.lat[ids[b]], cells.lon[ids[b]])).toBeGreaterThanOrEqual(APART_KM);
@@ -158,7 +164,7 @@ test("E3: the tour from Home picks a Moon site, walks the Finder, opens a Place,
     await expect(box.locator(".tour-n")).toHaveText(`${k} of 7`);
   }
   await expect(page).toHaveURL(/#\/place\?/);
-  await expect(page.locator(".mv-strips")).toBeVisible();
+  await expect(page.locator("#pl-mb")).toBeVisible();
   await page.mouse.click(10, 300);
   await expect(box).toBeHidden();
 });

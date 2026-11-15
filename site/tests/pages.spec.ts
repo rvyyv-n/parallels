@@ -31,9 +31,9 @@ test("every route opens its page with its heading, focus and title", async ({ pa
   }
   const c = best()[0];
   await page.goto(`/#/place?t=${main.id}&f=${f0.id}&c=${c}`);
-  await expect(h1(page)).toContainText(main.name);
-  await expect(page.locator("#card h3")).not.toBeEmpty();
-  await expect(page).toHaveTitle(`${await page.locator("#card h3").innerText()} · Parallels`);
+  await expect(page.locator(".pl-for")).toContainText(main.name);
+  await expect(h1(page)).not.toHaveText("A match on Earth");
+  await expect(page).toHaveTitle(`${await h1(page).innerText()} · Parallels`);
   expect(errors).toEqual([]);
 });
 
@@ -152,7 +152,7 @@ test("old shared links open the new pages and leave no old URL behind", async ({
   await page.goto(`/?t=${main.id}&f=${f.id}&c=${c}`);
   await expect(page).toHaveURL(new RegExp(`/#/place\\?t=${main.id}&f=${f.id}&c=${c}$`));
   expect(new URL(page.url()).search).toBe("");
-  await expect(page.locator("#card h3")).not.toBeEmpty();
+  await expect(page.locator("#place-h")).not.toHaveText("A match on Earth");
   await expect(page.locator("#back-find")).toHaveAttribute("href", new RegExp(`c=${c}`));
   await page.goto(`/?t=${main.id}`);
   await expect(page).toHaveURL(new RegExp(`/#/find\\?t=${main.id}$`));

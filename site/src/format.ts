@@ -3,7 +3,8 @@ export const esc = (s: unknown) =>
 
 export function num(v: number, digits = 0): string {
   if (!Number.isFinite(v)) return "no data";
-  return v.toLocaleString("en-GB", { minimumFractionDigits: digits, maximumFractionDigits: digits }).replace(/^-/, "−");
+  const s = v.toLocaleString("en-GB", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  return /^-0(\.0+)?$/.test(s) ? s.slice(1) : s.replace(/^-/, "−");
 }
 
 export const score100 = (v: number) => (Number.isFinite(v) ? num(v * 100, 0) : "—");
