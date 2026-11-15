@@ -159,3 +159,39 @@
 .touring .hovercard {
   z-index: 61;
 }
+
+.tour-bar {
+  height: 2px;
+  margin: 12px 0 0;
+  background: var(--rule);
+  overflow: hidden;
+}
+
+.tour-bar i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--signal);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.tour-box.ticking .tour-bar i {
+  animation: tour-play var(--play, 7s) linear forwards;
+}
+
+.tour-box:hover .tour-bar i {
+  animation-play-state: paused;
+}
+
+@keyframes tour-play {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-box.ticking .tour-bar i {
+    animation: none;
+  }
+}

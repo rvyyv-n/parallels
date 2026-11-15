@@ -12,6 +12,8 @@ interface Step {
   leave?: () => void;
 }
 
+const PLAY_MS = 7000;
+
 const one = (q: string) => [...document.querySelectorAll<HTMLElement>(q)].find((e) => e.getClientRects().length > 0) ?? null;
 const hrefOf = (q: string) => one(q)?.getAttribute("href");
 
@@ -20,15 +22,21 @@ const STEPS: Step[] = [
     page: "",
     at: "#ch-moon .sites",
     title: "Select a base site",
-    text: "Select a Moon base site to see the places on Earth that match it.",
+    text: "Each Moon and Mars base site is in this list. Select one, or wait, and the tour opens the Finder for it.",
     href: () => "#ch-moon",
+  },
+  {
+    page: "find",
+    at: "#summary",
+    title: "The best match",
+    text: "The Finder ranks all land on Earth for the base site. This card shows the best place and how many new places it found.",
+    href: () => hrefOf("#ch-moon a.site[aria-current]") ?? hrefOf("#ch-moon a.site"),
   },
   {
     page: "find",
     at: "#earth",
     title: "The map",
-    text: "The map colours the best 2% of land for the site, and the pins show the top 20.",
-    href: () => hrefOf("#ch-moon a.site[aria-current]"),
+    text: "The map lights the best 2% of land. The numbered pins are the top 20. The buttons under the map show more or less land.",
   },
   {
     page: "find",
@@ -46,16 +54,26 @@ const STEPS: Step[] = [
   },
   {
     page: "find",
+    at: ".presets",
+    title: "Presets",
+    text: "Balanced counts every challenge the same. The other presets rank for a rover, a crew or a habitat.",
+  },
+  {
+    page: "find",
     at: "#weights",
     title: "Change a weight",
     text: "Move a slider and the list changes its order immediately.",
     enter: (el) => ((el as HTMLDetailsElement).open = true),
+    leave: () => {
+      const w = document.querySelector<HTMLDetailsElement>("#weights");
+      if (w) w.open = false;
+    },
   },
   {
     page: "find",
     at: "#rank .rk-row",
     title: "Open a place",
-    text: "Click a place to see the full match for each challenge.",
+    text: "Select a place to see the full match for each challenge.",
   },
   {
     page: "place",
@@ -72,7 +90,10 @@ let steps: Step[] = [];
 let n = -1;
 let raf = 0;
 let token = 0;
+let timer = 0;
+let playing = true;
 let from: HTMLElement | null = null;
+let target: HTMLElement | null = null;
 
 const track = () => {
   raf = 0;
@@ -94,17 +115,39 @@ const wait = (q: string, mine: number) =>
       if (mine !== token) return done(null);
       const el = one(q);
       if (el) return done(el);
-      if (performance.now() - t0 > 12000) return done(null);
+      if (performance.now() - t0 > 15000) return done(null);
       setTimeout(look, 100);
     };
     look();
   });
 
+const next = () => (n >= steps.length - 1 ? end() : void show(n + 1));
+
+function schedule() {
+  clearTimeout(timer);
+  box.style.setProperty("--play", `${PLAY_MS}ms`);
+  box.classList.remove("ticking");
+  if (!playing || n < 0) return;
+  void box.offsetWidth;
+  box.classList.add("ticking");
+  timer = window.setTimeout(next, PLAY_MS);
+}
+
+function setPlaying(on: boolean) {
+  playing = on;
+  const b = box.querySelector<HTMLButtonElement>('[data-tour="play"]')!;
+  b.textContent = on ? "Pause" : "Play";
+  b.setAttribute("aria-pressed", String(!on));
+  schedule();
+}
+
 async function show(k: number) {
   steps[n]?.leave?.();
+  clearTimeout(timer);
   const mine = ++token;
   n = k;
   const st = steps[k];
+  target = null;
   hole.hidden = true;
   box.setAttribute("aria-busy", "true");
   if (at() !== st.page) go(st.href?.() ?? hrefFor(st.page));
@@ -112,6 +155,7 @@ async function show(k: number) {
   if (mine !== token) return;
   box.removeAttribute("aria-busy");
   if (!el) return end();
+  target = el;
   box.querySelector(".tour-n")!.textContent = `${k + 1} of ${steps.length}`;
   box.querySelector(".tour-t")!.textContent = st.title;
   box.querySelector(".tour-p")!.textContent = st.text;
@@ -123,13 +167,17 @@ async function show(k: number) {
   document.documentElement.classList.add("touring");
   if (!box.contains(document.activeElement)) box.querySelector<HTMLButtonElement>(".tour-next")!.focus({ preventScroll: true });
   if (!raf) raf = requestAnimationFrame(track);
+  schedule();
 }
 
 function end() {
   steps[n]?.leave?.();
+  clearTimeout(timer);
   token++;
   n = -1;
+  target = null;
   hole.hidden = box.hidden = true;
+  box.classList.remove("ticking");
   document.documentElement.classList.remove("touring");
   cancelAnimationFrame(raf);
   raf = 0;
@@ -147,23 +195,30 @@ function build() {
   box.setAttribute("role", "dialog");
   box.setAttribute("aria-label", "Guided tour");
   box.innerHTML = `<p class="tour-n" aria-hidden="true"></p><div aria-live="polite"><h2 class="tour-t"></h2><p class="tour-p"></p></div>
-    <div class="tour-btns"><button type="button" data-tour="back">Back</button><button type="button" data-tour="next" class="tour-next">Next</button><button type="button" data-tour="end" aria-label="Close the tour">Close</button></div>`;
+    <div class="tour-bar" aria-hidden="true"><i></i></div>
+    <div class="tour-btns"><button type="button" data-tour="back">Back</button><button type="button" data-tour="play" aria-pressed="false">Pause</button><button type="button" data-tour="next" class="tour-next">Next</button><button type="button" data-tour="end" aria-label="Close the tour">Close</button></div>`;
   document.body.append(hole, box);
   box.addEventListener("click", (e) => {
     const b = (e.target as HTMLElement).closest<HTMLElement>("[data-tour]");
     if (!b) return;
     if (b.dataset.tour === "end") end();
+    else if (b.dataset.tour === "play") setPlaying(!playing);
     else if (b.dataset.tour === "back") void show(Math.max(0, n - 1));
-    else if (n === steps.length - 1) end();
-    else void show(n + 1);
+    else next();
   });
+  box.addEventListener("pointerenter", () => clearTimeout(timer));
+  box.addEventListener("pointerleave", () => schedule());
   document.addEventListener("keydown", (e) => {
     if (n >= 0 && e.key === "Escape") end();
   });
   document.addEventListener(
     "pointerdown",
     (e) => {
-      if (n >= 0 && !box.contains(e.target as Node)) end();
+      if (n < 0 || box.contains(e.target as Node)) return;
+      if (target?.contains(e.target as Node) && n < steps.length - 1) {
+        clearTimeout(timer);
+        setTimeout(next, 400);
+      } else if (playing) setPlaying(false);
     },
     true,
   );
@@ -174,6 +229,8 @@ export function tourButton(button: HTMLElement, start: "home" | "find"): void {
   button.addEventListener("click", () => {
     from = button;
     steps = start === "home" ? STEPS : STEPS.slice(1);
+    playing = true;
+    setPlaying(true);
     void show(0);
   });
 }
