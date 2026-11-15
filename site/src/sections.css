@@ -551,14 +551,6 @@
   border-top: 1px solid var(--rule);
 }
 
-.top nav a[aria-current] {
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--signal);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 6px;
-}
-
 .top nav a {
   min-height: 44px;
   display: inline-flex;

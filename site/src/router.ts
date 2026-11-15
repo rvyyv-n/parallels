@@ -10,14 +10,14 @@ export interface Page {
 type How = "push" | "replace" | "pop";
 
 const HOLDS: [RegExp, string][] = [
-  [/^(checked|first-run|second-run|third-run|run-\d+)$/, "checks"],
+  [/^(checked|first-run|second-run|third-run|run-\d+)$/, "about"],
   [/^(about-h|scoring|challenge|benchmarks|questions|terrain|data|limits|credits)$/, "about"],
   [/^(explore|ledger-h)$/, "find"],
   [/^(card|c-cant)$/, "place"],
-  [/^(worlds|w-moon)$/, "moon"],
-  [/^w-mars$/, "mars"],
   [/^(intro|ch-[a-z]+)$/, ""],
 ];
+
+const ALIAS: Record<string, string> = { moon: "ch-moon", mars: "ch-mars" };
 
 const HOME_TITLE = "Parallels: Earth's closest parallels to every part of a Moon or Mars base";
 
@@ -60,6 +60,7 @@ const name = (p: Page) => {
 async function open(hash: string, how: How, anchor?: string) {
   const { path: raw, q } = parse(hash);
   const path = raw in pages ? raw : "";
+  anchor ??= ALIAS[raw];
   if (path !== raw) {
     hash = "#/";
     if (how === "pop") how = "replace";

@@ -10,11 +10,8 @@ import { logo } from "./logo";
 import { hrefFor, startRouter } from "./router";
 import { createCtx } from "./pages/ctx";
 import { homePage } from "./pages/home";
-import { moonPage } from "./pages/moon";
-import { marsPage } from "./pages/mars";
 import { finder } from "./pages/find";
 import { place } from "./pages/place";
-import { checks } from "./pages/checks";
 import { about } from "./pages/about";
 
 const AI_NOTE =
@@ -22,10 +19,7 @@ const AI_NOTE =
 
 const NAV = [
   ["", "Home"],
-  ["moon", "The Moon"],
-  ["mars", "Mars"],
   ["find", "Finder"],
-  ["checks", "Checks"],
   ["about", "About"],
 ];
 
@@ -38,7 +32,6 @@ function shell(m: Manifest) {
       <a class="skip" href="#main">Skip to content</a>
       <a class="brand" href="#/" aria-label="Parallels, home">${logo()}<span class="wordmark">Parallels</span></a>
       <p class="tagline">Earth's closest parallels to every part of a Moon or Mars base.</p>
-      <a class="nav-site" id="nav-site" href="#/find" hidden></a>
       <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav-list"><span class="menu-i" aria-hidden="true"></span>Menu</button>
       <nav aria-label="Pages"><ul id="nav-list">${NAV.map(([r, n]) => `<li><a href="#/${r}" data-route="${r}">${esc(n)}</a></li>`).join("")}</ul></nav>
     </header>
@@ -72,13 +65,7 @@ function menu() {
 }
 
 function site(t: Target | null) {
-  const a = app.querySelector<HTMLAnchorElement>("#nav-site")!;
-  a.hidden = !t;
-  if (!t) return;
-  a.href = `#/find?t=${encodeURIComponent(t.id)}`;
-  a.innerHTML = `<span>Site</span> <b>${esc(t.short)}</b>`;
-  a.title = `Earth's matches for ${t.name}`;
-  for (const el of app.querySelectorAll<SVGElement>(".logo")) el.dataset.body = t.body;
+  if (t) for (const el of app.querySelectorAll<SVGElement>(".logo")) el.dataset.body = t.body;
 }
 
 async function main() {
@@ -97,11 +84,8 @@ async function main() {
     app.querySelector<HTMLElement>("#main")!,
     {
       "": () => homePage(ctx),
-      moon: () => moonPage(ctx),
-      mars: () => marsPage(ctx),
       find: () => finder(ctx),
       place: () => place(ctx),
-      checks: () => checks(ctx),
       about: () => about(ctx),
     },
     (path) => {

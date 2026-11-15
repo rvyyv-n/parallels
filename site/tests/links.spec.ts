@@ -7,7 +7,7 @@ test("every source link answers", async ({ page, request }, info) => {
   test.setTimeout(600_000);
   await page.goto("/#/find");
   await expect(page.locator("#ledger li[data-i]")).toHaveCount(10);
-  for (const h of ["#/", "#/moon", "#/mars", "#/checks", "#/about"]) await page.evaluate((x) => (location.hash = x), h);
+  for (const h of ["#/", "#/checks", "#/about"]) await page.evaluate((x) => (location.hash = x), h);
   await expect(page.locator("table.ds")).toBeAttached();
   await expect(page.locator("#checked .run-hist")).toBeAttached();
   const urls = new Set<string>(await page.locator("a[href^='http']").evaluateAll((as) => as.map((a) => a.getAttribute("href")!)));

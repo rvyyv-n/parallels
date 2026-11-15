@@ -16,14 +16,15 @@ async function ready(p: Page, q = "") {
 type V = { tests: { checks: { passed: boolean | null }[] }[]; adopted?: boolean; preset?: string; title: string };
 const nowRun = (v: { third_run?: V; more_runs?: V[] }) => [v.third_run, ...(v.more_runs ?? [])].filter((r): r is V => !!r && !r.preset).reverse().find((r) => r.adopted);
 
-test("main flow: pick a site on its world's page, pick a filter, open a match, read the scorecard", async ({ page }) => {
+test("main flow: pick a site in its world's chapter on Home, pick a filter, open a match, read the scorecard", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(String(e)));
   const target = m.targets[m.targets.length - 1];
   const filter = m.filters[m.filters.length - 1];
   await page.goto(`/#/${target.body}`);
   if (m.sample) await expect(page.getByRole("note")).toContainText("Sample data");
-  await page.locator(`.page:not([hidden]) .chip.site[data-site="${target.id}"]`).click();
+  await expect(page.locator(`#ch-${target.body}`)).toBeInViewport();
+  await page.locator(`#ch-${target.body} a.site[data-site="${target.id}"]`).click();
   await expect(page).toHaveURL(new RegExp(`#/find\\?t=${target.id}`));
   await expect(rows(page)).toHaveCount(10);
   await expect(page.locator("#find-h")).toContainText(target.name);
@@ -148,12 +149,12 @@ test("no horizontal scroll at 375 px", async ({ page }) => {
 test("every internal link resolves to a page or an anchor", async ({ page }) => {
   await ready(page);
   const c = await rows(page).first().getAttribute("data-i");
-  for (const h of ["#/", "#/moon", "#/mars", `#/place?t=${main.id}&c=${c}`, "#/checks", "#/about"]) await page.evaluate((x) => (location.hash = x), h);
+  for (const h of ["#/", `#/place?t=${main.id}&c=${c}`, "#/checks", "#/about"]) await page.evaluate((x) => (location.hash = x), h);
   await expect(page.locator(".card")).toHaveCount(1);
   await expect(page.locator("#checked .run-hist")).toBeAttached();
-  await expect(page.locator(".page")).toHaveCount(7);
+  await expect(page.locator(".page")).toHaveCount(5);
   const hrefs = await page.locator("a[href^='#']").evaluateAll((as) => as.map((a) => a.getAttribute("href")!));
-  const routes = ["", "moon", "mars", "find", "place", "checks", "about"];
+  const routes = ["", "find", "place", "checks", "about"];
   const badRoutes = hrefs.filter((h) => h.startsWith("#/")).filter((h) => !routes.includes(h.slice(2).split("?")[0]));
   expect(badRoutes).toEqual([]);
   const missing = await page.evaluate((hs) => hs.filter((h) => !h.startsWith("#/")).map((h) => h.slice(1)).filter((id) => !id || !document.getElementById(id)), hrefs);
@@ -161,7 +162,7 @@ test("every internal link resolves to a page or an anchor", async ({ page }) => 
 });
 
 test("footer carries the AI note on every page", async ({ page }) => {
-  for (const h of ["", "moon", "mars", "find", "checks", "about"]) {
+  for (const h of ["", "find", "checks", "about"]) {
     await page.goto(`/#/${h}`);
     await expect(page.locator("footer .ai")).toContainText("How we used AI");
     await expect(page.locator("footer .ai")).toHaveCount(1);
@@ -314,24 +315,36 @@ test("list rows and map pins highlight each other, and the map can fly back to t
   await expect(page.locator("#back")).toBeHidden({ timeout: 8000 });
 });
 
-test("Home's two choices open the Moon and Mars pages", async ({ page }) => {
-  await page.goto("/#/");
-  await page.locator('.choice[href="#/mars"]').click();
-  await expect(page).toHaveURL(/#\/mars$/);
-  await expect(page.locator("#mars-h")).toBeVisible();
-  await page.goBack();
-  await page.locator('.choice[href="#/moon"]').click();
-  await expect(page.locator("#moon-h")).toBeVisible();
+test("old Moon and Mars links open Home at their chapter, and a base there opens the Finder", async ({ page }) => {
+  await page.goto("/#/mars");
+  await expect(page).toHaveURL(/#\/$/);
+  await expect(page.locator("#ch-mars")).toBeInViewport();
+  const ts = m.targets.filter((t) => t.body === "mars");
+  const sites = page.locator("#ch-mars a.site");
+  await expect(sites).toHaveCount(ts.length);
+  await expect(sites.first()).toHaveAttribute("aria-current", "true");
+  await sites.nth(1).hover();
+  await expect(sites.nth(1)).toHaveAttribute("aria-current", "true");
+  await sites.nth(1).focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(sites.nth(2)).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(new RegExp(`#/find\\?t=${ts[2].id}`));
+  await page.locator("#now-change").evaluate((a) => (a as HTMLElement).click());
+  await expect(page).toHaveURL(/#\/$/);
+  await expect(page.locator("#ch-mars")).toBeInViewport();
+  await page.goto("/#/moon");
+  await expect(page.locator("#ch-moon")).toBeInViewport();
 });
 
 test("page nav fits, marks the current page, and links open folded blocks", async ({ page }, info) => {
   await page.goto("/#/about");
   const nav = page.locator(".top nav a");
   if (info.project.name === "phone") await page.locator("#menu-btn").click();
-  await expect(nav).toHaveText(["Home", "The Moon", "Mars", "Finder", "Checks", "About"]);
+  await expect(nav).toHaveText(["Home", "Finder", "Checks", "About"]);
   for (const box of await nav.evaluateAll((as) => as.map((a) => a.getBoundingClientRect().toJSON()))) expect(box.height).toBeGreaterThanOrEqual(44);
   expect(await page.locator(".top nav").evaluate((n) => n.scrollWidth <= n.clientWidth + 1)).toBe(true);
-  await expect(nav.nth(5)).toHaveAttribute("aria-current", "page");
+  await expect(nav.nth(3)).toHaveAttribute("aria-current", "page");
   await expect(page.locator(".top nav a[aria-current]")).toHaveCount(1);
   if (info.project.name === "phone") await page.keyboard.press("Escape");
   await expect(page.locator("#benchmarks")).not.toHaveAttribute("open", "");
@@ -392,14 +405,27 @@ test("the guided tour steps through the Finder and closes on Escape", async ({ p
   await expect(page.locator("#tour")).toBeFocused();
 });
 
-test("Home shows what Earth can't copy for both worlds, and each world's page its known analog sites", async ({ page }) => {
+test("Home counts the land, says what Earth can't copy for each world, and turns to known analog places", async ({ page }) => {
+  const { t } = cols(m, main.id);
+  const ranked = [...t[`score:${m.filters[0].id}`]].filter((v) => !Number.isNaN(v)).length;
   await page.goto("/#/");
-  await expect(page.locator("#ch-moon .facts dl > div")).toHaveCount(m.cant_copy.length);
-  await expect(page.locator("#ch-mars .facts dl > div")).toHaveCount(m.cant_copy.length);
+  const counts = page.locator("#ch-count .counts > div");
+  await expect(counts).toHaveCount(3);
+  await expect(counts.nth(0).locator("dt")).toHaveText(m.grid.n.toLocaleString("en-US"));
+  await expect(page.locator("#count-ranked")).toHaveText(ranked.toLocaleString("en-US"));
+  await expect(page.locator("#count-known")).toHaveText(/^\d+$/);
+  const tops = await counts.evaluateAll((ds) => ds.map((d) => Math.round(d.getBoundingClientRect().top)));
+  expect(new Set(tops).size).toBe(1);
   for (const b of ["moon", "mars"] as const) {
-    await page.goto(`/#/${b}`);
-    await expect(page.locator(`#w-${b} .w-analog`).first()).toBeVisible();
-    await expect(page.locator(`#w-${b} .w-val`).first()).toBeVisible();
-    await expect(page.locator(`#w-${b} .w-solve li`)).toHaveCount(m.challenges[b].length);
+    await expect(page.locator(`#ch-${b} .cant dl > div`)).toHaveCount(m.cant_copy.length);
+    await expect(page.locator(`#ch-${b} .w-val, #ch-${b} .w-solve, #ch-${b} .w-analog`)).toHaveCount(0);
   }
+  const places = page.locator(".places button");
+  await expect(places).toHaveCount(6);
+  await expect(places.first()).toHaveAttribute("aria-pressed", "true");
+  await places.nth(3).click();
+  await expect(places.nth(3)).toHaveAttribute("aria-pressed", "true");
+  await expect(places.first()).toHaveAttribute("aria-pressed", "false");
+  await page.locator("#ch-go a.go").click();
+  await expect(page).toHaveURL(/#\/find/);
 });

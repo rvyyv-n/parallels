@@ -1,23 +1,9 @@
-import "./worlds.css";
-import type { Body, LabelPoint, Manifest, Target, TargetValue } from "./contract";
-import { esc, latlon, num, unit } from "./format";
-import { icon } from "./icons";
+import type { Body, Target } from "./contract";
 
 export const TEXTURE = { moon: "img/moon.jpg", mars: "img/mars.jpg" };
 export const SHARP = { moon: "img/moon-4k.jpg", mars: "img/mars-4k.jpg" };
 export const NAME: Record<Body, string> = { moon: "the Moon", mars: "Mars" };
 export const TITLE: Record<Body, string> = { moon: "The Moon", mars: "Mars" };
-const SITE_TRAITS = ["cold", "season_swing", "day_swing_air", "slope", "safe10", "relief", "sun_height", "dust"];
-const TI = " J m⁻² K⁻¹ s⁻½";
-const SHOWN: Record<string, [string, (v: number) => string]> = {
-  lit_share: ["Sunlight at the best-lit spot", (v) => `${num(v * 100)}% of the time`],
-  psr_share: ["Ground in permanent shadow", (v) => `${num(v * 100)}%`],
-  t_min_coldest_k: ["Coldest spot, winter minimum", (v) => `${num(v, 1)} K`],
-  weh_pct: ["Water-equivalent hydrogen", (v) => `${num(v, 1)}% by weight`],
-  dci: ["Dust cover index", (v) => num(v, 3)],
-  thermal_inertia: ["Thermal inertia", (v) => num(v) + TI],
-  thermal_inertia_moon_wide: ["Thermal inertia, Moon-wide", (v) => num(v) + TI],
-};
 const SPAN = 8;
 
 export function headline(text: string): [string, string] {
@@ -121,63 +107,4 @@ export async function thumb(cv: HTMLCanvasElement, t: Target) {
   ctx.lineWidth = n / 64;
   ctx.strokeStyle = "#5bbbe9";
   ctx.stroke();
-}
-
-const dsLink = (m: Manifest, id: string) => {
-  const ds = m.datasets.find((d) => d.id === id);
-  return ds?.url ? `<a href="${esc(ds.url)}" target="_blank" rel="noopener">${esc(ds.name)}</a>` : esc(ds?.name ?? id);
-};
-
-const limit = (key: string, v: number) => (key.endsWith("_k") && v < 25) || (key === "cold" && v < 25 - 273.15);
-
-const cell = (m: Manifest, key: string, label: string, text: string, v: TargetValue) =>
-  `<div class="w-val"><dt>${esc(label)}</dt><dd><b>${esc(text)}</b>${
-    limit(key, v.value!) ? `<em class="tag warn" title="${esc(v.note ?? "")}">at the instrument's limit</em>` : ""
-  }<span>${esc(v.stat)}</span><small>${dsLink(m, v.dataset)}</small></dd></div>`;
-
-export function siteHtml(m: Manifest, t: Target): string {
-  const traits = SITE_TRAITS.map((id) => ({ id, tr: m.traits.find((x) => x.id === id), v: t.values[id] }))
-    .filter((r) => r.tr && r.v && r.v.value != null)
-    .slice(0, 6)
-    .map((r) => cell(m, r.id, r.tr!.label, num(r.v.value!, r.tr!.digits) + unit(r.tr!.unit), r.v));
-  const shown = Object.entries(t.shown ?? {})
-    .filter(([k, v]) => SHOWN[k] && v.value != null)
-    .map(([k, v]) => cell(m, k, SHOWN[k][0], SHOWN[k][1](v.value!), v));
-  const rows = [...traits, ...shown].join("");
-  const facts = t.facts
-    .map((f) => `<li>${esc(f.text)} <a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.source)}</a></li>`)
-    .join("");
-  return `<h2>${icon("site")}Measured at ${esc(t.name)} <span class="muted">${latlon(t.lat, t.lon, 2)}</span></h2>
-    ${t.check_note ? `<p class="w-check">${icon("info")}${esc(t.check_note)}</p>` : ""}
-    ${rows ? `<dl class="w-vals">${rows}</dl>` : `<p class="muted">No measured values for this site.</p>`}
-    ${facts ? `<ul class="w-known">${facts}</ul>` : ""}
-    <p class="w-cta"><a class="go w-go" href="#/find?t=${esc(t.id)}">Find Earth's matches for ${esc(t.name)}${icon("chevron")}</a></p>`;
-}
-
-export function solveHtml(m: Manifest, b: Body): string {
-  return m.challenges[b].map((c) => `<li>${icon(c.id)}<b>${esc(c.name)}</b><span>${esc(c.question)}</span></li>`).join("");
-}
-
-export function fillAnalogs(root: HTMLElement, labels: LabelPoint[]): void {
-  for (const el of root.querySelectorAll<HTMLElement>("[data-analogs]")) {
-    const b = el.dataset.analogs as Body;
-    const list = labels.filter((l) => l.kind === "known_analog" && l.groups?.some((g) => g.startsWith(b)));
-    if (!list.length) {
-      el.innerHTML = `<p class="muted">No data: the known analog list could not be loaded.</p>`;
-      continue;
-    }
-    const cardOf = (l: LabelPoint) => {
-      const note = l.note ?? "";
-      const cut = note.indexOf(". ");
-      const used = cut > 0 ? note.slice(0, cut + 1) : note;
-      const rest = cut > 0 ? note.slice(cut + 2) : "";
-      return `<article class="w-analog"><h3>${esc(l.name)}</h3><p class="w-where">${l.country ? `${esc(l.country)} · ` : ""}${latlon(l.lat, l.lon, 1)}</p>
-        ${used ? `<p class="w-used">${esc(used)}</p>` : ""}
-        ${rest ? `<details><summary>More</summary><p>${esc(rest)}</p></details>` : ""}
-        <a href="${esc(l.analog_source ?? l.source)}" target="_blank" rel="noopener">Source</a></article>`;
-    };
-    el.innerHTML =
-      list.slice(0, 4).map(cardOf).join("") +
-      (list.length > 4 ? `<details class="w-all"><summary>Show ${num(list.length - 4)} more places</summary><div class="w-analogs">${list.slice(4).map(cardOf).join("")}</div></details>` : "");
-  }
 }
