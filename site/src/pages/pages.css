@@ -141,29 +141,3 @@
 a.chip {
   text-decoration: none;
 }
-
-.place .match-head {
-  padding-top: 4px;
-}
-
-.back-find {
-  width: 100%;
-  margin: 0;
-}
-
-.back-find a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  font-weight: 600;
-}
-
-.back-find a::before {
-  content: "\2190";
-  margin-right: 8px;
-}
-
-h1.tcap {
-  font-weight: 400;
-}
-

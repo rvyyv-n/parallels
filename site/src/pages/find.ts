@@ -9,7 +9,7 @@ import { rankOf } from "../score";
 import { focus, type Zones } from "../zones";
 import { createHoverCard, createPopup, type HoverCard, type Popup } from "../hovercard";
 import { isNew, spread } from "../rank";
-import { compare, fmtMul, key, list, rules, sliders, summary, type View } from "../ranklist";
+import { compare, fmtMul, key, list, rules, sliders, sortBar, summary, type View } from "../ranklist";
 import { tourButton } from "../tour";
 import { go, setQuery, type Page } from "../router";
 import { filterOf, query, rankedOf, readState, scoreOf, targetOf, type Ctx, type State } from "./ctx";
@@ -57,6 +57,7 @@ const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby=
       </div>
     </details>
     <div class="fd-key" id="key">${key()}</div>
+    <div class="rk-sort" id="rk-sort" role="group" aria-labelledby="rk-sort-k">${sortBar(false)}</div>
     <div class="fd-rank" id="rank"><p class="rk-empty" role="status">The list is loading…</p></div>
     <div class="fd-cmp" id="compare" hidden></div>
   </aside>
@@ -218,7 +219,8 @@ export function finder(ctx: Ctx): Page {
     const v = view();
     $("#summary").innerHTML = summary(v);
     $("#rules").textContent = rules(v);
-    box.innerHTML = list(v, shut, moved);
+    box.innerHTML = list(v, shut, moved, s.byRegion);
+    for (const b of el.querySelectorAll<HTMLButtonElement>("[data-sort]")) b.setAttribute("aria-pressed", String((b.dataset.sort === "region") === s.byRegion));
     renderCompare();
     if (!animate || reduced()) return;
     for (const li of box.querySelectorAll<HTMLElement>("li[data-i]")) {
@@ -318,6 +320,15 @@ export function finder(ctx: Ctx): Page {
         s.hand = null;
         renderSliders();
         changed();
+        return;
+      }
+      const sb = t.closest<HTMLButtonElement>("[data-sort]");
+      if (sb) {
+        if ((sb.dataset.sort === "region") === s.byRegion) return;
+        s.byRegion = !s.byRegion;
+        save();
+        renderList(true);
+        select(false);
         return;
       }
       if (t.closest("#known")) {

@@ -77,9 +77,9 @@ const STEPS: Step[] = [
   },
   {
     page: "place",
-    at: ".mv-strips",
+    at: "#pl-mb",
     title: "Where it breaks",
-    text: "Each match shows its weak points and what no place on Earth can copy.",
+    text: "Each place shows what matches the base site, where it breaks, and what no place on Earth can copy.",
     href: () => hrefOf("#rank .rk-row"),
   },
 ];
