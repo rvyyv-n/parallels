@@ -12,6 +12,7 @@ import { Checked } from "./ui/Checked";
 import { Feature, NEW_FROM_KM, placeName } from "./ui/Feature";
 import { Footer } from "./ui/Footer";
 import { Judges } from "./ui/Judges";
+import { CountUp, useReveal, useScrolled } from "./ui/motion";
 import { isChecked, Picker } from "./ui/Picker";
 import type { TerrainProps } from "./ui/Terrain";
 import { World } from "./ui/World";
@@ -62,8 +63,11 @@ export function App() {
   const bestFor = rank === 0 ? plan?.places.find((p) => p.cell === selected?.cell)?.parts.map((p) => p.challenge.name) : undefined;
   const [Closeup, setCloseup] = useState<ComponentType<TerrainProps>>();
   const [closeup, setCloseupOpen] = useState(false);
+  const [peek, setPeek] = useState<number>();
 
   useEffect(() => scrollTo(0, 0), [view.page]);
+  useReveal();
+  const scrolled = useScrolled();
 
   if (!manifest || !target || !filter) return <div class="loading">Parallels</div>;
 
@@ -76,7 +80,7 @@ export function App() {
   };
 
   const top = (
-    <header class="top">
+    <header class="top" data-scrolled={scrolled || undefined}>
       <a class="wordmark" href="#">
         <i aria-hidden="true" />
         Parallels
@@ -114,6 +118,7 @@ export function App() {
             listing={listing}
             selected={selected}
             plan={plan}
+            peek={peek}
             onSelect={(cell) => setView({ place: cell })}
           />
           <div class="chapters">
@@ -131,19 +136,28 @@ export function App() {
                     <span aria-hidden="true">↓</span>
                   </button>
                   <button class="ghost">Take the tour</button>
+                  <a class="text-link learn-link" href="learn.html">
+                    New to the Moon and Mars?
+                  </a>
                 </div>
                 <dl class="hero-stats">
                   <div>
                     <dt>squares of land searched</dt>
-                    <dd>{manifest.grid.n.toLocaleString("en")}</dd>
+                    <dd>
+                      <CountUp value={manifest.grid.n} />
+                    </dd>
                   </div>
                   <div>
                     <dt>base sites</dt>
-                    <dd>{manifest.targets.length}</dd>
+                    <dd>
+                      <CountUp value={manifest.targets.length} />
+                    </dd>
                   </div>
                   <div>
                     <dt>mission filters</dt>
-                    <dd>{manifest.filters.length}</dd>
+                    <dd>
+                      <CountUp value={manifest.filters.length} />
+                    </dd>
                   </div>
                 </dl>
               </div>
@@ -206,7 +220,9 @@ export function App() {
                 target={target}
                 plan={plan}
                 selected={selected.cell}
+                onPeek={setPeek}
                 onOpen={(cell) => {
+                  setPeek(undefined);
                   setView({ place: cell });
                   scrollToId("find");
                 }}

@@ -13,15 +13,28 @@ interface Props {
   listing: Listing | undefined;
   selected: PlaceInfo | undefined;
   plan: BasePlan | undefined;
+  peek: number | undefined;
   onSelect: (cell: number) => void;
 }
 
-export function World({ story, target, listing, selected, plan, onSelect }: Props) {
+export function World({ story, target, listing, selected, plan, peek, onSelect }: Props) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const pins = useRef<HTMLDivElement>(null);
   const scene = useRef<Scene | undefined>(undefined);
   const targetRef = useRef(target);
   const entered = useRef(false);
+  const at = useRef<string | undefined>(undefined);
+  const peeked = plan?.places.find((p) => p.cell === peek);
+  const looking = useRef({ selected, peeked, planned: !!plan });
+  looking.current = { selected, peeked, planned: !!plan };
+  const look = () => {
+    const s = scene.current;
+    const { selected, peeked, planned } = looking.current;
+    if (!s) return;
+    s.setSpin(at.current === "base" && planned && !peeked);
+    const to = at.current === "base" ? peeked : selected;
+    if (to) s.lookAt(to.lat, to.lon);
+  };
   const [failed, setFailed] = useState(false);
   const places = listing?.places ?? [];
   targetRef.current = target;
@@ -65,6 +78,11 @@ export function World({ story, target, listing, selected, plan, onSelect }: Prop
       entered.current = true;
 
       root.dataset.at = CHAPTERS[t > 0.5 ? next : index];
+      if (at.current !== root.dataset.at) {
+        const first = at.current === undefined;
+        at.current = root.dataset.at;
+        if (!first) look();
+      }
       chapters.forEach((c, i) => {
         if (!c) return;
         const p = progress[i];
@@ -113,6 +131,8 @@ export function World({ story, target, listing, selected, plan, onSelect }: Prop
     scene.current?.lookAt(selected.lat, selected.lon, first.current ? -70 : 0);
     first.current = false;
   }, [selected?.cell]);
+
+  useEffect(look, [peeked?.cell, !!plan]);
 
   useEffect(() => {
     const s = scene.current;

@@ -46,20 +46,24 @@ for (const target of manifest.targets) {
   }
 }
 
-test("no sideways scroll at 390 px", async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await ready(page);
-  for (const id of [...CHAPTERS, "checked"]) {
-    const selector = id === "checked" ? "#checked" : `[data-chapter="${id}"]`;
-    await page.locator(selector).scrollIntoViewIfNeeded();
-    const widths = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));
-    expect(widths.scroll, id).toBeLessThanOrEqual(widths.inner);
-  }
-});
+for (const hash of ["", "#t=mars-jezero", "#t=mars-jezero&f=life_support", "#t=mars-gale&f=habitat"]) {
+  test(`no sideways scroll at 390 px: ${hash || "default view"}`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await ready(page, hash);
+    for (const more of await page.locator("button.more").all()) await more.click();
+    for (const id of [...CHAPTERS, "base", "checked"]) {
+      const selector = id === "checked" ? "#checked" : `[data-chapter="${id}"]`;
+      await page.locator(selector).scrollIntoViewIfNeeded();
+      const widths = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));
+      expect(widths.scroll, id).toBeLessThanOrEqual(widths.inner);
+    }
+  });
+}
 
 test("reduced motion: nothing animates and the first screen is still", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await loaded(page);
+  await page.waitForLoadState("networkidle");
   await expect.poll(() => page.evaluate(() => document.getAnimations().length)).toBe(0);
   const first = await page.screenshot();
   await page.waitForTimeout(1000);

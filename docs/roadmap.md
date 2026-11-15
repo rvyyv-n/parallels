@@ -55,7 +55,7 @@ The passes run in order, with no set times. Inside a pass, the builder groups ru
 
 **Goal:** show that each part of a base has its own best place, give newcomers a way in, and let a judge see the ground itself.
 
-- [ ] **2A "Build the whole base"** · Opus, high · `data/base.ts` with a unit test, `ui/Base.tsx`, `base.css`
+- [x] **2A "Build the whole base"** · Opus, high · `data/base.ts` with a unit test, `ui/Base.tsx`, `base.css`
   - `bestPerChallenge(manifest, target)`: for each scored challenge, the top cell of its `ch:<challenge>` column in the target file, with its region, coordinates and terrain type. A cell that wins two parts is returned once with both parts.
   - The chapter (id `base`, after "What to test here"): one row per part with its pin number, place, and the one trait that matches best there; challenges with only labels are listed as not scored, with the reason.
   - Choosing a part opens that place in the chapters above.
@@ -72,7 +72,7 @@ The passes run in order, with no set times. Inside a pass, the builder groups ru
   - The month slider reads `m_best`, `m_freeze` and `m_rain` for the five best places; the weight calculator uses the gravity in `cant_copy`; the analog map places `labels.json` points on the bundled Earth image.
   - Ends with "Find your own place", which opens the main page with that world's base site chosen.
   - Done when every value traces to `dataset/` or a named source, and the page works at 390 px.
-- [ ] **2D Scene and selection** · orchestrator · shared files
+- [x] **2D Scene and selection** · orchestrator · shared files
   - A `base` keyframe and pins for many places at once in the scene; the Learn page entry in `vite.config.ts`.
   - Selection of any cell, not only the five best, so "Build the whole base" can open its places.
   - Motion: count-ups on the intro numbers, text that reveals with the scroll, a fixed top bar.

@@ -19,6 +19,7 @@ export interface ScreenPoint {
 }
 
 export const MATCH_W = 720;
+const SPIN_DEG_PER_S = 7;
 export const MATCH_H = 360;
 
 const SUN = new THREE.Vector3(-0.55, 0.5, 0.67).normalize();
@@ -189,6 +190,7 @@ export class Scene {
   private frame = 0;
   private last = 0;
   private dragging = false;
+  private spin = false;
   private settled = false;
   private height = 1;
 
@@ -288,6 +290,14 @@ export class Scene {
     this.kick();
   }
 
+  setSpin(on: boolean) {
+    on &&= !this.reducedMotion;
+    if (this.spin === on) return;
+    this.spin = on;
+    if (on) this.goal = { lat: 0, lon: this.view.lon };
+    this.kick();
+  }
+
   lookAt(lat: number, lon: number, fromLonOffset = 0) {
     this.goal = { lat, lon };
     if (this.reducedMotion) this.view = { lat, lon };
@@ -314,6 +324,10 @@ export class Scene {
     let moving = false;
 
     if (!this.dragging) {
+      if (this.spin) {
+        this.goal.lon = ((this.goal.lon + dt * SPIN_DEG_PER_S + 540) % 360) - 180;
+        moving = true;
+      }
       const dLon = ((this.goal.lon - this.view.lon + 540) % 360) - 180;
       const dLat = this.goal.lat - this.view.lat;
       if (Math.abs(dLon) + Math.abs(dLat) > 0.01) {

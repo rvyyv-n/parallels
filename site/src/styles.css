@@ -79,13 +79,33 @@ p {
 }
 
 .top {
-  position: absolute;
-  z-index: 5;
+  position: fixed;
+  z-index: 6;
   inset: 0 0 auto 0;
   display: flex;
   align-items: center;
   gap: clamp(18px, 3vw, 40px);
-  padding: 22px var(--pad) 0;
+  padding: 16px var(--pad);
+  transition: padding 0.3s var(--ease);
+}
+
+.top::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -18px 0;
+  z-index: -1;
+  background: linear-gradient(rgba(5, 6, 7, 0.92) 55%, transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.top[data-scrolled] {
+  padding-block: 10px;
+}
+
+.top[data-scrolled]::before {
+  opacity: 1;
 }
 
 .wordmark {
@@ -325,6 +345,18 @@ p {
 
 .ghost:hover {
   border-color: var(--ink);
+}
+
+.learn-link {
+  margin-left: 6px;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--dim);
+  text-shadow: 0 0 10px var(--bg), 0 0 3px var(--bg);
+}
+
+.learn-link:hover {
+  color: var(--ink);
 }
 
 .ghost.closeup {
@@ -1206,7 +1238,7 @@ p {
 
 @media (max-width: 899px) {
   .top {
-    padding-top: 14px;
+    padding-block: 10px;
     justify-content: space-between;
   }
 
@@ -1301,8 +1333,15 @@ p {
     font-size: 32px;
   }
 
+  .pairs tbody td {
+    padding-left: 10px;
+    white-space: normal;
+  }
+
   .row .v {
+    max-width: 34vw;
     font-size: 17px;
+    white-space: normal;
   }
 
   .plan {
@@ -1337,6 +1376,32 @@ p {
 
   .runners .name {
     flex: 0 1 auto;
+  }
+}
+
+.after.reveal,
+.foot > .reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+
+.after.reveal.in,
+.foot > .reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 899px) {
+  .copy.reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+  }
+
+  .copy.reveal.in {
+    opacity: 1;
+    transform: none;
   }
 }
 

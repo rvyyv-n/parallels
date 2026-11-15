@@ -39,7 +39,7 @@ for (const view of views) {
 
 test("intro numbers match the manifest", async ({ page }) => {
   await ready(page);
-  await expect(page.locator(".hero-stats dd")).toHaveText([
+  await expect(page.locator(".hero-stats dd > span[aria-hidden]")).toHaveText([
     manifest.grid.n.toLocaleString("en"),
     String(manifest.targets.length),
     String(manifest.filters.length),
