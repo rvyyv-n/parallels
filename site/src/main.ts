@@ -29,7 +29,7 @@ const app = document.getElementById("app")!;
 
 function shell(m: Manifest) {
   app.innerHTML = `
-    ${m.sample ? `<p class="sample" role="note"><b>Sample data.</b> Every number on this page is a made-up test value while the real data is processed. Nothing here is a result yet.</p>` : ""}
+    ${m.sample ? `<p class="sample" role="note"><b>Sample data.</b> All numbers on this page are test values, not results. The real data is not ready yet.</p>` : ""}
     <header class="top">
       <a class="skip" href="#main">Skip to content</a>
       <a class="brand" href="#/" aria-label="Parallels, home">${logo()}<span class="wordmark">Parallels</span></a>
@@ -40,9 +40,9 @@ function shell(m: Manifest) {
     <main id="main" tabindex="-1"></main>
     <footer class="foot">
       <p class="brand">${logo()}<span class="wordmark small">Parallels</span></p>
-      <p>NASA Space Apps Challenge 2026 entry: Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars. Data generated ${esc(m.generated)}.</p>
+      <p>NASA Space Apps Challenge 2026 entry: Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars. Data made on ${esc(m.generated)}.</p>
       <p class="ai" id="ai-note">${esc(AI_NOTE)}</p>
-      <p class="small muted">No NASA logos or insignia are used. Imagery credits are in the <a href="#data">Data section of the About page</a>.</p>
+      <p class="small muted">This site uses no NASA logos or insignia. The image credits are in the <a href="#data">Data part of the About page</a>.</p>
     </footer>`;
 }
 
@@ -75,7 +75,7 @@ async function main() {
   try {
     m = await manifest();
   } catch (e) {
-    app.innerHTML = `<div class="boot"><img src="${import.meta.env.BASE_URL}favicon.svg" width="28" height="28" alt=""><b>PARALLELS</b></div><p class="fatal" role="alert">The data files could not be loaded (${esc((e as Error).message)}). Please check your connection and reload the page.</p>`;
+    app.innerHTML = `<div class="boot"><img src="${import.meta.env.BASE_URL}favicon.svg" width="28" height="28" alt=""><b>PARALLELS</b></div><p class="fatal" role="alert">The data files did not load (${esc((e as Error).message)}). Make sure that you are online, then reload the page.</p>`;
     return;
   }
   shell(m);

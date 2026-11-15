@@ -4,19 +4,20 @@ import { icon } from "../icons";
 import type { Intro } from "../intro";
 import { logo } from "../logo";
 import { reveal, type Page } from "../router";
+import { tourButton } from "../tour";
 import { headline, NAME, SHARP, TEXTURE, thumb, TITLE } from "../worlds";
 import { home, rankedOf, type Ctx } from "./ctx";
 
 const CHAPTERS = [
   { id: "ch-hero", name: "Start" },
-  { id: "ch-count", name: "All of Earth's land" },
+  { id: "ch-count", name: "All land on Earth" },
   { id: "ch-moon", name: "The Moon" },
   { id: "ch-mars", name: "Mars" },
   { id: "ch-known", name: "Known analog places" },
   { id: "ch-go", name: "Open the Finder" },
 ];
 
-const LEDE: Record<Body, string> = { moon: "Choose a lunar site to see how Earth compares", mars: "Choose a Mars site to see how Earth compares" };
+const LEDE: Record<Body, string> = { moon: "Select a Moon base site to see the places on Earth that match it.", mars: "Select a Mars base site to see the places on Earth that match it." };
 
 const KNOWN = ["Haughton crater, Devon Island", "Yungay, Atacama", "McMurdo Dry Valleys", "Mauna Kea", "Rio Tinto", "Black Point lava flow"];
 
@@ -36,7 +37,7 @@ const site = (t: Target, i: number) =>
 
 function cant(m: Manifest, b: Body) {
   const src = [...new Map(m.cant_copy.map((c) => [c.source, c.url])).entries()];
-  return `<div class="cant"><p class="cant-k">${icon("cant")}Earth can't copy</p><dl>${m.cant_copy
+  return `<div class="cant"><p class="cant-k">${icon("cant")}Earth cannot copy</p><dl>${m.cant_copy
     .map((c) => `<div title="${esc(`${c[b]} (${c.source})`)}"><dt>${esc(c.name.replace(/ on the surface$/, ""))}</dt><dd>${esc(headline(c[b])[0])}</dd></div>`)
     .join("")}</dl><p class="cant-src">Sources: ${src.map(([s, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(s)}</a>`).join(" · ")}</p></div>`;
 }
@@ -46,7 +47,7 @@ const world = (m: Manifest, b: Body, n: number) => `<section class="chap chap-wo
       <h2 id="${b}-h"${b === "mars" ? ' class="w-mars"' : ""}>${TITLE[b]}</h2>
       <p class="sites-lede">${LEDE[b]}</p>
       <ul class="sites" data-world="${b}" aria-label="Base sites on ${NAME[b]}" aria-describedby="${b}-keys">${sitesOf(m, b).map(site).join("")}</ul>
-      <p class="sites-keys" id="${b}-keys">Arrow keys move through the sites. Enter opens Earth's matches in the Finder.</p>
+      <p class="sites-keys" id="${b}-keys">Use the arrow keys to move between the sites. Push Enter to open the matches on Earth in the Finder.</p>
       ${cant(m, b)}
     </div>
   </section>`;
@@ -60,19 +61,19 @@ const html = (m: Manifest) => `<section id="intro" class="intro" aria-labelledby
     <section class="chap chap-hero" id="ch-hero" data-chap="0">
       <div class="copy">
         <p class="intro-k">NASA Space Apps Challenge 2026</p>
-        <h1 id="intro-h" tabindex="-1">No place on Earth is <span class="w-moon">the Moon.</span> <span class="w-mars">Or Mars.</span></h1>
-        <p class="intro-lede">But every patch of land copies a part of them. Parallels identifies the Earth locations that analog a permanent Moon base and Mars, part by part.</p>
-        ${next("ch-count", "Scroll to begin")}
+        <h1 id="intro-h" tabindex="-1">No place on Earth is the same as <span class="w-moon">the Moon</span> or <span class="w-mars">Mars</span>.</h1>
+        <p class="intro-lede">But each patch of land is similar to them in some ways. Parallels finds the places on Earth that are most similar to each part of a permanent Moon or Mars base.</p>
+        <div class="hero-go">${next("ch-count", "Scroll down to start")}<button type="button" class="tour-btn" id="tour-home"><i aria-hidden="true"></i>Guided tour</button></div>
       </div>
     </section>
     <section class="chap chap-count" id="ch-count" data-chap="1" aria-labelledby="count-h">
       <div class="copy">
-        <p class="intro-k">All of Earth's land</p>
-        <h2 id="count-h">Every patch, scored. Not just the famous ones.</h2>
+        <p class="intro-k">All land on Earth</p>
+        <h2 id="count-h">We give a score to each patch of land, not only to the famous places.</h2>
         <dl class="counts">
-          <div><dt>${num(m.grid.n)}</dt><dd>patches of land, each about 50 km across</dd></div>
-          <div><dt id="count-ranked">—</dt><dd>ranked for the ${esc((home(m, "moon")?.short ?? "").replace(/\s*\(.*\)$/, ""))}</dd></div>
-          <div><dt id="count-known">—</dt><dd>places already used as analogs, drawn in amber</dd></div>
+          <div><dt>${num(m.grid.n)}</dt><dd>patches of land, each approximately 50 km wide</dd></div>
+          <div><dt id="count-ranked">—</dt><dd>patches with a rank for the ${esc((home(m, "moon")?.short ?? "").replace(/\s*\(.*\)$/, ""))}</dd></div>
+          <div><dt id="count-known">—</dt><dd>known analog places, shown in amber</dd></div>
         </dl>
         ${next("ch-moon", "The Moon")}
       </div>
@@ -81,8 +82,8 @@ const html = (m: Manifest) => `<section id="intro" class="intro" aria-labelledby
     ${world(m, "mars", 3)}
     <section class="chap chap-known" id="ch-known" data-chap="4" aria-labelledby="known-h">
       <div class="copy">
-        <h2 id="known-h">The Moon and Mars are closer than you think.</h2>
-        <p class="intro-lede">Crews have rehearsed Moon and Mars work at these places. Click one to go there.</p>
+        <h2 id="known-h">Crews already train on Earth for the Moon and Mars.</h2>
+        <p class="intro-lede">Crews practised Moon and Mars work at these places. Click a place to see it on the globe.</p>
         <ul class="places" aria-label="Known analog places"></ul>
       </div>
     </section>
@@ -106,6 +107,7 @@ export function homePage(ctx: Ctx): Page {
     mount(root) {
       el = root;
       el.innerHTML = html(m);
+      tourButton(el.querySelector<HTMLElement>("#tour-home")!, "home");
       const chaps = [...el.querySelectorAll<HTMLElement>(".chap")];
       const dots = [...el.querySelectorAll<HTMLElement>(".intro-dots a")];
       const top = document.querySelector<HTMLElement>(".top");
@@ -216,7 +218,7 @@ export function homePage(ctx: Ctx): Page {
                   }</button></li>`,
               )
               .join("")
-          : `<li class="muted">No data: the known analog list could not be loaded.</li>`;
+          : `<li class="muted">No data: the list of known analog places did not load.</li>`;
         choose(0);
       });
 

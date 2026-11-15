@@ -12,7 +12,7 @@ type How = "push" | "replace" | "pop";
 const HOLDS: [RegExp, string][] = [
   [/^(checked|first-run|second-run|third-run|run-\d+)$/, "about"],
   [/^(about-h|scoring|challenge|benchmarks|questions|terrain|data|limits|credits)$/, "about"],
-  [/^(explore|ledger-h)$/, "find"],
+  [/^(explore|find-h|rank)$/, "find"],
   [/^(card|c-cant)$/, "place"],
   [/^(intro|ch-[a-z]+)$/, ""],
 ];

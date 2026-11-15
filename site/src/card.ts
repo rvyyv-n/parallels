@@ -41,8 +41,8 @@ const BANDS = [
 ];
 
 const KIND: Record<string, string> = {
-  computed: "we worked it out from the mission data",
-  published: "taken from a published paper or fact sheet",
+  computed: "we calculated it from the mission data",
+  published: "from a published paper or fact sheet",
   derived: "calculated from other known values",
 };
 
@@ -122,7 +122,7 @@ function bullet(r: Row, label: string) {
   const u = unit(r.tr.unit);
   const d = r.tr.digits;
   const tx = at(tv);
-  const range = Number.isFinite(r.lo) ? `Earth's land spans ${num(r.lo, d)} to ${num(r.hi, d)}${u}.` : "";
+  const range = Number.isFinite(r.lo) ? `The land on Earth goes from ${num(r.lo, d)} to ${num(r.hi, d)}${u}.` : "";
   return `<div class="bb" role="img" aria-label="Here ${esc(val(r.tr, r.ev))}. ${esc(label)} ${esc(val(r.tr, tv))}. ${esc(range)}">
       ${Number.isFinite(r.lo) ? `<span class="bb-band" style="left:${at(r.lo).toFixed(2)}%;width:${Math.max(0.6, at(r.hi) - at(r.lo)).toFixed(2)}%"></span>` : ""}
       <span class="bb-here" style="width:${Math.max(0.8, at(r.ev)).toFixed(2)}%"></span>
@@ -132,7 +132,7 @@ function bullet(r: Row, label: string) {
 }
 
 function kindBadge(tr: Trait, tv: TargetValue) {
-  if (tr.scored_by === "ideal") return `<p class="kind"><span class="kb">ideal</span> a set goal, not a measurement (value field: ${esc(tv.kind)})</p>`;
+  if (tr.scored_by === "ideal") return `<p class="kind"><span class="kb">ideal</span> a goal that we set, not a measurement (value field: ${esc(tv.kind)})</p>`;
   return `<p class="kind"><span class="kb k-${esc(tv.kind)}">${esc(tv.kind)}</span> ${esc(KIND[tv.kind] ?? "")}</p>`;
 }
 
@@ -165,7 +165,7 @@ function traitHtml(x: CardInput, r: Row, why: string) {
   const missing = !Number.isFinite(r.ev)
     ? `No Earth data for this place.`
     : tv == null
-      ? `Not scored: no ${esc(label)} value.${r.tv?.note ? ` ${esc(r.tv.note)}` : ""}`
+      ? `No score: there is no ${esc(label)} value.${r.tv?.note ? ` ${esc(r.tv.note)}` : ""}`
       : "";
   const rank = Number.isFinite(r.rank)
     ? `<span class="t-rank" style="--c:${colour(r.rank)}"><i></i>Earth rank <b>${score100(r.rank)}</b></span>`
@@ -174,7 +174,7 @@ function traitHtml(x: CardInput, r: Row, why: string) {
   const tsrc = !r.tv
     ? ""
     : r.tr.scored_by === "ideal"
-      ? `<span class="chip"><b>Ideal</b> a set goal</span>`
+      ? `<span class="chip"><b>Ideal</b> a goal that we set</span>`
       : `<span class="chip"><b>${esc(label)}</b> ${esc(short(x.m, r.tv.dataset))} · ${esc(brief(r.tv.resolution))}</span>`;
   return `<li class="trait${missing ? " miss" : ""}">
     <div class="t-head"><span class="t-name">${esc(r.tr.label)}</span>${rank}</div>
@@ -222,8 +222,8 @@ function breakRows(x: CardInput, chs: Challenge[]) {
     const u = unit(r.tr.unit);
     const dir = r.ev > tv ? "above" : "below";
     const text = beyond
-      ? `No land on Earth reaches the ${esc(who)} value: Earth's land spans ${num(r.lo, d)} to ${num(r.hi, d)}${u}.`
-      : `Weaker than most of Earth's land on this trait (Earth rank ${score100(r.rank)}).`;
+      ? `No land on Earth gets to the ${esc(who)} value. The land on Earth goes from ${num(r.lo, d)} to ${num(r.hi, d)}${u}.`
+      : `Most land on Earth is better on this trait (Earth rank ${score100(r.rank)}).`;
     const ref = r.tr.scored_by === "ideal" ? `the ideal (ideal: ${val(r.tr, tv)})` : `the ${esc(who)} value`;
     out.push({ r, text: `<b>${num(Math.abs(r.ev - tv), d)}${u}</b> ${dir} ${ref}. ${text}` });
   }
@@ -232,7 +232,7 @@ function breakRows(x: CardInput, chs: Challenge[]) {
 
 function breaks(x: CardInput, chs: Challenge[]) {
   const out = breakRows(x, chs);
-  if (!out.length) return `<p class="muted">No weighted trait falls in Earth's weaker half or beyond Earth's range here.</p>`;
+  if (!out.length) return `<p class="muted">At this place, no weighted trait is in the weaker half of the land on Earth or outside the range of Earth.</p>`;
   return `<ul class="breaks">${out
     .map(
       ({ r, text }) =>
@@ -263,13 +263,13 @@ function summary(x: CardInput, chs: Challenge[]) {
   const said = names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0] ?? "";
   return `<section class="c-sum" aria-label="Summary">
     <div class="sum-row sum-ok"><h5 class="sum-k">${icon("check")}Matches</h5>${list(top, "no data")}</div>
-    <div class="sum-row sum-bad"><h5 class="sum-k">${icon("breaks")}Breaks</h5>${list(weak, all.length ? "No trait in this filter is weak here." : "no data")}</div>
-    <div class="sum-row sum-cant"><h5 class="sum-k">${icon("cant")}Earth can't copy</h5><p>${x.body === "moon" ? "The Moon's" : "Mars's"} ${esc(said)}. <a href="#c-cant">See the strip below.</a></p></div>
+    <div class="sum-row sum-bad"><h5 class="sum-k">${icon("breaks")}Breaks</h5>${list(weak, all.length ? "No trait in this preset is weak at this place." : "no data")}</div>
+    <div class="sum-row sum-cant"><h5 class="sum-k">${icon("cant")}Earth cannot copy</h5><p>${x.body === "moon" ? "The Moon's" : "Mars's"} ${esc(said)}. <a href="#c-cant">Refer to the strip below.</a></p></div>
   </section>`;
 }
 
 function plainWhy(m: Manifest, why: string) {
-  let s = why.replace(/closer than 0% of land/g, "further from the target than almost all land");
+  let s = why.replace(/closer than 0% of land/g, "farther from the target than almost all land");
   for (const tr of m.traits) {
     if (tr.scored_by !== "ideal") continue;
     const re = new RegExp(`(${tr.label.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} [^;()]*? against )`, "g");
@@ -284,7 +284,7 @@ function seasons(x: CardInput) {
   const frz = c.m_freeze?.[x.i];
   const rain = c.m_rain?.[x.i];
   const usable = c.usable?.[x.i];
-  if (![best, frz, rain].some(Number.isFinite)) return `<p class="muted">No monthly climate data for this place.</p>`;
+  if (![best, frz, rain].some(Number.isFinite)) return `<p class="muted">There is no monthly climate data for this place.</p>`;
   const line = (name: string, mask: number, cls: string) =>
     `<tr><th scope="row">${name}</th>${bits(mask)
       .map((on, k) => `<td class="${on ? cls : ""}"><span class="sr">${MONTHS[k]} ${on ? "yes" : "no"}</span></td>`)
@@ -294,7 +294,7 @@ function seasons(x: CardInput) {
       <tbody>${line("Best", best, "on-best")}${line("Freeze–thaw", frz, "on-frz")}${line("Rainy", rain, "on-rain")}</tbody>
     </table>
     <p class="m-sum">Usable months: <b>${Number.isFinite(usable) ? num(usable) : "no data"}</b> of 12. Best: ${monthList(best)}. Freeze–thaw: ${monthList(frz)}. Rainy: ${monthList(rain)}.${
-      x.yr ? " Year-round testing is on, so part-year places rank lower." : ""
+      x.yr ? " Year-round testing is on. Places that you can use for only part of the year get a lower rank." : ""
     }</p>`;
 }
 
@@ -321,7 +321,7 @@ function shownHtml(x: CardInput, key: string, v: TargetValue) {
   const note = v.note
     ? v.value == null
       ? `<span class="s-note">${esc(v.note)}</span>`
-      : `<details class="t-notes"${lim ? " open" : ""}><summary>${icon("sources")}${lim ? "At the instrument's limit: note" : "Notes"}</summary><p>${esc(v.note)}</p></details>`
+      : `<details class="t-notes"${lim ? " open" : ""}><summary>${icon("sources")}${lim ? "Note: the value is at the limit of the instrument" : "Notes"}</summary><p>${esc(v.note)}</p></details>`
     : "";
   return `<span class="s-val">${BODY[x.body]}: <b>${shownText(x, key, v)}</b>${lim ? ' <span class="tag warn">limit</span>' : ""}</span><span class="s-src">${src}</span>${note}`;
 }
@@ -331,7 +331,7 @@ function unscored(x: CardInput, chs: Challenge[]) {
   const used = new Set(items.map(({ l }) => l.target_key).filter(Boolean));
   const extra = Object.entries(x.target.shown).filter(([k]) => !used.has(k));
   if (!items.length && !extra.length) return "";
-  return `<details class="c-block c-fold mv-shown"><summary><h4>${icon("info")}Shown, not scored <span class="muted">(${items.length + extra.length})</span></h4>${icon("chevron", "chev")}</summary><ul class="labels">
+  return `<details class="c-block c-fold mv-shown"><summary><h4>${icon("info")}Shown, but not scored <span class="muted">(${items.length + extra.length})</span></h4>${icon("chevron", "chev")}</summary><ul class="labels">
     ${items
       .map(
         ({ c, l }) => `<li><span class="b-name">${esc(l.name)}</span><span class="l-body"><span><span class="tag">${esc(c.name)}</span> ${esc(l.reason)}</span>${
@@ -367,12 +367,12 @@ function regions(x: CardInput) {
   const body = rs
     .map((r) => `<tr><th scope="row">${esc(r.name)}<span class="muted"> ${latlon(r.lat, r.lon, 1)}</span></th>${keys.map((k) => `<td class="n">${cell(r, k)}</td>`).join("")}</tr>`)
     .join("");
-  return `<details class="c-block c-fold regions mv-regions"><summary><h4>${icon("site")}The ${rs.length} regions' own values</h4>${icon("chevron", "chev")}</summary>
+  return `<details class="c-block c-fold regions mv-regions"><summary><h4>${icon("site")}Values for each of the ${rs.length} regions</h4>${icon("chevron", "chev")}</summary>
     <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Region</th>${keys
       .map((k) => `<th scope="col">${esc(tr(k)?.label ?? k)}${tr(k)?.unit ? ` <span class="muted">${esc(tr(k)!.unit)}</span>` : ""}</th>`)
       .join("")}</tr></thead><tbody>${body}</tbody></table></div>
     ${marks.length ? `<ol class="marks small">${marks.map((k) => `<li><b>${esc(k.region)}, ${esc(k.label)}:</b> ${esc(k.note)}</li>`).join("")}</ol>` : ""}
-    <p class="muted small">Sources per value: ${[...new Set(rs.flatMap((r) => Object.values(r.values).map((v) => ds(x.m, v.dataset))))].map(esc).join(", ")}.</p>
+    <p class="muted small">Sources of the values: ${[...new Set(rs.flatMap((r) => Object.values(r.values).map((v) => ds(x.m, v.dataset))))].map(esc).join(", ")}.</p>
   </details>`;
 }
 
@@ -394,7 +394,7 @@ function chTile(x: CardInput, c: Challenge, k: number, open: boolean) {
   const w = x.weights[c.id] ?? 0;
   const rows = c.traits.map((tw) => row(x, tw.id)).filter((r): r is Row => !!r);
   const cov = coverage(x.t[`cov:${c.id}`], r, i);
-  const state = !c.traits.length ? "not scored" : cov <= 0 ? "no data here" : cov < 1 ? "partial data" : "";
+  const state = !c.traits.length ? "not scored" : cov <= 0 ? "no data here" : cov < 1 ? "some data missing" : "";
   const ok = Number.isFinite(r);
   return `<li class="ch${w > 0 ? "" : " off"}" style="--k:${k}">
     <details${open ? " open" : ""}>
@@ -403,12 +403,12 @@ function chTile(x: CardInput, c: Challenge, k: number, open: boolean) {
         <span class="ch-name">${esc(c.name)}${c.only ? ` <span class="tag">${esc(c.only)}</span>` : ""}</span>
         <span class="ch-n${ok ? "" : " word"}">${ok ? score100(r) : !c.traits.length ? "not scored" : "no data"}</span>
         <span class="ch-bar" aria-hidden="true"><i style="width:${ok ? r * 100 : 0}%;background:${ok ? colour(r) : "transparent"}"></i></span>
-        <span class="ch-w">${w > 0 ? `Weight ${num(w, w % 1 ? 1 : 0)}` : "Not in this filter"}${state ? ` · <span class="st${state === "partial data" ? " part" : ""}">${state}</span>` : ""}</span>
+        <span class="ch-w">${w > 0 ? `Weight ${num(w, w % 1 ? 1 : 0)}` : "Not in this preset"}${state ? ` · <span class="st${state === "some data missing" ? " part" : ""}">${state}</span>` : ""}</span>
         ${icon("chevron", "chev")}
       </summary>
       <div class="ch-body">
         <p class="ch-q">${esc(c.question)}</p>
-        ${rows.length ? `<ul class="traits">${rows.map((r) => traitHtml(x, r, c.traits.find((t) => t.id === r.tr.id)?.why ?? "")).join("")}</ul>` : `<p class="muted">No scored traits: this challenge is shown with labels only (see "Shown, not scored").</p>`}
+        ${rows.length ? `<ul class="traits">${rows.map((r) => traitHtml(x, r, c.traits.find((t) => t.id === r.tr.id)?.why ?? "")).join("")}</ul>` : `<p class="muted">This challenge has no scored traits. It shows labels only (refer to "Shown, but not scored").</p>`}
         <p class="ch-test">${icon("test")}<span><b>What to test here:</b> ${esc(c.what_to_test)}</span></p>
       </div>
     </details>
@@ -439,12 +439,12 @@ export function card(x: CardInput): string {
     .join("");
   return `<article class="card mv" aria-labelledby="card-title">
     <header class="c-head">
-      <p class="c-kicker">${Number.isFinite(x.place) ? `Match #${num(x.place)} of ${num(x.ranked)} ranked land cells` : "Not ranked for this filter"}${
-        Number.isFinite(far) && far > 100 ? ` <span class="rare">Rarely used: ${num(far)} km from any known analog</span>` : ""
+      <p class="c-kicker">${Number.isFinite(x.place) ? `Match ${num(x.place)} of ${num(x.ranked)} ranked land cells` : "No rank for this preset"}${
+        Number.isFinite(far) && far > 100 ? ` <span class="rare">New: ${num(far)} km from the nearest known analog</span>` : ""
       }${isIce(cells, i) ? ` <span class="tag ice">Ice sheet: ${num(ice)}% permanent ice</span>` : ""}</p>
       <h3 id="card-title">${esc(region)}</h3>
       <p class="c-meta">${region === latlon(cells.lat[i], cells.lon[i], 2) ? "" : `<span>${latlon(cells.lat[i], cells.lon[i])}</span>`}<span>${
-        !ttype ? "Terrain type: no data" : ttype.key === "none" ? "Other land (no special type)" : esc(ttype.name)
+        !ttype ? "Terrain type: no data" : ttype.key === "none" ? "Other land (no special terrain type)" : esc(ttype.name)
       }</span>${Number.isFinite(cells.cluster?.[i]) ? `<span>Cluster ${num(cells.cluster[i])}</span>` : ""}<span>0.5° cell</span></p>
     </header>
     <div class="mv-top">
@@ -460,20 +460,20 @@ export function card(x: CardInput): string {
           </div>
         </div>
         ${limiting(x, chs)}
-        <details class="o-how"><summary>${icon("info")}How the score works${icon("chevron", "chev")}</summary>
+        <details class="o-how"><summary>${icon("info")}How we calculate the score${icon("chevron", "chev")}</summary>
         <p class="o-text">${
           ok
-            ? "The match is a weighted mix of the challenge scores below. Each challenge score comes from its traits. A trait scores higher when more of Earth's land is further from the target than this place."
-            : "Not enough of the weighted challenges have data here to give a match."
+            ? "The match score combines the challenge scores below with their weights. Each challenge score comes from its traits. A trait gets a higher score when more land on Earth is farther from the target than this place."
+            : "Too many weighted challenges have no data at this place. We cannot give a match score."
         }</p>
-        <p class="v-bands"><b>Bands are our own labels, not data:</b> Close: 80 and up. Partial: 50 to 79. Weak: under 50.</p>
+        <p class="v-bands"><b>We made these bands. They are labels, not data:</b> Close: 80 and more. Partial: 50 to 79. Weak: less than 50.</p>
         </details>
         ${summary(x, chs)}
       </section>
     </div>
     <div class="mv-notes">
       ${lead ? `<section class="c-block mv-test"><h4>${icon("test")}What to test here</h4><p>${esc(lead.what_to_test)} <span class="muted">(${esc(lead.name)})</span></p></section>` : ""}
-      ${head ? `<details class="c-block c-fold headline"><summary><h4>${icon("site")}Why this is the headline match</h4>${icon("chevron", "chev")}</summary><p><b>${esc(head.title)}.</b> ${esc(plainWhy(m, head.why))}</p></details>` : ""}
+      ${head ? `<details class="c-block c-fold headline"><summary><h4>${icon("site")}Why this is the main match</h4>${icon("chevron", "chev")}</summary><p><b>${esc(head.title)}.</b> ${esc(plainWhy(m, head.why))}</p></details>` : ""}
     </div>
     <section class="c-block mv-chs" aria-labelledby="mv-chs-h">
       <div class="mv-chs-head">
@@ -484,8 +484,8 @@ export function card(x: CardInput): string {
     </section>
     <div class="mv-strips">
       <section class="c-block strip strip-break"><h4>${icon("breaks")}Where it breaks</h4>${breaks(x, chs)}</section>
-      <section class="c-block strip strip-cant" id="c-cant"><h4>${icon("cant")}Earth can't copy</h4>
-        <p class="strip-sub">True for every place on Earth, whatever its score.</p>
+      <section class="c-block strip strip-cant" id="c-cant"><h4>${icon("cant")}Earth cannot copy</h4>
+        <p class="strip-sub">This is true for all places on Earth, at all scores.</p>
         <table class="data cant"><thead><tr><th scope="col"><span class="sr">Condition</span></th><th scope="col">Earth</th><th scope="col">${body}</th><th scope="col">Source</th></tr></thead><tbody>${cc}</tbody></table>
       </section>
     </div>

@@ -1,16 +1,19 @@
 import { expect, test, type Page } from "@playwright/test";
 import { cols, manifest } from "./helpers";
-import { handScore, top } from "../src/score";
+import { handScore } from "../src/score";
+import { spread } from "../src/rank";
 
 const m = manifest();
-const rows = (p: Page) => p.locator("#ledger li[data-i]");
-const order = (p: Page) => rows(p).evaluateAll((els) => els.map((e) => Number((e as HTMLElement).dataset.i)));
+const rows = (p: Page) => p.locator("#rank li[data-i]");
+const order = (p: Page) =>
+  rows(p).evaluateAll((els) => els.map((e) => [Number((e as HTMLElement).dataset.rank), Number((e as HTMLElement).dataset.i)]).sort((a, b) => a[0] - b[0]).map((x) => x[1]));
 const main = m.targets.find((x) => x.default) ?? m.targets[0];
-const nameOf = async (p: Page, i: number) => (await rows(p).nth(i).locator(".r-name").innerText()).replace(/\s*(rarely used|ice sheet)\s*/gi, "").trim();
+const row = (p: Page, r: number) => p.locator(`#rank li[data-rank="${r}"]`);
+const nameOf = async (p: Page, i: number) => (await row(p, i + 1).locator(".rk-name").innerText()).trim();
 
 async function ready(p: Page, q = "") {
   await p.goto(`/#/find${q ? `?${q}` : ""}`);
-  await expect(rows(p)).toHaveCount(10);
+  await expect(rows(p)).toHaveCount(20);
 }
 
 type V = { tests: { checks: { passed: boolean | null }[] }[]; adopted?: boolean; preset?: string; title: string };
@@ -26,18 +29,17 @@ test("main flow: pick a site in its world's chapter on Home, pick a filter, open
   await expect(page.locator(`#ch-${target.body}`)).toBeInViewport();
   await page.locator(`#ch-${target.body} a.site[data-site="${target.id}"]`).click();
   await expect(page).toHaveURL(new RegExp(`#/find\\?t=${target.id}`));
-  await expect(rows(page)).toHaveCount(10);
+  await expect(rows(page)).toHaveCount(20);
   await expect(page.locator("#find-h")).toContainText(target.name);
-  await expect(page.locator(`[data-target="${target.id}"]`)).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#pick-target")).toHaveValue(target.id);
   await page.locator(`.presets [data-filter="${filter.id}"]`).click();
   await expect(page.locator(`.presets [data-filter="${filter.id}"]`)).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("#find-h")).toContainText(filter.name);
   await expect(page.locator(".card")).toHaveCount(0);
 
-  const row = rows(page).nth(2);
-  const id = await row.getAttribute("data-i");
+  const third = row(page, 3);
+  const id = await third.getAttribute("data-i");
   const name = await nameOf(page, 2);
-  await row.locator(".row").click();
+  await third.locator(".rk-row").click();
   await expect(page).toHaveURL(new RegExp(`#/place\\?t=${target.id}&f=${filter.id}.*c=${id}`));
   await expect(page.locator("#place-h")).toContainText(target.name);
   await expect(page.locator("#card h3")).toHaveText(name);
@@ -52,20 +54,20 @@ test("main flow: pick a site in its world's chapter on Home, pick a filter, open
   expect(vals.some((v) => units.some((u) => v.includes(u)))).toBe(true);
   await expect(open.locator(".t-src").first()).toContainText("Earth");
   await expect(page.locator(".card h4", { hasText: "Where it breaks" })).toBeVisible();
-  await expect(page.locator(".card h4", { hasText: "Earth can't copy" })).toBeVisible();
+  await expect(page.locator(".card h4", { hasText: "Earth cannot copy" })).toBeVisible();
   await expect(page.locator(".card .cant tbody tr")).toHaveCount(m.cant_copy.length);
   await expect(page.locator(".card h4", { hasText: "Seasons" })).toBeVisible();
 
   await page.locator("#back-find").click();
   await expect(page).toHaveURL(new RegExp(`#/find\\?t=${target.id}&f=${filter.id}`));
-  await expect(page.locator(`#ledger li[data-i="${id}"] .row`)).toHaveClass(/on/);
+  await expect(page.locator(`#rank li[data-i="${id}"] .rk-row`)).toHaveClass(/on/);
   expect(errors).toEqual([]);
 });
 
 test("a shared link opens the same place", async ({ page }) => {
   const f = m.filters[1] ?? m.filters[0];
   const { t, cells } = cols(m, main.id);
-  const { ids } = top(t[`score:${f.id}`], 10, cells);
+  const { ids } = spread(m, t[`score:${f.id}`], cells, () => true, false);
   await ready(page, `t=${main.id}&f=${f.id}`);
   const name = await nameOf(page, 4);
   await page.goto("about:blank");
@@ -74,14 +76,14 @@ test("a shared link opens the same place", async ({ page }) => {
   await expect(page.locator("#card h3")).toHaveText(name);
   await page.locator("#back-find").click();
   await expect(page.locator(`.presets [data-filter="${f.id}"]`)).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator(`#ledger li[data-i="${ids[4]}"] .row`)).toHaveAttribute("aria-current", "true");
+  await expect(page.locator(`#rank li[data-i="${ids[4]}"] .rk-row`)).toHaveAttribute("aria-current", "true");
 });
 
 test("year-round switch reorders the list exactly as the year-round scores say", async ({ page }) => {
   const f = m.filters[0];
   const { t, cells } = cols(m, main.id);
-  const plain = top(t[`score:${f.id}`], 10, cells).ids;
-  const yr = top(t[`score:${f.id}:yr`], 10, cells).ids;
+  const plain = spread(m, t[`score:${f.id}`], cells, () => true, false).ids;
+  const yr = spread(m, t[`score:${f.id}:yr`], cells, () => true, false).ids;
   await ready(page, `t=${main.id}&f=${f.id}`);
   expect(await order(page)).toEqual(plain);
   await page.locator("#pick-yr").check({ force: true });
@@ -90,57 +92,35 @@ test("year-round switch reorders the list exactly as the year-round scores say",
   await expect(page).toHaveURL(/yr=1/);
 });
 
-test("hand-set weights change the ranking", async ({ page }) => {
-  const f = m.filters[0];
+test("a weight slider multiplies the preset and re-ranks the list", async ({ page }) => {
+  const f = m.filters.find((x) => x.id === "balanced") ?? m.filters[0];
   const fw = f.weights[main.body];
   const { t, cells } = cols(m, main.id);
   await ready(page, `t=${main.id}&f=${f.id}`);
   const before = await order(page);
-  await page.locator("#hand summary").click();
-  const chs = m.challenges[main.body].filter((c) => t[`ch:${c.id}`]);
-  const w: Record<string, number> = { ...Object.fromEntries(chs.map((c) => [c.id, 0])), ...fw };
-  const off = Object.keys(fw)[0];
-  const on = chs.find((c) => !(fw[c.id] > 0))!.id;
-  for (const [id, v] of [
-    [on, 5],
-    [off, 0],
-  ] as const) {
-    await page.locator(`#sliders input[data-ch="${id}"]`).fill(String(v));
-    w[id] = v;
-  }
-  const expected = top(handScore(m, t, w, m.grid.n), 10, cells).ids;
+  await expect(page.locator("#weights")).not.toHaveAttribute("open", "");
+  await page.locator("#weights > summary").click();
+  const live = Object.keys(fw).filter((id) => fw[id] > 0 && t[`ch:${id}`]);
+  const off = live[0];
+  await page.locator(`#sliders input[data-ch="${off}"]`).fill("0");
+  await expect(page.locator(`#sliders output[for="w-${off}"]`)).toHaveText("0.0×");
+  const w = Object.fromEntries(live.map((id) => [id, id === off ? 0 : fw[id]]));
+  const expected = spread(m, handScore(m, t, w, m.grid.n), cells, () => true, false).ids;
   await expect.poll(() => order(page)).toEqual(expected);
   expect(expected).not.toEqual(before);
-  await expect(page.locator('.presets [data-filter="__hand"]')).toBeVisible();
-  await expect(page.locator('.presets [data-filter="__hand"]')).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#w-mine")).toBeVisible();
   await expect(page.locator("#pick-yr")).toBeDisabled();
   await expect(page).toHaveURL(/w=/);
-});
-
-test("the top 10 never lists two cells within 150 km of each other", async ({ page }) => {
-  for (const t of m.targets) {
-    await ready(page, `t=${t.id}`);
-    await expect.poll(() => page.locator(`[data-target="${t.id}"]`).getAttribute("aria-pressed")).toBe("true");
-    const ids = await order(page);
-    const { cells } = cols(m, t.id);
-    const r = Math.PI / 180;
-    const km = (a: number, b: number) =>
-      12742 *
-      Math.asin(
-        Math.sqrt(
-          Math.sin(((cells.lat[b] - cells.lat[a]) * r) / 2) ** 2 +
-            Math.cos(cells.lat[a] * r) * Math.cos(cells.lat[b] * r) * Math.sin(((cells.lon[b] - cells.lon[a]) * r) / 2) ** 2,
-        ),
-      );
-    for (let a = 0; a < ids.length; a++) for (let b = a + 1; b < ids.length; b++) expect(km(ids[a], ids[b])).toBeGreaterThanOrEqual(150);
-  }
+  await page.locator("#w-reset").click();
+  await expect.poll(() => order(page)).toEqual(before);
+  await expect(page).not.toHaveURL(/w=/);
 });
 
 test("no horizontal scroll at 375 px", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 800 });
   await ready(page);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
-  await rows(page).first().locator(".row").click();
+  await rows(page).first().locator(".rk-row").click();
   await expect(page.locator(".card")).toHaveCount(1);
   await page.locator(".card .ch details").evaluateAll((ds) => ds.forEach((d) => ((d as HTMLDetailsElement).open = true)));
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(375);
@@ -234,7 +214,7 @@ test("works with NASA GIBS tiles blocked, and makes no other outside calls", asy
   await page.route("**://gibs.earthdata.nasa.gov/**", (r) => r.abort());
   await ready(page);
   await expect(page.locator("#earth canvas.maplibregl-canvas")).toBeVisible();
-  await rows(page).first().locator(".row").click();
+  await rows(page).first().locator(".rk-row").click();
   await page.locator(".card .eimg").scrollIntoViewIfNeeded();
   await expect(page.locator(".card .eimg.fb")).toHaveCount(1);
   await page.evaluate(() => (location.hash = "#/checks"));
@@ -245,17 +225,16 @@ test("works with NASA GIBS tiles blocked, and makes no other outside calls", asy
   expect([...new Set(outside)].filter((h) => h !== "gibs.earthdata.nasa.gov" && h !== "trek.nasa.gov")).toEqual([]);
 });
 
-test("keyboard alone reaches the pickers, the top 10, the scorecard and the sliders", async ({ page }, info) => {
+test("keyboard alone reaches the pickers, the ranked list, the scorecard and the sliders", async ({ page }, info) => {
   test.skip(info.project.name !== "laptop", "keyboard path is a laptop check");
   await ready(page);
-  const chips = page.locator(".bar [data-target]");
-  await chips.nth(1).focus();
-  await page.keyboard.press("Tab");
-  await expect(chips.nth(2)).toBeFocused();
-  await chips.nth(2).press("Enter");
-  await expect(chips.nth(2)).toHaveAttribute("aria-pressed", "true");
-  await expect(rows(page)).toHaveCount(10);
-  const second = rows(page).nth(1).locator(".row");
+  const pick = page.locator("#pick-target");
+  const other = m.targets.find((x) => x.id !== main.id)!;
+  await pick.focus();
+  await pick.selectOption(other.id);
+  await expect(page).toHaveURL(new RegExp(`t=${other.id}`));
+  await expect(rows(page)).toHaveCount(20);
+  const second = row(page, 2).locator(".rk-row");
   await second.focus();
   await page.keyboard.press("Enter");
   await expect(page.locator("#place-h")).toBeFocused();
@@ -266,21 +245,21 @@ test("keyboard alone reaches the pickers, the top 10, the scorecard and the slid
   await page.locator("#back-find").focus();
   await page.keyboard.press("Enter");
   await expect(page.locator("#find-h")).toBeFocused();
-  await page.locator("#hand summary").focus();
+  await page.locator("#weights > summary").focus();
   await page.keyboard.press("Enter");
-  const slider = page.locator("#sliders input").first();
+  const slider = page.locator("#sliders input:not([disabled])").first();
   await slider.focus();
   const before = await slider.inputValue();
   await page.keyboard.press("ArrowRight");
   expect(await slider.inputValue()).not.toBe(before);
-  await expect(page.locator('.presets [data-filter="__hand"]')).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#w-mine")).toBeVisible();
 });
 
 test("two-column Finder with the list beside the map, and no scorecard on it", async ({ page }, info) => {
   await ready(page);
   await expect(page.locator(".tglobe, #link, .card, #card")).toHaveCount(0);
   if (info.project.name !== "laptop") return;
-  const [l, e] = await Promise.all([page.locator(".ledger-col").boundingBox(), page.locator(".earth-col").boundingBox()]);
+  const [l, e] = await Promise.all([page.locator(".fd-side").boundingBox(), page.locator(".earth-col").boundingBox()]);
   expect(l!.x + l!.width).toBeLessThanOrEqual(e!.x + 1);
   expect(Math.abs(l!.y - e!.y)).toBeLessThan(2);
   await expect(page.locator(".status .maplibregl-ctrl-scale")).toBeVisible();
@@ -289,17 +268,17 @@ test("two-column Finder with the list beside the map, and no scorecard on it", a
 test("list rows and map pins highlight each other, and the map can fly back to the pick", async ({ page }, info) => {
   test.skip(info.project.name !== "laptop", "hover is a laptop check");
   await ready(page);
-  await expect(page.locator(".pin")).toHaveCount(10);
-  const row = rows(page).nth(3);
-  const id = await row.getAttribute("data-i");
-  await row.hover();
+  await expect(page.locator(".pin")).toHaveCount(20);
+  const fourth = row(page, 4);
+  const id = await fourth.getAttribute("data-i");
+  await fourth.hover();
   await expect(page.locator(`.pin.hot[data-i="${id}"]`)).toHaveCount(1);
-  await row.locator(".row").focus();
+  await fourth.locator(".rk-row").focus();
   await expect(page.locator(`.pin.hot[data-i="${id}"]`)).toHaveCount(1);
-  const pin = page.locator(`.pin[data-i="${await rows(page).nth(0).getAttribute("data-i")}"]`);
+  const pin = page.locator(`.pin[data-i="${await row(page, 1).getAttribute("data-i")}"]`);
   await pin.dispatchEvent("mouseenter");
-  await expect(page.locator("#ledger li.hot")).toHaveCount(1);
-  await expect(rows(page).nth(0)).toHaveClass(/hot/);
+  await expect(page.locator("#rank li.hot")).toHaveCount(1);
+  await expect(row(page, 1)).toHaveClass(/hot/);
   await expect(page.locator("#back")).toBeHidden();
   for (let k = 0; k < 3; k++) await page.locator(".maplibregl-ctrl-zoom-in").click();
   const box = (await page.locator("#earth").boundingBox())!;
@@ -354,7 +333,7 @@ test("page nav fits, marks the current page, and links open folded blocks", asyn
   await expect(page.locator("#terrain")).toBeInViewport();
   await page.locator("#benchmarks a[href='#explore']").first().click();
   await expect(page).toHaveURL(/#\/find/);
-  await expect(rows(page)).toHaveCount(10);
+  await expect(rows(page)).toHaveCount(20);
   await page.goto("/#/checks");
   await page.locator(".run-hist a[href='#second-run']").click();
   await expect(page.locator("#second-run")).toBeVisible();
@@ -392,7 +371,7 @@ test("each check of the current run is a bar against its pass mark, failed first
   if (cs.some((c) => c.passed == null)) await expect(box.locator(".not-run")).toBeVisible();
 });
 
-test("the guided tour steps through the Finder and closes on Escape", async ({ page }) => {
+test("the guided tour starts from the Finder, steps on, and closes on Escape", async ({ page }) => {
   await ready(page);
   await page.locator("#tour").click();
   const box = page.locator(".tour-box");

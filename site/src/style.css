@@ -213,15 +213,6 @@ option {
   font-size: 14px;
 }
 
-.stage {
-  display: grid;
-  grid-template-columns: clamp(340px, 26vw, 380px) minmax(0, 1fr);
-  grid-template-areas: "ledger earth";
-  height: clamp(380px, calc(100vh - 64px - var(--bar, 120px) - 160px), 1000px);
-  height: clamp(380px, calc(100svh - 64px - var(--bar, 120px) - 160px), 1000px);
-  border-bottom: 1px solid var(--rule);
-}
-
 .ledger-col {
   grid-area: ledger;
   overflow-y: auto;
@@ -241,117 +232,13 @@ option {
   background: var(--space);
 }
 
-.col-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 10px;
-  padding: 14px 16px 10px;
-  border-bottom: 1px solid var(--rule);
-}
-
-.col-head h2,
 .c-block h4,
-.controls .ctl > span,
-.hand summary,
 .lg-title {
   font: 650 12px/1.2 var(--display);
   font-stretch: 85%;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-2);
-}
-
-.ledger {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.ledger li {
-  border-bottom: 1px solid var(--rule);
-}
-
-.ledger .empty {
-  padding: 16px;
-  color: var(--ink-2);
-}
-
-.row {
-  all: unset;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-columns: 26px minmax(0, 1fr) 54px;
-  grid-template-areas: "n name score" "n meta score";
-  gap: 1px 10px;
-  width: 100%;
-  min-height: 56px;
-  padding: 9px 14px 9px 12px;
-  cursor: pointer;
-  border-left: 2px solid transparent;
-  transition: background-color 0.15s;
-}
-
-.row:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.row:focus-visible {
-  outline: 2px solid var(--signal);
-  outline-offset: -2px;
-}
-
-.row.on {
-  border-left-color: var(--signal);
-  background: rgba(2, 151, 222, 0.12);
-}
-
-.r-n {
-  grid-area: n;
-  font: 700 17px/1.2 var(--display);
-  font-stretch: 80%;
-  color: var(--ink-3);
-}
-
-.row.on .r-n {
-  color: var(--signal);
-}
-
-.r-name {
-  grid-area: name;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.r-meta {
-  grid-area: meta;
-  font-size: 12.5px;
-  color: var(--ink-3);
-}
-
-.r-score {
-  grid-area: score;
-  text-align: right;
-  align-self: center;
-}
-
-.r-score b {
-  display: block;
-  font: 700 22px/1 var(--display);
-  font-stretch: 85%;
-}
-
-.r-score i {
-  display: block;
-  height: 3px;
-  margin-top: 6px;
-  background: linear-gradient(90deg, var(--c) var(--w), rgba(255, 255, 255, 0.12) var(--w));
-}
-
-.controls {
-  padding: 14px 16px 20px;
-  display: grid;
-  gap: 12px;
 }
 
 .ctl {
@@ -425,33 +312,6 @@ option {
 
 .switch span {
   font-weight: 600;
-}
-
-.hand summary {
-  cursor: pointer;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-}
-
-.slider {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 120px 20px;
-  align-items: center;
-  gap: 10px;
-  min-height: 40px;
-  font-size: 14px;
-}
-
-.slider input {
-  accent-color: var(--signal);
-  width: 100%;
-  min-height: 32px;
-}
-
-.slider output {
-  text-align: right;
-  font-weight: 700;
 }
 
 .legend {
@@ -1229,9 +1089,6 @@ ul.plain li {
 }
 
 @media (max-width: 1099px) {
-  .stage {
-    grid-template-columns: 300px minmax(0, 1fr);
-  }
 
   .tagline {
     display: none;
@@ -1266,12 +1123,6 @@ ul.plain li {
 
   .ask-sub {
     font-size: 13px;
-  }
-
-  .stage {
-    height: auto;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "earth" "ledger";
   }
 
   .ledger-col {
@@ -1338,10 +1189,6 @@ ul.plain li {
   .labels li {
     grid-template-columns: minmax(0, 1fr);
     gap: 2px;
-  }
-
-  .slider {
-    grid-template-columns: minmax(0, 1fr) 110px 20px;
   }
 
   .page-sec {
@@ -1881,14 +1728,6 @@ ul.plain li {
 
 .pin.sel.hot {
   background: var(--signal);
-}
-
-.ledger li.hot .row {
-  background: rgba(2, 151, 222, 0.12);
-}
-
-.ledger li.hot .r-n {
-  color: var(--signal);
 }
 
 .match {

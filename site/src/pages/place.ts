@@ -15,9 +15,9 @@ export function place(ctx: Ctx): Page {
       el = root;
       el.innerHTML = `<section class="place match" id="match" aria-labelledby="place-h">
         <div class="match-head">
-          <p class="back-find"><a id="back-find" href="#/find">Back to the Finder</a></p>
+          <p class="back-find"><a id="back-find" href="#/find">Go back to the Finder</a></p>
           <h1 class="tcap" id="place-h" tabindex="-1">A match on Earth</h1>
-          <details class="ask-note"><summary>About this filter and target</summary><p class="ask-sub" id="ask-sub"></p></details>
+          <details class="ask-note"><summary>About this preset and base site</summary><p class="ask-sub" id="ask-sub"></p></details>
         </div>
         <div class="card-wrap" id="card" tabindex="-1" aria-live="polite"></div>
       </section>`;
@@ -39,9 +39,9 @@ export function place(ctx: Ctx): Page {
       el.querySelector("#place-h")!.innerHTML = `<span class="tc-body">${BODY[t.body]}</span><span class="tc-k">A match on Earth for</span><b>${esc(t.name)}</b><span>${latlon(t.lat, t.lon, 2)}</span>${
         t.regions?.length ? `<span class="muted">+ ${t.regions.length} candidate regions</span>` : ""
       }`;
-      el.querySelector("#ask-sub")!.innerHTML = `<b>${esc(s.hand ? "Your own weights" : f.name)}:</b> ${esc(s.hand ? "you set how much each challenge counts." : f.plain)} <span class="muted">${esc(t.name)}: ${esc(t.anchor_note)}</span>`;
+      el.querySelector("#ask-sub")!.innerHTML = `<b>${esc(s.hand ? "Your own weights" : f.name)}:</b> ${esc(s.hand ? "you set the weight of each challenge." : f.plain)} <span class="muted">${esc(t.name)}: ${esc(t.anchor_note)}</span>`;
       const box = el.querySelector<HTMLElement>("#card")!;
-      box.innerHTML = `<p class="muted pad" role="status">Loading this place…</p>`;
+      box.innerHTML = `<p class="muted pad" role="status">The place is loading…</p>`;
       try {
         const [d, cols, ranges] = await Promise.all([ctx.data(), ctx.cols(t), ctx.ranges()]);
         if (applied !== key) return;
@@ -65,7 +65,7 @@ export function place(ctx: Ctx): Page {
         name = placeName(m, d.cells, s.cell);
       } catch (e) {
         applied = "";
-        box.innerHTML = `<p class="pad" role="alert">The data files could not be loaded (${esc((e as Error).message)}). Please check your connection and reload the page.</p>`;
+        box.innerHTML = `<p class="pad" role="alert">The data files did not load (${esc((e as Error).message)}). Make sure that you are online, then reload the page.</p>`;
       }
     },
   };

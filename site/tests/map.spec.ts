@@ -8,16 +8,17 @@ const main = m.targets.find((x) => x.default) ?? m.targets[0];
 const filter = m.filters[0];
 const { cells, t } = cols(m, main.id);
 const score = t[`score:${filter.id}`];
-const rows = (p: Page) => p.locator("#ledger li[data-i]");
+const rows = (p: Page) => p.locator("#rank li[data-i]");
 const legend = (p: Page) => p.locator("#legend");
 const card = (p: Page) => p.locator(".hovercard");
 const pop = (p: Page) => p.locator(".mpop");
-const nameOf = async (p: Page, i: number) => (await rows(p).nth(i).locator(".r-name").innerText()).replace(/\s*(rarely used|ice sheet)\s*/gi, "").trim();
+const row = (p: Page, r: number) => p.locator(`#rank li[data-rank="${r}"]`);
+const nameOf = async (p: Page, i: number) => (await row(p, i + 1).locator(".rk-name").innerText()).trim();
 
 async function ready(p: Page) {
   await p.goto(`/#/find?t=${main.id}&f=${filter.id}`);
-  await expect(rows(p)).toHaveCount(10);
-  await expect(p.locator(".pin")).toHaveCount(10);
+  await expect(rows(p)).toHaveCount(20);
+  await expect(p.locator(".pin")).toHaveCount(20);
 }
 
 const ranked = score.filter((v) => !Number.isNaN(v)).length;
@@ -58,7 +59,7 @@ test("the terrain filter still applies on top of the zones", async ({ page }) =>
 test("hovering pin 1 shows the same place as list row 1, and the card leaves the pin clear", async ({ page }, info) => {
   test.skip(info.project.name !== "laptop", "hover is a laptop check");
   await ready(page);
-  const id = Number(await rows(page).nth(0).getAttribute("data-i"));
+  const id = Number(await row(page, 1).getAttribute("data-i"));
   const name = await nameOf(page, 0);
   const pin = page.locator(`.pin[data-i="${id}"]`);
   await pin.hover();
@@ -66,7 +67,7 @@ test("hovering pin 1 shows the same place as list row 1, and the card leaves the
   await expect(card(page).locator(".hc-name")).toHaveText(`#1 ${name}`);
   await expect(card(page).locator(".hc-ll")).toContainText(latlon(cells.lat[id], cells.lon[id], 2));
   await expect(card(page).locator(".hc-score")).toHaveText(`${score100(score[id])} / 100 match score`);
-  await expect(rows(page).nth(0).locator(".r-score b")).toHaveText(score100(score[id]));
+  await expect(row(page, 1).locator(".rk-score b")).toHaveText(score100(score[id]));
   await expect(card(page)).toContainText("Click to open");
   await expect(card(page)).not.toContainText("%");
   const fresh = cells.nearest_analog_km[id] > (m.scoring.rare_km ?? 100);
@@ -82,19 +83,19 @@ test("hovering pin 1 shows the same place as list row 1, and the card leaves the
   expect(c!.y + c!.height).toBeLessThanOrEqual(e!.y + e!.height);
   await page.keyboard.press("Escape");
   await expect(card(page)).toBeHidden();
-  await page.locator("#ledger-h").hover();
+  await page.locator("#find-h").hover();
   await pin.hover();
   await expect(card(page)).toBeVisible();
-  await page.locator("#ledger-h").hover();
+  await page.locator("#find-h").hover();
   await expect(card(page)).toBeHidden();
 });
 
 test("hovering a list row shows the card beside that row's pin", async ({ page }, info) => {
   test.skip(info.project.name !== "laptop", "hover is a laptop check");
   await ready(page);
-  const row = rows(page).nth(2);
-  const id = Number(await row.getAttribute("data-i"));
-  await row.hover();
+  const third = row(page, 3);
+  const id = Number(await third.getAttribute("data-i"));
+  await third.hover();
   await expect(card(page)).toBeVisible();
   await expect(card(page).locator(".hc-name")).toHaveText(`#3 ${await nameOf(page, 2)}`);
   const [c, p] = await Promise.all([card(page).boundingBox(), page.locator(`.pin[data-i="${id}"]`).boundingBox()]);
@@ -103,20 +104,20 @@ test("hovering a list row shows the card beside that row's pin", async ({ page }
   expect(cx >= c!.x && cx <= c!.x + c!.width && cy >= c!.y && cy <= c!.y + c!.height).toBe(false);
   const gap = Math.max(c!.x - cx, cx - (c!.x + c!.width), c!.y - cy, cy - (c!.y + c!.height));
   expect(gap).toBeLessThan(60);
-  await page.locator("#ledger-h").hover();
+  await page.locator("#find-h").hover();
   await expect(card(page)).toBeHidden();
 });
 
 test("the top three pins carry a name and score label", async ({ page }) => {
   await ready(page);
   await expect(page.locator(".pin-tag")).toHaveCount(3);
-  const id = Number(await rows(page).nth(0).getAttribute("data-i"));
+  const id = Number(await row(page, 1).getAttribute("data-i"));
   await expect(page.locator(`.pin-tag[data-i="${id}"]`)).toContainText(`${score100(score[id])} / 100`);
 });
 
 test("clicking a pin opens a popup, and Details opens that place", async ({ page }, info) => {
   await ready(page);
-  const id = Number(await rows(page).nth(0).getAttribute("data-i"));
+  const id = Number(await row(page, 1).getAttribute("data-i"));
   const name = await nameOf(page, 0);
   await expect(card(page)).toBeHidden();
   const pin = page.locator(`.pin[data-i="${id}"]`);
@@ -138,7 +139,7 @@ test("clicking a pin opens a popup, and Details opens that place", async ({ page
 
 test("the popup closes with ×, Escape and a click elsewhere", async ({ page }, info) => {
   await ready(page);
-  const pin = page.locator(`.pin[data-i="${await rows(page).nth(0).getAttribute("data-i")}"]`);
+  const pin = page.locator(`.pin[data-i="${await row(page, 1).getAttribute("data-i")}"]`);
   const open = async () => {
     if (info.project.name === "phone") await pin.tap();
     else await pin.click();
@@ -151,15 +152,15 @@ test("the popup closes with ×, Escape and a click elsewhere", async ({ page }, 
   await page.keyboard.press("Escape");
   await expect(pop(page)).toBeHidden();
   await open();
-  await page.locator("#ledger-h").click();
+  await page.locator("#find-h").click();
   await expect(pop(page)).toBeHidden();
   await expect(page).toHaveURL(/#\/find/);
 });
 
 test("list rows stay plain links to the Place page", async ({ page }) => {
   await ready(page);
-  const id = await rows(page).nth(1).getAttribute("data-i");
-  await rows(page).nth(1).locator(".row").click();
+  const id = await row(page, 2).getAttribute("data-i");
+  await row(page, 2).locator(".rk-row").click();
   await expect(page).toHaveURL(new RegExp(`#/place\\?.*c=${id}`));
 });
 
@@ -167,7 +168,7 @@ test("the hover card works with NASA GIBS tiles blocked", async ({ page }, info)
   test.skip(info.project.name !== "laptop", "hover is a laptop check");
   await page.route("**://gibs.earthdata.nasa.gov/**", (r) => r.abort());
   await ready(page);
-  await rows(page).nth(0).hover();
+  await row(page, 1).hover();
   await expect(card(page)).toBeVisible();
   await expect(card(page)).toHaveClass(/noimg/);
   await expect(card(page).locator(".hc-score")).toBeVisible();

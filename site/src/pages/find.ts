@@ -1,16 +1,18 @@
 import type { Manifest } from "../contract";
 import type { Cols, Data } from "../data";
 import type { Earth, Top } from "../earth";
-import { BODY, isIce, placeName, terrainOf } from "../card";
+import { BODY, placeName, terrainOf } from "../card";
 import { esc, latlon, num, reduced, score100, webgl } from "../format";
-import { colour, gradient } from "../ramp";
+import { gradient } from "../ramp";
 import { icon } from "../icons";
-import { rankOf, top } from "../score";
+import { rankOf } from "../score";
 import { focus, type Zones } from "../zones";
 import { createHoverCard, createPopup, type HoverCard, type Popup } from "../hovercard";
-import { tour } from "../tour";
+import { isNew, spread } from "../rank";
+import { compare, fmtMul, key, list, rules, sliders, summary, type View } from "../ranklist";
+import { tourButton } from "../tour";
 import { go, setQuery, type Page } from "../router";
-import { filterOf, query, rankedOf, readState, scoreOf, targetOf, weightsOf, type Ctx, type State } from "./ctx";
+import { filterOf, query, rankedOf, readState, scoreOf, targetOf, type Ctx, type State } from "./ctx";
 
 const SHARES: [number, string][] = [
   [0.01, "1%"],
@@ -21,79 +23,65 @@ const SHARES: [number, string][] = [
 ];
 const shareTitle = (v: number) => (v >= 1 ? "All ranked land" : `Best ${SHARES.find(([x]) => x === v)?.[1] ?? `${v * 100}%`} of land`);
 
-const TEST_ICON: Record<string, string> = { rover: "surface", life_support: "resources", habitat: "shelter" };
-const GIBS_BM = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8";
+const presets = (m: Manifest) => [...m.filters].sort((a, b) => Number(b.id === "balanced") - Number(a.id === "balanced"));
 
-function groundThumb(lat: number, lon: number) {
-  const bx = ((lon + 180) / 360) * 100;
-  const by = ((90 - lat) / 180) * 100;
-  const base = `<span class="r-thumb" aria-hidden="true" style="background-position:${bx.toFixed(2)}% ${by.toFixed(2)}%">`;
-  if (Math.abs(lat) > 84) return `${base}</span>`;
-  const n = 32;
-  const x = ((lon + 180) / 360) * n;
-  const y = ((1 - Math.asinh(Math.tan((lat * Math.PI) / 180)) / Math.PI) / 2) * n;
-  const tx = Math.floor(x);
-  const ty = Math.floor(y);
-  const at = (f: number) => Math.max(-46, Math.min(0, 23 - f * 92));
-  return `${base}<img src="${GIBS_BM}/5/${ty}/${tx}.jpeg" alt="" loading="lazy" decoding="async" style="left:${at(x - tx).toFixed(1)}px;top:${at(y - ty).toFixed(1)}px" onerror="this.remove()"></span>`;
-}
-
-const html = (m: Manifest) => `<section id="explore" class="explore" aria-labelledby="find-h">
-  <div class="bar">
-    <h1 class="now" id="find-h" tabindex="-1" aria-live="polite">Earth's best places for this base site</h1>
-    <a class="now-change" id="now-change" href="#ch-moon">Change the base site</a>
-    <button type="button" class="tour-btn" id="tour"><i aria-hidden="true"></i>Guided tour</button>
-    <div class="pickrow"><span class="pk" id="pk-t">Base site</span><div class="chips" data-chips="target" role="group" aria-labelledby="pk-t">${(["moon", "mars"] as const)
-      .map((b) => {
-        const ts = m.targets.filter((t) => t.body === b);
-        return ts.length
-          ? `<span class="chip-group"><span class="chip-k k-${b}">${BODY[b]}</span>${ts
-              .map((t) => `<button type="button" class="chip" data-target="${esc(t.id)}" aria-pressed="false">${esc(t.short)}</button>`)
-              .join("")}</span>`
-          : "";
-      })
-      .join("")}</div></div>
-    <div class="presets"><p class="pk" id="pk-f">What are you testing?</p><div class="chips tests" data-chips="filter-rich" role="group" aria-labelledby="pk-f"></div></div>
-  </div>
-  <div class="stage">
-    <aside class="ledger-col" aria-labelledby="ledger-h">
-      <div class="col-head"><h2 id="ledger-h" tabindex="-1">Top 10 on Earth</h2><span class="muted small" id="ledger-note" aria-live="polite"></span></div>
-      <ol class="ledger" id="ledger"><li class="empty" role="status">Ranking Earth's land…</li></ol>
-      <div class="controls">
+const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby="find-h">
+  <aside class="fd-side" aria-label="Ranked places and controls">
+    <span class="fd-grip" aria-hidden="true"></span>
+    <header class="fd-head">
+      <h1 id="find-h" tabindex="-1">Earth's best places for this base site</h1>
+      <button type="button" class="tour-btn" id="tour"><i aria-hidden="true"></i>Guided tour</button>
+      <div class="fd-site">
+        <label class="fd-pick"><span class="sr">Base site</span><i class="fd-dot" aria-hidden="true"></i><select id="pick-target">${(["moon", "mars"] as const)
+          .map((b) => `<optgroup label="${BODY[b]}">${m.targets.filter((t) => t.body === b).map((t) => `<option value="${esc(t.id)}">${esc(t.short)}</option>`).join("")}</optgroup>`)
+          .join("")}</select></label>
+        <a class="fd-change" id="now-change" href="#ch-moon">Change</a>
+      </div>
+    </header>
+    <div class="fd-block fd-sum" id="summary" aria-live="polite"><p class="sum-k">The list is loading…</p></div>
+    <p class="fd-rules" id="rules"></p>
+    <div class="presets" role="group" aria-label="Rank by">${presets(m)
+      .map((f) => `<button type="button" data-filter="${esc(f.id)}" aria-pressed="false" title="${esc(f.plain)}">${esc(f.name)}</button>`)
+      .join("")}</div>
+    <details class="fd-block fd-w" id="weights">
+      <summary><span>Filters and weights</span><span class="w-mine" id="w-mine" hidden>your weights</span>${icon("chevron")}</summary>
+      <div class="fd-w-in">
         <label class="ctl"><span>Terrain type</span><select id="pick-type"><option value="">All land</option>${m.terrain_types
           .filter((t) => t.key !== "none")
           .map((t) => `<option value="${t.id}">${esc(t.name)} (${num(t.cells)} cells)</option>`)
           .join("")}</select></label>
         <label class="ctl switch"><input type="checkbox" id="pick-yr" role="switch"><span>Year-round testing</span></label>
-        <p class="small muted" id="yr-note"></p>
-        <details class="hand" id="hand"><summary>Set weights by hand</summary><div id="sliders"></div>
-          <button type="button" class="btn" id="hand-reset">Back to the mission filter</button>
-          <p class="small muted">${esc(m.scoring.rule)}</p>
-        </details>
+        <p class="w-note" id="yr-note"></p>
+        <div class="w-head"><h2>Weights</h2><button type="button" class="sum-link" id="w-reset">Reset</button></div>
+        <p class="w-note">Each slider multiplies the weight that the preset gives to that challenge.</p>
+        <div id="sliders"></div>
       </div>
-    </aside>
-    <div class="earth-col">
-      <div class="earth" id="earth" role="region" aria-label="Map of Earth's land coloured by match. Use the top 10 list for keyboard access."></div>
-      <button type="button" class="back" id="back" hidden>Back to selected</button>
-      <div class="status" id="status"><span class="st-scale" id="st-scale"></span><span class="st-at" id="st-at" aria-hidden="true"></span></div>
-      <div class="legend" id="legend">
-        <p class="lg-title" id="lg-title">${shareTitle(0.02)}</p>
-        <div class="lg-share" role="group" aria-labelledby="lg-title">${SHARES.map(
-          ([v, t]) => `<button type="button" data-share="${v}" aria-pressed="${v === 0.02}">${t}</button>`,
-        ).join("")}</div>
-        <div class="lg-scale"><div class="lg-bar" style="background:${gradient()}"></div><div class="lg-ticks"><span>0</span><span>50</span><span>100</span></div></div>
-        <label class="lg-range"><span>Match layer</span><input type="range" id="pick-strength" min="0" max="100" step="5" value="100"><output id="strength-out">100%</output></label>
-        <details class="lg-more"><summary>${icon("info")}About the colours</summary><div class="lg-pop">
-          <p class="lg-text">Only the best places are coloured: the share of ranked land you pick above, with a glowing line around each zone. Pick "All land" to colour every ranked cell.</p>
-          <p class="lg-text">The colour is the match score: a weighted mix of the challenge scores, each from how the place's traits rank against all of Earth's land.</p>
-          <p class="lg-faint">With all land shown, weak matches are drawn faint so the ground shows, and grey means not ranked.</p>
-          <p class="lg-pole">The map layer stops at 85° N and S; the list still ranks land beyond it.</p>
-        </div></details>
-      </div>
-      <div class="lg-keys">
-        <label><input type="checkbox" id="pick-labels" checked> <i class="k-analog"></i>Known analogs <i class="k-cave"></i>caves</label>
-        <label><input type="checkbox" id="pick-flat"> Flat map</label>
-      </div>
+    </details>
+    <div class="fd-key" id="key">${key()}</div>
+    <div class="fd-rank" id="rank"><p class="rk-empty" role="status">The list is loading…</p></div>
+    <div class="fd-cmp" id="compare" hidden></div>
+  </aside>
+  <div class="earth-col">
+    <div class="earth" id="earth" role="region" aria-label="Map of the land on Earth. The colour shows the match score. Use the ranked list with the keyboard."></div>
+    <button type="button" class="back" id="back" hidden>Go back to the selected place</button>
+    <div class="status" id="status"><span class="st-scale" id="st-scale"></span><span class="st-at" id="st-at" aria-hidden="true"></span></div>
+    <div class="legend" id="legend">
+      <p class="lg-title" id="lg-title">${shareTitle(0.02)}</p>
+      <div class="lg-share" role="group" aria-labelledby="lg-title">${SHARES.map(
+        ([v, t]) => `<button type="button" data-share="${v}" aria-pressed="${v === 0.02}">${t}</button>`,
+      ).join("")}</div>
+      <div class="lg-scale"><div class="lg-bar" style="background:${gradient()}"></div><div class="lg-ticks"><span>0</span><span>50</span><span>100</span></div></div>
+      <label class="lg-range"><span>Match layer</span><input type="range" id="pick-strength" min="0" max="100" step="5" value="100"><output id="strength-out">100%</output></label>
+      <details class="lg-more"><summary>${icon("info")}About the colours</summary><div class="lg-pop">
+        <p class="lg-text">The map colours only the best places. You select the share of ranked land above. A bright line goes around each zone. Select "All land" to colour all ranked cells.</p>
+        <p class="lg-text">The colour shows the match score. The match score combines the challenge scores. Each challenge score comes from how the traits of the place rank against all land on Earth.</p>
+        <p class="lg-faint">When the map shows all land, weak matches are pale so that you can see the ground. Grey land has no rank.</p>
+        <p class="lg-pole">The map layer stops at 85° N and 85° S. The list also ranks the land past this limit.</p>
+      </div></details>
+    </div>
+    <div class="lg-keys">
+      <label><input type="checkbox" id="pick-labels" checked> <i class="k-analog"></i>Known analogs <i class="k-cave"></i>caves</label>
+      <label><input type="checkbox" id="pick-flat"> Flat map</label>
     </div>
   </div>
 </section>`;
@@ -107,7 +95,7 @@ export function finder(ctx: Ctx): Page {
   let cols: Cols = {};
   let score: Float32Array = new Float32Array(0);
   let ids: number[] = [];
-  let near: number[] = [];
+  let pool = 0;
   let ranked = 0;
   let earth: Earth | null = null;
   let share = 0.02;
@@ -118,20 +106,28 @@ export function finder(ctx: Ctx): Page {
   const hovers = matchMedia("(hover: hover)");
   let terr: Float32Array | undefined;
   let picking = 0;
-  let richBody = "";
+  const shut = new Set<string>();
+  let moved = new Map<number, number>();
+  let fade = 0;
 
   const $ = <T extends HTMLElement>(q: string) => el.querySelector<T>(q)!;
   const target = () => targetOf(m, s);
+  const chs = () => m.challenges[target().body];
+  const base = () => filterOf(m, s).weights[target().body] ?? {};
+  const has = (id: string) => !!cols[`ch:${id}`];
+  const mulOf = (id: string) => {
+    const b = base()[id] ?? 0;
+    return b ? (s.hand?.[id] ?? (s.hand ? 0 : b)) / b : 0;
+  };
   const keep = (i: number) => s.type == null || terr?.[i] === s.type;
   const save = () => {
     applied = query(s, -1);
     setQuery("find", applied);
   };
-  const open = (i: number) => go(`#/place?${query(s, i)}`);
-  const href = (i: number) => `#/place?${esc(query(s, i))}`;
+  const open = (i: number) => go(`#/place?${query({ ...s, cmp: [] }, i)}`);
+  const href = (i: number) => `#/place?${esc(query({ ...s, cmp: [] }, i))}`;
   const info = (i: number) => {
     if (!d || !Number.isFinite(score[i])) return null;
-    const far = d.cells.nearest_analog_km?.[i];
     return {
       list: ids.indexOf(i) + 1,
       rank: rankOf(score, i),
@@ -140,9 +136,24 @@ export function finder(ctx: Ctx): Page {
       lat: d.cells.lat[i],
       lon: d.cells.lon[i],
       score: score[i],
-      fresh: Number.isFinite(far) && far > (m.scoring.rare_km ?? 100),
+      fresh: isNew(m, d.cells, i),
     };
   };
+  const view = (): View => ({
+    m,
+    cells: d!.cells,
+    t: cols,
+    chs: chs(),
+    score,
+    ids,
+    pool,
+    known: s.known,
+    robust: s.hand || s.yr ? null : s.filter,
+    cell: s.cell,
+    cmp: s.cmp,
+    href,
+  });
+
   const paint = () => {
     const focused = share < 1;
     mask = new Uint8Array(score.length);
@@ -169,112 +180,86 @@ export function finder(ctx: Ctx): Page {
     select(false);
     pop?.show(i, p.x, p.y);
   };
-  const named = (i: number) => Number.isFinite(d!.cells.region?.[i]) && !!m.regions[d!.cells.region[i]];
 
-  const richTests = () => {
-    const body = target().body;
-    if (body === richBody) return;
-    richBody = body;
-    const names = new Map(m.challenges[body].map((c) => [c.id, c.name]));
-    $('[data-chips="filter-rich"]').innerHTML =
-      m.filters
-        .map((f) => {
-          const w = Object.entries(f.weights[body] ?? {})
-            .filter(([id, v]) => v > 0 && names.has(id))
-            .sort((x, y) => y[1] - x[1]);
-          const most = Math.max(1, ...w.map(([, v]) => v));
-          return `<button type="button" class="chip test" data-filter="${esc(f.id)}" aria-pressed="false" title="${esc(f.plain)}">${icon(TEST_ICON[f.id] ?? "test")}<span class="test-n">${esc(f.name)}</span><span class="test-p">${esc(f.plain)}</span><span class="test-w">${w
-            .map(([id, v]) => `<span><i style="--w:${(v / most) * 100}%"></i>${esc(names.get(id))}</span>`)
-            .join("")}</span></button>`;
-        })
-        .join("") + `<button type="button" class="chip test" data-filter="__hand" aria-pressed="true" hidden>${icon("test")}<span class="test-n">Your own weights</span><span class="test-p">You set how much each challenge counts.</span></button>`;
-  };
-
-  const renderFilters = () => {
-    richTests();
-    for (const b of el.querySelectorAll<HTMLButtonElement>("[data-target]")) b.setAttribute("aria-pressed", String(b.dataset.target === s.target));
-    for (const b of el.querySelectorAll<HTMLButtonElement>("[data-filter]")) {
-      const hand = b.dataset.filter === "__hand";
-      if (hand) b.hidden = !s.hand;
-      b.setAttribute("aria-pressed", String(s.hand ? hand : b.dataset.filter === s.filter));
-    }
+  const renderControls = () => {
+    const t = target();
+    $<HTMLSelectElement>("#pick-target").value = s.target;
+    $(".fd-dot").dataset.body = t.body;
+    for (const b of el.querySelectorAll<HTMLButtonElement>("[data-filter]")) b.setAttribute("aria-pressed", String(b.dataset.filter === s.filter));
     const yr = $<HTMLInputElement>("#pick-yr");
     $<HTMLSelectElement>("#pick-type").value = s.type == null ? "" : String(s.type);
     yr.checked = s.yr && !s.hand;
     yr.disabled = !!s.hand;
     $("#yr-note").textContent = s.hand
-      ? "Year-round scores are worked out ahead for the mission filters only, so this switch is off with hand-set weights."
+      ? "We calculated year-round scores only for the presets. This switch is off when you set the weights."
       : m.scoring.yearround_rule;
-    const t = target();
-    $("#find-h").innerHTML = `Earth's best places for <b>${esc(t.name)}</b> <span class="now-f">· ${esc(s.hand ? "Your own weights" : filterOf(m, s).name)}</span>`;
+    $("#w-mine").hidden = !s.hand;
+    $("#find-h").innerHTML = `Earth's best places for <b>${esc(t.name)}</b>`;
     $<HTMLAnchorElement>("#now-change").href = `#ch-${t.body}`;
+    $<HTMLAnchorElement>("#now-change").setAttribute("aria-label", `Select a different base site in the ${BODY[t.body]} part of Home`);
   };
 
   const renderSliders = () => {
-    const w = weightsOf(m, s);
-    $("#sliders").innerHTML = m.challenges[target().body]
-      .map(
-        (c) => `<label class="slider"><span>${esc(c.name)}</span><input type="range" min="0" max="5" step="1" value="${w[c.id] ?? 0}" data-ch="${esc(c.id)}" aria-label="Weight for ${esc(
-          c.name,
-        )}"><output>${num(w[c.id] ?? 0)}</output></label>`,
-      )
-      .join("");
+    const b = base();
+    $("#sliders").innerHTML = sliders(chs().map((c) => ({ c, base: b[c.id] ?? 0, mul: mulOf(c.id), has: has(c.id) })));
   };
 
-  const ledger = () => {
-    const list = $("#ledger");
-    const before = new Map([...list.querySelectorAll<HTMLElement>("li")].map((li) => [li.dataset.i!, li.getBoundingClientRect().top]));
-    const cells = d!.cells;
-    list.innerHTML = ids.length
-      ? ids
-          .map((i, r) => {
-            const tt = m.terrain_types.find((x) => x.id === terr?.[i]);
-            const far = cells.nearest_analog_km?.[i];
-            return `<li data-i="${i}"><a class="row${i === s.cell ? " on" : ""}" href="${href(i)}"${i === s.cell ? ' aria-current="true"' : ""}>
-              <span class="r-n">${r + 1}</span>
-              ${groundThumb(cells.lat[i], cells.lon[i])}
-              <span class="r-name">${esc(placeName(m, cells, i))}${Number.isFinite(far) && far > 100 ? ` <span class="rare" title="${num(far)} km from the nearest known analog">rarely used</span>` : ""}${isIce(cells, i) ? ` <span class="tag ice">ice sheet</span>` : ""}</span>
-              <span class="r-meta">${[
-                named(i) ? latlon(cells.lat[i], cells.lon[i], 2) : "",
-                tt && tt.key !== "none" ? esc(tt.name) : "",
-                near[r] ? `<span class="r-near" title="${num(near[r])} more ${near[r] === 1 ? "cell" : "cells"} within 150 km of this one ${near[r] === 1 ? "scores" : "score"} high enough for this list. The map shows them all.">+${num(near[r])} ${near[r] === 1 ? "cell" : "cells"} next to it</span>` : "",
-              ]
-                .filter(Boolean)
-                .join(" · ")}</span>
-              <span class="r-score" style="--w:${score[i] * 100}%;--c:${colour(score[i])}"><b>${score100(score[i])}</b></span>
-            </a></li>`;
-          })
-          .join("")
-      : `<li class="empty">No ranked land for this choice. ${s.type != null ? "Try all land in the terrain filter." : ""}</li>`;
-    $("#ledger-note").textContent = `${num(ranked)} cells ranked for ${target().short}`;
-    if (reduced()) return;
-    for (const li of list.querySelectorAll<HTMLElement>("li[data-i]")) {
+  const renderCompare = () => {
+    const box = $("#compare");
+    box.hidden = !s.cmp.length;
+    box.innerHTML = d ? compare(view()) : "";
+  };
+
+  const renderList = (animate: boolean) => {
+    const box = $("#rank");
+    const before = new Map([...box.querySelectorAll<HTMLElement>("li[data-i]")].map((li) => [li.dataset.i!, li.getBoundingClientRect().top]));
+    const v = view();
+    $("#summary").innerHTML = summary(v);
+    $("#rules").textContent = rules(v);
+    box.innerHTML = list(v, shut, moved);
+    renderCompare();
+    if (!animate || reduced()) return;
+    for (const li of box.querySelectorAll<HTMLElement>("li[data-i]")) {
       const old = before.get(li.dataset.i!);
       const now = li.getBoundingClientRect().top;
-      const dy = old == null ? 12 : old - now;
+      if (!now && !li.offsetHeight) continue;
+      const dy = old == null || !old ? 12 : old - now;
       if (!dy) continue;
       li.animate([{ transform: `translateY(${dy}px)`, opacity: old == null ? 0 : 1 }, { transform: "none", opacity: 1 }], {
-        duration: 360,
+        duration: 420,
         easing: "cubic-bezier(.2,.7,.2,1)",
       });
     }
   };
 
-  const recompute = () => {
+  const recompute = (track = false) => {
+    const prev = new Map(ids.map((i, r) => [i, r]));
     score = scoreOf(m, cols, s, d!.n);
     ranked = rankedOf(score);
-    ({ ids, near } = top(score, 10, d!.cells, keep));
+    ({ ids, pool } = spread(m, score, d!.cells, keep, s.known));
+    moved = new Map();
+    if (track)
+      ids.forEach((i, r) => {
+        const p = prev.get(i);
+        if (p != null && p !== r) moved.set(i, p - r);
+      });
+    clearTimeout(fade);
+    if (moved.size)
+      fade = window.setTimeout(() => {
+        moved = new Map();
+        for (const x of el.querySelectorAll(".rk-move")) x.remove();
+      }, 4000);
     zones = focus(score, share, { lat: d!.cells.lat, lon: d!.cells.lon });
     pop?.hide(false);
     card?.hide();
     paint();
     earth?.top(tops());
-    ledger();
+    renderList(track);
   };
 
   const select = (fly: boolean) => {
     if (s.cell < 0) s.cell = ids[0] ?? -1;
-    for (const a of el.querySelectorAll<HTMLElement>("#ledger .row")) {
+    for (const a of el.querySelectorAll<HTMLElement>("#rank .rk-row")) {
       const on = a.closest("li")!.dataset.i === String(s.cell);
       a.classList.toggle("on", on);
       if (on) a.setAttribute("aria-current", "true");
@@ -286,63 +271,79 @@ export function finder(ctx: Ctx): Page {
   const apply = async (first: boolean) => {
     const t = target();
     const mine = ++picking;
-    for (const b of el.querySelectorAll<HTMLButtonElement>("[data-target]")) {
-      const on = b.dataset.target === s.target;
-      b.setAttribute("aria-pressed", String(on));
-      if (on) b.setAttribute("aria-busy", "true");
-      else b.removeAttribute("aria-busy");
-    }
+    const pick = $<HTMLSelectElement>("#pick-target");
+    pick.value = s.target;
+    pick.setAttribute("aria-busy", "true");
     ctx.site(t);
     const next = await ctx.cols(t).catch(() => null);
     if (mine !== picking) return;
-    for (const b of el.querySelectorAll<HTMLButtonElement>("[aria-busy]")) b.removeAttribute("aria-busy");
+    pick.removeAttribute("aria-busy");
     if (!next) {
-      $("#ledger").innerHTML = `<li class="empty" role="alert">The target file could not be loaded. Please reload the page.</li>`;
+      $("#rank").innerHTML = `<p class="rk-empty" role="alert">The data for this base site did not load. Reload the page.</p>`;
       return;
     }
     cols = next;
-    if (s.hand) s.hand = Object.fromEntries(m.challenges[t.body].map((c) => [c.id, s.hand![c.id] ?? 0]));
-    renderFilters();
+    renderControls();
     renderSliders();
     recompute();
     if (s.cell < 0) s.cell = t.headline?.cell ?? -1;
     select(!first);
   };
 
-  const changed = (keepCell = true) => {
+  const changed = (track = true) => {
     save();
-    renderFilters();
-    recompute();
-    if (!keepCell && !ids.includes(s.cell)) s.cell = -1;
+    renderControls();
+    recompute(track);
     select(true);
   };
 
+  const weigh = (id: string, v: number) => {
+    const b = base();
+    const muls = Object.fromEntries(chs().map((c) => [c.id, mulOf(c.id)]));
+    muls[id] = v;
+    const live = chs().filter((c) => b[c.id] && has(c.id));
+    s.hand = live.every((c) => Math.abs(muls[c.id] - 1) < 1e-6) ? null : Object.fromEntries(live.map((c) => [c.id, Math.round(b[c.id] * muls[c.id] * 100) / 100]));
+  };
+
   const wire = () => {
-    const warm = (e: Event) => {
-      const id = (e.target as HTMLElement).closest<HTMLElement>("[data-target]")?.dataset.target;
-      const t = id ? m.targets.find((x) => x.id === id) : undefined;
-      if (t) void ctx.cols(t).catch(() => {});
-    };
-    el.addEventListener("pointerover", warm, { passive: true });
-    el.addEventListener("focusin", warm);
     el.addEventListener("click", (e) => {
       if (!d) return;
-      const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-target], [data-filter]");
-      if (!b) return;
-      if (b.dataset.target) {
-        if (b.dataset.target === s.target) return;
-        s.target = b.dataset.target;
-        s.cell = -1;
-        save();
-        void apply(false);
+      const t = e.target as HTMLElement;
+      const b = t.closest<HTMLButtonElement>("[data-filter]");
+      if (b) {
+        if (!s.hand && b.dataset.filter === s.filter) return;
+        s.filter = b.dataset.filter!;
+        s.hand = null;
+        renderSliders();
+        changed();
         return;
       }
-      if (b.dataset.filter === "__hand" || (!s.hand && b.dataset.filter === s.filter)) return;
-      s.filter = b.dataset.filter!;
-      s.hand = null;
+      if (t.closest("#known")) {
+        s.known = !s.known;
+        changed(false);
+        return;
+      }
+      if (t.closest("#cmp-clear")) {
+        s.cmp = [];
+        save();
+        renderList(false);
+      }
+    });
+    $<HTMLSelectElement>("#pick-target").addEventListener("change", (e) => {
+      const id = (e.target as HTMLSelectElement).value;
+      if (id === s.target) return;
+      const was = Object.fromEntries(chs().map((c) => [c.id, mulOf(c.id)]));
+      const hand = s.hand;
+      s.target = id;
       s.cell = -1;
-      renderSliders();
-      changed();
+      s.cmp = [];
+      if (hand) {
+        const b = base();
+        const live = chs().filter((c) => b[c.id]);
+        s.hand = live.every((c) => (was[c.id] ?? 1) === 1) ? null : Object.fromEntries(live.map((c) => [c.id, Math.round(b[c.id] * (was[c.id] ?? 1) * 100) / 100]));
+      }
+      save();
+      void apply(false);
     });
     $<HTMLSelectElement>("#pick-type").addEventListener("change", (e) => {
       const v = (e.target as HTMLSelectElement).value;
@@ -355,19 +356,41 @@ export function finder(ctx: Ctx): Page {
     });
     $("#sliders").addEventListener("input", (e) => {
       const t = e.target as HTMLInputElement;
-      if (!t.dataset.ch) return;
-      s.hand = { ...weightsOf(m, s), [t.dataset.ch]: Number(t.value) };
-      t.nextElementSibling!.textContent = t.value;
+      if (!t.dataset.ch || !d) return;
+      const v = Number(t.value);
+      weigh(t.dataset.ch, v);
+      t.parentElement!.querySelector("output")!.textContent = fmtMul(v);
       changed();
     });
-    $("#hand-reset").addEventListener("click", () => {
+    $("#w-reset").addEventListener("click", () => {
+      if (!s.hand || !d) return;
       s.hand = null;
       renderSliders();
       changed();
     });
-    const ledgerEl = $("#ledger");
-    const rowOf = (e: Event) => (e.target as HTMLElement).closest<HTMLElement>("#ledger li[data-i]");
-    ledgerEl.addEventListener("mouseover", (e) => {
+    const rank = $("#rank");
+    rank.addEventListener("change", (e) => {
+      const t = e.target as HTMLInputElement;
+      if (!t.dataset.cmp) return;
+      const i = Number(t.dataset.cmp);
+      s.cmp = t.checked ? [...s.cmp.filter((x) => x !== i), i].slice(-3) : s.cmp.filter((x) => x !== i);
+      save();
+      const full = s.cmp.length >= 3;
+      for (const x of rank.querySelectorAll<HTMLInputElement>("input[data-cmp]")) x.disabled = full && !x.checked;
+      renderCompare();
+    });
+    rank.addEventListener(
+      "toggle",
+      (e) => {
+        const g = e.target as HTMLDetailsElement;
+        if (!g.dataset.group) return;
+        if (g.open) shut.delete(g.dataset.group);
+        else shut.add(g.dataset.group);
+      },
+      true,
+    );
+    const rowOf = (e: Event) => (e.target as HTMLElement).closest<HTMLElement>("#rank li[data-i]");
+    rank.addEventListener("mouseover", (e) => {
       const li = rowOf(e);
       const i = li ? Number(li.dataset.i) : null;
       earth?.hover(i);
@@ -375,6 +398,15 @@ export function finder(ctx: Ctx): Page {
       if (i != null && p) card?.show(i, p.x, p.y);
       else card?.hide();
     });
+    rank.addEventListener("mouseleave", () => {
+      earth?.hover(null);
+      card?.hide();
+    });
+    rank.addEventListener("focusin", (e) => {
+      const li = rowOf(e);
+      if (li) earth?.hover(Number(li.dataset.i));
+    });
+    rank.addEventListener("focusout", () => earth?.hover(null));
     card = createHoverCard($(".earth-col"), { info, open });
     pop = createPopup($(".earth-col"), { info, open, closed: () => {} });
     $("#legend").addEventListener("click", (e) => {
@@ -386,7 +418,7 @@ export function finder(ctx: Ctx): Page {
       paint();
     });
     document.addEventListener("keydown", (e) => {
-      if (e.key !== "Escape" || el.closest("[hidden]") || el.hidden) return;
+      if (e.key !== "Escape" || el.hidden) return;
       card?.hide();
       pop?.hide();
     });
@@ -394,15 +426,6 @@ export function finder(ctx: Ctx): Page {
       const t = e.target as HTMLElement;
       if (pop && pop.open >= 0 && t.isConnected && !t.closest(".mpop, #earth")) pop.hide(false);
     });
-    ledgerEl.addEventListener("mouseleave", () => {
-      earth?.hover(null);
-      card?.hide();
-    });
-    ledgerEl.addEventListener("focusin", (e) => {
-      const li = rowOf(e);
-      if (li) earth?.hover(Number(li.dataset.i));
-    });
-    ledgerEl.addEventListener("focusout", () => earth?.hover(null));
     $("#back").addEventListener("click", () => earth?.back());
     $<HTMLInputElement>("#pick-labels").addEventListener("change", (e) => earth?.labels((e.target as HTMLInputElement).checked));
     $<HTMLInputElement>("#pick-strength").addEventListener("input", (e) => {
@@ -411,19 +434,17 @@ export function finder(ctx: Ctx): Page {
       earth?.strength(v / 100);
     });
     $<HTMLInputElement>("#pick-flat").addEventListener("change", (e) => earth?.flat((e.target as HTMLInputElement).checked));
-    const bar = $(".bar");
-    new ResizeObserver(() => $("#explore").style.setProperty("--bar", `${Math.ceil(bar.offsetHeight)}px`)).observe(bar);
-    tour($("#tour"));
+    tourButton($("#tour"), "find");
   };
 
   const map = (data: Data) => {
     const earthEl = $("#earth");
     if (!webgl()) {
-      earthEl.innerHTML = `<p class="nogl">This browser can't draw the 3D map (WebGL is off). The ranked list and scorecards still work.</p>`;
+      earthEl.innerHTML = `<p class="nogl">This browser cannot show the 3D map because WebGL is off. The ranked list and the match pages work.</p>`;
       return;
     }
     const hot = (i: number | null) => {
-      for (const b of el.querySelectorAll<HTMLElement>("#ledger li[data-i]")) b.classList.toggle("hot", i != null && b.dataset.i === String(i));
+      for (const b of el.querySelectorAll<HTMLElement>("#rank li[data-i]")) b.classList.toggle("hot", i != null && b.dataset.i === String(i));
     };
     Promise.all([import("../earth"), ctx.labels()])
       .then(([mod, labels]) => {
@@ -452,7 +473,7 @@ export function finder(ctx: Ctx): Page {
         earth.flat($<HTMLInputElement>("#pick-flat").checked);
         earth.strength(Number($<HTMLInputElement>("#pick-strength").value) / 100);
       })
-      .catch(() => (earthEl.innerHTML = `<p class="nogl">The map could not be loaded. The ranked list and scorecards still work.</p>`));
+      .catch(() => (earthEl.innerHTML = `<p class="nogl">The map did not load. The ranked list and the match pages work.</p>`));
   };
 
   let ready: Promise<Data | null> = Promise.resolve(null);
@@ -475,7 +496,7 @@ export function finder(ctx: Ctx): Page {
           return data;
         })
         .catch((e) => {
-          $("#ledger").innerHTML = `<li class="empty" role="alert">The data files could not be loaded (${esc((e as Error).message)}). Please check your connection and reload the page.</li>`;
+          $("#rank").innerHTML = `<p class="rk-empty" role="alert">The data files did not load (${esc((e as Error).message)}). Make sure that you are online, then reload the page.</p>`;
           return null;
         });
     },
@@ -491,7 +512,7 @@ export function finder(ctx: Ctx): Page {
       s = next;
       applied = key;
       if (same) {
-        renderFilters();
+        renderControls();
         renderSliders();
         recompute();
         if (s.cell < 0) s.cell = target().headline?.cell ?? -1;

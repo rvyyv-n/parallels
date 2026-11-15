@@ -12,44 +12,44 @@ export const IMAGERY = [
     by: "NASA Earth Observatory via NASA GIBS",
     url: "https://nasa-gibs.github.io/gibs-api-docs/",
     licence: "NASA open data, no restrictions",
-    use: "Earth map background, the 3D Earth in the intro, and the base layer of the Earth close-up. A bundled copy of the same imagery takes over if the tile service is down.",
+    use: "The background of the Earth map, the 3D Earth on Home and the bottom layer of the Earth close-up. If the tile service is down, the site uses its own copy of the same images.",
   },
   {
     name: "Landsat WELD true colour, global annual mosaic (Earth close-up, live tiles)",
     by: "NASA / USGS Landsat, via NASA GIBS",
     url: "https://nasa-gibs.github.io/gibs-api-docs/",
     licence: "NASA open data, no restrictions",
-    use: "Earth side of the close-up in each match. Display only, not scored. Blue Marble shows where it has no data.",
+    use: "The Earth side of the close-up in each match. We show it but do not score it. Where it has no data, Blue Marble shows.",
   },
   {
     name: "LOLA south-pole shaded relief, 87.5° S to the pole (Moon close-up, live tiles)",
     by: "NASA LRO LOLA, via NASA Moon Trek tiles",
     url: "https://trek.nasa.gov/moon/",
     licence: "Public domain (NASA)",
-    use: "Moon side of the close-up. Shaded relief from laser altimetry, not a photo. Display only, not scored.",
+    use: "The Moon side of the close-up. This is shaded relief from laser altimetry, not a photo. We show it but do not score it.",
   },
   {
     name: "CGI Moon Kit: LROC colour map with filled poles",
     by: "NASA Scientific Visualization Studio (LRO data)",
     url: "https://svs.gsfc.nasa.gov/4720",
     licence: "Public domain (NASA)",
-    use: "Surface of the 3D Moon in the Moon chapter on Home, the site pictures in that chapter's list (redrawn as a view from above the pole, with the contrast raised, because the map is very flat near the pole), and the bundled fallback for the Moon close-up. Display only, not scored.",
+    use: "The surface of the 3D Moon in the Moon part of Home, and the site pictures in its list. We draw the site pictures as a view from above the pole with more contrast, because the map is very flat near the pole. The site also uses its own copy as the fallback for the Moon close-up. We show it but do not score it.",
   },
   {
     name: "Viking MDIM 2.1 global colour mosaic",
     by: "NASA / USGS Astrogeology, via NASA Mars Trek tiles",
     url: "https://trek.nasa.gov/mars/",
     licence: "Public domain (NASA / USGS)",
-    use: "Surface of the 3D Mars in the Mars chapter on Home, the site pictures in that chapter's list, and the Mars side of the close-up (live tiles, with a bundled copy as fallback). Display only, not scored.",
+    use: "The surface of the 3D Mars in the Mars part of Home, the site pictures in its list, and the Mars side of the close-up. The close-up uses live tiles, with a copy on the site as the fallback. We show it but do not score it.",
   },
 ];
 
 export const CODE = [
   { name: "MapLibre GL JS", url: "https://maplibre.org/", licence: "BSD-3-Clause", use: "Earth globe and map" },
   { name: "three.js", url: "https://threejs.org/", licence: "MIT", use: "3D Earth, Moon and Mars in the intro" },
-  { name: "Lucide icons 1.73.0", url: "https://lucide.dev/", licence: "ISC", use: "Icons in the match view" },
+  { name: "Lucide icons 1.73.0", url: "https://lucide.dev/", licence: "ISC", use: "Icons on the match page" },
   { name: "Archivo (variable font, by Omnibus-Type)", url: "https://fontsource.org/fonts/archivo", licence: "SIL Open Font Licence 1.1", use: "Headings, labels and numbers" },
-  { name: "Vite and TypeScript", url: "https://vite.dev/", licence: "MIT / Apache-2.0", use: "Building the site" },
+  { name: "Vite and TypeScript", url: "https://vite.dev/", licence: "MIT / Apache-2.0", use: "Tools that build the site" },
 ];
 
 const placeName = (t: ValidationTest, id: string) => t.places.find((p) => p.id === id)?.name ?? id;
@@ -355,8 +355,8 @@ function terrain(m: Manifest) {
     "terrain",
     m.terrain_types.length,
     "Terrain types and clusters",
-    `${num(m.terrain_types.length)} terrain types and ${num(m.clustering.k)} clusters, worked out from the data.`,
-    `<p>Every land cell gets one terrain tag, by rules worked out from the data. <a href="#/find">The Finder</a> filters its map by type.</p>
+    `${num(m.terrain_types.length)} terrain types and ${num(m.clustering.k)} clusters, from the data.`,
+    `<p>Each land cell gets one terrain type. Rules that come from the data set the type. <a href="#/find">The Finder</a> can filter its list and map by type.</p>
     <h3>Terrain types</h3>
     <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Type</th><th scope="col">Rule</th><th scope="col">Cells</th></tr></thead><tbody>${m.terrain_types
       .map((t) => `<tr><th scope="row">${esc(t.name)}</th><td>${esc(t.rule)}</td><td class="n">${num(t.cells)}</td></tr>`)
@@ -370,14 +370,14 @@ function terrain(m: Manifest) {
 
 function challenge(m: Manifest) {
   return {
-    lede: `Our local event's Challenge Guide sets ${num(m.benchmarks.length)} benchmarks and asks ${num(m.questions.length)} questions. Here is how we meet and answer each.`,
+    lede: `The Challenge Guide of our local event gives ${num(m.benchmarks.length)} benchmarks and ${num(m.questions.length)} questions. This part shows how we meet each benchmark and answer each question.`,
     body: `<div class="ch-grid">
     ${block2(
       "benchmarks",
       m.benchmarks.length,
-      "Benchmarks, and how we meet each",
-      "Each in the guide's own words, with where to see it on this site.",
-      `<p class="small muted">In the guide's own words.</p><ol class="bench">${m.benchmarks
+      "Benchmarks, and how we meet them",
+      "Each benchmark in the words of the guide, with a link to where you can see it on this site.",
+      `<p class="small muted">In the words of the guide.</p><ol class="bench">${m.benchmarks
         .map(
           (b) => `<li><span class="b-n">${b.n}</span><div><p class="guide">${esc(b.guide_words)}</p><p>${esc(b.how)}</p><p class="small"><a href="#${WHERE[b.n] ?? "explore"}">${esc(b.where)}</a></p></div></li>`,
         )
@@ -386,7 +386,7 @@ function challenge(m: Manifest) {
     ${block2(
       "questions",
       m.questions.length,
-      "Questions, answered",
+      "Questions and answers",
       "Each question from the guide, with our answer.",
       `<ol class="qs">${m.questions.map((q) => `<li><span class="b-n">${q.n}</span><div><p class="guide">${esc(q.question)}</p><p>${esc(q.answer)}</p></div></li>`).join("")}</ol>`,
     )}
@@ -403,21 +403,21 @@ function data(m: Manifest) {
   const card = (n: number, summary: string, line: string, body: string) =>
     fold(`<span class="cb-n">${num(n)}</span><span class="cb-tx"><span class="cb-t">${summary}</span>${line ? `<span class="cb-s">${line}</span>` : ""}</span>`, body, "d-block");
   return {
-    lede: "Every number on this site traces to a named dataset. NASA data does the main scoring work; partner data is marked.",
+    lede: "Each number on this site comes from a named dataset. NASA data does most of the scoring. A tag shows partner data.",
     body: `<div class="d-grid">
     ${
       b1
-        ? `<div class="archives"><p class="guide">${esc(b1.guide_words)}</p><p>${num(archives.length)} open data archives feed this site: ${archives.map(esc).join(", ")}.</p></div>`
+        ? `<div class="archives"><p class="guide">${esc(b1.guide_words)}</p><p>This site uses data from ${num(archives.length)} open data archives: ${archives.map(esc).join(", ")}.</p></div>`
         : ""
     }
-    ${card(ds.length, "Datasets", "Each with its archive, licence and use.", `<div class="scroll-x"><table class="data ds"><thead><tr><th scope="col">Dataset</th><th scope="col">Agency</th><th scope="col">Archive</th><th scope="col">Licence</th><th scope="col">Used for</th></tr></thead><tbody>${ds
+    ${card(ds.length, "Datasets", "Each dataset with its archive, licence and use.", `<div class="scroll-x"><table class="data ds"><thead><tr><th scope="col">Dataset</th><th scope="col">Agency</th><th scope="col">Archive</th><th scope="col">Licence</th><th scope="col">Used for</th></tr></thead><tbody>${ds
       .map(
         (d) => `<tr><th scope="row">${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>` : esc(d.name)}</th><td>${esc(d.agency)}${
           d.agency === "partner" ? ' <span class="tag">partner</span>' : ""
         }</td><td>${esc(d.archive ?? "")}</td><td>${esc(d.licence)}</td><td>${esc(d.used_for)}</td></tr>`,
       )
       .join("")}</tbody></table></div>`)}
-    ${card(IMAGERY.length, "Imagery shown, not scored", "", `<ul class="plain">${IMAGERY.map((i) => `<li><a href="${i.url}" target="_blank" rel="noopener">${esc(i.name)}</a>, ${esc(i.by)}. ${esc(i.licence)}. ${esc(i.use)}</li>`).join("")}</ul>`)}
+    ${card(IMAGERY.length, "Images that we show but do not score", "", `<ul class="plain">${IMAGERY.map((i) => `<li><a href="${i.url}" target="_blank" rel="noopener">${esc(i.name)}</a>, ${esc(i.by)}. ${esc(i.licence)}. ${esc(i.use)}</li>`).join("")}</ul>`)}
     ${card(CODE.length, "Code and fonts", "", `<ul class="plain">${CODE.map((c) => `<li><a href="${c.url}" target="_blank" rel="noopener">${esc(c.name)}</a>: ${esc(c.licence)}. ${esc(c.use)}.</li>`).join("")}</ul>`)}
     </div>`,
   };
@@ -425,7 +425,7 @@ function data(m: Manifest) {
 
 function limits(m: Manifest) {
   return {
-    lede: `${num(m.not_in_version.length)} things we left out of this version. Open any one to read why.`,
+    lede: `We did not put these ${num(m.not_in_version.length)} items in this version. Open an item to read the reason.`,
     body: `<ul class="lim-grid">${m.not_in_version
       .map((n) => `<li><details><summary>${esc(n.item)}</summary><p>${esc(n.reason)}</p></details></li>`)
       .join("")}</ul>`,

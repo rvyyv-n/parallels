@@ -1,13 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
 import { cols, manifest } from "./helpers";
-import { top } from "../src/score";
+import { spread } from "../src/rank";
 
 const m = manifest();
 const main = m.targets.find((x) => x.default) ?? m.targets[0];
 const f0 = m.filters[0];
 const best = () => {
   const { t, cells } = cols(m, main.id);
-  return top(t[`score:${f0.id}`], 10, cells).ids;
+  return spread(m, t[`score:${f0.id}`], cells, () => true, false).ids;
 };
 const here = (p: Page) => p.locator(".page:not([hidden])");
 const h1 = (p: Page) => here(p).locator("h1");
@@ -63,18 +63,18 @@ test("the nav moves between pages and Back returns to the previous page", async 
 test("each page leaves out what belongs on other pages", async ({ page }) => {
   const c = best()[0];
   const NOT: [string, string[]][] = [
-    ["", ["#ledger", ".card", "#earth", ".run-hist", ".v-checks", "table.ds", "[data-filter]", ".w-analogs"]],
+    ["", ["#rank", ".card", "#earth", ".run-hist", ".v-checks", "table.ds", "[data-filter]", ".w-analogs"]],
     ["find", [".card", ".run-hist", ".v-checks", "table.ds", ".w-analogs"]],
-    [`place?t=${main.id}&f=${f0.id}&c=${c}`, ["#ledger", "#earth", ".run-hist", ".v-checks", "table.ds", ".w-analogs"]],
-    ["checks", ["#ledger", ".card", "#earth", "table.ds", ".w-analogs"]],
-    ["about", ["#ledger", ".card", "#earth", ".run-hist", ".v-checks", ".w-analogs"]],
+    [`place?t=${main.id}&f=${f0.id}&c=${c}`, ["#rank", "#earth", ".run-hist", ".v-checks", "table.ds", ".w-analogs"]],
+    ["checks", ["#rank", ".card", "#earth", "table.ds", ".w-analogs"]],
+    ["about", ["#rank", ".card", "#earth", ".run-hist", ".v-checks", ".w-analogs"]],
   ];
   for (const [path, sels] of NOT) {
     await page.goto("about:blank");
     await page.goto(`/#/${path}`);
     await expect(h1(page)).toBeVisible();
     if (path.startsWith("place")) await expect(page.locator(".card")).toHaveCount(1);
-    if (path === "find") await expect(page.locator("#ledger li[data-i]")).toHaveCount(10);
+    if (path === "find") await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
     if (path === "checks") await expect(page.locator(".run-hist li").first()).toBeVisible();
     if (path === "about") await expect(page.locator("table.ds")).toBeAttached();
     for (const s of sels) expect(await page.locator(s).count(), `${s} on #/${path}`).toBe(0);
@@ -110,7 +110,7 @@ test("each data file loads once, and the map and intro are made once", async ({ 
   await expect(page).toHaveURL(/#\/$/);
   await expect(page.locator("#ch-moon")).toBeInViewport();
   await go(`#/find?t=${main.id}`);
-  await expect(page.locator("#ledger li[data-i]")).toHaveCount(10);
+  await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
   await expect(page.locator("#earth canvas.maplibregl-canvas")).toHaveCount(1);
   await go(`#/place?t=${main.id}&f=${f0.id}&c=${c}`);
   await expect(page.locator(".card")).toHaveCount(1);
@@ -133,7 +133,7 @@ test("settings on the Finder replace the history entry, so Back leaves the page"
   const site = page.locator("#ch-moon a.site").first();
   await site.click();
   await expect(page).toHaveURL(/#\/find\?t=/);
-  await expect(page.locator("#ledger li[data-i]")).toHaveCount(10);
+  await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
   await page.locator("#pick-yr").check({ force: true });
   await expect(page).toHaveURL(/yr=1/);
   await page.locator(`.presets [data-filter="${m.filters[m.filters.length - 1].id}"]`).click();
@@ -149,7 +149,7 @@ test("settings on the Finder replace the history entry, so Back leaves the page"
 test("old shared links open the new pages and leave no old URL behind", async ({ page }) => {
   const f = m.filters[1] ?? f0;
   const { t, cells } = cols(m, main.id);
-  const c = top(t[`score:${f.id}`], 10, cells).ids[4];
+  const c = spread(m, t[`score:${f.id}`], cells, () => true, false).ids[4];
   await page.goto(`/?t=${main.id}&f=${f.id}&c=${c}`);
   await expect(page).toHaveURL(new RegExp(`/#/place\\?t=${main.id}&f=${f.id}&c=${c}$`));
   expect(new URL(page.url()).search).toBe("");
@@ -157,14 +157,14 @@ test("old shared links open the new pages and leave no old URL behind", async ({
   await expect(page.locator("#back-find")).toHaveAttribute("href", new RegExp(`c=${c}`));
   await page.goto(`/?t=${main.id}`);
   await expect(page).toHaveURL(new RegExp(`/#/find\\?t=${main.id}$`));
-  await expect(page.locator(`[data-target="${main.id}"]`)).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#pick-target")).toHaveValue(main.id);
   await page.goto("/#third-run");
   await expect(page).toHaveURL(/#\/checks$/);
   await expect(page.locator("#third-run")).toBeVisible();
   await expect(page.locator("#third-run")).toBeInViewport();
   await page.goto(`/#/place?t=${main.id}`);
   await expect(page).toHaveURL(new RegExp(`#/find\\?t=${main.id}`));
-  await expect(page.locator("#ledger li[data-i]")).toHaveCount(10);
+  await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
 });
 
 test("a plain anchor to another page opens that page at the anchor", async ({ page }) => {
@@ -201,7 +201,7 @@ test("at 390 px every nav item is reachable through the menu and no page scrolls
     await page.goto(`/#/${path}`);
     await expect(h1(page)).toBeVisible();
     if (path.startsWith("place")) await expect(page.locator(".card")).toHaveCount(1);
-    if (path.startsWith("find")) await expect(page.locator("#ledger li[data-i]")).toHaveCount(10);
+    if (path.startsWith("find")) await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
     if (path === "checks") await expect(page.locator(".run-hist li").first()).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth), `#/${path}`).toBeLessThanOrEqual(390);
   }
