@@ -7,13 +7,21 @@ export interface Source {
 
 export function httpSource(base: string): Source {
   const whole = new Map<string, Promise<ArrayBuffer>>();
+  const ask = (file: string, offset: number, length: number, cache: RequestCache) =>
+    fetch(base + file, { headers: { Range: `bytes=${offset}-${offset + length - 1}` }, cache });
   return {
     async bytes(file, offset, length) {
       const full = whole.get(file);
       if (full) return (await full).slice(offset, offset + length);
-      const res = await fetch(base + file, { headers: { Range: `bytes=${offset}-${offset + length - 1}` } });
-      if (!res.ok) throw new Error(`${file}: ${res.status}`);
-      if (res.status === 206) return res.arrayBuffer();
+      let res = await ask(file, offset, length, "default");
+      for (let again = 0; ; again++) {
+        if (!res.ok) throw new Error(`${file}: ${res.status}`);
+        if (res.status !== 206) break;
+        const part = await res.arrayBuffer();
+        if (part.byteLength === length) return part;
+        if (again) throw new Error(`${file}: asked for ${length} bytes, got ${part.byteLength}`);
+        res = await ask(file, offset, length, "no-store");
+      }
       const all = res.arrayBuffer();
       whole.set(file, all);
       return (await all).slice(offset, offset + length);
