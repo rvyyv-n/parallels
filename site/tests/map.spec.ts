@@ -134,7 +134,7 @@ test("clicking a pin opens a popup, and Details opens that place", async ({ page
   await expect(page).toHaveURL(/#\/find/);
   await pop(page).getByRole("button", { name: "Details" }).click();
   await expect(page).toHaveURL(new RegExp(`#/place\\?t=${main.id}&f=${filter.id}.*c=${id}`));
-  await expect(page.locator("#card h3")).toHaveText(name);
+  await expect(page.locator("#place-h")).toHaveText(name);
 });
 
 test("the popup closes with ×, Escape and a click elsewhere", async ({ page }, info) => {

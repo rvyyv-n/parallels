@@ -56,39 +56,47 @@ export const rules = (v: View) =>
 export const key = () =>
   `<p>Each strip shows how close a site is on every challenge:</p><ul>${BANDS.map((b) => `<li><i class="fc ${b.cls}"></i>${b.word}</li>`).join("")}<li><i class="fc b-na"></i>no data</li></ul>`;
 
-export function list(v: View, shut: Set<string>, moved: Map<number, number>): string {
+export function list(v: View, shut: Set<string>, moved: Map<number, number>, byRegion: boolean): string {
   const { m, cells, ids } = v;
   if (!ids.length) return `<p class="rk-empty">No ranked land agrees with these settings.</p>`;
+  const full = v.cmp.length >= 3;
+  const row = (i: number) => {
+    const r = ids.indexOf(i) + 1;
+    const name = placeName(m, cells, i);
+    const keep = v.robust ? v.t[`keep:${v.robust}`]?.[i] : NaN;
+    const d = moved.get(i);
+    const on = v.cmp.includes(i);
+    return `<li class="rk" data-i="${i}" data-rank="${r}"><a class="rk-row${i === v.cell ? " on" : ""}" href="${v.href(i)}"${i === v.cell ? ' aria-current="true"' : ""}>
+      <span class="rk-n">${r}</span>
+      <span class="rk-name">${esc(name)}</span>
+      <span class="rk-badges">${isNew(m, cells, i) ? `<span class="rk-new" title="Not in our list of known analog sites">New</span>` : `<span class="rk-known" title="Within ${num(m.scoring.rare_km ?? 100)} km of a known analog site">Near a known analog</span>`}${
+        Number.isFinite(keep) ? `<span class="rk-stab" title="In the top list in ${num(keep * 100)}% of the robustness tests">${num(keep * 100)}% stable</span>` : ""
+      }${isIce(cells, i) ? `<span class="rk-ice">Ice sheet</span>` : ""}${d ? `<span class="rk-move ${d > 0 ? "up" : "down"}" title="${d > 0 ? "Up" : "Down"} ${Math.abs(d)}">${d > 0 ? "▲" : "▼"}${Math.abs(d)}</span>` : ""}</span>
+      ${chips(v, i)}
+      <span class="rk-score"><b>${score100(v.score[i])}</b> / 100</span>
+    </a><label class="rk-tick"><input type="checkbox" data-cmp="${i}"${on ? " checked" : full ? " disabled" : ""}><span aria-hidden="true">Compare</span><span class="sr">Compare ${esc(name)}</span></label></li>`;
+  };
+  if (!byRegion) return `<ol class="rk-list rk-flat">${ids.map(row).join("")}</ol>`;
   const groups = new Map<string, number[]>();
   for (const i of ids) {
     const g = worldOf(countryOf(m, cells, i));
     groups.set(g, [...(groups.get(g) ?? []), i]);
   }
-  const full = v.cmp.length >= 3;
   return [...groups]
-    .map(([g, rs]) => {
-      const rows = rs
-        .map((i) => {
-          const r = ids.indexOf(i) + 1;
-          const name = placeName(m, cells, i);
-          const keep = v.robust ? v.t[`keep:${v.robust}`]?.[i] : NaN;
-          const d = moved.get(i);
-          const on = v.cmp.includes(i);
-          return `<li class="rk" data-i="${i}" data-rank="${r}"><a class="rk-row${i === v.cell ? " on" : ""}" href="${v.href(i)}"${i === v.cell ? ' aria-current="true"' : ""}>
-            <span class="rk-n">${r}</span>
-            <span class="rk-name">${esc(name)}</span>
-            <span class="rk-badges">${isNew(m, cells, i) ? `<span class="rk-new" title="Not in our list of known analog sites">New</span>` : `<span class="rk-known" title="Within ${num(m.scoring.rare_km ?? 100)} km of a known analog site">Near a known analog</span>`}${
-              Number.isFinite(keep) ? `<span class="rk-stab" title="In the top list in ${num(keep * 100)}% of the robustness tests">${num(keep * 100)}% stable</span>` : ""
-            }${isIce(cells, i) ? `<span class="rk-ice">Ice sheet</span>` : ""}${d ? `<span class="rk-move ${d > 0 ? "up" : "down"}" title="${d > 0 ? "Up" : "Down"} ${Math.abs(d)}">${d > 0 ? "▲" : "▼"}${Math.abs(d)}</span>` : ""}</span>
-            ${chips(v, i)}
-            <span class="rk-score"><b>${score100(v.score[i])}</b> / 100</span>
-          </a><label class="rk-tick"><input type="checkbox" data-cmp="${i}"${on ? " checked" : full ? " disabled" : ""}><span aria-hidden="true">Compare</span><span class="sr">Compare ${esc(name)}</span></label></li>`;
-        })
-        .join("");
-      return `<details class="rk-grp" data-group="${esc(g)}"${shut.has(g) ? "" : " open"}><summary><span class="g-n">${esc(g)}</span><span class="g-m">${rs.length} ${rs.length === 1 ? "site" : "sites"} · best ${score100(v.score[rs[0]])}</span>${icon("chevron")}</summary><ol class="rk-list">${rows}</ol></details>`;
-    })
+    .map(
+      ([g, rs]) =>
+        `<details class="rk-grp" data-group="${esc(g)}"${shut.has(g) ? "" : " open"}><summary><span class="g-n">${esc(g)}</span><span class="g-m">${rs.length} ${rs.length === 1 ? "site" : "sites"} · best ${score100(v.score[rs[0]])}</span>${icon("chevron")}</summary><ol class="rk-list">${rs.map(row).join("")}</ol></details>`,
+    )
     .join("");
 }
+
+export const sortBar = (byRegion: boolean) =>
+  `<span class="rk-sort-k" id="rk-sort-k">Sort</span>${[
+    ["rank", "By rank"],
+    ["region", "By region"],
+  ]
+    .map(([k, t]) => `<button type="button" data-sort="${k}" aria-pressed="${(k === "region") === byRegion}">${t}</button>`)
+    .join("")}`;
 
 export function compare(v: View): string {
   const { m, cells } = v;

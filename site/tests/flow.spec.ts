@@ -41,10 +41,10 @@ test("main flow: pick a site in its world's chapter on Home, pick a filter, open
   const name = await nameOf(page, 2);
   await third.locator(".rk-row").click();
   await expect(page).toHaveURL(new RegExp(`#/place\\?t=${target.id}&f=${filter.id}.*c=${id}`));
-  await expect(page.locator("#place-h")).toContainText(target.name);
-  await expect(page.locator("#card h3")).toHaveText(name);
+  await expect(page.locator(".pl-for")).toContainText(target.name);
+  await expect(page.locator("#place-h")).toHaveText(name);
 
-  await expect(page.locator(".card .o-num b")).not.toBeEmpty();
+  await expect(page.locator(".card .ring b")).not.toBeEmpty();
   await expect(page.locator(".card .ch")).toHaveCount(m.challenges[target.body].length);
   const open = page.locator(".card .ch details[open]");
   await expect(open).toHaveCount(1);
@@ -53,10 +53,10 @@ test("main flow: pick a site in its world's chapter on Home, pick a filter, open
   const vals = await open.locator(".t-vals dd").allInnerTexts();
   expect(vals.some((v) => units.some((u) => v.includes(u)))).toBe(true);
   await expect(open.locator(".t-src").first()).toContainText("Earth");
-  await expect(page.locator(".card h4", { hasText: "Where it breaks" })).toBeVisible();
-  await expect(page.locator(".card h4", { hasText: "Earth cannot copy" })).toBeVisible();
+  await expect(page.locator(".card h2", { hasText: "Where it breaks" })).toBeVisible();
+  await expect(page.locator(".card h2", { hasText: "Earth cannot copy" })).toBeVisible();
   await expect(page.locator(".card .cant tbody tr")).toHaveCount(m.cant_copy.length);
-  await expect(page.locator(".card h4", { hasText: "Seasons" })).toBeVisible();
+  await expect(page.locator(".card h2", { hasText: "Seasons" })).toBeVisible();
 
   await page.locator("#back-find").click();
   await expect(page).toHaveURL(new RegExp(`#/find\\?t=${target.id}&f=${filter.id}`));
@@ -73,10 +73,25 @@ test("a shared link opens the same place", async ({ page }) => {
   await page.goto("about:blank");
   await page.goto(`/?t=${main.id}&f=${f.id}&c=${ids[4]}`);
   await expect(page).toHaveURL(new RegExp(`#/place\\?t=${main.id}&f=${f.id}&c=${ids[4]}$`));
-  await expect(page.locator("#card h3")).toHaveText(name);
+  await expect(page.locator("#place-h")).toHaveText(name);
   await page.locator("#back-find").click();
   await expect(page.locator(`.presets [data-filter="${f.id}"]`)).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(`#rank li[data-i="${ids[4]}"] .rk-row`)).toHaveAttribute("aria-current", "true");
+});
+
+test("Previous and Next on a place step through the Finder's top list for the same settings", async ({ page }) => {
+  const f = m.filters[1] ?? m.filters[0];
+  const { t, cells } = cols(m, main.id);
+  const { ids } = spread(m, t[`score:${f.id}`], cells, () => true, false);
+  await page.goto(`/#/place?t=${main.id}&f=${f.id}&c=${ids[0]}`);
+  await expect(page.locator("#pl-pos")).toContainText(`1 of ${ids.length}`);
+  await expect(page.locator("#pl-prev")).toHaveAttribute("aria-disabled", "true");
+  await page.locator("#pl-next").click();
+  await expect(page).toHaveURL(new RegExp(`#/place\\?t=${main.id}&f=${f.id}&c=${ids[1]}$`));
+  await expect(page.locator("#pl-pos")).toContainText(`2 of ${ids.length}`);
+  await page.locator("#pl-prev").click();
+  await expect(page).toHaveURL(new RegExp(`c=${ids[0]}$`));
+  await expect(page.locator("#back-find")).toHaveAttribute("href", new RegExp(`f=${f.id}.*c=${ids[0]}`));
 });
 
 test("year-round switch reorders the list exactly as the year-round scores say", async ({ page }) => {
