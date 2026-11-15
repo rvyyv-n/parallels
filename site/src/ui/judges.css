@@ -1,0 +1,498 @@
+.judges {
+  min-height: 100svh;
+  padding: 104px var(--pad) 96px;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0, rgba(255, 201, 101, 0.06), transparent 70%),
+    var(--bg);
+  overflow-x: clip;
+}
+
+.judges-col {
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+.judges-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  font-size: 13.5px;
+  color: var(--ink);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.judges-back:hover {
+  border-color: var(--ink);
+  background: rgba(244, 240, 232, 0.05);
+}
+
+.judges-head {
+  margin: 40px 0 8px;
+}
+
+.judges-kicker {
+  font: 500 11.5px/1 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--match);
+}
+
+.judges h1 {
+  margin-top: 14px;
+  font: 400 clamp(44px, 9vw, 76px) / 1 var(--serif);
+  letter-spacing: -0.025em;
+}
+
+.judges-intro {
+  margin-top: 14px;
+  max-width: 36rem;
+  font-size: 16px;
+  color: var(--dim);
+}
+
+.judges-meta {
+  margin-top: 22px;
+  font-size: 13px;
+  color: var(--faint);
+}
+
+.judges-meta span {
+  font-family: var(--mono);
+  color: var(--ink);
+}
+
+.judges-meta i {
+  font-style: normal;
+  margin: 0 6px;
+  color: var(--line-strong);
+}
+
+.judges details > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.judges details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.judges details > summary::after {
+  content: "+";
+  flex: none;
+  margin-left: auto;
+  font: 400 18px/1 var(--mono);
+  color: var(--faint);
+}
+
+.judges details[open] > summary::after {
+  content: "−";
+}
+
+.judges-rule {
+  margin-top: 18px;
+  border-block: 1px solid var(--line);
+}
+
+.judges-rule summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.judges-rule p {
+  padding-bottom: 16px;
+  font-size: 14px;
+  color: var(--dim);
+}
+
+.judges-jump ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.judges-jump a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-size: 13px;
+  color: var(--dim);
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.judges-jump a:hover {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.judges-jump a span {
+  font: 400 11px var(--mono);
+  color: var(--match);
+}
+
+.judges-section {
+  margin-top: 72px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line-strong);
+  scroll-margin-top: 24px;
+}
+
+.judges h2 {
+  font: 400 clamp(28px, 5vw, 38px) / 1.1 var(--serif);
+  letter-spacing: -0.015em;
+}
+
+.judges h3 {
+  margin: 0;
+  font: 500 15px/1.3 var(--sans);
+}
+
+.judges-list {
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.judges-item {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  gap: 0 12px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+
+.judges-item:first-child {
+  border-top: 0;
+}
+
+.judges-item p + p {
+  margin-top: 10px;
+}
+
+.judges-n {
+  padding-top: 5px;
+  font: 400 13px/1 var(--mono);
+  color: var(--match);
+}
+
+.judges-quote {
+  margin: 0 0 12px;
+  padding-left: 14px;
+  border-left: 2px solid var(--match);
+  font: italic 400 19px/1.4 var(--serif);
+}
+
+.judges-quote::before {
+  content: "“";
+}
+
+.judges-quote::after {
+  content: "”";
+}
+
+.judges-where {
+  font-size: 13.5px;
+  color: var(--dim);
+}
+
+.judges-where b {
+  display: block;
+  margin-bottom: 2px;
+  font: 500 11px/1.4 var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.judges-qa summary {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  font: 400 19px/1.35 var(--serif);
+}
+
+.judges-qa p {
+  margin-top: 10px;
+  color: var(--dim);
+}
+
+.judges-count {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 18px;
+  margin: 18px 0 20px;
+  font-size: 13px;
+  color: var(--dim);
+}
+
+.judges-count b {
+  font: 500 13px var(--mono);
+  color: var(--ink);
+}
+
+.judges-total {
+  width: 100%;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.judges-total b {
+  font-size: 30px;
+  color: var(--match);
+  margin-right: 4px;
+}
+
+.judges-group {
+  border-top: 1px solid var(--line);
+}
+
+.judges-group:last-of-type {
+  border-bottom: 1px solid var(--line);
+}
+
+.judges-group > summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+}
+
+.judges-badge {
+  min-width: 26px;
+  padding: 2px 7px;
+  border: 1px solid var(--line-strong);
+  border-radius: 99px;
+  font: 400 12px/1.4 var(--mono);
+  text-align: center;
+  color: var(--dim);
+}
+
+.judges-group ul {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.judges-dataset {
+  padding: 14px 0 14px 14px;
+  border-left: 1px solid var(--line);
+}
+
+.judges-dataset + .judges-dataset {
+  margin-top: 4px;
+}
+
+.judges-dataset-name {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.judges-dataset dl,
+.judges-facts {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+  font-size: 13.5px;
+}
+
+.judges-dataset dl > div,
+.judges-facts > div {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 12px;
+}
+
+.judges-dataset dt,
+.judges-facts dt {
+  font: 400 11px/1.9 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.judges-dataset dd,
+.judges-facts dd {
+  margin: 0;
+  color: var(--dim);
+  overflow-wrap: anywhere;
+}
+
+.judges-dataset [data-testid="licence"] {
+  color: var(--ink);
+}
+
+.judges-table {
+  margin-top: 22px;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.judges table {
+  width: 100%;
+  min-width: 30rem;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.judges th,
+.judges td {
+  padding: 10px 14px;
+  text-align: left;
+  vertical-align: top;
+  border-top: 1px solid var(--line);
+}
+
+.judges thead th {
+  border-top: 0;
+  font: 400 11px/1.4 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+  background: rgba(244, 240, 232, 0.03);
+}
+
+.judges tbody th {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.judges td {
+  color: var(--dim);
+}
+
+.judges .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.judges td.num {
+  font-family: var(--mono);
+  color: var(--ink);
+}
+
+.judges-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.judges-share > i {
+  width: 4rem;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.judges-share > i > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--match);
+}
+
+.judges-lede {
+  margin-top: 26px;
+  font: 400 19px/1.45 var(--serif);
+}
+
+.judges-facts {
+  margin-top: 16px;
+  gap: 10px;
+}
+
+.judges-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.judges-inputs code {
+  padding: 1px 7px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font: 400 12px/1.6 var(--mono);
+  color: var(--ink);
+}
+
+.judges-plain {
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.judges-plain li {
+  padding: 12px 0 12px 16px;
+  border-left: 2px solid var(--line);
+  color: var(--dim);
+}
+
+.judges-plain li b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.judges-wait {
+  margin-top: 18px;
+  color: var(--faint);
+}
+
+.judges-limits {
+  margin: 22px 0 0;
+}
+
+.judges-limits > div {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.judges-limits > div:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.judges-limits dt {
+  font-weight: 500;
+}
+
+.judges-limits dd {
+  margin: 4px 0 0;
+  color: var(--dim);
+}
+
+.judges-ai {
+  margin-top: 20px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--dim);
+}
+
+.judges-ai b {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.judges-end {
+  margin-top: 64px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line-strong);
+}
