@@ -83,7 +83,7 @@ The passes run in order, with no set times. Inside a pass, the builder groups ru
 
 **Goal:** the page can play itself, every value can be checked outside the site, and nothing breaks on a phone or an old laptop.
 
-- [ ] **3A Guided tour** · Opus, high · `ui/Tour.tsx`, `tour.css`
+- [x] **3A Guided tour** · Opus, high · `ui/Tour.tsx`, `tour.css`
   - A list of steps (chapter, view change, caption, seconds) that drives `scrollToId` and `setView`, 30 to 60 seconds, ending on "Build the whole base".
   - Captions, a progress bar, pause and exit; Escape, a wheel, a touch or a key gives control back.
   - `?tour=1` starts it at once, for the video recording.
@@ -93,6 +93,7 @@ The passes run in order, with no set times. Inside a pass, the builder groups ru
   - Links: NASA Worldview framed on the place, and Moon Trek or Mars Trek for the base site.
   - Done when the CSV matches the screen and every link opens.
 - [ ] **3C Code review** · Opus, high · read only
+  - Paused by the team on 15 November, before it reported. Start it again only when the team asks.
   - Bugs, numbers that differ from the data, budget breaks, keyboard and screen-reader gaps.
   - Done when each finding is fixed or listed here.
 - [x] **3D Hardening** · orchestrator · shared files

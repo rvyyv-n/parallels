@@ -151,7 +151,7 @@ export function App() {
                     Find a place
                     <span aria-hidden="true">↓</span>
                   </button>
-                  <button class="ghost" onClick={startTour}>
+                  <button class="ghost" data-testid="tour-start" onClick={startTour}>
                     Take the tour
                   </button>
                   <a class="text-link learn-link" href="learn.html">
