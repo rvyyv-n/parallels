@@ -41,7 +41,7 @@ function groundThumb(lat: number, lon: number) {
 const html = (m: Manifest) => `<section id="explore" class="explore" aria-labelledby="find-h">
   <div class="bar">
     <h1 class="now" id="find-h" tabindex="-1" aria-live="polite">Earth's best places for this base site</h1>
-    <a class="now-change" id="now-change" href="#/moon">Change the base site</a>
+    <a class="now-change" id="now-change" href="#ch-moon">Change the base site</a>
     <button type="button" class="tour-btn" id="tour"><i aria-hidden="true"></i>Guided tour</button>
     <div class="pickrow"><span class="pk" id="pk-t">Base site</span><div class="chips" data-chips="target" role="group" aria-labelledby="pk-t">${(["moon", "mars"] as const)
       .map((b) => {
@@ -207,7 +207,7 @@ export function finder(ctx: Ctx): Page {
       : m.scoring.yearround_rule;
     const t = target();
     $("#find-h").innerHTML = `Earth's best places for <b>${esc(t.name)}</b> <span class="now-f">· ${esc(s.hand ? "Your own weights" : filterOf(m, s).name)}</span>`;
-    $<HTMLAnchorElement>("#now-change").href = `#/${t.body}`;
+    $<HTMLAnchorElement>("#now-change").href = `#ch-${t.body}`;
   };
 
   const renderSliders = () => {

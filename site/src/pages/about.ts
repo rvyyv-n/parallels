@@ -19,7 +19,6 @@ function scoring(m: Manifest) {
       <li><b>Weigh the challenges for a test.</b> Each mission filter (${m.filters.map((f) => esc(f.name)).join(", ")}) weighs them differently. The result is a match score from 0 to 100: a rank, not a percentage of likeness.</li>
     </ol>
     <details class="fold-rule"><summary>The exact rule</summary><p>${esc(m.scoring.rule)}</p><p>${esc(m.scoring.yearround_rule)}</p>${m.method_note ? `<p>${esc(m.method_note)}</p>` : ""}</details>
-    <p><a href="#/checks">How we checked the method</a></p>
   </section>`;
 }
 

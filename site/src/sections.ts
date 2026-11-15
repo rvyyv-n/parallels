@@ -33,14 +33,14 @@ export const IMAGERY = [
     by: "NASA Scientific Visualization Studio (LRO data)",
     url: "https://svs.gsfc.nasa.gov/4720",
     licence: "Public domain (NASA)",
-    use: "Surface of the 3D Moon in the intro and on the Moon page, the site pictures in the Moon page's list (redrawn as a view from above the pole, with the contrast raised, because the map is very flat near the pole), and the bundled fallback for the Moon close-up. Display only, not scored.",
+    use: "Surface of the 3D Moon in the Moon chapter on Home, the site pictures in that chapter's list (redrawn as a view from above the pole, with the contrast raised, because the map is very flat near the pole), and the bundled fallback for the Moon close-up. Display only, not scored.",
   },
   {
     name: "Viking MDIM 2.1 global colour mosaic",
     by: "NASA / USGS Astrogeology, via NASA Mars Trek tiles",
     url: "https://trek.nasa.gov/mars/",
     licence: "Public domain (NASA / USGS)",
-    use: "Surface of the 3D Mars in the intro and on the Mars page, the site pictures in the Mars page's list, and the Mars side of the close-up (live tiles, with a bundled copy as fallback). Display only, not scored.",
+    use: "Surface of the 3D Mars in the Mars chapter on Home, the site pictures in that chapter's list, and the Mars side of the close-up (live tiles, with a bundled copy as fallback). Display only, not scored.",
   },
 ];
 
