@@ -10,6 +10,7 @@ The team's notes, in their words:
 4. The heat map shows only the places the scoring picks.
 5. A menu like the reference when the user hovers on a site.
 6. The site is clearly divided across different pages, with the relevant information on each page: nothing misleading, and nothing extra that does not belong on that page.
+7. A sidebar on the left of the Finder page, like the reference, with the results ranked and colour-coded on every factor.
 
 Reference screenshots for the notes are listed in the handoff prompt, not in this repo. Take ideas from them at the level of layout and behaviour. Write all code fresh; copy no code, text or images. Name no other project anywhere in the repo.
 
@@ -48,7 +49,7 @@ Note 6 is the frame for everything else, so it is built first. The site becomes 
 | Home | `#/` | Say what Parallels is and send the user to the Moon or Mars | The opening story (no place on Earth is the Moon or Mars; every patch of land is scored), what Earth can't copy (gravity, air, radiation), two big choices: the Moon, Mars | Site lists, rankings, scores |
 | The Moon | `#/moon` | Pick a Moon base site | The title page (note 1): every Moon target with an image and its name, the planet beside it; for the site in focus, its measured values with their datasets, what a base there must solve, and where crews already rehearse on Earth | Earth rankings, the map of Earth |
 | Mars | `#/mars` | Pick a Mars base site | Same layout as the Moon page, for the Mars targets | Same as the Moon page |
-| Finder | `#/find?t=…&f=…` | Find the Earth places that best match one site | The focused map (note 4), the hover card (notes 2, 5), the summary, the ranked list with factor strips and weights (note 3), presets, terrain filter, year-round switch | The full scorecard, validation, the dataset list |
+| Finder | `#/find?t=…&f=…` | Find the Earth places that best match one site | A left sidebar (note 7) with the summary, presets, weights and ranked list; the focused map (note 4) beside it, the hover card (notes 2, 5), the summary, the ranked list with factor strips and weights (note 3), presets, terrain filter, year-round switch | The full scorecard, validation, the dataset list |
 | Place | `#/place?t=…&c=…` | Explain one match | Earth and the base site side by side at one scale, the score, what matches, where it breaks, the seasons, what Earth can't copy, and the dataset behind each value | Other places' rankings |
 | Checks | `#/checks` | Show how we tested the method | Every validation run, failures included | Anything else |
 | About | `#/about` | Method, data and credits | How scoring works in plain words, the challenge, every dataset with its link and licence, limits ("Not in this version"), the "How we used AI" note, team and credits | Results |
@@ -131,15 +132,18 @@ Owner files: `site/src/sitepages.ts`, `site/src/pages/moon.ts`, `site/src/pages/
 
 ### Group C: ranked on every factor, the user picks the weights (*high*)
 
-Owner files: `site/src/rank.ts`, `site/src/ranklist.ts`, `site/src/score.ts`, a new `site/src/rank.css`, `site/tests/rank.spec.ts`. Needs P2 and P3.
+Owner files: `site/src/rank.ts`, `site/src/ranklist.ts`, `site/src/score.ts`, a new `site/src/rank.css`, `site/src/pages/find.ts` (layout only), `site/tests/rank.spec.ts`. Needs P2 and P3.
+
+- [ ] **C0. Left sidebar (note 7).** On laptops the Finder page is a fixed-width sidebar on the left (about 400 px) and the map fills the rest. The sidebar scrolls on its own; the map stays put. Top to bottom it holds: the summary card (C1), the rules note (C2), the preset row and the folded "Filters and weights" panel (C4), the colour key (C3), then the ranked list grouped by world region (C2). Dark panel, one rounded border per block, rows split by thin lines: each row has a rank circle on the left, the name, the badges under it, the chip strip under those, and the score on the right. On a phone the sidebar becomes a sheet under the map that can be dragged up. Hovering a row lights its pin on the map (B2).
+  → verify: at 1440×900 the sidebar is on the left and the map's canvas fills the rest; scrolling the list doesn't move the map; at 390×844 nothing overflows.
 
 - [ ] **C1. Summary card** at the top of the Finder list: "Best match on Earth: Name, 92 / 100", then "20 sites in 14 countries", "20 are new: not in our list of known analog sites", "N of 20 hold their place in every robustness test". A link "Include known analog sites" adds them back, so a judge can see the method find the places crews already use.
   → verify: every count matches a value worked out from the data files in the test.
 - [ ] **C2. Top 20 with spread.** Rank with the current preset (Balanced by default), keep cells at least 800 km apart and at most 2 per country (country = the text after the last comma in `manifest.regions`). Group the rows by world region (a small country-to-region table in `rank.ts`); each group folds open and shows "11 sites · best 92". A note under the summary gives the rules: "Top 20 of {ranked} land cells · new sites only · 800 km apart · 2 per country at most", with the count read from the data.
   → verify: no two rows are closer than 800 km; no country appears more than twice; rows inside a group are in score order.
-- [ ] **C3. A strip of factors on every row.** One small chip per challenge for the body (Surface, Resources, Dryness, Heat swing, …), coloured by its `ch:` value: very close (≥ 0.9), close (≥ 0.75), partly (≥ 0.5), far off. A one-line key above the list. Each chip's tooltip gives the challenge name and value. The row also shows the "New" badge and "85% stable" from P3.
+- [ ] **C3. A strip of factors on every row.** One small chip per challenge for the body (Surface, Resources, Dryness, Heat swing, …), labelled with its short name and filled with its band colour from its `ch:` value: very close (≥ 0.9, green), close (≥ 0.75, lime), partly (≥ 0.5, amber), far off (red). The chips sit in one row and wrap on narrow screens. A key above the list: "Each strip shows how close a site is on every challenge:" then the four colours with their names. The colours pass contrast with the chip text, and the band name is in the tooltip, so colour is never the only cue. Each chip's tooltip gives the challenge name and value. The row also shows the "New" badge and "85% stable" from P3.
   → verify: chip count equals the body's challenge count; each chip's colour band matches its `ch:` value.
-- [ ] **C4. Presets and weights.** Balanced and the three mission filters as one row of preset buttons. Under them, a "Filters and weights" panel, open by default on laptops, with one slider per challenge (0 to 2×, step 0.1, "1.0×" read-out) and a Reset. Challenges the site has no data for show "n/a: not used for this site" and are disabled. Moving a slider re-ranks at once; rows slide to their new place, and a row that moved shows ▲2 or ▼1 for a few seconds. The year-round switch stays, with the rule already shown in `#yr-note`.
+- [ ] **C4. Presets and weights.** Balanced and the three mission filters as one row of preset buttons. Under them, a "Filters and weights" panel, folded by default with a chevron, as in the reference, with one slider per challenge (0 to 2×, step 0.1, "1.0×" read-out) and a Reset. Challenges the site has no data for show "n/a: not used for this site" and are disabled. Moving a slider re-ranks at once; rows slide to their new place, and a row that moved shows ▲2 or ▼1 for a few seconds. The year-round switch stays, with the rule already shown in `#yr-note`.
   → verify: with every slider at 1.0× the list equals the Balanced preset; setting one slider to 0 gives the same order as `handScore` without that challenge.
 - [ ] **C5. Choose between them.** Each row has a compare tick. With two or three ticked, a compare strip shows their chips and scores side by side, and an "Open" link to each Place page.
   → verify: ticking two rows shows both names in the compare strip; the URL keeps the choice.
@@ -159,4 +163,4 @@ Owner files: `site/src/rank.ts`, `site/src/ranklist.ts`, `site/src/score.ts`, a 
 
 ## If time runs short
 
-Cut in this order: C5, the polar view in A2 (use the plain crop), B3 (the hover card's "click to open" goes straight to the Place page), the Shackleton rim in P1. Never cut R, B1, B2, C2, C3, C4, A1, A3 or E1: those are the team's notes.
+Cut in this order: C5, the polar view in A2 (use the plain crop), B3 (the hover card's "click to open" goes straight to the Place page), the Shackleton rim in P1. Never cut R, B1, B2, C0, C2, C3, C4, A1, A3 or E1: those are the team's notes.
