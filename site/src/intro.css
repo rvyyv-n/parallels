@@ -369,6 +369,17 @@
   color: var(--space);
 }
 
+.chip[aria-busy="true"] {
+  cursor: progress;
+  animation: chip-busy 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes chip-busy {
+  to {
+    opacity: 0.72;
+  }
+}
+
 .chip[hidden] {
   display: none;
 }
