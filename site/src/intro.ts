@@ -19,11 +19,15 @@ export interface Intro {
 
 type Body = "earth" | World;
 type Place = [number, number, number];
+// The Moon and Mars share one orbit, like two moons on a wheel facing the viewer: [x, y, front radius, turn, weight, distance].
+// turn 0 puts the Moon in front, 1 puts Mars in front, -1 puts the chosen world in front. weight 0 ignores the orbit and uses the Place values.
+type Orbit = [number, number, number, number, number, number];
 
 interface Key {
   earth: Place;
   moon: Place;
   mars: Place;
+  orb: Orbit;
   lon: number;
   free: number;
   tilt: number;
@@ -42,7 +46,6 @@ interface Globe {
   goal: { x: number; y: number };
   r: number;
   grow: number;
-  vis: number;
 }
 
 export interface Textures {
@@ -54,38 +57,39 @@ export interface Textures {
 const rad = (d: number) => (d * Math.PI) / 180;
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const smooth = (t: number) => t * t * (3 - 2 * t);
 const mix = (a: number, b: number, s: number) => a + (b - a) * s;
 // Palette: accent #0297DE. Thin lines drawn over the globes use a lighter tint of it so they stay visible on blue oceans.
 const SIGNAL = 0x5bbbe9;
 const MARS = 0xfc734d;
 const ARC = 48;
 const FAR = 10;
-// A planet whose path between two chapters is longer than this shrinks away and grows back in place, so planets never fly across the text or each other.
-const HOP = 1.2;
-// Each body sits at its own depth so overlapping bodies hide each other cleanly instead of cutting into each other. Positions are corrected so the layout on screen is unchanged.
+// Away from the orbit each body sits at its own depth, so overlapping bodies hide each other cleanly. Positions are corrected so the layout on screen is unchanged.
 const DEPTH: Record<Body, number> = { earth: -3, moon: 0.8, mars: 0.4 };
+const TAN = Math.tan(rad(15));
 // Sharper textures need a GPU that can hold them comfortably; older GPUs keep the lighter copies.
 const NEED: Record<Body, number> = { earth: 16384, moon: 8192, mars: 8192 };
 
 // x and y are fractions of the half-width and half-height of the view; the third value is the radius as a fraction of the half-height.
-// After the opening, chapter text sits on the left and the bodies on the right. The Moon and Mars take turns in the same spot (a radius of 0 hides one),
-// and the Earth faces land (lon) while it turns freely.
+// After the opening, chapter text sits on the left and the bodies on the right. Scrolling from the Moon to Mars turns the shared orbit, so the Moon
+// swings up and back while Mars rises to the front. In the last two chapters the orbit shrinks into the corner with the chosen world in front.
+// The Earth faces land (lon) while it turns freely.
 const WIDE: Key[] = [
-  { earth: [0, -2.24, 2], moon: [-0.62, 0.66, 0.085], mars: [0.66, 0.5, 0.06], lon: 62, free: 1, tilt: -0.62, link: 0, pins: 0, known: 0, dim: 1 },
-  { earth: [0, -0.04, 0.8], moon: [-0.8, 0.62, 0.07], mars: [0.82, 0.5, 0.055], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 1, dim: 0.34 },
-  { earth: [0.95, -1.45, 0.5], moon: [0.58, 0.02, 0.94], mars: [0.58, 0.02, 0], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
-  { earth: [0.95, -1.45, 0.5], moon: [0.58, 0.02, 0], mars: [0.58, 0.02, 0.94], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
-  { earth: [0.5, -0.08, 0.7], moon: [0.9, 0.7, 0.14], mars: [0.9, 0.7, 0.14], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 0, known: 0, dim: 1 },
-  { earth: [0.44, -0.06, 0.88], moon: [0.92, 0.74, 0.12], mars: [0.92, 0.74, 0.12], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 1, known: 0, dim: 1 },
+  { earth: [0, -2.24, 2], moon: [-0.62, 0.66, 0.085], mars: [0.66, 0.5, 0.06], orb: [0.58, 0.02, 0.94, 0, 0, 6], lon: 62, free: 1, tilt: -0.62, link: 0, pins: 0, known: 0, dim: 1 },
+  { earth: [0, -0.04, 0.8], moon: [0.62, 0.7, 0.075], mars: [0.84, 0.52, 0.055], orb: [0.58, 0.02, 0.94, 0, 0, 6], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 1, dim: 0.34 },
+  { earth: [0.95, -1.45, 0.5], moon: [0.58, 0.02, 0.94], mars: [0.58, 0.02, 0.6], orb: [0.58, 0.02, 0.94, 0, 1, 6], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
+  { earth: [0.95, -1.45, 0.5], moon: [0.58, 0.02, 0.6], mars: [0.58, 0.02, 0.94], orb: [0.58, 0.02, 0.94, 1, 1, 6], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
+  { earth: [0.5, -0.08, 0.7], moon: [0.9, 0.7, 0.14], mars: [0.9, 0.7, 0.14], orb: [0.9, 0.7, 0.14, -1, 1, 9], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 0, known: 0, dim: 1 },
+  { earth: [0.44, -0.06, 0.88], moon: [0.92, 0.74, 0.12], mars: [0.92, 0.74, 0.12], orb: [0.92, 0.74, 0.12, -1, 1, 9], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 1, known: 0, dim: 1 },
 ];
 
 const TALL: Key[] = [
-  { earth: [0, -1.62, 1.1], moon: [-0.55, -0.12, 0.05], mars: [0.6, -0.2, 0.036], lon: 62, free: 1, tilt: -0.62, link: 0, pins: 0, known: 0, dim: 1 },
-  { earth: [0, -0.5, 0.36], moon: [-0.7, -0.05, 0.04], mars: [0.72, -0.12, 0.03], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 1, dim: 0.7 },
-  { earth: [1.2, -1.3, 0.36], moon: [0, -0.6, 0.42], mars: [0, -0.6, 0], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
-  { earth: [1.2, -1.3, 0.36], moon: [0, -0.6, 0], mars: [0, -0.6, 0.42], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
-  { earth: [0, -0.6, 0.34], moon: [0.66, -0.2, 0.07], mars: [0.66, -0.2, 0.07], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 0, known: 0, dim: 0.8 },
-  { earth: [0, -0.55, 0.4], moon: [0.68, -0.14, 0.06], mars: [0.68, -0.14, 0.06], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 1, known: 0, dim: 1 },
+  { earth: [0, -1.62, 1.1], moon: [-0.55, -0.12, 0.05], mars: [0.6, -0.2, 0.036], orb: [0, -0.6, 0.42, 0, 0, 6], lon: 62, free: 1, tilt: -0.62, link: 0, pins: 0, known: 0, dim: 1 },
+  { earth: [0, -0.5, 0.36], moon: [-0.7, -0.05, 0.04], mars: [0.72, -0.12, 0.03], orb: [0, -0.6, 0.42, 0, 0, 6], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 1, dim: 0.7 },
+  { earth: [1.2, -1.3, 0.36], moon: [0, -0.6, 0.42], mars: [0, -0.6, 0.3], orb: [0, -0.6, 0.42, 0, 1, 6], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
+  { earth: [1.2, -1.3, 0.36], moon: [0, -0.6, 0.3], mars: [0, -0.6, 0.42], orb: [0, -0.6, 0.42, 1, 1, 6], lon: -72, free: 1, tilt: 0.3, link: 0, pins: 0, known: 0, dim: 0.8 },
+  { earth: [0, -0.6, 0.34], moon: [0.66, -0.2, 0.07], mars: [0.66, -0.2, 0.07], orb: [0.66, -0.2, 0.07, -1, 1, 9], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 0, known: 0, dim: 0.8 },
+  { earth: [0, -0.55, 0.4], moon: [0.68, -0.14, 0.06], mars: [0.68, -0.14, 0.06], orb: [0.68, -0.14, 0.06, -1, 1, 9], lon: -72, free: 0, tilt: 0.3, link: 1, pins: 1, known: 0, dim: 1 },
 ];
 
 const wrap = (d: number) => ((((d + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
@@ -193,7 +197,7 @@ export function createIntro(
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 160, 120), mat);
     spin.add(mesh);
     paint(id, mat);
-    return { tilt, spin, mesh, mat, cur: { ...face }, goal: { ...face }, r: 1, grow: 1, vis: 1 };
+    return { tilt, spin, mesh, mat, cur: { ...face }, goal: { ...face }, r: 1, grow: 1 };
   };
   const earth = globe("earth", 0x0297de, { x: 0.3, y: -2.2 });
   const worlds: Record<World, Globe> = {
@@ -205,8 +209,6 @@ export function createIntro(
     ["moon", worlds.moon],
     ["mars", worlds.mars],
   ];
-  const air = glow([0.2, 0.62, 0.96], 1.09);
-  earth.tilt.add(air.mesh);
   const haze = glow([0.99, 0.45, 0.3], 1.05);
   worlds.mars.tilt.add(haze.mesh);
 
@@ -249,6 +251,7 @@ export function createIntro(
   let at = 0;
   let atGoal = 0;
   let frames = 0;
+  let pick = 2;
   let spent = 0;
 
   const size = () => {
@@ -271,6 +274,22 @@ export function createIntro(
   const b = new THREE.Vector3();
   const c = new THREE.Vector3();
   const v = new THREE.Vector3();
+  const eye = new THREE.Vector3(0, 0, FAR);
+  const ou = new THREE.Vector3();
+  const ow = new THREE.Vector3();
+  const op = new THREE.Vector3();
+  // Place a world on the shared orbit. The orbit's axis runs along the line of sight to (x, y), so the world at the back hides exactly behind the one in front,
+  // and the orbit radius is larger than the worlds, so the two never touch while they swap.
+  const onOrbit = (o: number[], theta: number) => {
+    const rho = o[2] * TAN * o[5];
+    const R = rho * 1.3;
+    ou.set(o[0] * hw, o[1] * hh, 0).sub(eye).normalize();
+    ow.set(0, 1, 0).addScaledVector(ou, -ou.y).normalize();
+    op.copy(eye)
+      .addScaledVector(ou, o[5] + R - R * Math.cos(theta))
+      .addScaledVector(ow, R * Math.sin(theta));
+    return rho;
+  };
   const frame = (now: number) => {
     raf = 0;
     if (!seen) return;
@@ -284,16 +303,18 @@ export function createIntro(
     const f = still ? 1 : 1 - Math.exp(-dt * 3.2);
     drawn += (q - drawn) * (still ? 1 : 1 - Math.exp(-dt * 5));
     dive += (diveGoal - dive) * (still ? 1 : 1 - Math.exp(-dt * 4));
-    at = still ? Math.round(atGoal) : at + (atGoal - at) * (1 - Math.exp(-dt * 7));
+    at = still ? Math.round(atGoal) : at + (atGoal - at) * (1 - Math.exp(-dt * 11));
+    pick = still ? (world === "moon" ? 2 : 1) : pick + ((world === "moon" ? 2 : 1) - pick) * f;
 
     const i = Math.max(0, Math.min(keys.length - 2, Math.floor(at)));
-    const s = ease(clamp((at - i - 0.18) / 0.64));
+    const s = smooth(clamp((at - i - 0.06) / 0.88));
     const k0 = keys[i];
     const k1 = keys[i + 1];
     const val = (n: "lon" | "free" | "tilt" | "link" | "pins" | "known" | "dim") => mix(k0[n], k1[n], s);
     const free = val("free");
     const dim = val("dim");
-    const link0 = val("link");
+    const turn = (o: Orbit) => (o[3] < 0 ? pick : o[3]);
+    const orb = k0.orb.map((n, j) => (j === 3 ? mix(turn(k0.orb), turn(k1.orb), s) : mix(n, k1.orb[j], s)));
     const rise = still ? 0 : (1 - ease(clamp(t / 2.4))) * 0.5;
 
     for (const [id, g] of bodies) {
@@ -302,29 +323,17 @@ export function createIntro(
       g.cur.x += (g.goal.x - g.cur.x) * f;
       g.cur.y += (g.goal.y - g.cur.y) * f;
       g.grow += ((hover === id && id !== "earth" ? 1.06 : 1) - g.grow) * f;
-      // In the last two chapters only the chosen world stays; the other one shrinks away.
-      const away = id !== "earth" && id !== world ? link0 : 0;
-      g.vis = still ? 1 - away : g.vis + (1 - away - g.vis) * f;
-      let x = mix(from[0], to[0], s);
-      let y = mix(from[1], to[1], s);
-      let r = mix(from[2], to[2], s);
-      if (id !== "earth" && id !== world && k1.link > 0) {
-        // The world you did not pick shrinks where it is instead of travelling next to the one you did.
-        x = from[0];
-        y = from[1];
-        r = k0.link > 0 ? 0 : from[2] * ease(Math.max(0, 1 - 2 * s));
-      } else if (id !== "earth" && (!from[2] || !to[2] || Math.hypot(to[0] - from[0], to[1] - from[1]) > HOP)) {
-        // Shrink away in the first half of the scroll, grow back at the new spot in the second.
-        const h = s < 0.5 ? from : to;
-        x = h[0];
-        y = h[1];
-        r = h[2] * ease(Math.abs(1 - 2 * s));
-      }
       const k = (FAR - DEPTH[id]) / FAR;
-      g.r = r * hh * g.grow * g.vis;
-      g.tilt.visible = g.r > 1e-3;
-      g.tilt.position.set(x * hw * k, (y - (id === "earth" ? rise : 0)) * hh * k, DEPTH[id]);
-      g.tilt.scale.setScalar(Math.max(1e-4, g.r * k));
+      const y = mix(from[1], to[1], s) - (id === "earth" ? rise : 0);
+      g.tilt.position.set(mix(from[0], to[0], s) * hw * k, y * hh * k, DEPTH[id]);
+      let size = mix(from[2], to[2], s) * hh * k;
+      if (id !== "earth" && orb[4] > 0) {
+        const rho = onOrbit(orb, Math.PI * (orb[3] + (id === "mars" ? 1 : 0)));
+        g.tilt.position.lerp(op, orb[4]);
+        size = mix(size, rho, orb[4]);
+      }
+      g.r = size * g.grow;
+      g.tilt.scale.setScalar(g.r);
       g.tilt.rotation.x = id === "earth" ? mix(g.cur.x, val("tilt"), free) : g.cur.x;
       if (id === "earth") {
         // While the Earth turns freely it faces land, with a slow sway, instead of drifting onto the dark Pacific.
@@ -336,7 +345,6 @@ export function createIntro(
       g.mat.color.setScalar(p * lit);
       g.mat.emissiveIntensity = (1 - p) * 0.8;
     }
-    air.mat.uniforms.k.value = p * 0.75 * dim;
     haze.mat.uniforms.k.value = p * 0.35;
     faint.opacity = 0.12 * p;
     (sky.material as THREE.PointsMaterial).opacity = 0.75 * p;
@@ -457,8 +465,10 @@ export function createIntro(
       worldRing.geometry.dispose();
       worldRing.geometry = ring(ringLat, 1.008);
       g.spin.add(worldRing);
-      marker.position.copy(onSphere(s.lat, s.lon, 1.012));
-      marker.lookAt(onSphere(s.lat, s.lon, 3));
+      // Face the ring straight out from the surface in the globe's own frame. lookAt works in world space, so it tilted the ring edge-on after the first pick.
+      const up = onSphere(s.lat, s.lon, 1);
+      marker.position.copy(up).multiplyScalar(1.012);
+      marker.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), up);
       g.spin.add(marker);
       drawn = 0;
       run();

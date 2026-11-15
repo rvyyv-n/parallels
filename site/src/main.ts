@@ -507,12 +507,26 @@ async function main() {
     showCard();
   };
 
+  // Each pick gets a number, so a slow download for an earlier pick can't overwrite a later one.
+  let picking = 0;
   const setTarget = async (first: boolean) => {
     const t: Target = target();
-    cols = await targetCols(d.base, t);
+    const mine = ++picking;
+    // Show the choice straight away; the ranking follows when this base's data has arrived.
+    for (const b of app.querySelectorAll<HTMLButtonElement>("[data-target]")) {
+      const on = b.dataset.target === s.target;
+      b.setAttribute("aria-pressed", String(on));
+      if (on) b.setAttribute("aria-busy", "true");
+      else b.removeAttribute("aria-busy");
+    }
+    intro?.target(t.body, t);
+    const next = await targetCols(d.base, t).catch(() => null);
+    if (mine !== picking) return;
+    for (const b of app.querySelectorAll<HTMLButtonElement>("[aria-busy]")) b.removeAttribute("aria-busy");
+    if (!next) return;
+    cols = next;
     if (s.hand) s.hand = Object.fromEntries(m.challenges[t.body].map((c) => [c.id, s.hand![c.id] ?? 0]));
     for (const el of app.querySelectorAll<SVGElement>(".logo")) el.dataset.body = t.body;
-    intro?.target(t.body, t);
     renderFilters();
     renderSliders();
     caption();
@@ -531,6 +545,14 @@ async function main() {
     if (s.cell >= 0) showCard();
   };
 
+  // Start downloading a base's data as soon as the pointer or focus reaches its button, so the click itself feels instant.
+  const warm = (e: Event) => {
+    const id = (e.target as HTMLElement).closest<HTMLElement>("[data-target]")?.dataset.target;
+    const t = id ? m.targets.find((x) => x.id === id) : undefined;
+    if (t) void targetCols(d.base, t).catch(() => {});
+  };
+  app.addEventListener("pointerover", warm, { passive: true });
+  app.addEventListener("focusin", warm);
   app.addEventListener("click", (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-target], [data-filter]");
     if (!b) return;
