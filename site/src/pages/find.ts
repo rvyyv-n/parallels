@@ -5,7 +5,9 @@ import { BODY, isIce, placeName, terrainOf } from "../card";
 import { esc, latlon, num, reduced, score100, webgl } from "../format";
 import { colour, gradient } from "../ramp";
 import { icon } from "../icons";
-import { top } from "../score";
+import { rankOf, top } from "../score";
+import { focus, type Zones } from "../zones";
+import { createHoverCard, type HoverCard } from "../hovercard";
 import { tour } from "../tour";
 import { go, setQuery, type Page } from "../router";
 import { filterOf, query, rankedOf, readState, scoreOf, targetOf, weightsOf, type Ctx, type State } from "./ctx";
@@ -95,6 +97,9 @@ export function finder(ctx: Ctx): Page {
   let near: number[] = [];
   let ranked = 0;
   let earth: Earth | null = null;
+  let share = 1;
+  let zones: Zones = { keep: new Uint8Array(0), outline: [] };
+  let card: HoverCard | null = null;
   let terr: Float32Array | undefined;
   let picking = 0;
   let richBody = "";
@@ -108,6 +113,11 @@ export function finder(ctx: Ctx): Page {
   };
   const open = (i: number) => go(`#/place?${query(s, i)}`);
   const href = (i: number) => `#/place?${esc(query(s, i))}`;
+  const shown = (i: number) => keep(i) && zones.keep[i] === 1;
+  const info = (i: number) =>
+    d && Number.isFinite(score[i])
+      ? { rank: rankOf(score, i), name: placeName(m, d.cells, i), lat: d.cells.lat[i], lon: d.cells.lon[i], score: score[i], far: d.cells.nearest_analog_km?.[i] ?? NaN }
+      : null;
   const named = (i: number) => Number.isFinite(d!.cells.region?.[i]) && !!m.regions[d!.cells.region[i]];
 
   const richTests = () => {
@@ -203,7 +213,8 @@ export function finder(ctx: Ctx): Page {
     score = scoreOf(m, cols, s, d!.n);
     ranked = rankedOf(score);
     ({ ids, near } = top(score, 10, d!.cells, keep));
-    earth?.paint(score, keep);
+    zones = focus(score, share);
+    earth?.paint(score, shown);
     earth?.top(ids);
     ledger();
   };
@@ -307,7 +318,11 @@ export function finder(ctx: Ctx): Page {
       const li = rowOf(e);
       earth?.hover(li ? Number(li.dataset.i) : null);
     });
-    ledgerEl.addEventListener("mouseleave", () => earth?.hover(null));
+    card = createHoverCard($(".earth-col"), { info, open });
+    ledgerEl.addEventListener("mouseleave", () => {
+      earth?.hover(null);
+      card?.hide();
+    });
     ledgerEl.addEventListener("focusin", (e) => {
       const li = rowOf(e);
       if (li) earth?.hover(Number(li.dataset.i));
@@ -346,7 +361,7 @@ export function finder(ctx: Ctx): Page {
           scale: $("#st-scale"),
         });
         if (score.length) {
-          earth.paint(score, keep);
+          earth.paint(score, shown);
           earth.top(ids);
         }
         if (s.cell >= 0) earth.select(s.cell, false);
