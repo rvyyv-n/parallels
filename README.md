@@ -95,7 +95,7 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 | **Terrain types** | Arid basin, high-altitude volcanic field, salt flat, frozen ground, and cave or lava tube, each from a visible rule. Filter the list by type. |
 | **Compare** | Tick two or three places to see their chips and scores side by side. |
 | **Learn** | The Moon and Mars for newcomers: the base site against its best Earth place, a month slider over the best places, what a spacesuit, rover or habitat module weighs on each world, a map of known analogs and NASA photo pairs. |
-| **Guided tour** | Seven steps from choosing a base site on Home to where a match breaks on Earth. |
+| **Guided tour** | Nine steps that play by themselves, from choosing a base site on Home through the Finder to where a match breaks. Picking a site or a place during the tour carries it on. |
 | **Shareable views** | The address holds the base site, preset, weights and place, so a link opens the same view. |
 | **A public check** | Known analogs must beat ordinary places and plain deserts. The rules were fixed in git before each run. See [Validation](#validation). |
 
@@ -234,7 +234,7 @@ How to read the binary files:
 
 ## How we used AI
 
-The core idea and the key design decisions come from our team. We use Claude (Anthropic) to research the challenge and the judging rules, write our planning documents and, during the event, write and test the data pipeline and the site. We check its work at each checkpoint. Our local Challenge Guide asks for mission filters, terrain types and seasons. Claude checked our plan against the guide and we added them. Claude suggested a list of names and we picked Parallels. Our designs, including the logo, are aided by AI. The logo is on the site (header, footer and browser tab), and the site's footer says it was drawn with AI. Any other AI-made image or video carries a visible watermark. On 15 November the team chose another entry, [Terra Nova](https://github.com/Yakiyo/terra-nova), as the model for the layout of our scroll-story opening, the Moon and Mars site lists, the Finder's sidebar, its colour-coded ranked list and the hover card. Claude studied it and wrote our versions from scratch, with our own words, data and code; none of its code or images is used.
+The idea and the key design decisions are our team's. Claude (Anthropic) helped research the challenge, write our planning documents, and write and test the code and data pipeline. Our logo was drawn with AI. We checked its work at each checkpoint.
 
 ---
 
@@ -284,7 +284,7 @@ These images are shown, not scored. No NASA logo or insignia is used.
 
 | Image | Source | Licence | Used for |
 |---|---|---|---|
-| [Blue Marble: Shaded Relief and Bathymetry](https://nasa-gibs.github.io/gibs-api-docs/) | NASA Earth Observatory via NASA GIBS | NASA open data, no restrictions | Earth map background, the 3D Earth in the intro, the small ground pictures in the top 10 and the base layer of the Earth close-up (live tiles). We bundle three copies, `site/public/img/blue-marble.jpg` (1,024 px), `blue-marble-4k.jpg` (4,096 px) and `blue-marble-8k.jpg` (8,192 px), the larger two fetched from GIBS on 2026-11-15. The intro draws a light copy first and swaps in a sharper one when the graphics card can hold it. The bundled copy takes over if the live tile service is down. |
+| [Blue Marble: Shaded Relief and Bathymetry](https://nasa-gibs.github.io/gibs-api-docs/) | NASA Earth Observatory via NASA GIBS | NASA open data, no restrictions | Earth map background, the 3D Earth in the intro, the hover card and popup pictures in the Finder, and the base layer of the Earth close-up (live tiles). We bundle three copies, `site/public/img/blue-marble.jpg` (1,024 px), `blue-marble-4k.jpg` (4,096 px) and `blue-marble-8k.jpg` (8,192 px), the larger two fetched from GIBS on 2026-11-15. The intro draws a light copy first and swaps in a sharper one when the graphics card can hold it. The bundled copy takes over if the live tile service is down. |
 | [Landsat WELD true colour, global annual mosaic](https://nasa-gibs.github.io/gibs-api-docs/) | NASA / USGS Landsat, via NASA GIBS | NASA open data, no restrictions | Earth side of the close-up in each match (live tiles). Blue Marble shows where it has no data. |
 | [LOLA south-pole shaded relief, 87.5° S to the pole](https://trek.nasa.gov/moon/) | NASA LRO LOLA, via NASA Moon Trek tiles | Public domain (NASA) | Moon side of the close-up (live tiles). Shaded relief from laser altimetry, not a photo. |
 | [CGI Moon Kit: LROC colour map with filled poles](https://svs.gsfc.nasa.gov/4720) | NASA Scientific Visualization Studio (LRO data) | Public domain (NASA) | The 3D Moon in the intro (`site/public/img/moon.jpg`, 2,048 px, and `moon-4k.jpg`, 4,096 px, from the kit's 4K colour map), and the bundled fallback for the Moon close-up. |
