@@ -1,0 +1,31 @@
+{
+  "version": "v1.3",
+  "kind": "publishing",
+  "inherits": "v1.2.json, which inherits v1.1.json and v1.json: the method is unchanged. Trait weights, challenge weights, the three mission filters, ties, floors, pass marks, thresholds and the held-out split all stay as in version 1.2.",
+  "why": "Version 1.3 is a publishing config, not a new method, so the site still shows method version 1.2 and no new method run is judged. It publishes four of NASA's nine Artemis III regions and the Shackleton rim as targets of their own, as the team settled, and adds a Balanced preset where every challenge counts the same. The Balanced preset gets its own validation run, published pass or fail, with the same test places and pass marks; it is a preset check, so nothing is adopted.",
+  "targets": ["moon-malapert-massif", "moon-haworth", "moon-nobile-rim-1", "moon-de-gerlache-rim-2", "moon-shackleton-rim"],
+  "check_note": {
+    "moon": "Not checked on its own; the combined south-pole target is checked."
+  },
+  "filter_weights": {
+    "balanced": {
+      "moon": {
+        "surface": [1, "Every challenge counts the same."],
+        "resources": [1, "Every challenge counts the same."],
+        "dryness": [1, "Every challenge counts the same."],
+        "heat": [1, "Every challenge counts the same."],
+        "light": [1, "Every challenge counts the same."],
+        "industrial": [1, "Every challenge counts the same."]
+      },
+      "mars": {
+        "surface": [1, "Every challenge counts the same."],
+        "resources": [1, "Every challenge counts the same."],
+        "dryness": [1, "Every challenge counts the same."],
+        "heat": [1, "Every challenge counts the same."],
+        "atmosphere": [1, "Every challenge counts the same."],
+        "life": [1, "Every challenge counts the same."]
+      }
+    }
+  },
+  "presets_checked": ["balanced"]
+}

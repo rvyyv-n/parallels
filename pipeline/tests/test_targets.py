@@ -7,6 +7,8 @@ from pyproj import Transformer
 
 from pipeline.targets import (
     MOON,
+    MORE_MOON,
+    POLAR_MAPS,
     OUT,
     RAW,
     combine,
@@ -187,11 +189,13 @@ def test_every_value_names_a_listed_dataset():
 @needs_output
 def test_targets_and_defaults():
     ts = targets()
-    assert len(ts) == 15
-    assert len({t["id"] for t in ts}) == 15
+    assert len(ts) == 16
+    assert len({t["id"] for t in ts}) == 16
     assert [t["id"] for t in ts if t["default"]] == ["moon-south-pole", "mars-jezero"]
     combined = ts[0]
-    assert [r["id"] for r in combined["regions"]] == [t["id"] for t in ts if t["body"] == "moon" and t is not combined]
+    more = {"moon-shackleton-rim"}
+    assert [r["id"] for r in combined["regions"]] == [t["id"] for t in ts if t["body"] == "moon" and t is not combined and t["id"] not in more]
+    assert len(combined["regions"]) == len(MOON) == 9
     for t in ts:
         for k in TERRAIN:
             assert t["values"][k]["value"] is not None, (t["id"], k)
@@ -219,10 +223,28 @@ def test_mars_frozen_months_and_thermal_inertia():
 @needs_raw
 def test_moon_values_agree_with_published():
     moon = {t["name"]: t["values"] for t in targets() if t["body"] == "moon" and "regions" not in t}
-    assert len(moon) == len(MOON)
+    assert len(moon) == len(MOON) + len(MORE_MOON)
     best_lit = max(v["lit_share"]["value"] for v in moon.values())
     assert 0.75 < best_lit <= 0.95
     shadowed = [v for v in moon.values() if v["lit_share_median"]["value"] < 0.05]
     assert shadowed
     assert all(v["t_min_coldest_k"]["value"] < 110 for v in shadowed)
     assert all(v["t_min_k"]["value"] < 110 for v in shadowed)
+
+
+@needs_output
+def test_shackleton_rim_has_every_polar_map_and_stays_out_of_the_combined_target():
+    ts = {t["id"]: t for t in targets()}
+    s = ts["moon-shackleton-rim"]
+    assert all(s["values"][k]["value"] is not None for k in POLAR_MAPS)
+    assert s["lat"] < -89.9
+    assert "moon-shackleton-rim" not in [r["id"] for r in ts["moon-south-pole"]["regions"]]
+    assert not any("nine Artemis III" in f["text"] for f in s["facts"])
+
+
+def test_shackleton_rim_anchor_is_one_radius_from_its_centre():
+    lat, lon, d, _ = (-89.67, 129.78, 20.92, 5450)
+    a = moon_anchor("Shackleton", "rim_pole")
+    x0, y0 = polar_xy(lat, lon)
+    x1, y1 = polar_xy(*a)
+    assert math.hypot(x1 - x0, y1 - y0) / polar_scale(lat) == pytest.approx(d * 500, rel=0.01)

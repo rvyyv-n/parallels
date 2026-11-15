@@ -8,7 +8,7 @@ import numpy as np
 from scipy import ndimage
 
 from pipeline import publish, validate
-from pipeline.assemble import DERIVED, ROOT, SHAPE, build, grid_lat, grid_lon, known_analogs, load_config, load_points, load_stage, terrain_rules
+from pipeline.assemble import DERIVED, ROOT, SHAPE, build, grid_lat, grid_lon, known_analogs, load_config, load_points, load_publishing, load_stage, terrain_rules, with_publishing
 from pipeline.score import RULE, score_target, target_value, yearround_rule
 from pipeline.traits import BODIES, CANT_COPY, CHALLENGES, FILTERS, INPUTS, NOT_IN_VERSION, TERRAIN_TYPES, TRAITS
 
@@ -191,6 +191,8 @@ def challenge_entries(cfg):
 def filter_entries(cfg):
     out = []
     for f in FILTERS:
+        if f["id"] not in cfg["filter_weights"]:
+            continue
         fw = cfg["filter_weights"][f["id"]]
         reasons = {f"{b}:{k}": v[1] for b in BODIES for k, v in fw[b].items()}
         if f.get("note"):
@@ -249,12 +251,18 @@ def score_values(region, body, tid):
     return out
 
 
-def target_bin(path, n, scored, extra=None):
+def target_bin(path, n, scored, stab=None):
+    stab = stab or {}
+    late = {f["id"] for f in FILTERS if f.get("since")}
+    first = lambda k: k.split(":")[0] not in late
     cols = [(f"rank:{k}", v, "u8", 0.004, 0) for k, v in scored["ranks"].items()]
     cols += [(f"ch:{k}", v, "u8", 0.004, 0) for k, v in scored["challenges"].items()]
     cols += [(f"cov:{k}", v * 100, "u8", 1, 0) for k, v in scored["coverage"].items()]
-    cols += [(f"score:{k}", v, "u16", 0.0001, 0) for k, v in scored["scores"].items()]
-    cols += [(k, v, "u8", 1, 0) for k, v in (extra or {}).items()]
+    cols += [(f"score:{k}", v, "u16", 0.0001, 0) for k, v in scored["scores"].items() if first(k)]
+    cols += [(f"stable:{k}", publish.stable_column(n, r), "u8", 1, 0) for k, r in stab.items() if first(k)]
+    cols += [(f"score:{k}", v, "u16", 0.0001, 0) for k, v in scored["scores"].items() if not first(k)]
+    cols += [(f"stable:{k}", publish.stable_column(n, r), "u8", 1, 0) for k, r in stab.items() if not first(k)]
+    cols += [(f"keep:{k}", publish.keep_column(n, r), "u8", 0.01, 0) for k, r in stab.items()]
     return write_bin(path, n, cols)
 
 
@@ -398,7 +406,7 @@ def chain(method):
     return out
 
 
-def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sample, out=OUT, methods=()):
+def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sample, out=OUT, methods=(), publishing=None):
     out.mkdir(parents=True, exist_ok=True)
     cells, info = build(stages, metas, sites, caves, cfg)
     n = len(cells["lat"])
@@ -421,6 +429,16 @@ def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sa
         if run["adopted"]:
             cfg, scored = mcfg, scored_new
         prev_val, prev_name = val_new, name
+    pub, more = None, []
+    if publishing:
+        pub, pub_commit = publishing
+        pub = load_publishing(pub, cfg) if isinstance(pub, str) else pub
+        cfg = with_publishing(cfg, pub)
+        more = [tid for tid in pub["targets"] if tid in by_id]
+        scored = {tid: score_target(cells, by_id[tid], cfg) for tid in cfg["default_targets"]}
+        for k, preset in enumerate(pub.get("presets_checked", [])):
+            val_p = validate.run(cells, scored, sites, cfg, commit, with_misses=True, preset=preset)
+            val.setdefault("more_runs", []).append(validate.preset_run(val_p, scored, cfg, pub_commit, preset, len(runs) + 3 + k, method_name(cfg)))
     regions = metas.get("climate", {}).get("regions", [])
     stab, sentences, heads = {}, [], {}
     for tid in cfg["default_targets"]:
@@ -433,15 +451,18 @@ def export(stages, metas, targets, extra_datasets, sites, caves, cfg, commit, sa
     for t in targets:
         tid = t["id"]
         if tid in cfg["default_targets"]:
-            extra = {f"stable:{f}": publish.stable_column(n, r) for f, r in stab[tid].items()}
-            binfile = target_bin(out / f"target-{tid}.bin", n, scored[tid], extra)
+            binfile = target_bin(out / f"target-{tid}.bin", n, scored[tid], stab[tid])
             e = target_entry(t, scored[tid], binfile, True)
             if heads[tid][0]:
                 e["headline"] = heads[tid][0]
             entries.append(e)
-        elif t["body"] == "mars":
+        elif t["body"] == "mars" or tid in more:
             s = score_target(cells, t, cfg)
-            entries.append(target_entry(t, s, target_bin(out / f"target-{tid}.bin", n, s), False))
+            binfile = target_bin(out / f"target-{tid}.bin", n, s, publish.stability(s, cfg, t["body"]) if pub else None)
+            e = target_entry(t, s, binfile, False)
+            if pub and t["body"] in pub.get("check_note", {}):
+                e["check_note"] = pub["check_note"][t["body"]]
+            entries.append(e)
     datasets = used_datasets(merge_datasets(metas, extra_datasets), metas, entries)
     rules = terrain_rules(cfg)
     manifest = {
@@ -554,6 +575,8 @@ def main():
     ap.add_argument("--out", default=str(OUT))
     ap.add_argument("--method", help="also run newer method versions up to this one (e.g. 1.2 runs 1.1 then 1.2) as further validation runs")
     ap.add_argument("--method-commit", default="uncommitted", help="commit that fixed the config of the last method version")
+    ap.add_argument("--publish", help="publishing config (e.g. 1.3) that adds targets and presets on top of the method in use, without changing it")
+    ap.add_argument("--publish-commit", default="uncommitted", help="commit that fixed the publishing config")
     args = ap.parse_args()
     cfg = load_config()
     names = chain(args.method) if args.method else []
@@ -571,7 +594,8 @@ def main():
             stages[name], metas[name] = load_stage(name, DERIVED)
         targets, extra = load_targets()
         commit = args.weights_commit
-    cells, scored, info, heads = export(stages, metas, targets, extra, sites, caves, cfg, commit, args.stub, out, methods)
+    publishing = (args.publish, args.publish_commit) if args.publish else None
+    cells, scored, info, heads = export(stages, metas, targets, extra, sites, caves, cfg, commit, args.stub, out, methods, publishing)
     if info["missing"]:
         print("missing input columns:", ", ".join(info["missing"]))
     for f in sorted(out.iterdir()):

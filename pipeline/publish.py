@@ -8,7 +8,16 @@ TOP = 20
 KEEP = 0.9
 
 
-def weight_tables(cfg, body, ranks):
+def filter_groups(cfg):
+    groups = {}
+    for f in FILTERS:
+        if f["id"] in cfg["filter_weights"]:
+            groups.setdefault(f.get("since"), []).append(f)
+    return list(groups.values())
+
+
+def weight_tables(cfg, body, ranks, filters=None):
+    filters = filters or filter_groups(cfg)[0]
     tw = cfg["trait_weights"][body]
     traits = sorted({k for c in CHALLENGES[body] for k in c["traits"] if k in ranks and k in tw.get(c["id"], {})})
     chs = [c["id"] for c in CHALLENGES[body] if any(k in traits for k in c["traits"] if k in tw.get(c["id"], {}))]
@@ -17,8 +26,8 @@ def weight_tables(cfg, body, ranks):
         for k, (w, _) in tw[c].items():
             if k in traits:
                 wc[i, traits.index(k)] = w
-    wf = np.zeros((len(FILTERS), len(chs)))
-    for i, f in enumerate(FILTERS):
+    wf = np.zeros((len(filters), len(chs)))
+    for i, f in enumerate(filters):
         for c, (w, _) in cfg["filter_weights"][f["id"]][body].items():
             if c in chs:
                 wf[i, chs.index(c)] = w
@@ -50,19 +59,26 @@ def top(s, k=TOP):
 
 
 def stability(scored, cfg, body, runs=RUNS, seed=SEED):
+    out = {}
+    for filters in filter_groups(cfg):
+        out |= draws(scored, cfg, body, filters, runs, seed)
+    return out
+
+
+def draws(scored, cfg, body, filters, runs, seed):
     sc = cfg["scoring"]
-    traits, chs, wc, wf = weight_tables(cfg, body, scored["ranks"])
+    traits, chs, wc, wf = weight_tables(cfg, body, scored["ranks"], filters)
     logs, have = inputs(scored, traits, sc)
     base = filter_scores(logs, have, wc, wf, sc)
-    tops = [top(base[i]) for i in range(len(FILTERS))]
-    hits = [np.zeros(TOP) for _ in FILTERS]
+    tops = [top(base[i]) for i in range(len(filters))]
+    hits = [np.zeros(TOP) for _ in filters]
     rng = np.random.default_rng(seed)
     for _ in range(runs):
         s = filter_scores(logs, have, wc * rng.uniform(0.5, 1.5, wc.shape), wf * rng.uniform(0.5, 1.5, wf.shape), sc)
-        for i in range(len(FILTERS)):
+        for i in range(len(filters)):
             hits[i] += np.isin(tops[i], np.argpartition(-np.nan_to_num(s[i], nan=-1.0), TOP)[:TOP])
     out = {}
-    for i, f in enumerate(FILTERS):
+    for i, f in enumerate(filters):
         stable = tops[i][hits[i] / runs >= KEEP]
         out[f["id"]] = {"top": tops[i], "share": hits[i] / runs, "stable": stable}
     return out
@@ -74,8 +90,14 @@ def stable_column(n, result):
     return col
 
 
+def keep_column(n, result):
+    col = np.full(n, np.nan)
+    col[result["top"]] = result["share"]
+    return col
+
+
 def stability_sentence(target, result):
-    parts = [f"{f['name'].lower()} {len(result[f['id']]['stable'])} of {TOP}" for f in FILTERS]
+    parts = [f"{f['name'].lower()} {len(result[f['id']]['stable'])} of {TOP}" for f in FILTERS if not f.get("since")]
     return (
         f"{target.get('short') or target['name']}: we changed every challenge and trait weight by up to 50% either way, 1,000 times. "
         f"Top-20 places that stayed in the top 20 in at least 90% of runs: " + ", ".join(parts) + "."
