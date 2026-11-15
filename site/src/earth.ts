@@ -185,11 +185,11 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         },
       },
       layers: [
-        { id: "space", type: "background", paint: { "background-color": "#050607" } },
+        { id: "space", type: "background", paint: { "background-color": "#02070a" } },
         { id: "fallback", type: "raster", source: "fallback", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.9, "raster-fade-duration": 0 } },
         { id: "bm", type: "raster", source: "bm", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.9, "raster-contrast": 0.05 } },
-        { id: "par", type: "line", source: "sel", filter: ["==", ["get", "k"], "par"], paint: { "line-color": "#4fd8ff", "line-width": 1, "line-dasharray": [2, 3], "line-opacity": 0.75 } },
-        { id: "cell", type: "line", source: "sel", filter: ["==", ["get", "k"], "cell"], paint: { "line-color": "#4fd8ff", "line-width": 2.5 } },
+        { id: "par", type: "line", source: "sel", filter: ["==", ["get", "k"], "par"], paint: { "line-color": "#5bbbe9", "line-width": 1, "line-dasharray": [2, 3], "line-opacity": 0.75 } },
+        { id: "cell", type: "line", source: "sel", filter: ["==", ["get", "k"], "cell"], paint: { "line-color": "#5bbbe9", "line-width": 2.5 } },
         {
           id: "analogs",
           type: "circle",
@@ -202,7 +202,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           type: "circle",
           source: "pts",
           filter: ["==", ["get", "kind"], "cave"],
-          paint: { "circle-radius": 2.6, "circle-color": "#ffffff", "circle-stroke-color": "#050607", "circle-stroke-width": 1 },
+          paint: { "circle-radius": 2.6, "circle-color": "#ffffff", "circle-stroke-color": "#02070a", "circle-stroke-width": 1 },
         },
       ],
       sky: { "atmosphere-blend": 0 },

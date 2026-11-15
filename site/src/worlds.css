@@ -26,12 +26,12 @@
 }
 
 .w-tab[aria-pressed="true"] {
-  color: #000;
-  background: #d3d0c8;
+  color: var(--space);
+  background: var(--moon);
 }
 
 .w-tab-mars[aria-pressed="true"] {
-  background: #f0734a;
+  background: var(--mars);
 }
 
 .w-panel[hidden] {
@@ -70,11 +70,11 @@
 }
 
 #w-moon h3 {
-  color: #d3d0c8;
+  color: var(--moon);
 }
 
 #w-mars h3 {
-  color: #f0734a;
+  color: var(--mars);
 }
 
 .worlds h4 {

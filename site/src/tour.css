@@ -58,7 +58,7 @@
   width: min(380px, calc(100vw - 28px));
   padding: 16px 18px 14px;
   color: var(--ink);
-  background: #0c0e11;
+  background: var(--raise);
   border: 1px solid var(--rule-2);
   border-top: 2px solid var(--signal);
   box-shadow: 0 16px 50px rgba(0, 0, 0, 0.7);
@@ -112,7 +112,7 @@
 }
 
 .tour-btns .tour-next {
-  color: #000;
+  color: var(--space);
   background: var(--signal);
   border-color: var(--signal);
 }
