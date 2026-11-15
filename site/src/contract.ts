@@ -121,7 +121,7 @@ export interface Manifest {
   traits: Trait[];
   challenges: Record<Body, Challenge[]>;
   filters: MissionFilter[];
-  scoring: { floor: number; missing_rank: number; min_weight_with_data: number; rule: string; layout?: string; yearround_rule: string };
+  scoring: { floor: number; missing_rank: number; min_weight_with_data: number; rule: string; layout?: string; yearround_rule: string; rare_km?: number };
   terrain_types: TerrainType[];
   clustering: { k: number; method: string; inputs: string[]; agreement: { cluster: number; cells: number; top_type: string; share: number }[]; summary: string };
   targets: Target[];
