@@ -25,7 +25,7 @@ export async function loaded(page: Page, hash = "") {
 
 export async function ready(page: Page, hash = "") {
   await loaded(page, hash);
-  await page.locator('[data-chapter="find"]').scrollIntoViewIfNeeded();
+  await page.locator('[data-chapter="find"]').evaluate((el) => el.scrollIntoView({ block: "start" }));
   await page.locator('[data-testid="feature"] table.pairs').waitFor({ state: "visible" });
 }
 

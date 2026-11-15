@@ -86,7 +86,12 @@ p {
   align-items: center;
   gap: clamp(18px, 3vw, 40px);
   padding: 16px var(--pad);
+  pointer-events: none;
   transition: padding 0.3s var(--ease);
+}
+
+.top > * {
+  pointer-events: auto;
 }
 
 .top::before {
