@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <title>Parallels</title>
   <desc>Parallels logo: the same lines of latitude run through Earth, the Moon and Mars. Drawn by Claude (AI) for the Parallels team, NASA Space Apps 2026.</desc>
-  <rect width="128" height="128" rx="28" fill="#0f1626"/>
-  <circle cx="46" cy="64" r="30" fill="#3f7fd6"/>
+  <rect width="128" height="128" rx="28" fill="#02070a"/>
+  <circle cx="46" cy="64" r="30" fill="#0297de"/>
   <circle cx="100" cy="44" r="12" fill="#d3d0c8"/>
-  <circle cx="100" cy="84" r="12" fill="#c4471f"/>
-  <path d="M14 44H114M14 84H114M14 64H78" stroke="#0f1626" stroke-width="4"/>
+  <circle cx="100" cy="84" r="12" fill="#fc734d"/>
+  <path d="M14 44H114M14 84H114M14 64H78" stroke="#02070a" stroke-width="4"/>
 </svg>

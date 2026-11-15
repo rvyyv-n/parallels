@@ -1,12 +1,15 @@
 :root {
-  --space: #050607;
-  --raise: #0c0e11;
+  --space: #02070a;
+  --raise: #0a151c;
   --ink: #eef1f4;
   --ink-2: #b2bac4;
   --ink-3: #8a939e;
   --rule: rgba(255, 255, 255, 0.13);
   --rule-2: rgba(255, 255, 255, 0.28);
-  --signal: #4fd8ff;
+  --signal: #0297de;
+  --signal-2: #5bbbe9;
+  --mars: #fc734d;
+  --moon: #d3d0c8;
   --warn: #ffc24a;
   --pass: #86e3a8;
   --fail: #ff8f80;
@@ -35,6 +38,11 @@ body {
   font-variant-numeric: tabular-nums;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(2, 151, 222, 0.5);
+  color: #fff;
 }
 
 a {
@@ -124,7 +132,9 @@ p {
   align-items: center;
   gap: 8px 28px;
   padding: 10px 20px;
-  background: var(--space);
+  background: rgba(2, 7, 10, 0.86);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--rule);
 }
 
@@ -207,6 +217,7 @@ option {
   display: grid;
   grid-template-columns: clamp(340px, 26vw, 380px) minmax(0, 1fr);
   grid-template-areas: "ledger earth";
+  height: clamp(380px, calc(100vh - 64px - var(--bar, 120px) - 160px), 1000px);
   height: clamp(380px, calc(100svh - 64px - var(--bar, 120px) - 160px), 1000px);
   border-bottom: 1px solid var(--rule);
 }
@@ -292,7 +303,7 @@ option {
 
 .row.on {
   border-left-color: var(--signal);
-  background: rgba(79, 216, 255, 0.08);
+  background: rgba(2, 151, 222, 0.12);
 }
 
 .r-n {
@@ -449,7 +460,7 @@ option {
   bottom: 28px;
   width: 236px;
   padding: 10px 12px;
-  background: rgba(5, 6, 7, 0.86);
+  background: rgba(2, 7, 10, 0.86);
   border: 1px solid var(--rule);
   font-size: 12px;
   z-index: 2;
@@ -528,7 +539,7 @@ option {
 .pin.sel {
   background: var(--signal);
   border-color: var(--signal);
-  color: #000;
+  color: var(--space);
   z-index: 3;
 }
 
@@ -1058,13 +1069,13 @@ table.data .n {
 }
 
 .g2 {
-  fill: #e5603d;
-  background: #e5603d;
+  fill: var(--mars);
+  background: var(--mars);
 }
 
 .g3 {
-  fill: #4fd8ff;
-  background: #4fd8ff;
+  fill: var(--signal-2);
+  background: var(--signal-2);
 }
 
 .v-dot.held {
@@ -1081,7 +1092,7 @@ table.data .n {
 }
 
 .v-dot.held.g2 {
-  stroke: #e5603d;
+  stroke: var(--mars);
 }
 
 .v-groups {
@@ -1184,7 +1195,7 @@ ul.plain li {
 }
 
 .maplibregl-ctrl-attrib {
-  background: rgba(5, 6, 7, 0.8) !important;
+  background: rgba(2, 7, 10, 0.8) !important;
   color: var(--ink-3);
 }
 
@@ -1197,7 +1208,7 @@ ul.plain li {
 }
 
 .maplibregl-cooperative-gesture-screen {
-  background: rgba(5, 6, 7, 0.75);
+  background: rgba(2, 7, 10, 0.75);
   font-family: var(--body);
 }
 
@@ -1270,6 +1281,7 @@ ul.plain li {
   }
 
   .earth-col {
+    height: 45vh;
     height: 45svh;
     min-height: 300px;
   }
@@ -1629,14 +1641,14 @@ ul.plain li {
   z-index: 2;
   border: 1px solid var(--rule);
   padding: 4px 10px;
-  background: rgba(5, 6, 7, 0.86);
+  background: rgba(2, 7, 10, 0.86);
   font-size: 12px;
 }
 
 .pin.sel {
   background: #fff;
   border: 2px solid var(--signal);
-  color: #000;
+  color: var(--space);
   line-height: 18px;
 }
 
@@ -1665,6 +1677,7 @@ ul.plain li {
   .earth-col .earth {
     position: relative;
     inset: auto;
+    height: 45vh;
     height: 45svh;
     min-height: 300px;
   }
@@ -1804,7 +1817,7 @@ ul.plain li {
   padding: 0 12px;
   font-size: 13px;
   color: var(--ink-2);
-  background: rgba(5, 6, 7, 0.7);
+  background: rgba(2, 7, 10, 0.7);
   border: 1px solid var(--rule);
   text-decoration: none;
 }
@@ -1862,7 +1875,7 @@ ul.plain li {
   min-height: 36px;
   padding: 0 14px;
   font: 600 13px/1 var(--body);
-  color: #000;
+  color: var(--space);
   background: var(--signal);
   border: 0;
   cursor: pointer;
@@ -1882,7 +1895,7 @@ ul.plain li {
 
 .pin.hot {
   background: var(--ink);
-  color: #000;
+  color: var(--space);
   transform: scale(1.25);
   z-index: 4;
 }
@@ -1892,7 +1905,7 @@ ul.plain li {
 }
 
 .ledger li.hot .row {
-  background: rgba(79, 216, 255, 0.08);
+  background: rgba(2, 151, 222, 0.12);
 }
 
 .ledger li.hot .r-n {
