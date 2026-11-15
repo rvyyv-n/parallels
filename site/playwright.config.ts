@@ -1,13 +1,17 @@
 import { defineConfig } from "@playwright/test";
 
-const baseURL = process.env.SITE_URL ?? "http://localhost:4173";
+const port = process.env.E2E_PORT ?? "4173";
+const baseURL = process.env.SITE_URL ?? `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,
   reporter: "list",
-  use: { baseURL },
+  use: {
+    baseURL,
+    launchOptions: { args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] },
+  },
   webServer: process.env.SITE_URL
     ? undefined
-    : { command: "npm run preview", url: baseURL, reuseExistingServer: true },
+    : { command: `npx vite preview --port ${port} --strictPort`, url: baseURL, reuseExistingServer: false },
 });
