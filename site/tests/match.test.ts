@@ -63,3 +63,12 @@ describe("match for the headline places", () => {
     expect(monthsOf(1 << 11)[11]).toBe(true);
   });
 });
+
+describe("formatValue", () => {
+  it("drops the minus sign when a value rounds to zero", () => {
+    expect(formatValue(-0.3, { unit: "°C", digits: 0 })).toBe("0°C");
+    expect(formatValue(-0.04, { unit: "", digits: 1 })).toBe("0.0");
+    expect(formatValue(-0.6, { unit: "°C", digits: 0 })).toBe("−1°C");
+    expect(formatValue(-10.3, { unit: "°C", digits: 1 })).toBe("−10.3°C");
+  });
+});

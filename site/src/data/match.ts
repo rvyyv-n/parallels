@@ -140,9 +140,11 @@ export function buildMatch(
 
 export const monthsOf = (mask: number) => Array.from({ length: 12 }, (_, m) => (mask & (1 << m)) !== 0);
 
+export const fixed = (value: number, digits: number) => value.toFixed(digits).replace(/^-(0(\.0+)?)$/, "$1");
+
 export function formatValue(value: number | null, trait: Pick<Trait, "unit" | "digits">): string {
   if (value === null) return "no data";
-  const n = value.toFixed(trait.digits).replace("-", "−");
+  const n = fixed(value, trait.digits).replace("-", "−");
   if (!trait.unit) return n;
   return /^[°%]/.test(trait.unit) ? n + trait.unit : `${n} ${trait.unit}`;
 }
