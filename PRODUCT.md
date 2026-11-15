@@ -28,9 +28,10 @@ A discovery tool, not a list of famous sites: every land cell is scored, and eve
 
 ## Main flow
 
-1. The page opens on a 3D scene: the logo's Earth, Moon and Mars come alive, joined by a cyan line from Earth to the chosen base site. Beside it, two steps with plain buttons: "Where is the base?" and "What are you testing?". Clicking the Moon or Mars in the scene also picks that world. The best match and its score are already shown, and "See Earth's top 10" (or clicking Earth) drops into the explorer, where the first match's scorecard is already open. A shared link with a place in it skips straight to the explorer.
-2. The explorer has two columns: the top 10 on the left and the Earth map, coloured by match, filling the rest. Rows and pins highlight each other.
-3. Click a row or any land cell: the map flies there and the full-width match view under the map updates. It opens with the Earth cell and the Moon or Mars site side by side at the same ground scale (with a wipe mode), then the score with a band word, challenge tiles with icons, each trait as a bar against its target, "Where it breaks" and "Earth can't copy".
+1. The page opens on a scroll story in six chapters, with Earth, the Moon and Mars pinned behind the text and moving as you scroll: the claim ("No place on Earth is the Moon. Or Mars."), the count of land patches scored and of known analogs, the Moon and its base site, Mars and its base sites, the test (rover, crew or habitat) and Earth's answer with the best match and its score. Each world's chapter shows what Earth can't copy. "Skip intro" is always on screen, and a shared link with a place in it skips straight to the explorer.
+2. The explorer has two columns: the top 10 on the left, each row with a small ground picture and a score ring, and the Earth map, coloured by match, filling the rest. Rows and pins highlight each other. The legend is a slim strip under the map. A seven-step guided tour walks a newcomer through the page.
+3. Click a row or any land cell: the map flies there and the full-width match view under the map updates. It opens with the Earth cell and the Moon or Mars site side by side at the same ground scale (with a wipe mode), then the score as a ring with a band word, challenge tiles with icons, each trait as a bar against its target, "Where it breaks" and "Earth can't copy".
+4. A Worlds section follows: for the Moon and for Mars, what Earth can't copy, the measured values at the base site, the challenges a base must solve and the places already used as analogs, each with its source.
 
 ## Capabilities and Constraints
 

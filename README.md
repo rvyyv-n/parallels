@@ -87,7 +87,7 @@ How to read the binary files:
 
 ## How we used AI
 
-The core idea and the key design decisions come from our team. We use Claude (Anthropic) to research the challenge and the judging rules, write our planning documents and, during the event, write and test the data pipeline and the site. We check its work at each checkpoint. Our local Challenge Guide asks for mission filters, terrain types and seasons. Claude checked our plan against the guide and we added them. Claude suggested a list of names and we picked Parallels. Our designs, including the logo, are aided by AI. The logo is on the site (header, footer and browser tab), and the site's footer says it was drawn with AI. Any other AI-made image or video carries a visible watermark.
+The core idea and the key design decisions come from our team. We use Claude (Anthropic) to research the challenge and the judging rules, write our planning documents and, during the event, write and test the data pipeline and the site. We check its work at each checkpoint. Our local Challenge Guide asks for mission filters, terrain types and seasons. Claude checked our plan against the guide and we added them. Claude suggested a list of names and we picked Parallels. Our designs, including the logo, are aided by AI. The logo is on the site (header, footer and browser tab), and the site's footer says it was drawn with AI. Any other AI-made image or video carries a visible watermark. On 15 November the team chose the scroll-story opening of another entry, [Terra Nova](https://github.com/Yakiyo/terra-nova), as the model for ours. Claude studied it and wrote our version from scratch, with our own words, data and code; none of its code or images is used.
 
 ## Data
 
@@ -135,7 +135,7 @@ These images are shown, not scored.
 
 | Image | Source | Licence | Use |
 |---|---|---|---|
-| [Blue Marble: Shaded Relief and Bathymetry](https://nasa-gibs.github.io/gibs-api-docs/) | NASA Earth Observatory via NASA GIBS | NASA open data, no restrictions | Earth globe background. We bundle a copy as `site/public/img/blue-marble.jpg`. It takes over if the live tile service is down. |
+| [Blue Marble: Shaded Relief and Bathymetry](https://nasa-gibs.github.io/gibs-api-docs/) | NASA Earth Observatory via NASA GIBS | NASA open data, no restrictions | Earth globe background, the 3D Earth in the opening and the small ground pictures in the top 10 (live tiles). We bundle two copies, `site/public/img/blue-marble.jpg` (1,024 px) and `blue-marble-4k.jpg` (4,096 px, fetched from GIBS on 2026-11-15 for wide screens). The bundled copy takes over if the live tile service is down. |
 | [CGI Moon Kit: LROC colour map with filled poles](https://svs.gsfc.nasa.gov/4720) | NASA Scientific Visualization Studio (LRO data) | Public domain (NASA) | Surface of the 3D Moon globe (`site/public/img/moon.jpg`). |
 | [Viking MDIM 2.1 global colour mosaic](https://trek.nasa.gov/mars/) | NASA / USGS Astrogeology, via NASA Mars Trek tiles | Public domain (NASA / USGS) | Surface of the 3D Mars globe (`site/public/img/mars.jpg`). |
 | [Landsat WELD true colour, global annual mosaic](https://nasa-gibs.github.io/gibs-api-docs/) | NASA / USGS Landsat, via NASA GIBS | NASA open data, no restrictions | Earth side of the close-up in each match (live tiles), over Blue Marble. Display only, not scored. |
