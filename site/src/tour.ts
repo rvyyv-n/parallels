@@ -11,8 +11,11 @@ const STEPS: { at: string; title: string; text: string }[] = [
   { at: "#checked", title: "How we checked it", text: "Places already used as analogs should beat ordinary places. Checks that did not pass stay on show." },
 ];
 
+const visible = (at: string) => [...document.querySelectorAll<HTMLElement>(at)].find((e) => e.getClientRects().length > 0) ?? null;
+
 export function tour(button: HTMLElement): void {
   let n = -1;
+  let steps = STEPS;
   let raf = 0;
   const hole = document.createElement("div");
   hole.className = "tour-hole";
@@ -25,7 +28,7 @@ export function tour(button: HTMLElement): void {
   box.innerHTML = `<p class="tour-n" aria-hidden="true"></p><div aria-live="polite"><h2 class="tour-t"></h2><p class="tour-p"></p></div>
     <div class="tour-btns"><button type="button" data-tour="back">Back</button><button type="button" data-tour="next" class="tour-next">Next</button><button type="button" data-tour="end" aria-label="Close the tour">Close</button></div>`;
   document.body.append(hole, box);
-  const target = () => document.querySelector<HTMLElement>(STEPS[n].at);
+  const target = () => visible(steps[n].at);
 
   const track = () => {
     raf = 0;
@@ -43,16 +46,12 @@ export function tour(button: HTMLElement): void {
   const show = (k: number): void => {
     n = k;
     const el = target();
-    if (!el) {
-      if (k < STEPS.length - 1) show(k + 1);
-      else end();
-      return;
-    }
-    box.querySelector(".tour-n")!.textContent = `${k + 1} of ${STEPS.length}`;
-    box.querySelector(".tour-t")!.textContent = STEPS[k].title;
-    box.querySelector(".tour-p")!.textContent = STEPS[k].text;
+    if (!el) return end();
+    box.querySelector(".tour-n")!.textContent = `${k + 1} of ${steps.length}`;
+    box.querySelector(".tour-t")!.textContent = steps[k].title;
+    box.querySelector(".tour-p")!.textContent = steps[k].text;
     box.querySelector<HTMLButtonElement>('[data-tour="back"]')!.disabled = k === 0;
-    box.querySelector('[data-tour="next"]')!.textContent = k === STEPS.length - 1 ? "Finish" : "Next";
+    box.querySelector('[data-tour="next"]')!.textContent = k === steps.length - 1 ? "Finish" : "Next";
     hole.hidden = box.hidden = false;
     el.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: el.offsetHeight > innerHeight * 0.7 ? "start" : "center" });
     if (!raf) raf = requestAnimationFrame(track);
@@ -67,6 +66,8 @@ export function tour(button: HTMLElement): void {
   }
 
   button.addEventListener("click", () => {
+    steps = STEPS.filter((s) => visible(s.at));
+    if (!steps.length) return;
     show(0);
     box.querySelector<HTMLButtonElement>(".tour-next")!.focus({ preventScroll: true });
   });
@@ -75,7 +76,7 @@ export function tour(button: HTMLElement): void {
     if (!b) return;
     if (b.dataset.tour === "end") end();
     else if (b.dataset.tour === "back") show(Math.max(0, n - 1));
-    else if (n === STEPS.length - 1) end();
+    else if (n === steps.length - 1) end();
     else show(n + 1);
   });
   document.addEventListener("keydown", (e) => {

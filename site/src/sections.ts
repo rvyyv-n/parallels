@@ -4,14 +4,6 @@ import { esc, num } from "./format";
 
 const pct = (v: number | null | undefined) => (v == null ? "not run" : `${num(v * 100, 0)}%`);
 
-export const NAV = [
-  ["worlds", "Worlds"],
-  ["checked", "Checks"],
-  ["challenge", "Challenge"],
-  ["data", "Data"],
-  ["limits", "Limits"],
-];
-
 const WHERE: Record<number, string> = { 1: "data", 2: "terrain", 3: "explore", 4: "terrain", 5: "explore", 6: "explore" };
 
 export const IMAGERY = [
@@ -225,28 +217,33 @@ function block(ts: ValidationTest[], m: Manifest, l: string) {
 
 type Later = NonNullable<Validation["second_run"]> & Partial<Pick<NonNullable<Validation["third_run"]>, "method_change" | "adopted" | "adoption_rule">>;
 
-type Run = { id: string; title: string; label: string; adopted?: boolean; tests: ValidationTest[]; body: (head: boolean) => string };
+type Run = { id: string; title: string; label: string; adopted?: boolean; preset?: string; tests: ValidationTest[]; body: (head: boolean) => string };
+
+const presetName = (m: Manifest, id: string) => m.filters.find((f) => f.id === id)?.name ?? id.charAt(0).toUpperCase() + id.slice(1).replace(/_/g, " ");
 
 const methodOf = (title: string) => title.match(/method version ([\d.]+)/i)?.[1];
 
-const runLabel = (n: number, title: string) => {
+const runLabel = (n: number, title: string, preset?: string) => {
   const v = methodOf(title);
-  return `Run ${n} · ${v ? `method ${v}` : title}`;
+  return `Run ${n} · ${preset ? `check of the ${preset} preset` : v ? `method ${v}` : title}`;
 };
 
-function later(r: Later, id: string, l: string, m: Manifest, head: boolean) {
-  const extra = [
-    r.method_change ? `<p><b>Method change.</b> ${esc(r.method_change)}</p>` : "",
-    r.adoption_rule ? `<p><b>Adoption rule.</b> ${esc(r.adoption_rule)}</p>` : "",
-    r.adopted != null ? `<p><b>Adopted.</b> ${r.adopted ? "Yes" : "No"}</p>` : "",
-  ].join("");
-  return `<div class="second" id="${id}">
+function later(r: Later, id: string, l: string, m: Manifest, head: boolean, preset?: string) {
+  const extra = preset
+    ? `<p><b>A check of the ${esc(presetName(m, preset))} preset.</b> It runs the same checks on that preset's ranking. It does not change the method or what the map uses.</p>`
+    : [
+        r.method_change ? `<p><b>Method change.</b> ${esc(r.method_change)}</p>` : "",
+        r.adoption_rule ? `<p><b>Adoption rule.</b> ${esc(r.adoption_rule)}</p>` : "",
+        r.adopted != null ? `<p><b>Adopted.</b> ${r.adopted ? "Yes" : "No"}</p>` : "",
+      ].join("");
+  return `<div class="second${preset ? " preset-run" : ""}" id="${id}">
+      ${preset ? `<p class="run-label">Check of the ${esc(presetName(m, preset))} preset</p>` : ""}
       <h3 class="run-h">${esc(r.title)}</h3>
       ${verdict(r.tests, undefined, head)}
       <div class="run-notes">${notRun(r.tests)}<p class="note"><b>Designed after seeing the first run.</b> Its design was chosen knowing the first run's result, so it can't confirm the method the way the first run could. Config fixed at commit ${esc(r.config_commit)}.</p></div>
       <div class="folds">
       ${r.summary ? fold("What this run found, in full", `<p class="v-summary">${esc(r.summary)}</p>`) : ""}
-      ${fold(extra ? "What this run changed, and the rule for using it" : "What this run did", `<p>${esc(r.plain)}</p>${extra}`)}
+      ${fold(extra && !preset ? "What this run changed, and the rule for using it" : "What this run did", `<p>${esc(r.plain)}</p>${extra}`)}
       ${block(r.tests, m, l)}
       ${r.unchecked.length ? fold(`Not checked in this run (${num(r.unchecked.length)})`, `<ul class="plain">${r.unchecked.map((u) => `<li><b>${esc(u.place)}:</b> ${esc(u.why)}</li>`).join("")}</ul>`) : ""}
       </div>
@@ -269,9 +266,9 @@ function first(v: Validation, l: string, m: Manifest, head: boolean) {
 
 function runs(v: Validation, m: Manifest): Run[] {
   const out: Run[] = [];
-  const add = (id: string, title: string, tests: ValidationTest[], adopted: boolean | undefined, body: (l: string, head: boolean) => string) => {
-    const l = runLabel(out.length + 1, title);
-    out.push({ id, title, label: l, adopted, tests, body: (head) => body(l, head) });
+  const add = (id: string, title: string, tests: ValidationTest[], adopted: boolean | undefined, body: (l: string, head: boolean) => string, preset?: string) => {
+    const l = runLabel(out.length + 1, title, preset && presetName(m, preset));
+    out.push({ id, title, label: l, adopted, preset, tests, body: (head) => body(l, head) });
   };
   add("first-run", "First run", v.tests, undefined, (l, h) => first(v, l, m, h));
   const s = v.second_run;
@@ -280,7 +277,8 @@ function runs(v: Validation, m: Manifest): Run[] {
   if (t) add("third-run", t.title, t.tests, t.adopted, (l, h) => later(t, "third-run", l, m, h));
   for (const r of v.more_runs ?? []) {
     const id = `run-${out.length + 1}`;
-    add(id, r.title, r.tests, r.adopted, (l, h) => later(r, id, l, m, h));
+    const preset = r.preset;
+    add(id, r.title, r.tests, r.adopted, (l, h) => later(r, id, l, m, h, preset), preset);
   }
   return out;
 }
@@ -290,7 +288,7 @@ function meter(passed: number, all: number, cls = "") {
   return `<span class="meter${cls ? ` ${cls}` : ""}" aria-hidden="true"><i style="width:${w}%"></i></span>`;
 }
 
-function runHistory(all: Run[], now: Run) {
+function runHistory(all: Run[], now: Run, m: Manifest) {
   return `<ol class="run-hist">${all
     .map((r, i) => {
       const v = methodOf(r.title);
@@ -301,7 +299,7 @@ function runHistory(all: Run[], now: Run) {
         <span class="rh-m">${v ? `Method version ${esc(v)}` : esc(r.title)}</span>
         ${meter(p, n)}
         <span class="rh-p"><b>${num(p)} of ${num(n)}</b> checks passed</span>
-        <span class="rh-u${r === now ? " on" : ""}">${r === now ? "Used now" : "Not used now"}</span>
+        <span class="rh-u${r === now ? " on" : ""}">${r === now ? "Used now" : r.preset ? `Check of the ${esc(presetName(m, r.preset))} preset` : "Not used now"}</span>
       </a></li>`;
     })
     .join("")}</ol>`;
@@ -310,9 +308,10 @@ function runHistory(all: Run[], now: Run) {
 function checked(v: Validation | null, m: Manifest) {
   if (!v) return { lede: "", body: `<p>The validation file is missing from this build, so no check results are shown.</p>` };
   const all = runs(v, m);
-  const now = [...all].reverse().find((r) => r.adopted) ?? all[0];
+  const now = [...all].reverse().find((r) => r.adopted && !r.preset) ?? all[0];
   const ver = m.method_version ?? methodOf(now.title);
-  const earlier = all.filter((r) => r !== now);
+  const earlier = all.filter((r) => r !== now && !r.preset);
+  const presets = all.filter((r) => r.preset);
   const dataOk = v.data_checks.filter((c) => c.passed).length;
   const dataBad = v.data_checks.filter((c) => !c.passed);
   const p = passCount(now.tests);
@@ -329,10 +328,11 @@ function checked(v: Validation | null, m: Manifest) {
       </div>
       <div class="current-box">
         <p class="run-label">Every run</p>
-        ${runHistory(all, now)}
+        ${runHistory(all, now, m)}
       </div>
     </div>
     ${now.body(false)}
+    ${presets.map((r) => r.body(true)).join("")}
     <div class="folds chk-more">
     ${earlier.length ? `<details class="earlier"><summary>Earlier runs (${num(earlier.length)})</summary>${earlier.map((r) => r.body(true)).join("")}</details>` : ""}
     ${v.stability ? fold("How stable the top places are", `<p>${esc(v.stability)}</p>`) : ""}
@@ -356,7 +356,7 @@ function terrain(m: Manifest) {
     m.terrain_types.length,
     "Terrain types and clusters",
     `${num(m.terrain_types.length)} terrain types and ${num(m.clustering.k)} clusters, worked out from the data.`,
-    `<p>Every land cell gets one terrain tag, by rules worked out from the data. Filter the map by type above.</p>
+    `<p>Every land cell gets one terrain tag, by rules worked out from the data. <a href="#/find">The Finder</a> filters its map by type.</p>
     <h3>Terrain types</h3>
     <div class="scroll-x"><table class="data"><thead><tr><th scope="col">Type</th><th scope="col">Rule</th><th scope="col">Cells</th></tr></thead><tbody>${m.terrain_types
       .map((t) => `<tr><th scope="row">${esc(t.name)}</th><td>${esc(t.rule)}</td><td class="n">${num(t.cells)}</td></tr>`)
@@ -432,62 +432,12 @@ function limits(m: Manifest) {
   };
 }
 
-export function sections(m: Manifest, v: Validation | null) {
-  const sec = (id: string, kicker: string, title: string, part: { lede: string; body: string }) =>
-    `<section id="${id}" class="page-sec band" aria-labelledby="${id}-h"><header class="sec-head"><p class="sec-k">${esc(kicker)}</p><h2 id="${id}-h">${esc(title)}</h2>${
-      part.lede ? `<p class="lede">${part.lede}</p>` : ""
-    }</header>${part.body}</section>`;
-  const k = Object.fromEntries(NAV);
-  return [
-    sec("checked", k.checked, "How we checked it", checked(v, m)),
-    sec("challenge", k.challenge, "The challenge", challenge(m)),
-    sec("data", k.data, "Data", data(m)),
-    sec("limits", k.limits, "Not in this version", limits(m)),
-  ].join("");
-}
+const sec = (id: string, kicker: string, title: string, part: { lede: string; body: string }, h = "h2") =>
+  `<section id="${id}" class="page-sec band" aria-labelledby="${id}-h"><header class="sec-head"><p class="sec-k">${esc(kicker)}</p><${h} id="${id}-h"${h === "h1" ? ' tabindex="-1"' : ""}>${esc(title)}</${h}>${
+    part.lede ? `<p class="lede">${part.lede}</p>` : ""
+  }</header>${part.body}</section>`;
 
-function reveal(id: string, smooth: boolean) {
-  const el = document.getElementById(id);
-  if (!el) return false;
-  if (el instanceof HTMLDetailsElement) el.open = true;
-  for (let p = el.parentElement; p; p = p.parentElement) if (p instanceof HTMLDetailsElement) p.open = true;
-  el.scrollIntoView({ behavior: smooth && !matchMedia("(prefers-reduced-motion: reduce)").matches ? "smooth" : "auto", block: "start" });
-  return true;
-}
+export const checksPage = (m: Manifest, v: Validation | null) => sec("checked", "Checks", "How we checked it", checked(v, m), "h1");
 
-let wired = false;
-let watch: IntersectionObserver | null = null;
-
-export function wire(): void {
-  const links = [...document.querySelectorAll<HTMLAnchorElement>(".top nav a")];
-  const ids = links.map((a) => a.hash.slice(1));
-  const mark = (id: string | null) =>
-    links.forEach((a) => (a.hash.slice(1) === id ? a.setAttribute("aria-current", "location") : a.removeAttribute("aria-current")));
-  const seen = new Map<string, boolean>();
-  watch?.disconnect();
-  watch = new IntersectionObserver(
-    (es) => {
-      for (const e of es) seen.set(e.target.id, e.isIntersecting);
-      mark(ids.find((id) => seen.get(id)) ?? null);
-    },
-    { rootMargin: "-30% 0px -60% 0px" },
-  );
-  for (const id of ids) {
-    const el = document.getElementById(id);
-    if (el) watch.observe(el);
-  }
-  if (location.hash) reveal(decodeURIComponent(location.hash.slice(1)), false);
-  if (wired) return;
-  wired = true;
-  document.addEventListener("click", (e) => {
-    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-    const a = (e.target as Element | null)?.closest?.<HTMLAnchorElement>('a[href^="#"]');
-    if (!a) return;
-    const id = decodeURIComponent(a.getAttribute("href")!.slice(1));
-    if (!id || !document.getElementById(id)) return;
-    e.preventDefault();
-    if (location.hash !== `#${id}`) history.pushState(null, "", `#${id}`);
-    reveal(id, true);
-  });
-  addEventListener("hashchange", () => location.hash && reveal(decodeURIComponent(location.hash.slice(1)), true));
-}
+export const aboutParts = (m: Manifest) =>
+  [sec("challenge", "Challenge", "The challenge", challenge(m)), sec("data", "Data", "Data", data(m)), sec("limits", "Limits", "Not in this version", limits(m))].join("");
