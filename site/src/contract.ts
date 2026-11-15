@@ -97,6 +97,7 @@ export interface Target {
   facts: { text: string; source: string; url: string }[];
   regions?: { id: string; name: string; lat: number; lon: number; anchor_note: string; values: Record<string, TargetValue> }[];
   headline?: { cell: number; title: string; why: string; what_to_test: string };
+  check_note?: string;
 }
 
 export interface CantCopy {
@@ -178,7 +179,7 @@ export interface Validation {
   tests: ValidationTest[];
   second_run?: { title: string; plain: string; designed_after_first_run: true; config_commit: string; summary: string; tests: ValidationTest[]; unchecked: { place: string; why: string }[] };
   third_run?: { title: string; plain: string; designed_after_first_run: true; config_commit: string; summary: string; tests: ValidationTest[]; unchecked: { place: string; why: string }[]; method_change: string; adopted: boolean; adoption_rule: string };
-  more_runs?: { title: string; plain: string; designed_after_first_run: true; config_commit: string; summary: string; tests: ValidationTest[]; unchecked: { place: string; why: string }[]; method_change: string; adopted: boolean; adoption_rule: string }[];
+  more_runs?: { title: string; plain: string; designed_after_first_run: true; config_commit: string; summary: string; tests: ValidationTest[]; unchecked: { place: string; why: string }[]; method_change: string; adopted: boolean; adoption_rule: string; preset?: string }[];
   stability?: string;
   data_checks: { name: string; result: string; passed: boolean }[];
 }
