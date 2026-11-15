@@ -2,6 +2,19 @@
 
 What gets built when, and by whom, for version 2 of the site. What the site is lives in the [plan](plan.md) (part 1, the team's idea; part 2, the spec). This file changes as work is done. A new session starts at the first unticked box.
 
+## Status: paused on 15 November 2026
+
+The team submits version 1. Work on version 2 stops here, and the team continues it after the event. Everything built is on the `v2` branch and live at https://parallels-v2-preview.vercel.app.
+
+- **Done:** passes 1 and 2, and pass 3 except the code review (3C), which was stopped before it reported.
+- **Not started:** pass 4 (demo video, fresh-eyes check, README, project page text, public link) and pass 5.
+- **Tests at the pause:** 107 unit tests and 92 browser tests pass on the build (`npm test`, `npm run build`, `npx playwright test --workers=3 --grep-invert "link answers"` in `site/`). The main page has 834 of its 900 words.
+- **Open points:**
+  - A gold "=" can sit between values that are far apart (for example "102°C = 189°C" in "Build the whole base"). It is the closest place on Earth, but it reads as equal. The team has not decided how to show it.
+  - The share image tag in `site/index.html` and `site/learn.html` needs the public address once there is one.
+  - The README still describes the site before these passes; its screenshots and feature list are out of date for version 2.
+  - Three dataset links (large NASA and USGS files) answer too slowly for the link test, so it only warns about them.
+
 ## How a pass runs
 
 - **The orchestrator** is the second v2 build thread: Claude Fable 5.2 at high effort. It owns this file and the shared files, writes the builders' briefs, joins their work, runs the tests, commits, deploys and tells the team. It writes little feature code itself.
