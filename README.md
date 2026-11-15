@@ -11,7 +11,7 @@
 
 Our NASA Space Apps 2026 entry for [Identify Earth Locations that Analog the Permanent Moon Base Locations and Mars](https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/). Event: 14–15 November 2026.
 
-No single place on Earth can stand in for a Moon or Mars base. So we split base-building into challenges, and for each one we rank the Earth sites best suited to test it. Parallels scores **91,971** squares of land (0.5°, about 50 km wide) against **six** Moon and Mars base sites, for **three** kinds of mission. Every match shows what is similar, how similar, and where it breaks, with the dataset behind each number. We check the method against known analog sites and publish the result, pass or fail.
+No single place on Earth can stand in for a Moon or Mars base. So we split base-building into challenges, and for each one we rank the Earth sites best suited to test it. Parallels scores **91,971** squares of land (0.5°, about 50 km wide) against **eleven** Moon and Mars base sites, with a **Balanced** preset where every challenge counts the same and **three** mission presets. Every match shows what is similar, how similar, and where it breaks, with the dataset behind each number. We check the method against known analog sites and publish the result, pass or fail.
 
 **TEAM RMD** · Live site: [dotcatcher.vercel.app](https://dotcatcher.vercel.app) · Use of AI: [How we used AI](#how-we-used-ai)
 
@@ -21,24 +21,24 @@ No single place on Earth can stand in for a Moon or Mars base. So we split base-
 
 <table>
 <tr>
-<td width="50%" valign="top"><img src="docs/images/intro.jpg" alt="The opening screen"><br><b>The opening screen</b><br><sub>Earth's horizon with the Moon and Mars above it. Scrolling picks a base site and a kind of test.</sub></td>
-<td width="50%" valign="top"><img src="docs/images/explore.jpg" alt="Earth's top 10"><br><b>Earth's top 10</b><br><sub>Pick a base site and a mission filter. The globe colours all land by match, and the list shows the ten best places with their scores.</sub></td>
+<td width="50%" valign="top"><img src="docs/images/home.jpg" alt="The opening screen"><br><b>The opening screen</b><br><sub>Earth's horizon with the Moon and Mars above it. Home is one scroll story that ends in the Finder.</sub></td>
+<td width="50%" valign="top"><img src="docs/images/moon.jpg" alt="Choose a base site"><br><b>Choose a base site</b><br><sub>Every Moon and Mars base site with a picture cut from NASA maps. Hover a site to light it on the globe; click to find its matches on Earth.</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><img src="docs/images/match.jpg" alt="One match"><br><b>One match</b><br><sub>The place on Earth beside the Moon or Mars site at the same ground scale, with the score, what matches and what breaks.</sub></td>
-<td width="50%" valign="top"><img src="docs/images/part-by-part.jpg" alt="Part by part"><br><b>Part by part</b><br><sub>Each challenge opens to its traits: the Earth value against the target, Earth's whole range, and both datasets.</sub></td>
+<td width="50%" valign="top"><img src="docs/images/hover.jpg" alt="The Finder"><br><b>The Finder</b><br><sub>The best 2% of land lit on the globe, the top 20 places in a sidebar with a colour chip for every challenge, and a card for each place on hover.</sub></td>
+<td width="50%" valign="top"><img src="docs/images/place.jpg" alt="One match"><br><b>One match</b><br><sub>The place on Earth beside the base site at the same ground scale, with the match score, what matches, what breaks and the dataset behind each value.</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><img src="docs/images/where-it-breaks.jpg" alt="Where it breaks"><br><b>Where it breaks</b><br><sub>The weak traits at this place, and what no place on Earth can copy: gravity, air and radiation.</sub></td>
-<td width="50%" valign="top"><img src="docs/images/how-we-checked.jpg" alt="How we checked it"><br><b>How we checked it</b><br><sub>Every validation run, with the checks that did not pass left on show.</sub></td>
+<td width="50%" valign="top"><img src="docs/images/known.jpg" alt="Where crews already train"><br><b>Where crews already train</b><br><sub>Known analog sites on Earth. Click one to fly the globe there.</sub></td>
+<td width="50%" valign="top"><img src="docs/images/learn.jpg" alt="Learn"><br><b>Learn</b><br><sub>The Moon and Mars in six short sections: temperatures, seasons on Earth, what Earth cannot copy, and NASA photo pairs.</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><img src="docs/images/worlds.jpg" alt="Meet the Moon and Mars"><br><b>Meet the Moon and Mars</b><br><sub>The base site's measured values, what a base there must solve, and where crews already rehearse on Earth.</sub></td>
-<td width="50%" valign="top"><img src="docs/images/phone.jpg" alt="The site on a phone" width="60%"><br><b>On a phone</b><br><sub>The same flow on a small screen, with the guided tour one tap away.</sub></td>
+<td width="50%" valign="top"><img src="docs/images/phone.jpg" alt="The site on a phone" width="60%"><br><b>On a phone</b><br><sub>The map on top and the ranked list in a sheet that slides up over it.</sub></td>
+<td width="50%" valign="top"></td>
 </tr>
 </table>
 
-The screenshots show the live site on 15 November 2026.
+The screenshots show the site on 15 November 2026.
 
 ---
 
@@ -82,22 +82,24 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 
 | Capability | Description |
 |---|---|
-| **Base sites** | Six: the Moon's south pole (the nine Artemis III regions) and five Mars sites (Jezero, Gale, Arcadia Planitia, Deuteronilus Mensae and the Arsia Mons caves). Each value names its dataset or paper in `manifest.json`. |
+| **Base sites** | Eleven. On the Moon: the south pole (NASA's nine Artemis III regions combined), four of those regions on their own (Haworth, Malapert Massif, Nobile Rim 1, de Gerlache Rim 2) and the Shackleton rim. On Mars: Jezero, Gale, Arcadia Planitia, Deuteronilus Mensae and the Arsia Mons caves. Each value names its dataset or paper in `manifest.json`. |
 | **Parts of a base** | The Moon has eight challenges and Mars has seven, such as Surface, Resources, Heat swing and Atmosphere and dust. Parts that cannot be measured on both sides are shown, not scored, with the reason. |
-| **Mission filters** | Rover mobility, Life support and Habitat structure. Each one weights the challenges for that kind of test. You can also set the weights by hand. |
-| **Search of all land** | Every square of land is ranked on 17 traits against all of Earth's land, not against a hand-picked list. The globe colours all of it by match. |
-| **Top 10 places** | The ten best places for a base site and filter, each with its score out of 100, coordinates and terrain type. |
+| **Presets** | Balanced (every challenge counts the same; the default) and three mission presets: Rover mobility, Life support and Habitat structure. Sliders change each challenge's weight from 0 to 2×, and the list re-ranks at once. |
+| **Search of all land** | Every square of land is ranked on 17 traits against all of Earth's land, not against a hand-picked list. The globe lights the best 2% of land, with a switch for 1%, 5%, 10% and all land. |
+| **Top 20 places** | The twenty best places, at least 800 km apart and at most two per country, grouped by world region. Each row has a colour chip for every challenge (very close, close, partly, far off), a "New" badge and how often it held its place in the robustness runs. |
+| **Hover card and popup** | Hovering a place shows a NASA Blue Marble picture of it, its coordinates and its match score; clicking opens a popup with its share of land and a link to the full match. |
 | **Side by side** | The Earth place (Landsat) beside the Moon or Mars site (LOLA relief or Viking colour), drawn at the same ground scale, with a wipe to compare. Display only, not scored. |
 | **Match and break** | Each trait shows the Earth value against the base-site value in real units, Earth's whole range, and both datasets. Missing data is shown as missing. |
-| **New places** | A "rarely used" tag marks places more than 100 km from all 50 known analog sites in our list. The Moon's top place for rover mobility is 426 km from the nearest one. |
+| **New places** | "New" marks places more than 100 km from all 50 known analog sites in our list. By default the top 20 shows new places only; one click adds the known sites back. |
 | **Seasons** | Best months, freeze–thaw months and rainy months for each place, and a switch for year-round testing. |
-| **Terrain types** | Arid basin, high-altitude volcanic field, salt flat, frozen ground, and cave or lava tube, each from a visible rule. Filter the top 10 by type. |
-| **Worlds** | The Moon and Mars side: what Earth can't copy, the base site's measured values, the challenges a base there must solve, and the known analog sites. |
-| **Guided tour** | Seven steps through the explorer, from the top 10 to how we checked it. |
-| **Shareable views** | The address holds the base site, filter and place, so a link opens the same match. |
-| **A public check** | Known analogs must beat ordinary places and plain deserts. The rules were fixed in git before each run, and every result is on the site. See [Validation](#validation). |
+| **Terrain types** | Arid basin, high-altitude volcanic field, salt flat, frozen ground, and cave or lava tube, each from a visible rule. Filter the list by type. |
+| **Compare** | Tick two or three places to see their chips and scores side by side. |
+| **Learn** | The Moon and Mars for newcomers: the base site against its best Earth place, a month slider over the best places, what a spacesuit, rover or habitat module weighs on each world, a map of known analogs and NASA photo pairs. |
+| **Guided tour** | Seven steps from choosing a base site on Home to where a match breaks on Earth. |
+| **Shareable views** | The address holds the base site, preset, weights and place, so a link opens the same view. |
+| **A public check** | Known analogs must beat ordinary places and plain deserts. The rules were fixed in git before each run. See [Validation](#validation). |
 
-**Design rule:** the browser computes nothing new for the default view. It selects, groups and displays what the pipeline already computed, so every number on screen traces to a named dataset. Hand-set weights combine the pre-computed ranks; they never recompute a rank or a value.
+**Design rule:** the browser computes nothing new for the default view. It selects, groups and displays what the pipeline already computed, so every number on screen traces to a named dataset. Weight sliders combine the pre-computed ranks; they never recompute a rank or a value.
 
 ---
 
@@ -107,7 +109,7 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ 1. BASE-SITE VALUES                                                      │
 │    Moon and Mars maps (NASA PDS, NASA PGDA, USGS) and published results  │
-│    → one value per trait for each of the six base sites                  │
+│    → one value per trait for each of the eleven base sites               │
 └──────────────────────────────────────────────────────────────────────────┘
                                      ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
@@ -130,14 +132,14 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
                                      ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ 5. DATA FILES (site/public/data/)                                        │
-│    manifest.json, cells.bin, six target files, labels.json,              │
+│    manifest.json, cells.bin, eleven target files, labels.json,           │
 │    validation.json                                                       │
 └──────────────────────────────────────────────────────────────────────────┘
                                      ▼
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ 6. STATIC SITE (site/)                                                   │
-│    globe and top 10, side-by-side close-up, where each place matches     │
-│    and where it breaks, Worlds, how we checked it, guided tour           │
+│    Home story, Finder (focused map, top 20, weights), one match side by  │
+│    side with where it breaks, Learn, About, guided tour                  │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -145,9 +147,9 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 
 ## Status
 
-**Version 1 is live** at [dotcatcher.vercel.app](https://dotcatcher.vercel.app) and is our submission. It ranks every land cell on Earth against six targets: the Moon's south pole and five Mars sites (Jezero, Gale, Arcadia Planitia, Deuteronilus Mensae and the Arsia Mons caves). The map shows method version 1.2. Only the Moon's south pole and Jezero are checked against test places.
+**Version 1 is our submission**, live at [dotcatcher.vercel.app](https://dotcatcher.vercel.app). It ranks every land cell on Earth against eleven base sites, six on the Moon and five on Mars. The map uses method version 1.2; the Balanced preset and the new Moon sites were added without changing the method.
 
-**The method does not pass every check.** It passes 1 of its 4 first checks. In the fourth run, 10 of 15 checks with enough sites pass. On the held-out half, version 1.2 beats ordinary places 96% of the time for the Moon and 76% for Mars. The site shows all of this. See [Validation](#validation) and `site/public/data/validation.json`.
+**How well it works:** on the held-out half of the test places, known analogs beat ordinary places 96% of the time for the Moon and 76% for Mars. In the method's latest run, 10 of 15 checks with enough sites pass, and the Balanced preset also passes 10 of 15. Only the Moon's south pole and Jezero are checked against test places. See [Validation](#validation) and `site/public/data/validation.json`.
 
 ---
 
@@ -161,6 +163,7 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 - [docs/v1-spec.md](docs/v1-spec.md): the brief for version 1, including the data file layout.
 - [docs/review-pre-v1.md](docs/review-pre-v1.md): the data and test-place checks made before the build.
 - [docs/judging-notes.md](docs/judging-notes.md): how Space Apps is judged and what past winners did.
+- [docs/v1-roadmap.md](docs/v1-roadmap.md): the last round of site changes, with a tick box for each.
 - [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
 - [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.
 - [PRODUCT.md](PRODUCT.md): product and design notes for the site.
@@ -183,7 +186,7 @@ Pipeline (Python 3.13). Run each command from the repository root.
 | Terrain | `.venv/Scripts/python -m pipeline.terrain_grid` | Reads Copernicus DEM GLO-90 tiles. Writes slope and relief for each cell. Takes about 30 minutes. |
 | Surface | `.venv/Scripts/python -m pipeline.surface` | Reads GLiM rock, NASA EMIT minerals and MODIS land cover. Writes the surface grid. Needs a free NASA Earthdata login in `~/.netrc`. |
 | Targets | `.venv/Scripts/python -m pipeline.targets` | Reads Moon and Mars maps. Writes `pipeline/derived/targets_v1.json`. |
-| Export | `.venv/Scripts/python -m pipeline.export` | Ranks the cells, runs the validation and writes the files in `site/public/data/`. Add `--method 1.2` to run method versions 1.1 and 1.2 as further validation runs. |
+| Export | `.venv/Scripts/python -m pipeline.export --method 1.2 --method-commit b070766 --weights-commit 16b6a1c --publish 1.3 --publish-commit e21a971` | Ranks the cells, runs every validation run and writes the files in `site/public/data/`. `--method 1.2` runs method versions 1.1 and 1.2 as further runs; `--publish 1.3` adds the extra Moon sites and the Balanced preset. With these arguments the output matches the committed files byte for byte. |
 
 3. Run the tests: `.venv/Scripts/python -m pytest`.
 
@@ -208,16 +211,11 @@ The pipeline and the site meet only through these files in `site/public/data/`. 
 
 | File | What it holds | Size |
 |---|---|---|
-| `manifest.json` | The data list, traits, challenges, mission filters, terrain types, targets and their values, the byte layout of the `.bin` files, the benchmarks, the questions and the "not in this version" list | 230 KB |
+| `manifest.json` | The data list, traits, challenges, presets, terrain types, targets and their values, the byte layout of the `.bin` files, the benchmarks, the questions and the "not in this version" list | 284 KB |
 | `cells.bin` | One value per land cell (91,971 cells) for each of 30 columns: position, climate, terrain, rock, minerals, terrain type and cluster | 4.4 MB |
-| `target-moon-south-pole.bin` | Ranks and scores of every cell against the Moon's south pole | 3.6 MB |
-| `target-mars-jezero.bin` | The same, against Jezero | 3.6 MB |
-| `target-mars-gale.bin` | The same, against Gale | 3.3 MB |
-| `target-mars-arcadia-planitia.bin` | The same, against Arcadia Planitia | 2.8 MB |
-| `target-mars-deuteronilus-mensae.bin` | The same, against Deuteronilus Mensae | 2.8 MB |
-| `target-mars-arsia-mons-caves.bin` | The same, against the Arsia Mons caves | 2.8 MB |
+| `target-<site>.bin` (11 files) | Ranks and scores of every cell against one base site: the Moon's south pole, Haworth, Malapert Massif, Nobile Rim 1, de Gerlache Rim 2, the Shackleton rim, Jezero, Gale, Arcadia Planitia, Deuteronilus Mensae and the Arsia Mons caves | 3.9–4.4 MB each |
 | `labels.json` | 77 labelled places: known analogs, plain deserts, ordinary places and caves | 35 KB |
-| `validation.json` | The test places, pass marks and the results of every run, with the stability check | 276 KB |
+| `validation.json` | The test places, pass marks and the results of every run, with the stability check | 363 KB |
 
 How to read the binary files:
 
@@ -229,13 +227,14 @@ How to read the binary files:
 - `cov:<challenge>` is one byte: the percent of the challenge's trait weight that has data (0 to 100).
 - `score:<filter>` and `score:<filter>:yr` are two bytes each. The values 0 to 10000 mean 0 to 1. The value 65535 means not ranked.
 - `stable:<filter>` is one byte: 1 if the cell stays in the top 20 in at least 90% of 1,000 runs with changed weights, otherwise 0.
+- `keep:<filter>` is one byte: the percent of those runs that kept the cell in the top 20 (0 to 100). Cells that were never in the top 20 have no data.
 - The types are in `site/src/contract.ts`. The layout is in section 6 of [docs/v1-spec.md](docs/v1-spec.md).
 
 ---
 
 ## How we used AI
 
-The core idea and the key design decisions come from our team. We use Claude (Anthropic) to research the challenge and the judging rules, write our planning documents and, during the event, write and test the data pipeline and the site. We check its work at each checkpoint. Our local Challenge Guide asks for mission filters, terrain types and seasons. Claude checked our plan against the guide and we added them. Claude suggested a list of names and we picked Parallels. Our designs, including the logo, are aided by AI. The logo is on the site (header, footer and browser tab), and the site's footer says it was drawn with AI. Any other AI-made image or video carries a visible watermark. On 15 November the team chose the scroll-story opening of another entry, [Terra Nova](https://github.com/Yakiyo/terra-nova), as the model for ours. Claude studied it and wrote our version from scratch, with our own words, data and code; none of its code or images is used.
+The core idea and the key design decisions come from our team. We use Claude (Anthropic) to research the challenge and the judging rules, write our planning documents and, during the event, write and test the data pipeline and the site. We check its work at each checkpoint. Our local Challenge Guide asks for mission filters, terrain types and seasons. Claude checked our plan against the guide and we added them. Claude suggested a list of names and we picked Parallels. Our designs, including the logo, are aided by AI. The logo is on the site (header, footer and browser tab), and the site's footer says it was drawn with AI. Any other AI-made image or video carries a visible watermark. On 15 November the team chose another entry, [Terra Nova](https://github.com/Yakiyo/terra-nova), as the model for the layout of our scroll-story opening, the Moon and Mars site lists, the Finder's sidebar, its colour-coded ranked list and the hover card. Claude studied it and wrote our versions from scratch, with our own words, data and code; none of its code or images is used.
 
 ---
 
@@ -290,6 +289,8 @@ These images are shown, not scored. No NASA logo or insignia is used.
 | [LOLA south-pole shaded relief, 87.5° S to the pole](https://trek.nasa.gov/moon/) | NASA LRO LOLA, via NASA Moon Trek tiles | Public domain (NASA) | Moon side of the close-up (live tiles). Shaded relief from laser altimetry, not a photo. |
 | [CGI Moon Kit: LROC colour map with filled poles](https://svs.gsfc.nasa.gov/4720) | NASA Scientific Visualization Studio (LRO data) | Public domain (NASA) | The 3D Moon in the intro (`site/public/img/moon.jpg`, 2,048 px, and `moon-4k.jpg`, 4,096 px, from the kit's 4K colour map), and the bundled fallback for the Moon close-up. |
 | [Viking MDIM 2.1 global colour mosaic](https://trek.nasa.gov/mars/) | NASA / USGS Astrogeology, via NASA Mars Trek tiles | Public domain (NASA / USGS) | The 3D Mars in the intro (`site/public/img/mars.jpg`, 2,048 px, and `mars-4k.jpg`, 4,096 px, stitched from the 128 Mars Trek tiles at zoom level 3 on 2026-11-15), and the Mars side of the close-up (live tiles, with the bundled copy as fallback). |
+| Site pictures in the Moon and Mars lists | Cut from the CGI Moon Kit and Viking MDIM maps above | Public domain (NASA / USGS) | One square picture per base site, centred on the site; the south-pole sites use a view from above the pole with raised contrast. |
+| [NASA Image and Video Library](https://images.nasa.gov/) and [NASA Photojournal](https://photojournal.jpl.nasa.gov/): s49-92-071, PIA23736, GSFC_20171208_Archive_e001754, PIA22077, iss068e068973, PIA00300, iss045e112699, PIA12954 | NASA, NASA/JPL-Caltech, NASA/GSFC, University of Arizona, USGS, Arizona State University | Public domain (NASA) | The eight photo pairs on the Learn page (`site/public/img/learn/`), each credited under the photo. |
 
 ---
 
@@ -311,12 +312,13 @@ These images are shown, not scored. No NASA logo or insignia is used.
 
 - Each trait is ranked against all of Earth's land. A cell's rank is the share of land, counted by area, that is strictly further from the target value. Land exactly as far away earns no credit.
 - A challenge combines its trait ranks with a weighted geometric mean. A mission filter combines the challenge scores the same way. Ranks have a floor of 0.01.
-- The Moon has eight challenges: Surface, Resources, Dryness, Heat swing, Shelter, Polar light and power, Industrial sites and Dust. Mars has seven: Surface, Resources, Dryness, Heat swing, Shelter, Atmosphere and dust, and Signs of life. The mission filters are Rover mobility, Life support and Habitat structure.
+- The Moon has eight challenges: Surface, Resources, Dryness, Heat swing, Shelter, Polar light and power, Industrial sites and Dust. Mars has seven: Surface, Resources, Dryness, Heat swing, Shelter, Atmosphere and dust, and Signs of life. The presets are Balanced (every challenge weight 1) and the three mission presets: Rover mobility, Life support and Habitat structure.
 - Version 1.0 used hand-set weights. A second run, designed after the first, checked each known analog only on the challenges it is used for.
 - Version 1.1 gave each part of a challenge equal weight and added a volcanic rock trait for Mars. Why: Mars Surface failed clearly in the second run (21% against ordinary places, pass mark 80%). Farmland is as flat as Jezero's floor, and Mars had no rock trait.
 - Version 1.2 counts only land strictly further from the target. Why: the Amazon near Manaus scored above 90% of land for rover mobility at Jezero, because tied values got half credit.
 - Each version replaced the one before only by a rule fixed before it ran. The test places have now been used four times, so no further change will be judged on them.
-- The rules were fixed in git before each run: commits `16b6a1c` (weights, thresholds, pass marks and held-out split), `d48b9ab` (config formatting restored), `7661981` (version 1.1) and `b070766` (version 1.2).
+- `pipeline/config/v1.3.json` is a publishing config, not a method version: it adds the Balanced preset and five Moon sites and changes no score. Every column published before it is byte-identical.
+- The rules were fixed in git before each run: commits `16b6a1c` (weights, thresholds, pass marks and held-out split), `d48b9ab` (config formatting restored), `7661981` (version 1.1), `b070766` (version 1.2) and `e21a971` (the Balanced preset).
 
 ---
 
@@ -330,6 +332,7 @@ We graded the method in public. The weights, the pass marks and the held-out hal
 | Second | Each known analog only on the challenges it is used for | 6 of 11 checks with enough sites pass |
 | Third | Version 1.1: each part of a challenge counts equally; a volcanic rock trait for Mars | 7 of 15 checks with enough sites pass |
 | Fourth | Version 1.2: no credit for tied values. This is the method on the map | 10 of 15 checks with enough sites pass; 6 more have too few sites to count |
+| Fifth | The Balanced preset, same method and pass marks | 10 of 15 checks with enough sites pass; pooled, known analogs beat ordinary places 94% of the time for the Moon and 82% for Mars |
 
 - **Held-out half:** version 1.2 beats ordinary places 96% of the time for the Moon and 76% for Mars.
 - **What still fails:** Mars Surface misses its pass mark (73% against 80%), and so does Mars Dryness. The Moon's polar and highland check reaches 72% against 80%.
@@ -346,11 +349,11 @@ We graded the method in public. The weights, the pass marks and the held-out hal
 | One rock class per cell | The GLiM rock map gives one main rock for each cell. |
 | Minerals cover bare, dry land only | EMIT mineral data is empty outside its coverage and where vegetation, water, cloud or urban areas hide the ground. |
 | Top places change with the weights | We changed the weights by up to 50% in 1,000 runs. For Jezero, 6 of 20 top places stay in the top 20 for rover mobility, 3 of 20 for life support and 0 of 20 for habitat structure. |
-| Only two targets are checked | The Moon's south pole and Jezero are checked against test places. The other four are scored but not validated. |
+| Only two targets are checked | The Moon's south pole and Jezero are checked against test places. The other nine are scored but not validated; the five extra Moon sites say so on the site. |
 | Validation does not pass in full | See [Validation](#validation). The test places were used four times. |
 | Thermal inertia is a label | Mars thermal inertia (NASA TES) is shown, not scored. Earth's side needs a checked conversion first. |
 | No UV, no travel difficulty | UV is not scored or shown. How hard it is to get there is not scored. |
-| Artemis regions | The nine Artemis regions are not separate maps. Their values sit under the Moon's south pole. |
+| Artemis regions | Four of the nine Artemis III regions and the Shackleton rim are their own targets. The other five regions are combined in the Moon's south pole target. |
 | Some ideas are left out | Mars ice maps (SWIM) can only be labels. Martian valley networks have no global Earth layer. The lunar pit atlas was not checked. |
 | Terrain is ESA data | Earth slopes and relief come from Copernicus DEM GLO-90, a European (ESA) dataset. |
 | What Earth can't copy | Low gravity, the Moon's vacuum, Mars's thin air and space radiation. |
