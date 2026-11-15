@@ -64,13 +64,13 @@ A top bar on every page links Home, The Moon, Mars, Finder, Checks and About, an
 
 Owner files: `site/src/main.ts` (during this pass only), a new `site/src/router.ts`, a new `site/src/pages/` folder (one module per page), `site/src/sections.ts`, `site/src/worlds.ts`, `site/tests/pages.spec.ts`, and updates to `site/tests/flow.spec.ts`.
 
-- [ ] **R1. Router.** Hash routes, so the site stays static with no server config. Each route renders its page into `#app`, sets the document title, moves focus to the page heading and scrolls to the top. The back button works. Data loads once and is shared between pages.
+- [x] **R1. Router.** Hash routes, so the site stays static with no server config. Each route renders its page into `#app`, sets the document title, moves focus to the page heading and scrolls to the top. The back button works. Data loads once and is shared between pages.
   → verify: every route in the table opens its page with its heading; Back returns to the previous page.
-- [ ] **R2. Move the content.** Move each part of today's single page to its page in the table: the opening chapters to Home, the Moon and Mars chapters and the Worlds section to the Moon and Mars pages, the explore stage to Finder, the scorecard to Place, "How we checked it" to Checks, the challenge, data and limits sections to About. The "What are you testing?" chapter becomes the preset row on Finder.
+- [x] **R2. Move the content.** Move each part of today's single page to its page in the table: the opening chapters to Home, the Moon and Mars chapters and the Worlds section to the Moon and Mars pages, the explore stage to Finder, the scorecard to Place, "How we checked it" to Checks, the challenge, data and limits sections to About. The "What are you testing?" chapter becomes the preset row on Finder.
   → verify: no page shows any item from the "What is not on it" column (a test checks for the main selectors).
-- [ ] **R3. Old links.** `/?t=…&f=…&c=…` redirects to `#/place?t=…&f=…&c=…`; `/?t=…` redirects to `#/find?t=…`.
+- [x] **R3. Old links.** `/?t=…&f=…&c=…` redirects to `#/place?t=…&f=…&c=…`; `/?t=…` redirects to `#/find?t=…`.
   → verify: the shared-link test in `flow.spec.ts`, updated for the new route, passes.
-- [ ] **R4. Nav and footer.** One top bar and one footer, as in the table, on every page. On a phone the nav folds into a menu button.
+- [x] **R4. Nav and footer.** One top bar and one footer, as in the table, on every page. On a phone the nav folds into a menu button.
   → verify: at 390 px every nav item can be reached, and nothing overflows.
 
 Then the orchestrator takes `main.ts` back and commits the stubs for pass 2:
@@ -87,15 +87,15 @@ Then the orchestrator takes `main.ts` back and commits the stubs for pass 2:
 
 Owner files: `pipeline/` (targets, config, export, publish, validate, tests), `site/public/data/`.
 
-- [ ] **P1. Moon sites as targets (S1).** The pipeline already scores each Artemis III region on its own (`targets.py`: `targets = [moon_target(regions)] + regions`), but export publishes only `cfg["default_targets"]`. Add the S1 regions to a new config `pipeline/config/v1.3.json` and publish a target file for each. For the Shackleton rim, add it to `MOON` in `targets.py` with its USGS gazetteer position and the same polar maps (LOLA, Diviner, PGDA); drop it if any of them has no value there.
+- [x] **P1. Moon sites as targets (S1).** The pipeline already scores each Artemis III region on its own (`targets.py`: `targets = [moon_target(regions)] + regions`), but export publishes only `cfg["default_targets"]`. Add the S1 regions to a new config `pipeline/config/v1.3.json` and publish a target file for each. For the Shackleton rim, add it to `MOON` in `targets.py` with its USGS gazetteer position and the same polar maps (LOLA, Diviner, PGDA); drop it if any of them has no value there.
   → verify: `python -m pytest pipeline/tests` passes; `manifest.json` lists each new target with a `.bin`; every value in each new target names a dataset in `manifest.datasets`.
-- [ ] **P2. Balanced preset (S2).** Add a fourth filter `balanced` with equal challenge weights for both bodies. Export gives it `score:balanced`, `score:balanced:yr` and `stable:balanced`, like the other filters.
+- [x] **P2. Balanced preset (S2).** Add a fourth filter `balanced` with equal challenge weights for both bodies. Export gives it `score:balanced`, `score:balanced:yr` and `stable:balanced`, like the other filters.
   → verify: a test finds the old `score:rover|life_support|habitat` columns unchanged for every existing target.
-- [ ] **P3. Stability as a share.** Today `stable:<filter>` is 1 or 0. Also export `keep:<filter>` as one byte, 0–100: the percent of robustness runs that kept the cell in the top list (`publish.py` already computes `hits / runs`).
+- [x] **P3. Stability as a share.** Today `stable:<filter>` is 1 or 0. Also export `keep:<filter>` as one byte, 0–100: the percent of robustness runs that kept the cell in the top list (`publish.py` already computes `hits / runs`).
   → verify: cells with `stable = 1` have `keep` at or above the publish threshold.
-- [ ] **P4. Validation for Balanced (S4).** Run `validate.py` on `balanced` and append the result to `validation.json` under `more_runs`, labelled as designed after the first run, with its pass marks unchanged. New Moon targets with no checks of their own say "not checked on its own; the combined south-pole target is checked".
+- [x] **P4. Validation for Balanced (S4).** Run `validate.py` on `balanced` and append the result to `validation.json` under `more_runs`, labelled as designed after the first run, with its pass marks unchanged. New Moon targets with no checks of their own say "not checked on its own; the combined south-pole target is checked".
   → verify: the Checks page shows the new run, including any checks that fail.
-- [ ] **P5. Publish.** Re-run export, copy the files to `site/public/data/`, check each target file stays near today's 3–4 MB (each loads only when its site is picked), and update `contract.ts` (orchestrator) for the new columns.
+- [x] **P5. Publish.** Re-run export, copy the files to `site/public/data/`, check each target file stays near today's 3–4 MB (each loads only when its site is picked), and update `contract.ts` (orchestrator) for the new columns.
   → verify: the full Playwright suite passes on the new data.
 
 **Checkpoint 1.** Preview link and a screenshot of each page. Ask the user whether each page holds the right things.
