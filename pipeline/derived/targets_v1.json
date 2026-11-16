@@ -88,7 +88,7 @@
    "agency": "USGS",
    "url": "https://planetarynames.wr.usgs.gov/",
    "licence": "Open lookup; no licence stated",
-   "used_for": "Anchor positions of the nine Artemis III regions.",
+   "used_for": "Anchor positions of the nine Artemis III regions and the Shackleton rim.",
    "archive": "USGS Astrogeology"
   },
   {
@@ -3098,6 +3098,163 @@
      "text": "One of NASA's nine Artemis III candidate landing regions",
      "source": "NASA, 28 Oct 2024",
      "url": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/"
+    }
+   ],
+   "default": false
+  },
+  {
+   "id": "moon-shackleton-rim",
+   "body": "moon",
+   "name": "Shackleton rim",
+   "lat": -89.985,
+   "lon": -50.22,
+   "anchor_note": "Point on Shackleton's rim facing the pole: Gazetteer centre moved one radius (half the Gazetteer diameter) toward the pole. The crater's centre lies about 10 km from the pole, so this point sits next to the pole itself; the window takes in the rim, part of the crater's inner wall and the ground outside. Shackleton is not one of NASA's nine Artemis III regions, so it is not part of the combined south-pole target. Gazetteer: https://planetarynames.wr.usgs.gov/Feature/5450",
+   "values": {
+    "slope_median_deg": {
+     "value": 20.94,
+     "stat": "median slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "slope_p90_deg": {
+     "value": 32.33,
+     "stat": "90th percentile slope over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_10": {
+     "value": 0.129,
+     "stat": "share of the 10 km window with slope under 10°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "share_under_5": {
+     "value": 0.041,
+     "stat": "share of the 10 km window with slope under 5°",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "relief_m": {
+     "value": 2444.3,
+     "stat": "5th to 95th percentile height range over the 10 km window",
+     "dataset": "lola-ldem-240m",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "10 km window at the anchor, polar stereographic 240 m grid, slopes at 240 m."
+    },
+    "t_min_k": {
+     "value": 56.0,
+     "stat": "median over the 10 km window of the winter-minimum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the winter minimum surface temperature (polar_south_80_winter_min-float.tif)."
+    },
+    "t_min_coldest_k": {
+     "value": 17.5,
+     "stat": "coldest pixel of the winter-minimum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Coldest pixel in the 10 km window. Below about 25 K, the coldest ground temperature the Diviner team reports for the south pole (https://www.diviner.ucla.edu/science); readings this low are at the limit of what the instrument can measure, so read it as 'colder than about 25 K'."
+    },
+    "t_max_k": {
+     "value": 269.5,
+     "stat": "median over the 10 km window of the summer-maximum map",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window of the summer maximum surface temperature (polar_south_80_summer_max-float.tif)."
+    },
+    "t_swing_k": {
+     "value": 213.5,
+     "stat": "median of the summer-maximum map minus median of the winter-minimum map, 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "computed",
+     "note": "Summer-to-winter range of surface temperature, not a day-to-night swing."
+    },
+    "frozen_months": {
+     "value": 12,
+     "stat": "coolest pixel of the summer-maximum map in the 10 km window",
+     "dataset": "diviner-polar-south",
+     "resolution": "240 m",
+     "kind": "derived",
+     "note": "The window's coolest spot peaks at 84 K in summer, below 273 K, so it stays frozen all year."
+    },
+    "lit_share": {
+     "value": 0.774,
+     "stat": "best-lit pixel in the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Best-lit 120 m pixel in the 10 km window, as a fraction of time (0–1), at the surface."
+    },
+    "lit_share_median": {
+     "value": 0.223,
+     "stat": "median over the 10 km window",
+     "dataset": "pgda-avgvisib",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Median over the 10 km window, fraction of time (0–1)."
+    },
+    "psr_share": {
+     "value": 0.2,
+     "stat": "share of 120 m pixels in the 10 km window flagged as permanent shadow",
+     "dataset": "pgda-psr",
+     "resolution": "120 m",
+     "kind": "computed",
+     "note": "Pixel value +20000 means permanent shadow and -20000 means not; the meaning comes from the product label on the LOLA team's node (http://imbrium.mit.edu/EXTRAS/ILLUMINATION/IMG/LPSR_75S_120M_201608.LBL). File: https://pgda.gsfc.nasa.gov/data/MoonIllumination/LPSR_75S_120M_201608.TIF"
+    },
+    "noon_sun_deg": {
+     "value": 0.01,
+     "stat": "90 − |latitude|",
+     "dataset": "nssdc-moon-fact",
+     "resolution": "computed from latitude",
+     "kind": "derived",
+     "note": "Mean sun height at the anchor; the Moon's 1.54° tilt moves it about ±1.5° over the year."
+    },
+    "sun_height_min_deg": {
+     "value": 2,
+     "stat": "published range, lower end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "sun_height_max_deg": {
+     "value": 7,
+     "stat": "published range, upper end",
+     "dataset": "artemis-overview",
+     "resolution": "published range",
+     "kind": "published"
+    },
+    "thermal_inertia_moon_wide": {
+     "value": 55,
+     "stat": "Moon-wide average at 273 K, 55 ± 2",
+     "dataset": "hayne-2017",
+     "resolution": "Moon-wide average",
+     "kind": "published",
+     "note": "Moon-wide average at 273 K, 55 +/- 2; not mapped at the pole (the Diviner map stops at 70 degrees latitude)"
+    }
+   },
+   "facts": [
+    {
+     "text": "South-pole highlands rock is noritic anorthosite (feldspar-rich)",
+     "source": "Lemelin et al. 2022",
+     "url": "https://doi.org/10.3847/PSJ/ac532c"
+    },
+    {
+     "text": "Landing needs slopes under 10°; walking under 20°",
+     "source": "NASA Artemis overview for Space Apps 2025",
+     "url": "https://ntrs.nasa.gov/api/citations/20250009323/downloads/ArtemisOverview2025IntSPAPPSChallenge.pdf"
     }
    ],
    "default": false

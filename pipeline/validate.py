@@ -5,7 +5,7 @@ import numpy as np
 
 from pipeline.assemble import cell_of, index_of
 from pipeline.score import challenge, earth_rank, overall
-from pipeline.traits import CHALLENGES, TRAITS
+from pipeline.traits import CHALLENGES, FILTERS, TRAITS
 
 GROUPS = {
     "mars-analog": ("Known Mars analogs", "Places already used to test Mars missions."),
@@ -177,18 +177,19 @@ def data_checks(cells, where, checks):
     return out
 
 
-def run(cells, scored, sites, cfg, commit, with_misses=False):
+def run(cells, scored, sites, cfg, commit, with_misses=False, preset=None):
     v = cfg["validation"]
     pm = v["pass_marks"]
     held = set(v["held_out"])
     where = locate(sites, cells, index_of(cells))
     mars, moon = scored[v["mars_target"]], scored[v["moon_target"]]
+    overall_of = lambda s: s["scores"][preset] if preset else s["equal"]
     rule = "Each place is scored on its 0.5° cell against {t}, with every scored challenge weighted equally (a weighted geometric mean of the challenge scores, under the same 70% data rule as the map). A pair counts as a win when the analog scores higher; a pair with exactly equal scores counts as half a win."
     tests = [
         test(
             "mars", "Mars test", "mars",
             "Known Mars analogs should beat ordinary places and plain deserts. " + rule.format(t="Jezero crater"),
-            sites, ["mars-analog", "ordinary", "desert"], mars["equal"], cells, where, held, v["mars_target"],
+            sites, ["mars-analog", "ordinary", "desert"], overall_of(mars), cells, where, held, v["mars_target"],
             [
                 ("Known Mars analogs beat ordinary places", "mars-analog", "ordinary", pm["mars_vs_ordinary"]),
                 ("Known Mars analogs beat plain deserts", "mars-analog", "desert", pm["mars_vs_desert"]),
@@ -198,7 +199,7 @@ def run(cells, scored, sites, cfg, commit, with_misses=False):
         test(
             "moon-polar", "Moon test, part 1", "moon",
             "Polar and highland analogs should beat ordinary places. It's a small group, and we say so. " + rule.format(t="the Moon's south pole"),
-            sites, ["moon-analog", "ordinary"], moon["equal"], cells, where, held, v["moon_target"],
+            sites, ["moon-analog", "ordinary"], overall_of(moon), cells, where, held, v["moon_target"],
             [("Polar and highland analogs beat ordinary places", "moon-analog", "ordinary", pm["moon_vs_ordinary"])],
             moon["ranks"],
         ),
@@ -490,6 +491,52 @@ def later_run(val_old, val_new, cfg, commit, n, old_name, new_name, shown_name, 
     }
 
 
+def same_scores(a, b):
+    return bool(np.array_equal(np.nan_to_num(np.asarray(a, float), nan=-1.0), np.nan_to_num(np.asarray(b, float), nan=-1.0)))
+
+
+def preset_run(val, scored, cfg, commit, preset, n, shown_name):
+    v = cfg["validation"]
+    name = next(f["name"] for f in FILTERS if f["id"] == preset)
+    sr = val["second_run"]
+    checks = [c for t in val["tests"] + sr["tests"] for c in t["checks"] if c["passed"] is not None]
+    passed = sum(bool(c["passed"]) for c in checks)
+    pct = lambda x: "no result" if x is None else f"{round(x * 100)}%"
+    pooled_line = "; ".join(f"{b.capitalize()} {pct(pooled(sr, b)['result'])}" for b in ("moon", "mars"))
+    same = all(same_scores(scored[t]["scores"][preset], scored[t]["equal"]) for t in (v["mars_target"], v["moon_target"]))
+    word = ORDINALS[n]
+    summary = (
+        f"A {word} run checked the {name} preset with method version {shown_name}: "
+        f"{passed} of {len(checks)} checks with enough sites pass"
+        + (f", so the {name} preset does not pass in full either. " if passed < len(checks) else ". ")
+        + f"Pooled against ordinary places, challenge by challenge: {pooled_line}. The method did not change, so nothing is adopted."
+    )
+    plain = (
+        f"The {name} preset weights every challenge the same. This run repeats the first run's four checks and the second run's "
+        f"challenge-by-challenge checks with the overall score taken from the {name} preset, on the same test places with the same pass marks. "
+        "It was designed after the first run, so it is not independent proof."
+    )
+    if same:
+        plain += (
+            " The first run's overall checks already weight every scored challenge the same, so the scores here are the same as in "
+            f"the run for method version {shown_name}. The challenge-by-challenge checks do not depend on the preset."
+        )
+    tests = [dict(t, id=f"{word}-{t['id']}") for t in val["tests"] + sr["tests"]]
+    return {
+        "title": f"{word.capitalize()} run: the {name} preset",
+        "plain": plain,
+        "designed_after_first_run": True,
+        "config_commit": commit,
+        "summary": summary,
+        "tests": tests,
+        "unchecked": sr["unchecked"],
+        "method_change": f"The method did not change: it is still version {shown_name}. This run checks the new {name} preset, where every challenge counts the same.",
+        "adopted": False,
+        "adoption_rule": "No adoption applies: this run checks a preset, not a change to the method.",
+        "preset": preset,
+    }
+
+
 def second_line(tests):
     checks = [c for t in tests for c in t["checks"] if c["passed"] is not None]
     passed = [c for c in checks if c["passed"]]
@@ -546,5 +593,5 @@ def summary(val):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--file", default="dataset/validation.json")
+    ap.add_argument("--file", default="site/public/data/validation.json")
     print(summary(json.load(open(ap.parse_args().file, encoding="utf8"))))

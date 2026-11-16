@@ -1,22 +1,14 @@
 # Claude's plan
 
-Build notes for the [team plan](team-plan.md): rivals, method, data, checks, stack, roadmap and fallbacks. Written by Claude on 13 November 2026 and aligned with our local [Challenge Guide](challenge-guide.pdf) on 14 November. Where this file and the team plan differ, the team plan wins.
+Build notes for the [team plan](team-plan.md): our edge, method, data, checks, stack, roadmap and fallbacks. Written by Claude on 13 November 2026 and aligned with our local [Challenge Guide](challenge-guide.pdf) on 14 November. Where this file and the team plan differ, the team plan wins.
 
 This is the plan from before the build. What version 1 ships (its targets, data, method and limits) is in the [README](../README.md). Where the two differ, the README has the current state.
 
-## 1. Rivals
+## 1. Our edge
 
-A scan on 13 November found at least 22 public repos for this challenge. Three are serious:
+Where we can stand out:
 
-| Project | Strong point | What it lacks |
-|---|---|---|
-| [TwinWorlds](https://github.com/JimmyGuajan/twinworlds) | 15-trait fingerprint, a mission picker, "what it cannot simulate", a 2.5° global map, live site | Its only check on known sites is an anecdote; global map is coarse; some traits are literature estimates |
-| [EarthTwin](https://github.com/es-ratt/earthtwin) | Leaves missing data empty, limitations tab, tests, live site | Ranks only 18 hand-picked Earth sites; its own docs say "not a validated ranking" |
-| [terrestrial-analog-finder](https://github.com/shishir-kuet/terrestrial-analog-finder) | Terrain at 30 m in 12 regions | Terrain only, no global search, no live link |
-
-Where we can beat them:
-
-1. **We test the method in public.** Known analogs should outrank farmland and rainforest, with plain deserts in between, and we commit the weights before the v1 run. A throwaway prototype ran the same test places first, so v1's run isn't blind (section 6). None of the three rivals shows a check like this. Our literature search turned up no published analog method checked this way either.
+1. **We test the method in public.** Known analogs should outrank farmland and rainforest, with plain deserts in between, and we commit the weights before the v1 run. A throwaway prototype ran the same test places first, so v1's run isn't blind (section 6). Our literature search turned up no published analog method checked this way either.
 2. **Search all of Earth's land, then zoom to one spot.** Screen the globe at 0.5°, then compare terrain at the same scale as the Moon or Mars data, down to one valley, crater or massif. The challenge asks for exactly this ("'The Sahara' is too broad").
 3. **Rank by "Earth rank", show the real gap.** Nowhere on Earth is as cold as a lunar crater, so we rank places by how far toward the target they get. Next to that rank we always show the real gap in units, e.g. how far the coldest month falls short of −248 °C.
 4. **A headline that fills a real gap.** The Moon's south pole is pale anorthosite highland rock ([Lemelin et al. 2022](https://api.crossref.org/works/10.3847/PSJ/ac532c)), but most lunar analogs in use are dark basalt. Mistastin crater, where Artemis crews trained, is the exception ([NASA, LPSC 2024](https://ntrs.nasa.gov/api/citations/20230018695/downloads/LPSC2024_Evans_draft2.pdf)). We headline a highland stand-in only if NASA data alone ranks it high (section 5).
@@ -32,10 +24,10 @@ The first version was planned with **two targets: the Moon's south pole and Jeze
     - an "Earth can't copy" block for gravity, air, radiation and magnetic shield;
     - the site's best months to test, freeze–thaw months and rainy months;
     - one line on what to test there;
-    - Earth and target images.
+    - Earth and target images side by side.
 4. **"How we checked it"** shows the validation chart (section 6).
 
-That's two clicks to a result, well under a minute. Users can also filter by terrain type and set the weights by hand.
+That's two clicks to a result, well under a minute. A terrain-type filter and hand-set weights sit beside the list.
 
 **Extras,** only once that flow works:
 - more targets;
@@ -121,7 +113,7 @@ The zoom stage is not in version 1 (see the README's [Limits](../README.md#limit
 
 ## 4. Data
 
-Every dataset below was checked on 13 November: the files answered, or NASA's data catalogue (CMR) listed them. The datasets version 1 really uses, with their licences, are in the README's [Data](../README.md#data) section. MOD11C3 and the Obu permafrost map were not used. The link, size and licence checks made before the build are in [Appendix B](#appendix-b-data-checks-before-the-build).
+Every dataset below was checked on 13 November: the files answered, or NASA's data catalogue (CMR) listed them. The datasets version 1 really uses, with their licences, are in the README's [Data](../README.md#data) section. MOD11C3 and the Obu permafrost map were not used.
 
 **NASA Earth data** (the main scoring work):
 
@@ -131,6 +123,7 @@ Every dataset below was checked on 13 November: the files answered, or NASA's da
 | EMIT L3 mineral abundance (EMITL3ASA v002) | 10 surface minerals at 0.5°, 55°S–55°N; no feldspar, so Mars only | Earthdata | 22 MB |
 | MODIS land cover (MCD12C1 v061, 0.05°), read through NASA GIBS | bare ground | no key | 1,187 MB a year as a file; streamed tiles are smaller |
 | MODIS land-surface temperature (MOD11C3 v061) | day–night swing for thermal inertia; sharper temperature | Earthdata | about 0.9 GB a year |
+| [NASA GIBS](https://nasa-gibs.github.io/gibs-api-docs/access-basics/) Blue Marble tiles | map background | no key | streamed |
 
 **Moon and Mars data** (all answered on 13 November unless marked):
 
@@ -259,7 +252,7 @@ The full lists of test places, with positions and sources, are in `pipeline/site
 
 **Stability:** re-run with 1,000 random weight sets, each weight changed by up to ±50%. A top match that stays in the top 20 in at least 90% of runs earns the stability badge.
 
-**On the site:** the result for every test place, by group, against the pass marks. The same result goes on the project page and in the video.
+**On the site:** one chart. Each test place is a dot on a 0–100 Earth-rank line, with one row per group. The same chart goes on the project page and in the video.
 
 **Data checks:**
 - Five random cells match the POWER point API.
@@ -268,22 +261,23 @@ The full lists of test places, with positions and sources, are in `pipeline/site
 
 ## 7. Tech stack and hosting
 
-- **Pipeline:** Python 3.13 with the packages pinned in `pyproject.toml` and `uv.lock`, in `pipeline/`. Raw downloads go in `data/` (already gitignored). Outputs are small files in `dataset/`. A 0.5° land grid is about 75,000 cells, so the traits plus the scores for each mission filter come to under a few MB per target.
-- **Site:** every score, for every mission filter, is pre-computed into its own file, so the browser never recalculates anything.
+- **Pipeline:** Python 3.13 with the packages pinned in `pyproject.toml` and `uv.lock`, in `pipeline/`. Raw downloads go in `data/` (already gitignored). Outputs are small files in `site/public/data/`. A 0.5° land grid is about 75,000 cells, so the traits plus the scores for each mission filter come to under a few MB per target.
+- **Site:** Vite and TypeScript (no framework unless the interface outgrows it); MapLibre GL JS 6.18 with GIBS Blue Marble tiles (no key; zoom levels up to 8); plain SVG charts. Every score, for every mission filter, is pre-computed into its own file, so the browser never recalculates anything.
 - **Tests:**
     - pytest for the pipeline: the scoring rule on hand-made cases, plus the data checks in section 6;
-    - browser tests for the main flow and every link.
+    - Playwright for the main flow and every link.
 - **Hosting:** Vercel's free plan, deploying from the repo on every push. It's for non-commercial use only and pauses a site for 30 days if it goes over the limits. GitHub Pages (needs a public repo) is the fallback, and we can move to it at the very end.
 - **Lasting until 26 January 2027:**
     - no keys, no server, no live data calls;
+    - GIBS tiles are the only live dependency, so a static background image ships as a fallback;
     - we tag the submitted version and request a FortiGuard classification after deploying.
 
 ## 8. Roadmap
 
-Steps in order, each with its check. Clock times appear only where our guidelines ask for them: the fallback switch times in section 9, a first draft on Saturday night, and the final submission by Sunday 21:59.
+Steps in order, each with its check. The site is built on a stub data file from step 1 onward, alongside the pipeline, so it never waits for real data. Clock times appear only where our guidelines ask for them: the fallback switch times in section 9, a first draft on Saturday night, and the final submission by Sunday 21:59.
 
-1. **Before the event: accounts, setup and downloads.** We make a free Earthdata account, install the Python packages and download every file in section 4.
-    → verify: a download check lists every file and its size.
+1. **Before the event: accounts, setup and downloads.** We make a free Earthdata account, install the Python packages, download every file in section 4, and deploy a placeholder site that already runs on stub data.
+    → verify: a download check lists every file and its size; the placeholder opens in a private window on a phone.
 2. **Earth trait grid and target values** for the south pole and Jezero.
     → verify: five random cells match the POWER point API; the Artemis values agree with published ones.
 3. **Scoring, terrain types, seasons and the validation run.** The weights (per mission filter), terrain thresholds and the held-out split are committed first.
@@ -310,10 +304,12 @@ Times are in our Local Event's time zone.
 | SWIM site stays down | NASA image PIA26045 plus Odyssey GRS | Saturday 10:00 |
 | Vercel limits or pause | move to GitHub Pages (public repo) | Saturday 12:00 |
 | Rock trait unworkable | drop it from the score and keep it as an explanation | Saturday 14:00 |
-| Validation fails | publish the honest result and the reasons, never hidden. It's still more than any rival shows. | write-up by Saturday 16:00 |
+| Map library trouble | static map image plus a clickable list | Saturday 15:00 |
+| Validation fails | publish the honest result and the reasons, never hidden. | write-up by Saturday 16:00 |
 | Moon ranking is all polar ice | already handled: GLiM's ice class scores low on rock, and headlines exclude Antarctica | built in |
 | Zoom stage too slow | ship the 0.5° screen; headline at cell level with imagery | Saturday 20:00 |
 | No headline clears the bar | headline the validation: "it finds the analogs NASA uses, and ranks these next" | Saturday 22:00 |
+| GIBS tiles go down after the event | bundled static background image | built in from the start |
 | Video fails | 7 slides or fewer | Sunday 18:00 |
 
 ## 10. Awards, project page and demo
@@ -356,76 +352,13 @@ Sources for the known analogs:
 - [Mars habitability analogues (Wikipedia)](https://en.wikipedia.org/wiki/Mars_habitability_analogue_environments_on_Earth)
 - [Salar de Pajonales](https://www.frontiersin.org/articles/10.3389/fspas.2021.797591/full)
 
-## Appendix B. Data checks before the build
-
-Checked on 14 November, before the version 1 build, by opening each link or reading its file header. Section 4 and the README's [Data](../README.md#data) section give what version 1 really uses. "Not re-checked" means the value comes from the source named in `pipeline/sites.json` and I did not open that source again.
-
-### Datasets
-
-| Hole | Result | Link, size and notes |
-|---|---|---|
-| TES thermal inertia (Mars) | **Confirmed** | NASA PDS, dataset `MGS-M-TES-5-TIMAP-V1.0` (Putzig and Mellon, 2007 maps). Night map: [global_ti_night_2007.img](https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-timap-v1/mgst_9001/data/global_ti_night_2007.img), 51,840,000 bytes. Day map the same size; two masks at 25,920,000 bytes each; the [whole set as a zip](https://pds-geosciences.wustl.edu/mgs/mgs-m-tes-5-timap-v1/mgst_9001.zip) is 69,628,554 bytes. 7,200 × 3,600 pixels, 20 per degree (about 3 km), pole to pole, 16-bit integers, units J m⁻² K⁻¹ s⁻½. Multiply by the mask to drop filled-in pixels. [Overview page](https://pds-geosciences.wustl.edu/missions/mgs/tes-timap.html). |
-| Diviner regolith properties (Moon) | **Unresolved for our targets** | The maps exist: [Hayne's project page](https://phayne.github.io/projects/5_lunar-regolith/) links a [Google Drive folder](https://drive.google.com/drive/folders/1DTnMB_fWTUmRcc-abtbiFxXNZZ8dSHXv) (it opens; 128 pixels per degree, 32-bit, sizes not listed). But they cover 70°S to 70°N only, and the Artemis regions are at 84–89°S. Do instead: don't score Moon thermal inertia. Show the paper's Moon-wide average, 55 ± 2 J m⁻² K⁻¹ s⁻½ at 273 K ([Hayne et al. 2017 abstract](https://arxiv.org/abs/1711.00977)), labelled "Moon-wide average; not mapped at the pole". |
-| SWIM ice maps (Mars) | **Confirmed, site is back up** | [Products page](https://swim.psi.edu/SWIM4MIMProducts.php), last updated 4 August 2025. Direct files: [0–1 m](https://swim.psi.edu/output/SWIM4MIM/Global/Composite/SWIM4MIM_Ci_0_1.tif) 70,995,807 bytes; [1–5 m](https://swim.psi.edu/output/SWIM4MIM/Global/Composite/SWIM4MIM_Ci_1_5.tif) 70,995,807 bytes; [deeper than 5 m](https://swim.psi.edu/output/SWIM4MIM/Global/Composite/SWIM4MIM_Ci_5.tif) 70,995,794 bytes. 3,000 m pixels, 60°S to 60°N, 0–360°E, no-data value −30. Jezero, Arcadia and Deuteronilus are inside the coverage. Two cautions: the value is "ice consistency" (how far the datasets agree that ice is there), not an amount of ice, and Earth has nothing like it, so it can be a label or map layer but not a score. The page states no licence or DOI; it cites Morgan and Putzig et al. 2025. I did not confirm the value range; read it from the file. |
-| MOLA 128 px size | **Confirmed, and not needed** | PDS: [16 height tiles](https://pds-geosciences.wustl.edu/mgs/mgs-m-mola-5-megdr-l3-v1/mgsl_300x/meg128/) named `megt…hb.img`, 129,761,280 bytes each, 2,076,180,480 bytes in all (about 2.1 GB). Or one USGS file at 463 m: [Mars_MGS_MOLA_DEM_mosaic_global_463m.tif](https://planetarymaps.usgs.gov/mosaic/Mars_MGS_MOLA_DEM_mosaic_global_463m.tif), 2,125,771,142 bytes, readable in parts. Better: read small windows straight from the USGS [HRSC–MOLA 200 m file](https://planetarymaps.usgs.gov/mosaic/Mars/HRSC_MOLA_Blend/Mars_HRSC_MOLA_BlendDEM_Global_200mp_v2.tif) (11,384,463,908 bytes) without downloading it. |
-| MODIS albedo (MCD43C3), "size to check" | **Confirmed, too big: cut** | 205 MB per daily file (NASA's catalogue, latest file). A year is about 75 GB. Do instead: POWER has its own surface albedo, `ALLSKY_SRF_ALB`, in the files we already use. |
-| Other sizes in plan §4 | **Confirmed** | From NASA's catalogue: MOD11C3 73.6 MB a month (about 0.9 GB a year, as planned); MOD13C2 100.6 MB a month; MOD10CM 2.0 MB a month; EMIT L3 v002 21.8 MB. The 0.05° land-cover file MCD12C1 is 1,187 MB a year. |
-| GLiM rock map | **Confirmed** | [PANGAEA 788537](https://doi.org/10.1594/PANGAEA.788537) is the version already gridded to 0.5°, the same as our grid; CC BY 3.0; one [zip](https://hdl.handle.net/10013/epic.39939.d001) (size not checked). No login. This is the data the prototype's failed Moon check asked for. |
-| GRIP4 roads licence | **Not checked** | Cut from the plan, so no time spent. |
-
-### Ground strength stand-in
-
-| World | Result | What to show |
-|---|---|---|
-| Mars | **Resolved as a label** | Thermal inertia is NASA's own stand-in. Every Mars landing site has had to clear 100–140 J m⁻² K⁻¹ s⁻½ so that the ground is load-bearing and not metres of loose dust ([Golombek et al. 2020](https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020JE006502); the InSight site paper, [Golombek et al. 2017](https://sharad.psi.edu/~ibsmith/pubs/Golombek_SSR_2016.pdf), has the same rule in its requirements table). Show each target's TES value against that line. |
-| Earth | **Partly resolved** | An Earth thermal-inertia estimate from day–night temperatures is not in TES units unless it's converted, and the plan names no formula. If the build thread finds a published conversion and it gives sensible values for dry sand and bare rock, score thermal inertia once (under Heat swing, as the team plan has it) and read ground strength from it. If not, show both as "not scored" and tell the team: benchmark 4 is then met on minerals and aridity only. One NASA-hosted Earth dataset could back a label: [soil and regolith thickness at 1 km](https://doi.org/10.3334/ORNLDAAC/1304) (ORNL DAAC), which separates bare rock from deep soil. It has no Moon or Mars match, so it can't be scored. |
-| Moon | **Unresolved: keep as "not scored"** | No map exists. One study measured it in permanently shadowed ground from boulder tracks ([Sargeant et al. 2020](https://doi.org/10.1029/2019JE006157)). The summaries I found disagree on its numbers, so read the paper before quoting one. |
-
-### Test places with estimated positions
-
-`pipeline/sites.json` has already replaced most of these. The distance is from our point to the coordinates on the named Wikipedia article.
-
-| Place | Use this position | Result |
-|---|---|---|
-| Mistastin crater | 55.8863, −63.3283 (central island) | Confirmed: 1.8 km from the article's point |
-| Lofoten | 68.10, 13.30 | Confirmed as a point in the islands: the article lists 68.0833, 13.3333. It's a region, so label it "representative point" |
-| Black Point lava flow | 35.68, −111.36 | Not re-checked (NASA Earth Observatory page) |
-| Cinder Lake crater field | 35.3066, −111.5048 | Not re-checked (USGS drone-survey dataset) |
-| Kilbourne Hole | 31.97, −106.97 | Confirmed: 0.5 km |
-| Sedan crater | 37.18, −116.05 | Confirmed: 0.5 km |
-| Ries crater | 48.88, 10.57 | Confirmed: 0.4 km |
-| Lanzarote | 28.99, −13.79 (Timanfaya lava fields; the plan's 29.16, −13.45 is outside them) | Confirmed: 0.6 km |
-| Mauna Kea | 19.82, −155.47 | Confirmed: 0.2 km |
-| Askja | 65.05, −16.75 | Confirmed: 2.4 km |
-| Yungay, Atacama | −24.0804, −69.9412 | Not re-checked (paper PMC6232106) |
-| Bockfjorden, Svalbard | 79.43, 13.33 | Confirmed: 4.3 km from the fjord's point, between the two spring groups |
-| Tso Kar | 33.30, 77.98 | Confirmed: 0.3 km |
-| Puga Valley | 33.22, 78.31 | **Unresolved.** Its source is a GeoNames search page, not a record, and Wikipedia gives no point. Find the geothermal field in a paper, or drop it |
-| Kangerlussuaq | 67.00, −50.70 | Confirmed: 1.1 km |
-| Makgadikgadi | −20.70, 25.90 | **Unresolved.** 60 km from the article's point (−20.80, 25.33) and not confirmed to be on a pan. Use the article's point or check on a map |
-| Argentine Puna | −26, −67 | **Unresolved.** A whole plateau, 285 km from the article's point. The challenge asks for one valley or crater. Replace with a named Puna site from a paper, or drop it |
-| Death Valley | 36.2469, −116.8169 (valley floor) | Confirmed: same as the article |
-| Craters of the Moon | 43.4617, −113.5627 | Confirmed: same as the article |
-| Kīlauea Iki | 19.4139, −155.246 | Not re-checked (Wikidata Q1333175) |
-| Bletterbach | 46.35, 11.43 | Confirmed: 0.9 km |
-| Six plain deserts | as in `pipeline/sites.json` | Thar, Rub' al Khali and Kalahari match their article's point exactly. Grand Erg Oriental, Simpson and Great Victoria are 154, 64 and 220 km from theirs. **Suggestion:** move those three to the article's point so every desert has a named source |
-
-Also checked, though not starred:
-
-- **Gypsum Hill.** A search found four papers giving 79°24′30″N, 90°43′05″W (79.4083, −90.7181), for example [this one](https://aem.asm.org/content/74/22/6898); I read the search results, not the papers. Our point is about 1 km away, which is fine, but its listed source is the island's Wikipedia page. Point it at the paper.
-- **Rio Tinto** (37.683, −6.583) and **Emi Koussi** (19.7925, 18.5464) match their articles exactly. **Manicouagan** is 0.7 km from its article's point.
-- **Nain anorthosite** stays an estimate: no published point for the rock body, and ours is 4 km from the town.
-- **Lut kaluts** (30.53, 58.222) and **Umm Jirsan** (25.5888, 39.757) come from an IUGS page and a 2024 paper. Not re-checked.
-- **Mars targets.** Jezero, Arcadia, Deuteronilus, Gale's centre and Arsia's summit all match the plan. **Protonilus Mensae** does not: the plan has 42.19, 48.06 and the article has 43.86, 49.4. Drop it.
-
-Every unresolved row and suggestion above has since been settled in `pipeline/sites.json`. Each place there names its `coord_source` and explains its point in `coord_note`. Each known analog also names a source for why it counts as one, in `used_for_source`.
-
 ## Sources
 
-Rivals and hosting (opened 13 Nov):
+Hosting (opened 13 Nov):
 - the [challenge page](https://www.spaceappschallenge.org/2026/challenges/permanent-moon-base-locations-and-mars/), last edited 13 Nov
 - [GitHub plans](https://docs.github.com/en/get-started/learning-about-github/githubs-plans)
 - Vercel: [Hobby plan](https://vercel.com/docs/plans/hobby), [Git deploys](https://vercel.com/docs/git), [terms](https://vercel.com/legal/terms)
+- [MapLibre raster sources](https://maplibre.org/maplibre-gl-js/docs/API/classes/RasterTileSource/)
 
 Earth data:
 - the [NASA POWER Zarr bucket](https://nasa-power.s3.amazonaws.com/) and point API

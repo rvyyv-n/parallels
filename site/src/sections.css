@@ -1,0 +1,45 @@
+.sec-k {
+  margin: 0 0 14px;
+  font: 600 12px/1 var(--display);
+  font-stretch: 85%;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+
+.foot {
+  max-width: none;
+  margin: 0;
+  padding: 36px 20px 60px;
+  border-top: 1px solid var(--rule);
+}
+
+.top nav a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+}
+
+@media (max-width: 759px) {
+  .sec-k {
+    margin-bottom: 8px;
+  }
+
+  html {
+    scroll-padding-top: 108px;
+  }
+
+  .top nav ul {
+    gap: 0 16px;
+  }
+
+  .top nav {
+    overflow-x: visible;
+  }
+
+  .foot {
+    padding: 32px 14px 48px;
+  }
+}
+

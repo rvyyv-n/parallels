@@ -11,7 +11,7 @@ Sources: the [Judging & Awards Guide](https://www.spaceappschallenge.org/resourc
 | Criterion | Key words from the guide | What it means for us |
 |---|---|---|
 | Impact | "addressing a significant problem"; "benefits a large audience" | Say who uses our matches and what they'd test there |
-| Creativity | "a novel concept that has not been attempted before or ... an improvement upon existing ideas in a meaningful way" | At least 22 other teams build for this challenge, most of them a similarity ranker (see [Claude's plan](claudes-plan.md#1-rivals)); our angle has to be different |
+| Creativity | "a novel concept that has not been attempted before or ... an improvement upon existing ideas in a meaningful way" | At least 22 other teams build for this challenge, most of them a similarity ranker (see [Claude's plan](claudes-plan.md#1-our-edge)); our angle has to be different |
 | Validity | "grounded in scientific principles"; "usability and user-friendliness ... influence its practicality" | Show how we checked the method, and make the tool easy for a newcomer |
 | Relevance | "integrates NASA data, utilizing it as a core component ... rather than a superficial addition" | NASA data must do the main work in the scoring, not decorate it |
 | Presentation | "Judges evaluate the demo and full project to compute this score" | The project page and the site count, not just the video |

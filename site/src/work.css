@@ -1,0 +1,115 @@
+.lg-more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.lg-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.lg-more > summary:hover,
+.lg-more[open] > summary {
+  color: var(--signal);
+}
+
+.lg-more .ic {
+  width: 14px;
+  height: 14px;
+}
+
+.lg-pop p {
+  margin: 0 0 6px;
+}
+
+@media (min-width: 760px) {
+
+  .earth-col .earth {
+    bottom: 72px;
+  }
+
+  .earth-col .legend {
+    left: 0;
+    right: 0;
+    bottom: 30px;
+    width: auto;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 12px;
+    border-width: 1px 0 0;
+    background: var(--raise);
+  }
+
+  .legend .lg-title {
+    margin: 0;
+    white-space: nowrap;
+    color: var(--ink-2);
+  }
+
+  .legend .lg-scale {
+    flex: 0 1 240px;
+    min-width: 120px;
+  }
+
+  .legend .lg-bar {
+    margin-top: 0;
+    height: 7px;
+  }
+
+  .legend .lg-ticks {
+    margin: 1px 0 0;
+    font-size: 10.5px;
+    line-height: 1;
+  }
+
+  .legend .lg-range {
+    flex: 0 1 250px;
+    border-top: 0;
+    padding-top: 0;
+    white-space: nowrap;
+  }
+
+  .lg-more {
+    position: relative;
+    margin-left: auto;
+  }
+
+  .lg-pop {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 8px);
+    width: 300px;
+    padding: 12px 14px 6px;
+    background: var(--raise);
+    border: 1px solid var(--rule-2);
+    z-index: 5;
+  }
+
+  .earth-col > .lg-keys {
+    display: flex;
+    gap: 14px;
+    padding: 2px 12px;
+  }
+}
+
+@media (max-width: 759px) {
+  .legend .lg-scale,
+  .legend .lg-more {
+    grid-column: 1 / -1;
+  }
+
+  .legend .lg-text {
+    display: block;
+  }
+
+  .lg-more > summary {
+    min-height: 44px;
+  }
+}

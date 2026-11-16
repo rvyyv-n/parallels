@@ -2,3 +2,9 @@
 __pycache__/
 /data/
 .pytest_cache/
+node_modules/
+dist/
+test-results/
+playwright-report/
+.vercel/
+.DS_Store

@@ -531,6 +531,13 @@ FILTERS = [
         "challenges": {"moon": ["surface", "heat"], "mars": ["surface", "heat"]},
         "note": "Ground strength and Shelter belong here too, but neither can be scored, so they are shown as labels.",
     },
+    {
+        "id": "balanced",
+        "name": "Balanced",
+        "plain": "Every challenge counts the same.",
+        "challenges": {"moon": ["surface", "resources", "dryness", "heat", "light", "industrial"], "mars": ["surface", "resources", "dryness", "heat", "atmosphere", "life"]},
+        "since": "1.3",
+    },
 ]
 
 TERRAIN_TYPES = [
