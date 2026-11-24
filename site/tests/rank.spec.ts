@@ -150,21 +150,24 @@ test("C5: ticking two rows shows both in the compare strip, and the URL keeps th
   await expect(page.locator("#compare")).toBeHidden();
 });
 
-test("E3: the tour from Home picks a Moon site, walks the Finder, opens a Place, and closes on a click outside", async ({ page }) => {
+test("E3: the tour from Home picks a Moon site, walks the Finder, opens a Place, pauses on a click outside, and closes on Finish", async ({ page }) => {
   await page.goto("/#/");
   await page.locator("#tour-home").click();
   const box = page.locator(".tour-box");
-  await expect(box.locator(".tour-n")).toHaveText("1 of 7");
+  await expect(box.locator(".tour-n")).toHaveText("1 of 9");
   await expect(page.locator("#ch-moon .sites")).toBeInViewport();
   await box.locator(".tour-next").click();
-  await expect(box.locator(".tour-n")).toHaveText("2 of 7");
+  await expect(box.locator(".tour-n")).toHaveText("2 of 9");
   await expect(page).toHaveURL(/#\/find\?t=moon-/);
-  for (let k = 3; k <= 7; k++) {
+  for (let k = 3; k <= 9; k++) {
     await box.locator(".tour-next").click();
-    await expect(box.locator(".tour-n")).toHaveText(`${k} of 7`);
+    await expect(box.locator(".tour-n")).toHaveText(`${k} of 9`);
   }
   await expect(page).toHaveURL(/#\/place\?/);
   await expect(page.locator("#pl-mb")).toBeVisible();
   await page.mouse.click(10, 300);
+  await expect(box.locator('[data-tour="play"]')).toHaveText("Play");
+  await expect(box).toBeVisible();
+  await box.locator(".tour-next").click();
   await expect(box).toBeHidden();
 });

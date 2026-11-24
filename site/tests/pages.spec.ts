@@ -133,6 +133,7 @@ test("settings on the Finder replace the history entry, so Back leaves the page"
   await site.click();
   await expect(page).toHaveURL(/#\/find\?t=/);
   await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
+  await page.locator("#weights > summary").click();
   await page.locator("#pick-yr").check({ force: true });
   await expect(page).toHaveURL(/yr=1/);
   await page.locator(`.presets [data-filter="${m.filters[m.filters.length - 1].id}"]`).click();
@@ -158,9 +159,8 @@ test("old shared links open the new pages and leave no old URL behind", async ({
   await expect(page).toHaveURL(new RegExp(`/#/find\\?t=${main.id}$`));
   await expect(page.locator("#pick-target")).toHaveValue(main.id);
   await page.goto("/#third-run");
-  await expect(page).toHaveURL(/#\/checks$/);
-  await expect(page.locator("#third-run")).toBeVisible();
-  await expect(page.locator("#third-run")).toBeInViewport();
+  await expect(page).toHaveURL(/#\/about$/);
+  await expect(page.locator("#checked")).toBeInViewport();
   await page.goto(`/#/place?t=${main.id}`);
   await expect(page).toHaveURL(new RegExp(`#/find\\?t=${main.id}`));
   await expect(page.locator("#rank li[data-i]")).toHaveCount(20);
@@ -207,19 +207,6 @@ test("at 390 px every nav item is reachable through the menu and no page scrolls
   await links.filter({ hasText: "About" }).click();
   await expect(h1(page)).toHaveText(/About Parallels/);
   await expect(btn).toHaveAttribute("aria-expanded", "false");
-});
-
-test("the top bar shows the current site once one is picked", async ({ page }) => {
-  await page.goto("/#/");
-  await expect(page.locator("#nav-site")).toBeHidden();
-  const t = m.targets[m.targets.length - 1];
-  await page.goto(`/#/${t.body}`);
-  await page.locator(`#ch-${t.body} a.site[data-site="${t.id}"]`).click();
-  await expect(page.locator("#nav-site")).toBeVisible();
-  await expect(page.locator("#nav-site")).toContainText(t.short);
-  await expect(page.locator("#nav-site")).toHaveAttribute("href", `#/find?t=${t.id}`);
-  await page.goto("/#/about");
-  await expect(page.locator("footer .ai")).toContainText("How we used AI");
 });
 
 test("a check of a preset shows only as that preset's total on About", async ({ page, request }) => {

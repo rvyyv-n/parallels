@@ -101,6 +101,7 @@ test("year-round switch reorders the list exactly as the year-round scores say",
   const yr = spread(m, t[`score:${f.id}:yr`], cells, () => true, false).ids;
   await ready(page, `t=${main.id}&f=${f.id}`);
   expect(await order(page)).toEqual(plain);
+  await page.locator("#weights > summary").click();
   await page.locator("#pick-yr").check({ force: true });
   await expect.poll(() => order(page)).toEqual(yr);
   if (JSON.stringify(plain) !== JSON.stringify(yr)) expect(await order(page)).not.toEqual(plain);
