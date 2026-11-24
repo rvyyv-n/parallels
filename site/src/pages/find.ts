@@ -1,4 +1,4 @@
-import type { Manifest } from "../contract";
+import type { Body, Manifest } from "../contract";
 import type { Cols, Data } from "../data";
 import type { Earth, Top } from "../earth";
 import { BODY, placeName, terrainOf } from "../card";
@@ -198,8 +198,12 @@ export function finder(ctx: Ctx): Page {
       : m.scoring.yearround_rule;
     $("#w-mine").hidden = !s.hand;
     $("#find-h").innerHTML = `<span>Earth's best places for</span> <b>${esc(t.name)}</b>`;
-    $<HTMLAnchorElement>("#now-change").href = `#ch-${t.body}`;
-    $<HTMLAnchorElement>("#now-change").setAttribute("aria-label", `Select a different base site in the ${BODY[t.body]} part of Home`);
+    siteLink(t.body);
+  };
+
+  const siteLink = (b: Body) => {
+    $<HTMLAnchorElement>("#now-change").href = `#ch-${b}`;
+    $<HTMLAnchorElement>("#now-change").setAttribute("aria-label", `Select a different base site in the ${BODY[b]} part of Home`);
   };
 
   const renderSliders = () => {
@@ -537,6 +541,7 @@ export function finder(ctx: Ctx): Page {
     async show(q) {
       const next = readState(m, q);
       ctx.site(targetOf(m, next));
+      siteLink(targetOf(m, next).body);
       earth?.resize();
       if (!(await ready)) return;
       const key = query(next, -1);
