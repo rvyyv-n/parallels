@@ -33,7 +33,6 @@ function shell(m: Manifest) {
     <header class="top">
       <a class="skip" href="#main">Skip to content</a>
       <a class="brand" href="#/" aria-label="Parallels, home">${logo()}<span class="wordmark">Parallels</span></a>
-      <p class="tagline">Earth's closest parallels to every part of a Moon or Mars base.</p>
       <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav-list"><span class="menu-i" aria-hidden="true"></span>Menu</button>
       <nav aria-label="Pages"><ul id="nav-list">${NAV.map(([r, n]) => `<li><a href="#/${r}" data-route="${r}">${esc(n)}</a></li>`).join("")}</ul></nav>
     </header>

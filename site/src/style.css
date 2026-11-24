@@ -157,14 +157,6 @@ p {
   display: inline-block;
 }
 
-.tagline {
-  margin: 0;
-  color: var(--ink-2);
-  font-size: 13px;
-  max-width: 34ch;
-  line-height: 1.3;
-}
-
 .top nav {
   margin-left: auto;
 }
@@ -551,13 +543,6 @@ table.data .n {
   }
   to {
     stroke-dashoffset: 0;
-  }
-}
-
-@media (max-width: 1099px) {
-
-  .tagline {
-    display: none;
   }
 }
 

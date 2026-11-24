@@ -717,10 +717,36 @@
 .rk-chips .fc {
   display: block;
   min-width: 0;
-  padding: 3px 4px;
+  min-height: 18px;
+  padding: 2px 5px;
   overflow: hidden;
-  text-align: center;
+  color: var(--ink-2);
+  background: rgba(255, 255, 255, 0.035);
+  border-left: 2px solid transparent;
+  border-radius: 3px;
+  text-align: left;
   text-overflow: ellipsis;
+}
+
+.rk-chips .fc.b-vc {
+  border-left-color: #5fd09a;
+}
+
+.rk-chips .fc.b-c {
+  border-left-color: #c3df6a;
+}
+
+.rk-chips .fc.b-p {
+  border-left-color: #f0b85a;
+}
+
+.rk-chips .fc.b-f {
+  border-left-color: #f07a6e;
+}
+
+.rk-chips .fc.b-na {
+  border-left-color: var(--rule-2);
+  box-shadow: none;
 }
 
 .rk-score {
