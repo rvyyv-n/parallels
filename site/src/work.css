@@ -91,12 +91,6 @@
     border: 1px solid var(--rule-2);
     z-index: 5;
   }
-
-  .earth-col > .lg-keys {
-    display: flex;
-    gap: 14px;
-    padding: 2px 12px;
-  }
 }
 
 @media (max-width: 759px) {

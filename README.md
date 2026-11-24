@@ -155,8 +155,7 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 
 ## Repository layout
 
-- [docs/workflow.png](docs/workflow.png): our workflow at a glance; start here.
-- [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, the main brief.
+- [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, the main brief; start here.
 - [docs/challenge.md](docs/challenge.md): the challenge in plain words, and how we meet the guide's six objectives and answer its seven questions.
 - [docs/team-plan.md](docs/team-plan.md): what we're building.
 - [docs/claudes-plan.md](docs/claudes-plan.md): the build plan from before v1: method, data, checks, stack and roadmap.

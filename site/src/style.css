@@ -192,13 +192,6 @@ option {
   font-size: 16px;
 }
 
-.ledger-col {
-  grid-area: ledger;
-  overflow-y: auto;
-  border-right: 1px solid var(--rule);
-  scrollbar-width: thin;
-}
-
 .earth-col {
   grid-area: earth;
   position: relative;
@@ -318,26 +311,6 @@ option {
 
 .lg-text {
   color: var(--ink-2);
-}
-
-.lg-keys {
-  display: grid;
-  gap: 2px;
-  border-top: 1px solid var(--rule);
-  padding-top: 6px;
-}
-
-.lg-keys label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 30px;
-  cursor: pointer;
-}
-
-.lg-keys input {
-  accent-color: var(--signal);
-  margin: 0 4px 0 0;
 }
 
 .k-analog,
@@ -475,12 +448,6 @@ table.data .n {
   background: #0f0d07;
 }
 
-.b-n {
-  font: 800 28px/1 var(--display);
-  font-stretch: 75%;
-  color: var(--signal);
-}
-
 .foot {
   max-width: 1180px;
   margin: 0 auto;
@@ -572,12 +539,6 @@ table.data .n {
     padding: 13px 0;
   }
 
-  .ledger-col {
-    overflow: visible;
-    border-right: 0;
-    border-top: 1px solid var(--rule);
-  }
-
   .earth-col {
     height: 45vh;
     height: 45svh;
@@ -615,13 +576,6 @@ table.data .n {
 
   .lg-ticks {
     margin-bottom: 0;
-  }
-
-  .lg-keys {
-    grid-row: 1 / 3;
-    grid-column: 2;
-    border: 0;
-    padding: 0;
   }
 
   .earth-col .maplibregl-ctrl-bottom-right {
@@ -807,7 +761,6 @@ table.data .n {
 }
 
 @media (pointer: coarse) {
-  .lg-keys label,
   .t-notes summary {
     min-height: 44px;
   }
@@ -815,10 +768,6 @@ table.data .n {
   .top nav a {
     padding: 13px 0;
   }
-}
-
-.r-near {
-  white-space: nowrap;
 }
 
 .lg-faint {
@@ -855,17 +804,6 @@ table.data .n {
     width: 300px;
     bottom: 12px;
   }
-}
-
-.earth-col > .lg-keys {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 2;
-  border: 1px solid var(--rule);
-  padding: 4px 10px;
-  background: rgba(2, 7, 10, 0.86);
-  font-size: 12px;
 }
 
 .pin.sel {
@@ -933,12 +871,6 @@ table.data .n {
 
   .lg-range {
     min-height: 44px;
-  }
-
-  .earth-col > .lg-keys {
-    top: 8px;
-    left: 8px;
-    padding: 0 8px;
   }
 
   .earth-col .maplibregl-ctrl-bottom-right {

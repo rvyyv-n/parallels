@@ -30,8 +30,6 @@ const PATHS = {
 
 export type IconName = keyof typeof PATHS;
 
-export const ICON_CREDIT = "Lucide 1.73.0, ISC licence";
-
 export function icon(name: string, cls = ""): string {
   const d = PATHS[name as IconName] ?? PATHS.info;
   return `<svg class="ic${cls ? ` ${cls}` : ""}" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${d}</svg>`;
