@@ -111,7 +111,17 @@ export function finder(ctx: Ctx): Page {
   const shut = new Set<string>();
   let moved = new Map<number, number>();
   let fade = 0;
+  let sliderRaf = 0;
+  let sliderDirty = false;
   let flat = false;
+
+  const cancelSliderRaf = () => {
+    if (sliderRaf) {
+      cancelAnimationFrame(sliderRaf);
+      sliderRaf = 0;
+    }
+    sliderDirty = false;
+  };
 
   const $ = <T extends HTMLElement>(q: string) => el.querySelector<T>(q)!;
   const target = () => targetOf(m, s);
@@ -277,6 +287,7 @@ export function finder(ctx: Ctx): Page {
   };
 
   const apply = async (first: boolean) => {
+    cancelSliderRaf();
     const t = target();
     const mine = ++picking;
     const pick = $<HTMLSelectElement>("#pick-target");
@@ -320,6 +331,7 @@ export function finder(ctx: Ctx): Page {
       const b = t.closest<HTMLButtonElement>("[data-filter]");
       if (b) {
         if (!s.hand && b.dataset.filter === s.filter) return;
+        cancelSliderRaf();
         s.filter = b.dataset.filter!;
         s.hand = null;
         renderSliders();
@@ -371,17 +383,42 @@ export function finder(ctx: Ctx): Page {
       s.yr = (e.target as HTMLInputElement).checked;
       changed();
     });
-    $("#sliders").addEventListener("input", (e) => {
+    const slidersEl = $("#sliders");
+    const applySliderUi = (t: HTMLInputElement) => {
+      const v = Number(t.value);
+      weigh(t.dataset.ch!, v);
+      const out = (t.closest(".w-row") ?? t.parentElement!).querySelector("output");
+      if (out) out.textContent = fmtMul(v);
+      t.style.setProperty("--v", `${v * 50}%`);
+    };
+    slidersEl.addEventListener("input", (e) => {
       const t = e.target as HTMLInputElement;
       if (!t.dataset.ch || !d) return;
-      const v = Number(t.value);
-      weigh(t.dataset.ch, v);
-      t.parentElement!.querySelector("output")!.textContent = fmtMul(v);
-      t.style.setProperty("--v", `${v * 50}%`);
-      changed();
+      applySliderUi(t);
+      sliderDirty = true;
+      if (!sliderRaf) {
+        sliderRaf = requestAnimationFrame(() => {
+          sliderRaf = 0;
+          if (!sliderDirty) return;
+          sliderDirty = false;
+          changed();
+        });
+      }
+    });
+    slidersEl.addEventListener("change", (e) => {
+      const t = e.target as HTMLInputElement;
+      if (!t.dataset.ch || !d) return;
+      const before = s.hand ? JSON.stringify(s.hand) : "";
+      applySliderUi(t);
+      const after = s.hand ? JSON.stringify(s.hand) : "";
+      if (sliderDirty || before !== after) {
+        cancelSliderRaf();
+        changed();
+      }
     });
     $("#w-reset").addEventListener("click", () => {
       if (!s.hand || !d) return;
+      cancelSliderRaf();
       s.hand = null;
       renderSliders();
       changed();
@@ -518,6 +555,7 @@ export function finder(ctx: Ctx): Page {
   return {
     title: () => "Finder",
     hide() {
+      cancelSliderRaf();
       card?.hide();
       pop?.hide(false);
     },

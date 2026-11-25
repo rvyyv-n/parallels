@@ -12,13 +12,49 @@ const C = 720;
 const R = 360;
 const RES = 0.5;
 
+function median3(a: number, b: number, c: number) {
+  return a < b ? (b < c ? b : a < c ? c : a) : a < c ? a : b < c ? c : b;
+}
+
+function selectDesc(a: Float32Array, lo: number, hi: number, k: number): number {
+  while (lo < hi) {
+    const p = median3(a[lo], a[(lo + hi) >>> 1], a[hi]);
+    let lt = lo;
+    let i = lo;
+    let gt = hi;
+    while (i <= gt) {
+      const v = a[i];
+      if (v > p) {
+        a[i] = a[lt];
+        a[lt] = v;
+        lt++;
+        i++;
+      } else if (v < p) {
+        a[i] = a[gt];
+        a[gt] = v;
+        gt--;
+      } else {
+        i++;
+      }
+    }
+    if (k < lt) hi = lt - 1;
+    else if (k > gt) lo = gt + 1;
+    else return p;
+  }
+  return a[lo];
+}
+
 export function cut(score: Float32Array, share: number) {
   if (share >= 1) return -Infinity;
-  const vals: number[] = [];
-  for (const v of score) if (!Number.isNaN(v)) vals.push(v);
-  if (!vals.length) return Infinity;
-  vals.sort((a, b) => b - a);
-  return vals[Math.max(0, Math.ceil(share * vals.length) - 1)];
+  const buf = new Float32Array(score.length);
+  let n = 0;
+  for (let i = 0; i < score.length; i++) {
+    const v = score[i];
+    if (Number.isFinite(v)) buf[n++] = v;
+  }
+  if (!n) return Infinity;
+  const k = Math.min(n - 1, Math.max(0, Math.ceil(share * n) - 1));
+  return selectDesc(buf, 0, n - 1, k);
 }
 
 function trace(on: Uint8Array) {

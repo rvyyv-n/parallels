@@ -1,7 +1,9 @@
 .lg-share {
   display: flex;
-  margin: 8px 0 2px;
+  margin: 0;
   border: 1px solid var(--rule-2);
+  border-radius: var(--r-sm);
+  overflow: hidden;
 }
 
 .lg-share button {
@@ -35,6 +37,7 @@
   display: block;
   overflow: hidden;
   background: #0b1a24;
+  border-radius: var(--r-xs);
 }
 
 .gv img {
@@ -64,7 +67,7 @@
   gap: 5px;
   padding: 3px 8px;
   border: 1px solid var(--warn);
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   font: 600 11px/1 var(--body);
   color: var(--warn);
   white-space: nowrap;
@@ -79,14 +82,15 @@
 
 .hovercard {
   position: absolute;
-  z-index: 6;
+  z-index: var(--z-hover);
   width: 264px;
   display: grid;
   gap: 4px;
   padding: 8px 8px 10px;
-  background: rgba(6, 12, 16, 0.96);
+  background: var(--glass-strong);
   border: 1px solid var(--rule-2);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-float);
   pointer-events: none;
   font-size: 13px;
 }
@@ -155,12 +159,50 @@
   font-size: 12px;
 }
 
+.pin {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font: 700 11px/21px var(--display);
+  text-align: center;
+  color: var(--ink);
+  background: rgba(2, 7, 10, 0.9);
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform var(--t-fast) var(--ease), background-color var(--t-fast);
+}
+
+.pin.sel {
+  color: var(--space);
+  background: #fff;
+  border: 2px solid var(--signal);
+  line-height: 20px;
+  box-shadow: 0 0 0 4px rgba(2, 151, 222, 0.35);
+  z-index: 3;
+}
+
+.pin.hot {
+  color: var(--space);
+  background: var(--signal-2);
+  border-color: #fff;
+  transform: scale(1.2);
+  z-index: 4;
+}
+
+.pin.sel.hot {
+  background: var(--signal);
+}
+
 .pin-tag {
-  padding: 3px 7px;
+  padding: 4px 9px;
   font: 650 11.5px/1.2 var(--body);
   color: var(--ink);
-  background: rgba(2, 7, 10, 0.88);
+  background: var(--glass-strong);
   border: 1px solid var(--rule-2);
+  border-radius: var(--r-sm);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
   white-space: nowrap;
   pointer-events: none;
 }
@@ -176,12 +218,13 @@
 
 .mpop {
   position: absolute;
-  z-index: 7;
+  z-index: var(--z-pop);
   width: 300px;
   padding: 12px;
-  background: rgba(6, 12, 16, 0.97);
+  background: var(--glass-strong);
   border: 1px solid var(--rule-2);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-pop);
   font-size: 13px;
 }
 
@@ -194,7 +237,9 @@
 }
 
 .mpop:focus-visible {
-  outline: 2px solid var(--signal);
+  outline: 2px solid var(--signal-2);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(2, 7, 10, 0.85);
 }
 
 .mpop-x {
@@ -316,22 +361,14 @@
 }
 
 .mpop-go:hover {
-  border-color: var(--ink);
+  background: var(--signal-2);
+  border-color: var(--signal-2);
 }
 
 .mpop-go svg {
   width: 14px;
   height: 14px;
   transform: rotate(-90deg);
-}
-
-@media (max-width: 759px) {
-  .mpop {
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-    width: auto;
-  }
 }
 
 .fd.wide {
@@ -347,7 +384,7 @@
   position: absolute;
   left: 0;
   top: 50%;
-  z-index: 4;
+  z-index: var(--z-hud);
   display: grid;
   place-items: center;
   width: 22px;
@@ -355,10 +392,10 @@
   margin-top: -28px;
   padding: 0;
   color: var(--ink-2);
-  background: #050d12;
+  background: var(--surface-1);
   border: 1px solid var(--rule-2);
   border-left: 0;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
   cursor: pointer;
 }
 
@@ -382,7 +419,7 @@
   top: 12px;
   left: 34px;
   right: 64px;
-  z-index: 3;
+  z-index: var(--z-hud);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -397,10 +434,11 @@
 .seg {
   display: inline-flex;
   padding: 3px;
-  background: rgba(5, 13, 18, 0.88);
+  background: var(--glass);
   border: 1px solid var(--rule-2);
-  border-radius: 999px;
-  backdrop-filter: blur(6px);
+  border-radius: var(--r-pill);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
 .seg button {
@@ -410,9 +448,9 @@
   color: var(--ink-2);
   background: none;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   cursor: pointer;
-  transition: color 0.15s, background-color 0.15s;
+  transition: color var(--t-fast), background-color var(--t-fast);
 }
 
 .seg button:hover {
@@ -433,10 +471,11 @@
   padding: 0 14px 0 10px;
   font: 600 12.5px/1 var(--body);
   color: var(--ink);
-  background: rgba(5, 13, 18, 0.88);
+  background: var(--glass);
   border: 1px solid var(--rule-2);
-  border-radius: 999px;
-  backdrop-filter: blur(6px);
+  border-radius: var(--r-pill);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   cursor: pointer;
 }
 
@@ -473,8 +512,9 @@
 }
 
 .tog input:focus-visible + .tog-box {
-  outline: 2px solid var(--signal);
+  outline: 2px solid var(--signal-2);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(2, 7, 10, 0.85);
 }
 
 .tog-more {
@@ -486,14 +526,9 @@
 
 .map-bar .tour-btn {
   margin-left: auto;
-  background: rgba(5, 13, 18, 0.88);
-  backdrop-filter: blur(6px);
-}
-
-.fd .maplibregl-ctrl-top-right .maplibregl-ctrl-group {
-  border-radius: 8px !important;
-  overflow: hidden;
-  background: rgba(5, 13, 18, 0.88) !important;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
 .fd .maplibregl-ctrl-top-right .maplibregl-ctrl-group + .maplibregl-ctrl-group {
@@ -506,61 +541,14 @@
   color: var(--ink);
 }
 
-.fd .pin {
-  width: 24px;
-  height: 24px;
-  font: 700 11px/21px var(--display);
-  color: var(--ink);
-  background: rgba(2, 7, 10, 0.9);
-  border: 1.5px solid rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  transition: transform 0.15s var(--ease), background-color 0.15s;
-}
-
-.fd .pin.sel {
-  color: var(--space);
-  background: #fff;
-  border: 2px solid var(--signal);
-  line-height: 20px;
-  box-shadow: 0 0 0 4px rgba(2, 151, 222, 0.35);
-}
-
-.fd .pin.hot {
-  color: var(--space);
-  background: var(--signal-2);
-  border-color: #fff;
-  transform: scale(1.2);
-}
-
-.fd .pin-tag {
-  padding: 4px 9px;
-  border-radius: 6px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
-}
-
-.fd .earth-col .earth {
-  bottom: 42px;
-}
-
-.fd .status {
-  left: 12px;
-  right: auto;
-  bottom: 52px;
-  height: auto;
-  gap: 12px;
-  padding: 0;
-  background: none;
-  border: 0;
-  text-shadow: 0 1px 3px #000;
-  pointer-events: none;
-}
-
-.fd .earth-col .legend {
-  bottom: 0;
-}
-
 @media (max-width: 759px) {
+  .mpop {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+  }
+
   .fd-fold {
     display: none;
   }
@@ -597,81 +585,22 @@
 
   .map-bar .tour-btn {
     width: 42px;
+    min-height: 42px;
     padding: 0;
     justify-content: center;
   }
 
-  .map-bar .tour-btn {
-    min-height: 42px;
-  }
-
-  .fd .earth-col .earth {
-    bottom: auto;
-  }
-
-  .fd .status {
-    display: none;
-  }
-
-  .fd .earth-col .legend {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 6px 12px;
-    padding: 10px 14px 32px;
-  }
-
-  .fd .earth-col .legend .lg-title {
-    display: block;
-    margin: 0;
-    white-space: nowrap;
-  }
-
-  .fd .legend .lg-share {
+  .legend .lg-share {
     grid-column: 1 / -1;
     grid-row: 2;
-    margin: 0;
-    border-radius: 8px;
-    overflow: hidden;
+    border-radius: var(--r-md);
   }
+}
 
-  .fd .legend .lg-scale {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .fd .legend .lg-ticks {
-    margin: 2px 0 0;
-    font-size: 10.5px;
-  }
-
-  .fd .legend .lg-range {
-    display: none;
-  }
-
-  .fd .legend .lg-more {
-    grid-column: 3;
-    grid-row: 1;
-  }
-
-  .fd .legend .lg-more > summary {
-    min-height: 32px;
-    font-size: 0;
-    gap: 0;
-  }
-
-  .fd .legend .lg-more > summary .ic {
-    width: 20px;
-    height: 20px;
-  }
-
-  .fd .legend .lg-more[open] {
-    grid-column: 1 / -1;
-    grid-row: 3;
-  }
-
-  .fd .legend .lg-more[open] > summary {
-    font-size: 12px;
-    gap: 6px;
+@media (max-width: 459px) {
+  .pin::before {
+    content: "";
+    position: absolute;
+    inset: -11px;
   }
 }
