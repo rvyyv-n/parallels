@@ -10,13 +10,21 @@ const GIBS =
 const MAXLAT = 85.051129;
 const W = 720;
 const H = 1024;
-const DIM = 80;
+// Gentle dimming over uncolored Earth when spotlighting top-share zones (rgba(2, 7, 10, 0.38)).
+const DIM = 97;
 const WORLD: [[number, number], [number, number], [number, number], [number, number]] = [
   [-180, MAXLAT],
   [180, MAXLAT],
   [180, -MAXLAT],
   [-180, -MAXLAT],
 ];
+
+const GLOBE_SKY: maplibregl.SkySpecification = {
+  "sky-color": "#0297de",
+  "horizon-color": "#3d8eff",
+  "sky-horizon-blend": 0.55,
+  "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.88, 4.5, 0.48, 7, 0.08],
+};
 
 export interface Grid {
   lat: Float32Array;
@@ -33,6 +41,12 @@ export interface Earth {
   flat(on: boolean): void;
   hover(i: number | null): void;
   at(i: number): { x: number; y: number } | null;
+  project(lat: number, lon: number): { x: number; y: number } | null;
+  cellIndex(lat: number, lon: number): number;
+  flyTo(lat: number, lon: number, opts?: { zoom?: number; onArrived?: () => void }): void;
+  zoomIn(): void;
+  zoomOut(): void;
+  resetView(): void;
   back(): void;
   resize(): void;
 }
@@ -45,6 +59,8 @@ export interface Top {
 
 export interface Hooks {
   pick(i: number): void;
+  analogPick(p: LabelPoint, cell: number, x: number, y: number): void;
+  analogOver(p: LabelPoint | null, x: number, y: number): void;
   pin(i: number | null): void;
   over(i: number | null, x: number, y: number, pin: boolean): void;
   moved(): void;
@@ -106,11 +122,18 @@ function painter(far: HTMLCanvasElement, near: HTMLCanvasElement, px: Int32Array
       }
       const c = Math.max(0, Math.min(1, v));
       const l = Math.round(c * 255) * 3;
-      d[o] = e[o] = LUT[l];
-      d[o + 1] = e[o + 1] = LUT[l + 1];
-      d[o + 2] = e[o + 2] = LUT[l + 2];
-      d[o + 3] = keep[i] ? Math.round(255 * (0.3 + 0.6 * c)) : 15;
-      e[o + 3] = keep[i] ? Math.round(255 * (0.1 + 0.75 * c * c)) : 15;
+      if (focused) {
+        // Blend a 12% warm golden wash (#ffc24a) inside focused spotlight cells.
+        d[o] = e[o] = Math.round(LUT[l] * 0.88 + 255 * 0.12);
+        d[o + 1] = e[o + 1] = Math.round(LUT[l + 1] * 0.88 + 194 * 0.12);
+        d[o + 2] = e[o + 2] = Math.round(LUT[l + 2] * 0.88 + 74 * 0.12);
+      } else {
+        d[o] = e[o] = LUT[l];
+        d[o + 1] = e[o + 1] = LUT[l + 1];
+        d[o + 2] = e[o + 2] = LUT[l + 2];
+      }
+      d[o + 3] = keep[i] ? Math.round(255 * (0.34 + 0.6 * c)) : 15;
+      e[o + 3] = keep[i] ? Math.round(255 * (0.14 + 0.75 * c * c)) : 15;
     }
     gf.putImageData(imgF, 0, 0);
     gn.putImageData(imgN, 0, 0);
@@ -192,7 +215,6 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           tiles: [GIBS],
           tileSize: 256,
           maxzoom: 8,
-          attribution: '<a href="https://nasa-gibs.github.io/gibs-api-docs/" target="_blank" rel="noopener">NASA GIBS Blue Marble</a>',
         },
         sel: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
         zone: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
@@ -200,16 +222,32 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           type: "geojson",
           data: {
             type: "FeatureCollection",
-            features: pts.map((p) => ({ type: "Feature", properties: { kind: p.kind, name: p.name }, geometry: { type: "Point", coordinates: [p.lon, p.lat] } })),
+            features: pts.map((p, idx) => ({
+              type: "Feature",
+              properties: { idx, kind: p.kind, name: p.name },
+              geometry: { type: "Point", coordinates: [p.lon, p.lat] },
+            })),
           },
         },
       },
       layers: [
-        { id: "space", type: "background", paint: { "background-color": "#02070a" } },
+        { id: "space", type: "background", paint: { "background-color": "#02070a", "background-opacity": 0 } },
         { id: "fallback", type: "raster", source: "fallback", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.9, "raster-fade-duration": 0 } },
         { id: "bm", type: "raster", source: "bm", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.9, "raster-contrast": 0.05 } },
-        { id: "zone-glow", type: "line", source: "zone", layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-color": "#ffc24a", "line-width": 5, "line-blur": 4, "line-opacity": 0.55 } },
-        { id: "zone-line", type: "line", source: "zone", layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-color": "#ffe08a", "line-width": 1.1, "line-opacity": 0.95 } },
+        {
+          id: "zone-glow",
+          type: "line",
+          source: "zone",
+          layout: { "line-join": "round", "line-cap": "round" },
+          paint: { "line-color": "#ffc24a", "line-width": 6, "line-blur": 5, "line-opacity": 0.65 },
+        },
+        {
+          id: "zone-line",
+          type: "line",
+          source: "zone",
+          layout: { "line-join": "round", "line-cap": "round" },
+          paint: { "line-color": "#ffd97d", "line-width": 1.35, "line-opacity": 0.96 },
+        },
         { id: "par", type: "line", source: "sel", filter: ["==", ["get", "k"], "par"], paint: { "line-color": "#5bbbe9", "line-width": 1, "line-dasharray": [2, 3], "line-opacity": 0.75 } },
         { id: "cell", type: "line", source: "sel", filter: ["==", ["get", "k"], "cell"], paint: { "line-color": "#5bbbe9", "line-width": 2.5 } },
         {
@@ -217,26 +255,42 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           type: "circle",
           source: "pts",
           filter: ["==", ["get", "kind"], "known_analog"],
-          paint: { "circle-radius": 3.5, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#ffffff", "circle-stroke-width": 1.4 },
+          paint: {
+            "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 4.2, 5, 6.2],
+            "circle-color": "rgba(91, 187, 233, 0.28)",
+            "circle-stroke-color": "#ffffff",
+            "circle-stroke-width": 1.6,
+          },
         },
         {
           id: "caves",
           type: "circle",
           source: "pts",
           filter: ["==", ["get", "kind"], "cave"],
-          paint: { "circle-radius": 2.6, "circle-color": "#ffffff", "circle-stroke-color": "#02070a", "circle-stroke-width": 1 },
+          paint: {
+            "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 3.4, 5, 5.2],
+            "circle-color": "#ffd97d",
+            "circle-stroke-color": "#02070a",
+            "circle-stroke-width": 1.3,
+          },
         },
       ],
-      sky: { "atmosphere-blend": 0 },
+      sky: GLOBE_SKY,
     },
     center: [10, 15],
     zoom: fit(),
     minZoom: 0,
     maxZoom: 7.5,
     cooperativeGestures: phone,
-    attributionControl: { compact: true },
+    attributionControl: false,
     fadeDuration: 0,
   });
+
+  const resetView = () => {
+    const c: [number, number] = selected >= 0 ? [g.lon[selected], Math.max(-68, Math.min(68, g.lat[selected]))] : [10, 15];
+    map.flyTo({ center: c, zoom: fit(), duration: reduced() ? 0 : 900, essential: false });
+  };
+
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
   map.addControl(
     {
@@ -244,10 +298,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         const box = document.createElement("div");
         box.className = "maplibregl-ctrl maplibregl-ctrl-group";
         box.innerHTML = `<button type="button" class="ctl-fit" title="Reset the view" aria-label="Reset the view"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg></button>`;
-        box.firstElementChild!.addEventListener("click", () => {
-          const c: [number, number] = selected >= 0 ? [g.lon[selected], Math.max(-60, Math.min(60, g.lat[selected]))] : [10, 15];
-          map.flyTo({ center: c, zoom: fit(), duration: reduced() ? 0 : 900, essential: false });
-        });
+        box.firstElementChild!.addEventListener("click", resetView);
         return box;
       },
       onRemove() {},
@@ -260,61 +311,112 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
   const srcs = () => LAYERS.map((id) => map.getSource(id) as maplibregl.CanvasSource | undefined);
   const fade = (id: (typeof LAYERS)[number], k: number): maplibregl.ExpressionSpecification =>
     id === "match-far" ? ["interpolate", ["linear"], ["zoom"], 2.5, k, 4.5, 0] : ["interpolate", ["linear"], ["zoom"], 2.5, 0, 4.5, k];
-  const ready = new Promise<void>((r) =>
-    map.once("load", () => {
+  const ready = new Promise<void>((r) => {
+    const init = () => {
       for (const id of LAYERS) {
-        map.addSource(id, { type: "canvas", canvas: id === "match-far" ? farCanvas : nearCanvas, coordinates: WORLD, animate: false });
-        map.addLayer({ id, type: "raster", source: id, paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": fade(id, 1) } }, "zone-glow");
+        if (!map.getSource(id)) {
+          map.addSource(id, { type: "canvas", canvas: id === "match-far" ? farCanvas : nearCanvas, coordinates: WORLD, animate: false });
+          map.addLayer({ id, type: "raster", source: id, paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": fade(id, 1) } }, "zone-glow");
+        }
       }
       r();
-    }),
-  );
+    };
+    // Use style.load so pins and the match overlay mount immediately without blocking on remote GIBS tiles.
+    if (map.isStyleLoaded()) init();
+    else map.once("style.load", init);
+  });
+
   let selected = -1;
   let centred = false;
+  let labelsVisible = true;
   let mask: Uint8Array = new Uint8Array(0);
   const markers: maplibregl.Marker[] = [];
   const tags: maplibregl.Marker[] = [];
 
   const wrap = (lng: number) => ((((lng + 180) % 360) + 360) % 360) - 180;
-  const hit = (e: maplibregl.MapMouseEvent) => {
-    const k = cellAt(e.lngLat.lat, wrap(e.lngLat.lng));
-    const i = k >= 0 ? at[k] : -1;
-    return i >= 0 && mask[i] ? i : -1;
+  const cellIndex = (lat: number, lon: number) => {
+    const k = cellAt(lat, wrap(lon));
+    return k >= 0 ? at[k] : -1;
   };
+  const hit = (e: maplibregl.MapMouseEvent, anyLand = false) => {
+    const i = cellIndex(e.lngLat.lat, e.lngLat.lng);
+    if (i < 0) return -1;
+    return anyLand || mask[i] ? i : -1;
+  };
+  const analogHit = (pt: maplibregl.Point): LabelPoint | null => {
+    if (!labelsVisible || !map.getLayer("analogs")) return null;
+    const pad = 7;
+    const feats = map.queryRenderedFeatures(
+      [
+        [pt.x - pad, pt.y - pad],
+        [pt.x + pad, pt.y + pad],
+      ],
+      { layers: ["analogs", "caves"] },
+    );
+    if (!feats.length) return null;
+    const idx = Number(feats[0].properties?.idx);
+    return Number.isInteger(idx) && pts[idx] ? pts[idx] : null;
+  };
+
   const onPin = (e: maplibregl.MapMouseEvent) => !!(e.originalEvent.target as HTMLElement).closest?.(".pin, .pin-tag");
   map.on("click", (e) => {
-    if (!onPin(e)) on.pick(hit(e));
+    if (onPin(e)) return;
+    const ap = analogHit(e.point);
+    if (ap) {
+      on.analogPick(ap, cellIndex(ap.lat, ap.lon), e.point.x, e.point.y);
+      return;
+    }
+    // Click inspects any valid land cell even outside the highlighted top-share zone.
+    on.pick(hit(e, true));
   });
   map.on("mousemove", (e) => {
     if (onPin(e)) return;
-    const i = hit(e);
-    map.getCanvas().style.cursor = i >= 0 ? "pointer" : "";
     on.pointer({ lat: e.lngLat.lat, lon: wrap(e.lngLat.lng) });
+    const ap = analogHit(e.point);
+    if (ap) {
+      map.getCanvas().style.cursor = "pointer";
+      on.over(null, 0, 0, false);
+      on.analogOver(ap, e.point.x, e.point.y);
+      return;
+    }
+    on.analogOver(null, 0, 0);
+    const i = hit(e, false);
+    map.getCanvas().style.cursor = i >= 0 ? "pointer" : "";
     on.over(i >= 0 ? i : null, e.point.x, e.point.y, false);
   });
   map.on("mouseout", () => {
     on.pointer(null);
     on.over(null, 0, 0, false);
+    on.analogOver(null, 0, 0);
   });
+
   const facing = (lat: number, lon: number) => {
     if (map.getProjection()?.type === "mercator") return true;
     const c = map.getCenter();
     const r = Math.PI / 180;
     return Math.sin(lat * r) * Math.sin(c.lat * r) + Math.cos(lat * r) * Math.cos(c.lat * r) * Math.cos((lon - c.lng) * r) > 0.05;
   };
+  const projectPoint = (lat: number, lon: number) => {
+    if (!facing(lat, lon)) return null;
+    const p = map.project([lon, lat]);
+    const b = el.getBoundingClientRect();
+    return p.x >= 0 && p.y >= 0 && p.x <= b.width && p.y <= b.height ? { x: p.x, y: p.y } : null;
+  };
+
   const declutter = () => {
     const boxes: DOMRect[] = markers.map((m) => m.getElement().getBoundingClientRect());
     for (const t of tags.map((m) => m.getElement())) {
-      t.hidden = false;
       const b = t.getBoundingClientRect();
       const i = Number(t.dataset.i);
       const lap = boxes.some((o) => b.left < o.right && b.right > o.left && b.top < o.bottom && b.bottom > o.top);
-      t.hidden = lap || !facing(g.lat[i], g.lon[i]);
-      if (!t.hidden) boxes.push(b);
+      const dim = lap || !facing(g.lat[i], g.lon[i]);
+      t.classList.toggle("is-dim", dim);
+      if (!dim) boxes.push(b);
     }
   };
   map.on("move", () => on.moved());
   map.on("moveend", declutter);
+  map.on("resize", declutter);
 
   const visible = () => {
     if (selected < 0) return true;
@@ -337,14 +439,18 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
   map.on("move", () => {
     if (away && visible()) on.away((away = false));
   });
+
   const goTo = (i: number, animate: boolean) => {
     const z = Math.max(map.getZoom(), fit());
-    const center: [number, number] = [g.lon[i], Math.max(-60, Math.min(60, g.lat[i]))];
+    const center: [number, number] = [g.lon[i], Math.max(-68, Math.min(68, g.lat[i]))];
     if (!animate || reduced()) {
       map.jumpTo({ center, zoom: z });
       check();
-    } else map.flyTo({ center, zoom: z, duration: 1300, essential: false });
+      declutter();
+    } else map.flyTo({ center, zoom: z, duration: 1100, essential: false });
   };
+
+  let flyToken = 0;
 
   return {
     paint(score, keep, focused, outline) {
@@ -399,9 +505,10 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         rows.forEach(({ i }, r) => {
           const b = document.createElement("button");
           b.type = "button";
-          b.className = "pin";
+          b.className = r >= 10 ? "pin pin-minor" : "pin";
           b.tabIndex = -1;
           b.dataset.i = String(i);
+          b.style.setProperty("--z", String(21 - r));
           b.textContent = String(r + 1);
           b.setAttribute("aria-hidden", "true");
           b.classList.toggle("sel", i === selected);
@@ -412,6 +519,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           b.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
           b.addEventListener("mouseenter", () => {
             on.pin(i);
+            on.analogOver(null, 0, 0);
             const p = map.project([g.lon[i], g.lat[i]]);
             on.over(i, p.x, p.y, true);
           });
@@ -428,9 +536,10 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           t.setAttribute("aria-hidden", "true");
           t.innerHTML = `${esc(name)} <b>${esc(score)}</b>`;
           tags.push(
-            new maplibregl.Marker({ element: t, anchor: "left", offset: [15, 0], opacityWhenCovered: "0" }).setLngLat([g.lon[i], g.lat[i]]).addTo(map),
+            new maplibregl.Marker({ element: t, anchor: "left", offset: [16, 0], opacityWhenCovered: "0" }).setLngLat([g.lon[i], g.lat[i]]).addTo(map),
           );
         });
+        declutter();
         requestAnimationFrame(declutter);
       });
     },
@@ -440,14 +549,17 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         for (const id of LAYERS) map.setPaintProperty(id, "raster-opacity", fade(id, k));
       });
     },
-    labels(on) {
+    labels(onFlag) {
+      labelsVisible = onFlag;
       ready.then(() => {
-        for (const id of ["analogs", "caves"]) map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
+        for (const id of ["analogs", "caves"]) map.setLayoutProperty(id, "visibility", onFlag ? "visible" : "none");
       });
     },
-    flat(on) {
+    flat(onFlag) {
       ready.then(() => {
-        map.setProjection({ type: on ? "mercator" : "globe" });
+        map.setProjection({ type: onFlag ? "mercator" : "globe" });
+        map.setPaintProperty("space", "background-opacity", onFlag ? 1 : 0);
+        map.setSky(onFlag ? { "atmosphere-blend": 0 } : GLOBE_SKY);
         map.once("idle", check);
       });
     },
@@ -455,11 +567,45 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
       for (const m of markers) m.getElement().classList.toggle("hot", i != null && Number(m.getElement().dataset.i) === i);
     },
     at(i) {
-      if (!facing(g.lat[i], g.lon[i])) return null;
-      const p = map.project([g.lon[i], g.lat[i]]);
-      const b = el.getBoundingClientRect();
-      return p.x >= 0 && p.y >= 0 && p.x <= b.width && p.y <= b.height ? { x: p.x, y: p.y } : null;
+      return projectPoint(g.lat[i], g.lon[i]);
     },
+    project: projectPoint,
+    cellIndex,
+    flyTo(lat, lon, opts) {
+      const mine = ++flyToken;
+      ready.then(() => {
+        if (mine !== flyToken) return;
+        const clampedLat = Math.max(-76, Math.min(76, lat));
+        const z = Math.max(map.getZoom(), opts?.zoom ?? Math.max(fit(), 2.6));
+        const center: [number, number] = [wrap(lon), clampedLat];
+        if (reduced()) {
+          map.jumpTo({ center, zoom: z });
+          check();
+          declutter();
+          opts?.onArrived?.();
+          return;
+        }
+        let settled = false;
+        const done = () => {
+          if (settled || mine !== flyToken) return;
+          settled = true;
+          clearTimeout(guard);
+          check();
+          declutter();
+          opts?.onArrived?.();
+        };
+        const guard = window.setTimeout(done, 1200);
+        map.once("moveend", done);
+        map.flyTo({ center, zoom: z, duration: 700, essential: false });
+      });
+    },
+    zoomIn() {
+      map.zoomIn({ duration: reduced() ? 0 : 250 });
+    },
+    zoomOut() {
+      map.zoomOut({ duration: reduced() ? 0 : 250 });
+    },
+    resetView,
     back() {
       if (selected >= 0) goTo(selected, true);
     },

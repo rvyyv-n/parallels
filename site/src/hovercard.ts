@@ -1,4 +1,5 @@
 import "./map.css";
+import type { LabelPoint } from "./contract";
 import { esc, latlon, num, score100 } from "./format";
 import { colour } from "./ramp";
 import { icon } from "./icons";
@@ -12,6 +13,8 @@ export interface HoverInfo {
   lon: number;
   score: number;
   fresh: boolean;
+  outsideZone?: boolean;
+  shareShort?: string;
 }
 
 export interface HoverHooks {
@@ -24,9 +27,17 @@ export interface HoverCard {
   hide(): void;
 }
 
+export interface AnalogTip {
+  show(p: LabelPoint, x: number, y: number): void;
+  hide(): void;
+}
+
 export interface Popup {
   readonly open: number;
+  readonly isOpen: boolean;
+  readonly coords: { lat: number; lon: number } | null;
   show(i: number, x: number, y: number): void;
+  showAnalog(p: LabelPoint, cell: number, x: number, y: number, href: string | null, scoreText: string | null): void;
   move(at: { x: number; y: number } | null): void;
   hide(restore?: boolean): void;
 }
@@ -69,7 +80,7 @@ function blank(box: HTMLElement) {
   );
 }
 
-function place(box: HTMLElement, host: HTMLElement, x: number, y: number, gap: number) {
+function place(box: HTMLElement, host: HTMLElement, x: number, y: number, gap: number, offsetX = 0, offsetY = 0) {
   const W = host.clientWidth;
   const H = host.clientHeight;
   const w = box.offsetWidth;
@@ -92,8 +103,8 @@ function place(box: HTMLElement, host: HTMLElement, x: number, y: number, gap: n
     if (right + w <= W - 4 || left >= 4) at = [right + w <= W - 4 ? right : left, clampY(y - h / 2)];
     else at = [clampX(x - w / 2), y + gap + h <= H - 4 || y - gap - h < 4 ? y + gap : y - gap - h];
   }
-  box.style.left = `${Math.round(at[0])}px`;
-  box.style.top = `${Math.round(at[1])}px`;
+  box.style.left = `${Math.round(at[0] + offsetX)}px`;
+  box.style.top = `${Math.round(at[1] + offsetY)}px`;
 }
 
 export function topShare(rank: number, of: number) {
@@ -133,7 +144,33 @@ export function createHoverCard(el: HTMLElement, hooks: HoverHooks): HoverCard {
   };
 }
 
-export function createPopup(el: HTMLElement, hooks: HoverHooks & { closed(): void }): Popup {
+export function createAnalogTip(el: HTMLElement): AnalogTip {
+  const tip = document.createElement("div");
+  tip.className = "analog-tip";
+  tip.hidden = true;
+  tip.setAttribute("aria-hidden", "true");
+  el.append(tip);
+  let nowId = "";
+  return {
+    show(p, x, y) {
+      if (p.id !== nowId) {
+        nowId = p.id;
+        const kind = p.kind === "cave" ? "Cave / lava tube" : "Known analog";
+        tip.innerHTML = `<span class="at-kind ${p.kind === "cave" ? "is-cave" : ""}">${kind}</span>
+          <span class="at-name">${esc(p.name)}</span>
+          ${p.country ? `<span class="at-sub">${esc(p.country)} · Click for details</span>` : `<span class="at-sub">Click for details</span>`}`;
+      }
+      tip.hidden = false;
+      place(tip, el, x, y, 14);
+    },
+    hide() {
+      nowId = "";
+      tip.hidden = true;
+    },
+  };
+}
+
+export function createPopup(el: HTMLElement, hooks: HoverHooks & { closed(): void }, mountEl: HTMLElement = el): Popup {
   const box = document.createElement("div");
   box.className = "mpop";
   box.hidden = true;
@@ -141,8 +178,10 @@ export function createPopup(el: HTMLElement, hooks: HoverHooks & { closed(): voi
   box.setAttribute("role", "dialog");
   box.setAttribute("aria-labelledby", "mpop-h");
   blank(box);
-  el.append(box);
+  mountEl.append(box);
   let open = -1;
+  let shown = false;
+  let coords: { lat: number; lon: number } | null = null;
   let back: HTMLElement | null = null;
   let anchor = { x: 0, y: 0 };
   const R = 30;
@@ -150,25 +189,52 @@ export function createPopup(el: HTMLElement, hooks: HoverHooks & { closed(): voi
   box.addEventListener("click", (e) => {
     const t = e.target as HTMLElement;
     if (t.closest(".mpop-x")) api.hide();
-    else if (t.closest(".mpop-go") && open >= 0) hooks.open(open);
+    else if (t.closest("button.mpop-go") && open >= 0) hooks.open(open);
   });
+
+  const position = (at: { x: number; y: number } | null) => {
+    if (!shown) return;
+    const phone = matchMedia("(max-width: 759px)").matches;
+    if (phone) {
+      box.style.visibility = "";
+      box.style.left = box.style.top = "";
+      return;
+    }
+    box.style.visibility = at ? "" : "hidden";
+    if (!at) return;
+    anchor = at;
+    const ox = mountEl === el ? 0 : el.offsetLeft;
+    const oy = mountEl === el ? 0 : el.offsetTop;
+    place(box, el, anchor.x, anchor.y, 16, ox, oy);
+  };
+
   const api: Popup = {
     get open() {
       return open;
     },
+    get isOpen() {
+      return shown;
+    },
+    get coords() {
+      return coords;
+    },
     show(i, x, y) {
       const p = hooks.info(i);
       if (!p) return;
-      if (open < 0) back = document.activeElement as HTMLElement | null;
+      if (!shown) back = document.activeElement as HTMLElement | null;
       open = i;
+      shown = true;
+      coords = { lat: p.lat, lon: p.lon };
       const img = ground(p.lat, p.lon, 104);
       const v = Math.max(0, Math.min(1, p.score));
+      box.classList.remove("is-analog");
       box.classList.toggle("noimg", !img);
+      const outside = p.outsideZone && p.shareShort ? `<span class="mpop-out">Outside the ${esc(p.shareShort)}</span>` : "";
       box.innerHTML = `<button type="button" class="mpop-x" aria-label="Close">${icon("x")}</button>
         <div class="mpop-top">${img ? `<span class="mpop-fig" title="${CREDIT}">${img}</span>` : ""}<div>
           <h3 id="mpop-h">${p.list ? `<span class="mpop-n">#${p.list}</span> ` : ""}${esc(p.name)}</h3>
           <p class="mpop-ll">${latlon(p.lat, p.lon, 2)}</p>
-          ${badge(p)}
+          <div class="mpop-badges">${badge(p)}${outside}</div>
         </div></div>
         <div class="mpop-mid">
           <span class="mpop-ring" role="img" aria-label="${score100(p.score)} / 100 match score"><svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="${R}" class="trk"/><circle cx="36" cy="36" r="${R}" class="val" style="stroke:${colour(v)};stroke-dasharray:${(v * C).toFixed(1)} ${C.toFixed(1)}"/></svg><b>${score100(p.score)}</b><span>/ 100</span></span>
@@ -177,26 +243,47 @@ export function createPopup(el: HTMLElement, hooks: HoverHooks & { closed(): voi
         ${img ? `<p class="mpop-credit">Image: ${CREDIT}</p>` : ""}
         <button type="button" class="btn mpop-go">Details ${icon("chevron")}</button>`;
       box.hidden = false;
-      api.move({ x, y });
+      position({ x, y });
       box.focus({ preventScroll: true });
-      if (matchMedia("(max-width: 759px)").matches) box.scrollIntoView({ block: "nearest" });
     },
-    move(at) {
-      if (open < 0) return;
-      box.style.visibility = at ? "" : "hidden";
-      if (!at) return;
-      anchor = at;
-      if (matchMedia("(max-width: 759px)").matches) {
-        box.style.left = box.style.top = "";
-        return;
-      }
-      place(box, el, anchor.x, anchor.y, 16);
-    },
-    hide(restore = true) {
-      if (open < 0) return;
+    showAnalog(p, cell, x, y, href, scoreText) {
+      if (!shown) back = document.activeElement as HTMLElement | null;
       open = -1;
+      shown = true;
+      coords = { lat: p.lat, lon: p.lon };
+      const kindLabel = p.kind === "cave" ? "Cave / lava tube" : "Known analog";
+      const src = p.analog_source ?? p.source;
+      box.classList.add("is-analog");
+      box.classList.remove("noimg");
+      box.innerHTML = `<button type="button" class="mpop-x" aria-label="Close">${icon("x")}</button>
+        <div class="mpop-analog-head">
+          <span class="mpop-kind ${p.kind === "cave" ? "is-cave" : ""}">${kindLabel}</span>
+          <h3 id="mpop-h">${esc(p.name)}</h3>
+          <p class="mpop-ll">${p.country ? `${esc(p.country)} · ` : ""}${latlon(p.lat, p.lon, 2)}</p>
+        </div>
+        ${p.note ? `<p class="mpop-note">${esc(p.note)}</p>` : ""}
+        <div class="mpop-analog-meta">
+          ${scoreText ? `<span class="mpop-cell-score">Cell score: <b>${esc(scoreText)}</b></span>` : ""}
+          ${src ? `<a class="mpop-src" href="${esc(src)}" target="_blank" rel="noopener noreferrer">Source ↗</a>` : ""}
+        </div>
+        ${
+          cell >= 0 && href
+            ? `<a class="btn mpop-go" href="${href}">See this cell's score ${icon("chevron")}</a>`
+            : `<p class="mpop-unranked">Outside the 0.5° ranked land grid.</p>`
+        }`;
+      box.hidden = false;
+      position({ x, y });
+      box.focus({ preventScroll: true });
+    },
+    move: position,
+    hide(restore = true) {
+      if (!shown) return;
+      open = -1;
+      shown = false;
+      coords = null;
       const had = box.contains(document.activeElement);
       box.hidden = true;
+      box.classList.remove("is-analog");
       if (restore && had && back?.isConnected) back.focus({ preventScroll: true });
       back = null;
       hooks.closed();

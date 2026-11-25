@@ -174,3 +174,120 @@ test("the hover card works with NASA GIBS tiles blocked", async ({ page }, info)
   await expect(card(page)).toHaveClass(/noimg/);
   await expect(card(page).locator(".hc-score")).toBeVisible();
 });
+
+test("legend renders a live 36-bin score histogram synced with the active share", async ({ page }) => {
+  await ready(page);
+  const bins = legend(page).locator(".lg-hist .lg-bin");
+  await expect(bins).toHaveCount(36);
+  const activeCount = () => legend(page).locator(".lg-hist .lg-bin.is-active").count();
+  const at2 = await activeCount();
+  expect(at2).toBeGreaterThan(0);
+  expect(at2).toBeLessThan(36);
+  await legend(page).getByRole("button", { name: "10%", exact: true }).click();
+  const at10 = await activeCount();
+  expect(at10).toBeGreaterThanOrEqual(at2);
+  await legend(page).getByRole("button", { name: "All land" }).click();
+  const atAll = await activeCount();
+  expect(atAll).toBeGreaterThan(at10);
+});
+
+test("pins use rank-priority z-index and tier ranks 11 to 20 as minor dots", async ({ page }) => {
+  await ready(page);
+  const id1 = Number(await row(page, 1).getAttribute("data-i"));
+  const id18 = Number(await row(page, 18).getAttribute("data-i"));
+  const z1 = await page.locator(`.pin[data-i="${id1}"]`).evaluate((e) => Number(getComputedStyle(e).zIndex));
+  const z18 = await page.locator(`.pin[data-i="${id18}"]`).evaluate((e) => Number(getComputedStyle(e).zIndex));
+  expect(z1).toBeGreaterThan(z18);
+  await expect(page.locator(".pin.pin-minor")).toHaveCount(10);
+  await expect(page.locator(`.pin[data-i="${id1}"]`)).not.toHaveClass(/pin-minor/);
+  await expect(page.locator(`.pin[data-i="${id18}"]`)).toHaveClass(/pin-minor/);
+});
+
+test("clicking a known analog opens its note and a link to that cell's scorecard", async ({ page }) => {
+  await ready(page);
+  const search = page.locator("#fd-search");
+  await search.fill("Rio Tinto");
+  await page.locator("#fd-search-list [role='option']").first().click();
+  await expect(pop(page)).toBeVisible();
+  await expect(pop(page).locator("h3")).toContainText("Rio Tinto");
+  // Close the search-opened popup, then click the rendered analog marker at the map center.
+  await pop(page).getByRole("button", { name: "Close" }).click();
+  await expect(pop(page)).toBeHidden();
+  const box = (await page.locator("#earth").boundingBox())!;
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(pop(page)).toBeVisible();
+  await expect(pop(page).locator("h3")).toContainText("Rio Tinto");
+  await expect(pop(page).locator(".mpop-note")).toContainText("hematite");
+  await expect(pop(page).locator('a[href^="#/place?"]')).toBeVisible();
+});
+
+test("clicking a ranked land cell outside the best 2% zone still opens the popup", async ({ page }) => {
+  await ready(page);
+  const threshold = cut(score, 0.02);
+  let targetIdx = -1;
+  for (let i = 0; i < score.length; i++) {
+    if (
+      Number.isFinite(score[i]) &&
+      score[i] < threshold &&
+      cells.lat[i] > 46 &&
+      cells.lat[i] < 49 &&
+      cells.lon[i] > 0 &&
+      cells.lon[i] < 4
+    ) {
+      targetIdx = i;
+      break;
+    }
+  }
+  expect(targetIdx).toBeGreaterThanOrEqual(0);
+  const lat = cells.lat[targetIdx];
+  const lon = cells.lon[targetIdx];
+  const search = page.locator("#fd-search");
+  await search.fill(`${lat.toFixed(2)}, ${lon.toFixed(2)}`);
+  await page.keyboard.press("Enter");
+  await expect(pop(page)).toBeVisible();
+  await pop(page).getByRole("button", { name: "Close" }).click();
+  await expect(pop(page)).toBeHidden();
+  const box = (await page.locator("#earth").boundingBox())!;
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(pop(page)).toBeVisible();
+  await expect(pop(page).locator(".mpop-out")).toContainText("Outside the best 2%");
+  await expect(pop(page).locator(".mpop-ring")).toHaveAttribute("aria-label", `${score100(score[targetIdx])} / 100 match score`);
+});
+
+test("local search finds Haughton and parses direct coordinates 41.25, 96.75", async ({ page }) => {
+  await ready(page);
+  const search = page.locator("#fd-search");
+  await search.fill("Haughton");
+  const opt = page.locator("#fd-search-list [role='option']", { hasText: "Haughton" }).first();
+  await expect(opt).toBeVisible();
+  await opt.click();
+  await expect(pop(page)).toBeVisible();
+  await expect(pop(page).locator("h3")).toContainText("Haughton");
+  await pop(page).getByRole("button", { name: "Close" }).click();
+  await expect(pop(page)).toBeHidden();
+
+  await search.fill("41.25, 96.75");
+  await expect(page.locator("#fd-search-list [role='option']").first()).toContainText("41.25");
+  await page.keyboard.press("Enter");
+  await expect(pop(page)).toBeVisible();
+  await expect(pop(page)).toContainText("41.25° N, 96.75° E");
+});
+
+test("on phone, tapping a pin opens the popup unclipped above the sidebar sheet", async ({ page }, info) => {
+  test.skip(info.project.name !== "phone", "mobile sheet stacking check");
+  await ready(page);
+  const id = Number(await row(page, 1).getAttribute("data-i"));
+  await page.locator(`.pin[data-i="${id}"]`).tap();
+  await expect(pop(page)).toBeVisible();
+  const vp = page.viewportSize()!;
+  const box = (await pop(page).boundingBox())!;
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.y).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(vp.width + 1);
+  expect(box.y + box.height).toBeLessThanOrEqual(vp.height + 1);
+  const onTop = await page.evaluate(({ x, y }) => {
+    const hit = document.elementFromPoint(x, y);
+    return !!hit?.closest(".mpop");
+  }, { x: box.x + box.width / 2, y: box.y + box.height / 2 });
+  expect(onTop).toBe(true);
+});

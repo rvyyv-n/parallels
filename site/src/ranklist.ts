@@ -21,12 +21,13 @@ export interface View {
   href(i: number): string;
 }
 
-const chipOf = (v: View, c: Challenge, i: number, text?: string) => {
+const chipOf = (v: View, c: Challenge, i: number, text?: string, best = false) => {
   const col = v.t[`ch:${c.id}`];
   const x = col ? col[i] : NaN;
   const b = bandOf(x);
   const label = b ? `${c.name}: ${score100(x)} / 100, ${b.word}` : `${c.name}: no data`;
-  return `<span class="fc ${b ? b.cls : "b-na"}" role="img" aria-label="${esc(label)}" title="${esc(label)}">${esc(text ?? shortName(c.id, c.name))}</span>`;
+  const inner = esc(text ?? shortName(c.id, c.name));
+  return `<span class="fc ${b ? b.cls : "b-na"}${best ? " cmp-best" : ""}" role="img" aria-label="${esc(label)}" title="${esc(label)}"><span class="fc-t">${inner}</span></span>`;
 };
 
 const across = (n: number) => (n > 5 ? Math.ceil(n / 2) : n);
@@ -54,7 +55,7 @@ export const rules = (v: View) =>
   `Top ${LIST} of ${num(v.pool)} land cells · ${v.known ? "new and known sites" : "new sites only"} · ${num(APART_KM)} km apart · ${PER_COUNTRY} per country at most`;
 
 export const key = () =>
-  `<p>Each strip shows how close a site is on every challenge:</p><ul>${BANDS.map((b) => `<li><i class="fc ${b.cls}"></i>${b.word}</li>`).join("")}<li><i class="fc b-na"></i>no data</li></ul>`;
+  `<p>Each strip shows how close a site is on every challenge:</p><ul>${BANDS.map((b) => `<li><i class="fc ${b.cls}" aria-hidden="true"></i>${b.word}</li>`).join("")}<li><i class="fc b-na" aria-hidden="true"></i>no data</li></ul>`;
 
 export function list(v: View, shut: Set<string>, moved: Map<number, number>, byRegion: boolean): string {
   const { m, cells, ids } = v;
@@ -91,12 +92,12 @@ export function list(v: View, shut: Set<string>, moved: Map<number, number>, byR
 }
 
 export const sortBar = (byRegion: boolean) =>
-  `<span class="rk-sort-k" id="rk-sort-k">Sort</span>${[
+  `<span class="rk-sort-k" id="rk-sort-k">Sort</span><span class="rk-sort-seg">${[
     ["rank", "By rank"],
     ["region", "By region"],
   ]
     .map(([k, t]) => `<button type="button" data-sort="${k}" aria-pressed="${(k === "region") === byRegion}">${t}</button>`)
-    .join("")}`;
+    .join("")}</span>`;
 
 export function compare(v: View): string {
   const { m, cells } = v;
@@ -105,12 +106,26 @@ export function compare(v: View): string {
   if (cs.length < 2) return `<div class="cmp-head"><p>Select one more site to compare the sites.</p><button type="button" class="sum-link" id="cmp-clear">Clear</button></div>`;
   return `<div class="cmp-head"><h2 id="cmp-h">Compare ${cs.length} sites</h2><button type="button" class="sum-link" id="cmp-clear">Clear</button></div>
     <table class="cmp-t" aria-labelledby="cmp-h"><thead><tr><th scope="col"><span class="sr">Challenge</span></th>${cs
-      .map(
-        (i) =>
-          `<th scope="col"><span class="cmp-name">${esc(placeName(m, cells, i))}</span><span class="cmp-score"><b>${score100(v.score[i])}</b> / 100</span><a class="cmp-open" href="${v.href(i)}">Open</a></th>`,
-      )
+      .map((i) => {
+        const name = placeName(m, cells, i);
+        return `<th scope="col"><div class="cmp-col-h"><span class="cmp-name">${esc(name)}</span><button type="button" class="cmp-rm" data-cmp-rm="${i}" aria-label="Remove ${esc(name)}" title="Remove ${esc(name)}">${icon("x")}</button></div><span class="cmp-score"><b>${score100(v.score[i])}</b> / 100</span><a class="cmp-open" href="${v.href(i)}">Open</a></th>`;
+      })
       .join("")}</tr></thead><tbody>${v.chs
-      .map((c) => `<tr><th scope="row">${esc(shortName(c.id, c.name))}</th>${cs.map((i) => `<td>${chipOf(v, c, i, v.t[`ch:${c.id}`] && Number.isFinite(v.t[`ch:${c.id}`][i]) ? score100(v.t[`ch:${c.id}`][i]) : "–")}</td>`).join("")}</tr>`)
+      .map((c) => {
+        const col = v.t[`ch:${c.id}`];
+        const vals = cs.map((i) => (col && Number.isFinite(col[i]) ? col[i] : NaN));
+        const finite = vals.filter((x) => Number.isFinite(x));
+        const hi = finite.length >= 2 ? Math.max(...finite) : NaN;
+        const lo = finite.length >= 2 ? Math.min(...finite) : NaN;
+        const hasBest = Number.isFinite(hi) && hi > lo + 1e-4;
+        return `<tr><th scope="row">${esc(shortName(c.id, c.name))}</th>${cs
+          .map((i, idx) => {
+            const val = vals[idx];
+            const best = hasBest && Number.isFinite(val) && Math.abs(val - hi) <= 1e-4;
+            return `<td>${chipOf(v, c, i, Number.isFinite(val) ? score100(val) : "–", best)}</td>`;
+          })
+          .join("")}</tr>`;
+      })
       .join("")}</tbody></table>`;
 }
 
@@ -129,7 +144,8 @@ export function sliders(ss: Slider[]): string {
       const off = !has || !base;
       const note = !has ? "n/a: not used for this site" : !base ? "This preset does not use this challenge. Select Balanced to use it." : "";
       return `<div class="w-row${off ? " off" : ""}"><label for="w-${esc(c.id)}">${esc(c.name)}</label><output for="w-${esc(c.id)}">${!has ? "n/a" : !base ? "off" : fmtMul(mul)}</output>
-        <input type="range" id="w-${esc(c.id)}" min="0" max="2" step="0.1" value="${off ? 0 : mul}" style="--v:${off ? 0 : mul * 50}%" data-ch="${esc(c.id)}"${off ? " disabled" : ""}${note ? ` aria-describedby="wn-${esc(c.id)}"` : ""}>
+        <input type="range" id="w-${esc(c.id)}" min="0" max="2" step="0.1" value="${off ? 0 : mul}" data-ch="${esc(c.id)}"${off ? " disabled" : ""}${note ? ` aria-describedby="wn-${esc(c.id)}"` : ""}>
+        ${off ? "" : `<span class="w-ticks" aria-hidden="true"><span>0×</span><span>1×</span><span>2×</span></span>`}
         ${note ? `<p class="w-note" id="wn-${esc(c.id)}">${note}</p>` : ""}</div>`;
     })
     .join("");
