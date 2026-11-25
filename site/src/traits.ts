@@ -106,15 +106,21 @@ function bullet(r: Row, label: string) {
   const a = Math.min(lo, tv, r.ev);
   const b = Math.max(hi, tv, r.ev);
   const pad = (b - a || 1) * 0.03;
-  const at = (v: number) => ((v - a + pad) / (b - a + 2 * pad)) * 100;
+  const at = (v: number) => Math.max(0, Math.min(100, ((v - a + pad) / (b - a + 2 * pad)) * 100));
   const u = unit(r.tr.unit);
   const d = r.tr.digits;
+  const hx = at(r.ev);
   const tx = at(tv);
+  const gapLeft = Math.min(hx, tx);
+  const gapWidth = Math.abs(hx - tx);
+  const band = bandOf(r.rank);
+  const bandCls = band ? band.cls : "b-na";
   const range = Number.isFinite(r.lo) ? `Land on Earth: ${num(r.lo, d)} to ${num(r.hi, d)}${u}` : "";
   return `<div class="bb" role="img" aria-label="Here ${esc(val(r.tr, r.ev))}. ${esc(label)} ${esc(val(r.tr, tv))}. ${esc(range)}">
       ${Number.isFinite(r.lo) ? `<span class="bb-band" style="left:${at(r.lo).toFixed(2)}%;width:${Math.max(0.6, at(r.hi) - at(r.lo)).toFixed(2)}%"></span>` : ""}
-      <span class="bb-here" style="width:${Math.max(0.8, at(r.ev)).toFixed(2)}%"></span>
-      <span class="bb-tick${tx > 80 ? " end" : tx < 20 ? " start" : ""}" style="left:${tx.toFixed(2)}%"><em>${esc(label)}</em></span>
+      <span class="bb-gap ${bandCls}" style="left:${gapLeft.toFixed(2)}%;width:${gapWidth.toFixed(2)}%"></span>
+      <span class="bb-here-dot" style="left:${hx.toFixed(2)}%"></span>
+      <span class="bb-tick${tx > 82 ? " end" : tx < 18 ? " start" : ""}" style="left:${tx.toFixed(2)}%"><em>${esc(label)}</em></span>
     </div>
     ${range ? `<p class="bb-axis">${range}</p>` : ""}`;
 }

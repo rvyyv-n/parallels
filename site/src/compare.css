@@ -4,60 +4,152 @@
 
 .cmp-bar {
   display: flex;
-  gap: 0;
-  margin-bottom: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.cmp-seg {
+  display: inline-flex;
+  padding: 2px;
+  background: var(--raise);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-pill);
+  box-shadow: var(--edge-hi);
+  --seg-thumb-bg: var(--ink);
+  --seg-thumb-r: var(--r-pill);
 }
 
 .cmp-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  min-height: 36px;
-  padding: 0 12px;
-  border: 1px solid var(--rule-2);
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: var(--r-pill);
   background: transparent;
   color: var(--ink-2);
   font: 600 12px/1 var(--display);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   cursor: pointer;
+  transition: color var(--t-fast) var(--ease);
 }
 
-.cmp-btn + .cmp-btn {
-  border-left: 0;
+.cmp-btn:hover {
+  color: var(--ink);
 }
 
 .cmp-btn .ic {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
 }
 
 .cmp-btn[aria-pressed="true"] {
   background: var(--ink);
-  border-color: var(--ink);
   color: var(--space);
 }
 
-.cmp-btn:focus-visible {
-  outline: 2px solid var(--signal);
+.cmp-seg.seg-has-thumb .cmp-btn[aria-pressed="true"] {
+  background: transparent;
+}
+
+.cmp-btn:focus-visible,
+.cmp-ov:focus-visible {
+  outline: 2px solid var(--signal-2);
   outline-offset: 2px;
   position: relative;
-  z-index: 1;
+  z-index: 2;
+}
+
+.cmp-ov {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  margin-left: auto;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-pill);
+  background: var(--raise);
+  color: var(--ink-2);
+  font: 600 12px/1 var(--display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: var(--edge-hi);
+  transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
+}
+
+.cmp-ov:hover {
+  color: var(--ink);
+  border-color: var(--rule-3);
+  background: var(--surface-2);
+}
+
+.cmp-ov[aria-pressed="true"] {
+  color: var(--ink);
+  border-color: rgba(91, 187, 233, 0.45);
+  background: var(--signal-tint);
+}
+
+.cmp-ov-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink-3);
+  transition: background-color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+
+.cmp-ov[aria-pressed="true"] .cmp-ov-dot {
+  background: var(--signal-2);
+  border-color: var(--signal-2);
 }
 
 .cmp-stage {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 6px;
+  gap: 8px;
 }
 
 .cmp-p {
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
-  background: #0b0d10;
+  border-radius: var(--r-md);
+  border: 1px solid var(--rule);
+  background: var(--surface-1);
   margin: 0;
+}
+
+.cmp-p::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(110deg, var(--surface-1) 24%, var(--surface-2) 50%, var(--surface-1) 76%);
+  background-size: 220% 100%;
+  transition: opacity var(--t-state) var(--ease);
+}
+
+.cmp-p.loading::before {
+  opacity: 1;
+  animation: cmp-shimmer 1.4s linear infinite;
+}
+
+@keyframes cmp-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
 }
 
 .cmp .cmp-p img,
@@ -71,6 +163,7 @@
 .cmp-tiles {
   position: absolute;
   inset: 0;
+  z-index: 1;
 }
 
 .cmp-p img.blank {
@@ -80,10 +173,11 @@
 .cmp-fb {
   position: absolute;
   inset: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
   display: none;
-  }
+}
 
 .cmp .cmp-p.fb .cmp-tiles {
   display: none;
@@ -95,13 +189,16 @@
 
 .cmp-cell {
   position: absolute;
-  border: 2px solid var(--signal);
-  outline: 1px solid rgba(0, 0, 0, 0.7);
+  z-index: 2;
+  border: 2px solid var(--signal-2);
+  outline: 1px solid rgba(2, 7, 10, 0.78);
   pointer-events: none;
+  transition: opacity var(--t-fast) var(--ease);
 }
 
 .cmp-x {
   position: absolute;
+  z-index: 2;
   width: 22px;
   height: 22px;
   margin: -11px 0 0 -11px;
@@ -110,10 +207,12 @@
     linear-gradient(var(--ink), var(--ink)) center / 2px 100% no-repeat,
     linear-gradient(var(--ink), var(--ink)) center / 100% 2px no-repeat;
   filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000);
+  transition: opacity var(--t-fast) var(--ease);
 }
 
 .cmp-mark {
   position: absolute;
+  z-index: 2;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -124,6 +223,7 @@
   text-shadow: 0 0 3px #000, 0 0 2px #000;
   white-space: nowrap;
   pointer-events: none;
+  transition: opacity var(--t-fast) var(--ease);
 }
 
 .cmp-mark.left {
@@ -134,17 +234,31 @@
 .cmp-mark b {
   width: 8px;
   height: 8px;
+  border-radius: 50%;
   border: 2px solid var(--ink);
   background: var(--space);
 }
 
+.cmp.cmp-clean .cmp-cell,
+.cmp.cmp-clean .cmp-x,
+.cmp.cmp-clean .cmp-mark {
+  opacity: 0;
+  visibility: hidden;
+}
+
 .cmp-tag {
   position: absolute;
-  top: 0;
-  left: 0;
-  padding: 5px 8px 4px;
-  background: rgba(2, 7, 10, 0.82);
-  font: 700 11px/1 var(--display);
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  padding: 5px 10px 4px;
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-pill);
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-float);
+  font: 700 10.5px/1 var(--display);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink);
@@ -176,7 +290,7 @@
 
 .cmp[data-mode="wipe"] .timg .cmp-tag {
   left: auto;
-  right: 0;
+  right: 10px;
 }
 
 .cmp[data-mode="wipe"] .cmp-knob {
@@ -187,22 +301,33 @@
   left: var(--wipe);
   width: 2px;
   margin-left: -1px;
-  background: var(--ink);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 0 0 1px rgba(2, 7, 10, 0.72), 0 0 10px rgba(2, 7, 10, 0.7);
   pointer-events: none;
-  z-index: 2;
+  z-index: 4;
 }
 
-.cmp[data-mode="wipe"] .cmp-knob::after {
-  content: "";
+.cmp[data-mode="wipe"] .cmp-puck {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 28px;
-  height: 28px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
   transform: translate(-50%, -50%);
-  background: var(--ink);
-  clip-path: polygon(0 50%, 35% 20%, 35% 80%, 0 50%, 100% 50%, 65% 20%, 65% 80%, 100% 50%);
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: var(--glass-strong);
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(2, 7, 10, 0.78), 0 0 18px rgba(91, 187, 233, 0.45), var(--shadow-float);
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+
+.cmp[data-mode="wipe"] .cmp-stage:hover .cmp-puck,
+.cmp[data-mode="wipe"] .cmp-stage:has(.cmp-range:active) .cmp-puck {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 0 0 2px rgba(2, 7, 10, 0.85), 0 0 22px rgba(91, 187, 233, 0.65), var(--shadow-float);
 }
 
 .cmp[data-mode="wipe"] .cmp-range {
@@ -214,11 +339,12 @@
   margin: 0;
   opacity: 0;
   cursor: ew-resize;
-  z-index: 3;
+  z-index: 5;
 }
 
 .cmp-stage:has(.cmp-range:focus-visible) {
-  outline: 2px solid var(--signal);
+  border-radius: var(--r-md);
+  outline: 2px solid var(--signal-2);
   outline-offset: 2px;
 }
 
@@ -233,7 +359,7 @@
 
 .cmp-sb {
   display: block;
-  width: calc((100% - 6px) / 2);
+  width: calc((100% - 8px) / 2);
 }
 
 .cmp[data-mode="wipe"] .cmp-sb {
@@ -332,5 +458,12 @@
 
   .cmp[data-mode="split"] .cmp-sb {
     width: 84%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmp-p.loading::before {
+    animation: none;
+    background: var(--surface-1);
   }
 }

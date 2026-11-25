@@ -2,6 +2,7 @@ import "./card.css";
 import { compareHtml, wireCompare } from "./compare";
 import type { Challenge, Manifest, TargetValue, Trait } from "./contract";
 import type { Cols } from "./data";
+import { trekUrl, worldviewUrl } from "./export";
 import { MONTHS, bits, esc, latlon, monthList, num, score100, unit } from "./format";
 import { icon } from "./icons";
 import { BANDS, bandOf, isNew, shortName } from "./rank";
@@ -10,13 +11,29 @@ import { BODY, breakRows, ds, row, same, scoreChip, scoredRows, short, traitHtml
 
 export { BODY };
 
+const RING_R = 52;
+const RING_C = 2 * Math.PI * RING_R;
+
+const SVG_LINK = `<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`;
+const SVG_DOWNLOAD = `<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>`;
+const SVG_EXTERNAL = `<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`;
+const SVG_PRINT = `<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>`;
+
 export interface CardInput extends TraitInput {
   score: Float32Array;
   place: number;
   ranked: number;
+  filterId?: string;
+  hand?: boolean;
   weightsName: string;
   plain: string;
   yr: boolean;
+}
+
+export interface CardHandlers {
+  onPreset?: (filterId: string) => void;
+  onYearRound?: () => void;
+  onCsv?: () => void;
 }
 
 export const terrainOf = (c: Cols) => c.terrain_type ?? c.terrain;
@@ -129,14 +146,14 @@ function seasons(x: CardInput) {
   if (![best, frz, rain].some(Number.isFinite)) return `<p class="muted">No monthly climate data for this place.</p>`;
   const line = (name: string, mask: number, cls: string) =>
     `<tr><th scope="row">${name}</th>${bits(mask)
-      .map((on, k) => `<td class="${on ? cls : ""}"><span class="sr">${MONTHS[k]} ${on ? "yes" : "no"}</span></td>`)
+      .map((on, k) => `<td data-m="${k}" class="${on ? cls : ""}"><span class="sr">${MONTHS[k]} ${on ? "yes" : "no"}</span></td>`)
       .join("")}</tr>`;
   return `<p class="se-k"><b>${Number.isFinite(usable) ? num(usable) : "no data"}</b> of 12 months usable <span class="muted">· ${esc(short(x.m, "power_merra2"))}</span></p>
     <div class="scroll-x"><table class="months">
-      <thead><tr><td></td>${MONTHS.map((mm) => `<th scope="col">${mm}</th>`).join("")}</tr></thead>
+      <thead><tr><td></td>${MONTHS.map((mm, k) => `<th scope="col" data-m="${k}">${mm}</th>`).join("")}</tr></thead>
       <tbody>${line("Best", best, "on-best")}${line("Freeze–thaw", frz, "on-frz")}${line("Rainy", rain, "on-rain")}</tbody>
     </table></div>
-    <dl class="se-list"><div><dt>Best</dt><dd>${monthList(best)}</dd></div><div><dt>Freeze–thaw</dt><dd>${monthList(frz)}</dd></div><div><dt>Rainy</dt><dd>${monthList(rain)}</dd></div></dl>
+    <dl class="se-list"><div><dt><i class="se-sw on-best" aria-hidden="true"></i>Best</dt><dd>${monthList(best)}</dd></div><div><dt><i class="se-sw on-frz" aria-hidden="true"></i>Freeze–thaw</dt><dd>${monthList(frz)}</dd></div><div><dt><i class="se-sw on-rain" aria-hidden="true"></i>Rainy</dt><dd>${monthList(rain)}</dd></div></dl>
     ${x.yr ? `<p class="se-yr">${icon("info")}<span><b>Year-round testing is on.</b> ${esc(x.m.scoring.yearround_rule)}</span></p>` : ""}`;
 }
 
@@ -234,16 +251,57 @@ function datasets(x: CardInput, chs: Challenge[]) {
   earth.add("power_merra2");
   const there = ids((tr) => (tr.scored_by === "ideal" ? undefined : x.target.values[tr.id]?.dataset));
   for (const v of Object.values(x.target.shown)) there.add(v.dataset);
+  const badge = (ag: string): [string, string] => {
+    if (ag === "NASA") return ["nasa", "NASA"];
+    if (ag === "USGS") return ["usgs", "USGS"];
+    if (ag === "ESA") return ["esa", "ESA"];
+    if (ag === "computed") return ["calc", "Calculated"];
+    return ["open", "Open data"];
+  };
   const li = (id: string) => {
     const d = x.m.datasets.find((d) => d.id === id);
     if (!d) return `<li>${esc(id)}</li>`;
-    return `<li>${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>` : esc(d.name)} <span class="ds-ag">${esc(d.agency === "computed" ? "calculated" : d.agency === "other" || d.agency === "partner" ? "open data" : d.agency)}</span></li>`;
+    const [key, label] = badge(d.agency);
+    return `<li><span class="ds-name">${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">${esc(d.name)}</a>` : esc(d.name)}</span><span class="ds-ag" data-ag="${key}">${esc(label)}</span></li>`;
   };
   return `<div class="ds-cols">
     <div><h3>Earth values</h3><ul class="ds">${[...earth].map(li).join("")}</ul></div>
     <div><h3>${esc(BODY[x.body])} values</h3><ul class="ds">${[...there].map(li).join("")}</ul></div>
   </div>
   <p class="muted small">Images: NASA GIBS (Blue Marble, Landsat WELD) for Earth; NASA ${esc(BODY[x.body])} Trek for the ${esc(BODY[x.body])}. Each value above names its own dataset; open "Method and notes" under any trait for the full method.</p>`;
+}
+
+function ringHtml(s: number, b: { cls: string; word: string } | null) {
+  const ok = Number.isFinite(s);
+  const frac = ok ? Math.max(0, Math.min(1, s)) : 0;
+  const offset = RING_C * (1 - frac);
+  return `<div class="ring" data-band="${b ? b.cls : "b-na"}" style="--p:${ok ? (s * 100).toFixed(1) : 0}" role="img" aria-label="${ok ? `Match score ${score100(s)} / 100` : "No match score"}">
+    <svg class="ring-svg" viewBox="0 0 120 120" aria-hidden="true">
+      <circle class="ring-track" cx="60" cy="60" r="${RING_R}" />
+      <circle class="ring-arc${ok ? "" : " is-empty"}" cx="60" cy="60" r="${RING_R}" stroke-dasharray="${RING_C.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}" />
+    </svg>
+    <b>${ok ? score100(s) : "—"}</b><span>${ok ? "/ 100" : "not ranked"}</span>
+  </div>`;
+}
+
+function checkStrip(x: CardInput) {
+  const body = BODY[x.body];
+  const lat = x.cells.lat[x.i];
+  const lon = x.cells.lon[x.i];
+  const wv = worldviewUrl(lat, lon, x.m.generated);
+  const tk = trekUrl(x.target);
+  return `<div class="pl-check" role="region" aria-label="Check it yourself">
+    <div class="pl-check-head">
+      <h3>Check it yourself</h3>
+      <p class="muted small">Export every number here, verify the coordinates in NASA's own viewers, or save a print report.</p>
+    </div>
+    <div class="pl-check-actions">
+      <button type="button" class="pl-act" id="pl-csv">${SVG_DOWNLOAD}<span>Download CSV</span></button>
+      <a class="pl-act" id="pl-worldview" href="${esc(wv)}" target="_blank" rel="noopener noreferrer">${SVG_EXTERNAL}<span>Open in NASA Worldview</span></a>
+      <a class="pl-act" id="pl-trek" href="${esc(tk)}" target="_blank" rel="noopener noreferrer">${SVG_EXTERNAL}<span>Open in NASA ${esc(body)} Trek</span></a>
+      <button type="button" class="pl-act" id="pl-print">${SVG_PRINT}<span>Print / Save PDF</span></button>
+    </div>
+  </div>`;
 }
 
 export function card(x: CardInput): string {
@@ -262,17 +320,33 @@ export function card(x: CardInput): string {
   const b = bandOf(s);
   const ok = Number.isFinite(s);
   const fresh = isNew(m, cells, i);
+  const orderedFilters = [...m.filters].sort((a, bb) => Number(bb.id === "balanced") - Number(a.id === "balanced"));
+  const filterId = x.filterId ?? "balanced";
+  const isHand = !!x.hand;
+  const presetOptions = `${isHand ? `<option value="__custom" selected>Custom weights</option>` : ""}${orderedFilters
+    .map((f) => `<option value="${esc(f.id)}"${!isHand && f.id === filterId ? " selected" : ""}>${esc(f.name)}</option>`)
+    .join("")}`;
+  const rawCoords = `${cells.lat[i].toFixed(4)}, ${cells.lon[i].toFixed(4)}`;
   return `<article class="card pl" aria-labelledby="place-h">
     <div class="pl-top">
       <header class="pl-hero">
-        <p class="pl-for"><span class="pl-body" data-body="${x.body}">${body}</span><span>Match on Earth for <b>${esc(target.name)}</b></span><span class="pl-preset">${esc(x.weightsName)}${x.yr ? ", year-round" : ""}</span></p>
+        <div class="pl-for">
+          <span class="pl-body" data-body="${x.body}">${body}</span>
+          <span class="pl-for-txt">Match on Earth for <b>${esc(target.name)}</b></span>
+          <label class="pl-preset" title="Switch mission preset"><span class="sr">Mission preset</span><select class="pl-preset-sel" id="pl-preset" aria-label="Mission preset">${presetOptions}</select>${icon("chevron", "pl-preset-ic")}</label>
+          <button type="button" class="pl-yr" id="pl-yr" aria-pressed="${x.yr ? "true" : "false"}"${isHand ? ' disabled title="Reset custom weights in Finder to use Year-round"' : ' title="Prefer places usable all year"'}>Year-round</button>
+        </div>
         <h1 id="place-h" tabindex="-1">${esc(region)}</h1>
-        <p class="pl-meta"><span>${latlon(cells.lat[i], cells.lon[i])}</span><span>${!ttype ? "Terrain: no data" : ttype.key === "none" ? "Other land" : esc(ttype.name)}</span><span>0.5° cell, about 50 km</span></p>
+        <div class="pl-meta-row">
+          <p class="pl-meta"><span>${latlon(cells.lat[i], cells.lon[i])}</span><span>${!ttype ? "Terrain: no data" : ttype.key === "none" ? "Other land" : esc(ttype.name)}</span><span>0.5° cell, about 50 km</span></p>
+          <div class="pl-copy-grp">
+            <button type="button" class="pl-copy" data-copy="link" aria-label="Copy link to this place" title="Copy link">${SVG_LINK}<span>Copy link</span></button>
+            <button type="button" class="pl-copy" data-copy="coords" data-coords="${esc(rawCoords)}" aria-label="Copy coordinates" title="Copy coordinates">${icon("pin")}<span>Copy coords</span></button>
+          </div>
+        </div>
         ${fresh || isIce(cells, i) ? `<p class="pl-flags">${fresh ? `<span><span class="rk-new">New</span>${num(far)} km from the nearest known analog</span>` : ""}${isIce(cells, i) ? `<span><span class="tag ice">Ice sheet</span>${num(cells.ice?.[i])}% permanent ice</span>` : ""}</p>` : ""}
         <div class="pl-score">
-          <div class="ring" data-band="${b ? b.cls : "b-na"}" style="--p:${ok ? (s * 100).toFixed(1) : 0}" role="img" aria-label="${ok ? `Match score ${score100(s)} / 100` : "No match score"}">
-            <b>${ok ? score100(s) : "—"}</b><span>${ok ? "/ 100" : "not ranked"}</span>
-          </div>
+          ${ringHtml(s, b)}
           <div class="pl-rank">
             ${Number.isFinite(x.place) ? `<p><b>#${num(x.place)}</b> of ${num(x.ranked)} ranked land cells</p><p class="muted">In the top ${topShare(x.place, x.ranked)} of land</p>` : `<p>No rank with these settings</p>`}
           </div>
@@ -302,6 +376,7 @@ export function card(x: CardInput): string {
       <div class="pl-chs-head">
         <h2 id="pl-chs-h">Challenge by challenge</h2>
         <p class="key">${BANDS.map((bb) => `<span><i class="fc ${bb.cls}"></i>${bb.word}</span>`).join("")}<span><i class="kk band"></i>Earth's range</span><span><i class="kk here"></i>here</span><span><i class="kk tick"></i>${esc(body)} or ideal</span></p>
+        <button type="button" class="pl-toggle-all" aria-expanded="false">Expand all</button>
       </div>
       <ol class="chs">${chs.map((c, k) => chTile(x, c, k === firstOpen)).join("")}</ol>
     </section>
@@ -311,6 +386,7 @@ export function card(x: CardInput): string {
     </div>
     <section class="pl-sec pl-data" aria-labelledby="pl-data-h">
       <h2 id="pl-data-h">${icon("sources")}Data sources</h2>
+      ${checkStrip(x)}
       ${datasets(x, chs)}
       ${unscored(x, chs)}
       ${regions(x)}
@@ -318,7 +394,106 @@ export function card(x: CardInput): string {
   </article>`;
 }
 
+async function copyText(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // Fallback below for restricted clipboard contexts.
+  }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.append(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
 
-export function wireCard(el: HTMLElement): void {
-  wireCompare(el);
+export function wireCard(el: HTMLElement, handlers?: CardHandlers): () => void {
+  const disposeCompare = wireCompare(el);
+  const timers: number[] = [];
+
+  const preset = el.querySelector<HTMLSelectElement>("#pl-preset");
+  preset?.addEventListener("change", () => {
+    if (preset.value && preset.value !== "__custom") handlers?.onPreset?.(preset.value);
+  });
+
+  const yr = el.querySelector<HTMLButtonElement>("#pl-yr");
+  yr?.addEventListener("click", () => {
+    if (!yr.disabled) handlers?.onYearRound?.();
+  });
+
+  const csvBtn = el.querySelector<HTMLButtonElement>("#pl-csv");
+  csvBtn?.addEventListener("click", () => handlers?.onCsv?.());
+
+  const printBtn = el.querySelector<HTMLButtonElement>("#pl-print");
+  printBtn?.addEventListener("click", () => window.print());
+
+  el.querySelectorAll<HTMLButtonElement>(".pl-copy").forEach((btn) => {
+    const label = btn.querySelector<HTMLElement>("span");
+    const idleText = label?.textContent ?? "";
+    let resetId = 0;
+    btn.addEventListener("click", () => {
+      const value = btn.dataset.copy === "coords" ? (btn.dataset.coords ?? "") : location.href;
+      void copyText(value).then(() => {
+        if (resetId) clearTimeout(resetId);
+        btn.dataset.copied = "true";
+        if (label) label.textContent = "Copied";
+        resetId = window.setTimeout(() => {
+          delete btn.dataset.copied;
+          if (label) label.textContent = idleText;
+        }, 2000);
+        timers.push(resetId);
+      });
+    });
+  });
+
+  const toggleAll = el.querySelector<HTMLButtonElement>(".pl-toggle-all");
+  const details = [...el.querySelectorAll<HTMLDetailsElement>(".ch > details")];
+  const syncToggleAll = () => {
+    if (!toggleAll || !details.length) return;
+    const allOpen = details.every((d) => d.open);
+    toggleAll.textContent = allOpen ? "Collapse all" : "Expand all";
+    toggleAll.setAttribute("aria-expanded", String(allOpen));
+  };
+  if (toggleAll && details.length) {
+    syncToggleAll();
+    toggleAll.addEventListener("click", () => {
+      const open = !details.every((d) => d.open);
+      for (const d of details) d.open = open;
+      syncToggleAll();
+    });
+    for (const d of details) d.addEventListener("toggle", syncToggleAll);
+  }
+
+  const months = el.querySelector<HTMLTableElement>(".months");
+  if (months) {
+    let activeMonth: string | null = null;
+    const setMonth = (mIdx: string | null) => {
+      if (mIdx === activeMonth) return;
+      if (activeMonth != null) months.querySelectorAll(`[data-m="${activeMonth}"]`).forEach((c) => c.classList.remove("is-col"));
+      activeMonth = mIdx;
+      if (activeMonth != null) months.querySelectorAll(`[data-m="${activeMonth}"]`).forEach((c) => c.classList.add("is-col"));
+    };
+    months.addEventListener("pointerover", (e) => {
+      const cell = (e.target as Element | null)?.closest<HTMLElement>("[data-m]");
+      setMonth(cell?.dataset.m ?? null);
+    });
+    months.addEventListener("pointerleave", () => setMonth(null));
+  }
+
+  return () => {
+    disposeCompare();
+    for (const id of timers) clearTimeout(id);
+  };
 }

@@ -1,5 +1,6 @@
 import "./compare.css";
 import type { Body, Target } from "./contract";
+import { bindSegmented } from "./controls";
 import { esc, latlon, num } from "./format";
 import { icon } from "./icons";
 
@@ -158,20 +159,23 @@ export function compareHtml(x: CompareInput): string {
       : `NASA Blue Marble shaded relief (GIBS), at approximately ${metres(e.kmPerPx)} for each pixel. The square shows this 0.5° cell.`;
   const frac = (BAR_KM / VIEW_KM) * 100;
   const earthPanel = e
-    ? `<div class="cmp-p eimg" data-body="earth" data-lat="${x.lat}" data-lon="${x.lon}" role="img" aria-label="Earth around ${esc(x.place)}, ${VIEW_KM} km across, with the 0.5 degree cell outlined">
+    ? `<div class="cmp-p eimg loading" data-body="earth" data-lat="${x.lat}" data-lon="${x.lon}" role="img" aria-label="Earth around ${esc(x.place)}, ${VIEW_KM} km across, with the 0.5 degree cell outlined">
         <div class="cmp-tiles">${e.tiles}</div><canvas class="cmp-fb" width="256" height="256"></canvas>${e.marks}<span class="cmp-tag">Earth</span></div>`
     : `<div class="cmp-p eimg none" role="img" aria-label="No Earth image this near the pole"><p>There is no live map image this near the pole.</p><span class="cmp-tag">Earth</span></div>`;
-  const targetPanel = `<div class="cmp-p timg" data-body="${x.body}" data-proj="${polar ? "sp" : "eq"}" data-lat="${x.target.lat}" data-lon="${x.target.lon}" role="img" aria-label="${esc(bodyName)} at ${esc(x.target.name)}, ${VIEW_KM} km across">
+  const targetPanel = `<div class="cmp-p timg loading" data-body="${x.body}" data-proj="${polar ? "sp" : "eq"}" data-lat="${x.target.lat}" data-lon="${x.target.lon}" role="img" aria-label="${esc(bodyName)} at ${esc(x.target.name)}, ${VIEW_KM} km across">
       <div class="cmp-tiles">${tv.tiles}</div><canvas class="cmp-fb" width="256" height="256"></canvas><i class="cmp-x" style="left:50%;top:50%"></i>${tv.marks}<span class="cmp-tag">${esc(bodyName)}</span></div>`;
   return `<figure class="cmp" data-mode="split" style="--wipe:50%;--bar:${frac.toFixed(3)}%">
-    <div class="cmp-bar" role="group" aria-label="How to compare the two images">
-      <button type="button" class="cmp-btn" data-cmp-mode="split" aria-pressed="true">${icon("split")}Side by side</button>
-      <button type="button" class="cmp-btn" data-cmp-mode="wipe" aria-pressed="false">${icon("wipe")}Wipe</button>
+    <div class="cmp-bar">
+      <div class="cmp-seg" role="group" aria-label="How to compare the two images">
+        <button type="button" class="cmp-btn" data-cmp-mode="split" aria-pressed="true">${icon("split")}Side by side</button>
+        <button type="button" class="cmp-btn" data-cmp-mode="wipe" aria-pressed="false">${icon("wipe")}Wipe</button>
+      </div>
+      <button type="button" class="cmp-ov" aria-pressed="true" title="Show or hide cell box and markers"><span class="cmp-ov-dot" aria-hidden="true"></span>Overlays</button>
     </div>
     <div class="cmp-stage">
       ${earthPanel}
       ${targetPanel}
-      <span class="cmp-knob" aria-hidden="true"></span>
+      <span class="cmp-knob" aria-hidden="true"><span class="cmp-puck"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 6 3.5 10l4 4"/><path d="m12.5 6 4 4-4 4"/></svg></span></span>
       <input class="cmp-range" type="range" min="0" max="100" value="50" step="1" aria-label="Wipe divider: Earth on the left, ${esc(bodyName)} on the right" aria-valuetext="Divider at 50%">
     </div>
     <div class="cmp-scale"><span class="cmp-sb" aria-hidden="true"><i></i></span><span><b>${BAR_KM} km</b> · both images ${VIEW_KM} km wide, same ground scale</span></div>
@@ -259,8 +263,25 @@ function drawFallback(panel: HTMLElement) {
           out.data[b + 3] = 255;
         }
       g.putImageData(out, 0, 0);
+      panel.dataset.fbReady = "1";
+      panel.classList.remove("loading");
     })
-    .catch(() => undefined);
+    .catch(() => {
+      panel.dataset.fbReady = "1";
+      panel.classList.remove("loading");
+    });
+}
+
+function checkLoaded(panel: HTMLElement) {
+  if (!panel.classList.contains("loading")) return;
+  if (panel.classList.contains("fb")) {
+    if (panel.dataset.fbReady === "1") panel.classList.remove("loading");
+    return;
+  }
+  const base = [...panel.querySelectorAll<HTMLImageElement>("img.t:not(.hi)")];
+  if (!base.length || base.every((im) => im.complete && im.naturalWidth > 0)) {
+    panel.classList.remove("loading");
+  }
 }
 
 function blank(img: HTMLImageElement) {
@@ -310,14 +331,30 @@ function install() {
     "load",
     (e) => {
       const t = e.target;
-      if (t instanceof HTMLImageElement && t.classList.contains("hi") && t.closest(".cmp-p")) blank(t);
+      if (!(t instanceof HTMLImageElement)) return;
+      const p = t.closest<HTMLElement>(".cmp-p");
+      if (!p) return;
+      if (t.classList.contains("hi")) blank(t);
+      else if (t.classList.contains("t")) checkLoaded(p);
     },
     true,
   );
   document.addEventListener("click", (e) => {
-    const b = (e.target as Element | null)?.closest?.<HTMLButtonElement>("[data-cmp-mode]");
-    const fig = b?.closest<HTMLElement>(".cmp");
-    if (b && fig) setMode(fig, b.dataset.cmpMode ?? "split");
+    const target = e.target as Element | null;
+    const b = target?.closest?.<HTMLButtonElement>("[data-cmp-mode]");
+    if (b) {
+      const fig = b.closest<HTMLElement>(".cmp");
+      if (fig) setMode(fig, b.dataset.cmpMode ?? "split");
+      return;
+    }
+    const ov = target?.closest?.<HTMLButtonElement>(".cmp-ov");
+    if (ov) {
+      const fig = ov.closest<HTMLElement>(".cmp");
+      if (fig) {
+        const clean = fig.classList.toggle("cmp-clean");
+        ov.setAttribute("aria-pressed", String(!clean));
+      }
+    }
   });
   document.addEventListener("input", (e) => {
     const t = e.target;
@@ -340,13 +377,16 @@ function giveUp(p: HTMLElement) {
   drawFallback(p);
 }
 
-export function wireCompare(el: HTMLElement) {
+export function wireCompare(el: HTMLElement): () => void {
   install();
+  const cleanups: (() => void)[] = [];
+  el.querySelectorAll<HTMLElement>(".cmp-seg").forEach((seg) => cleanups.push(bindSegmented(seg)));
+  const timers: number[] = [];
   const seen = new IntersectionObserver((es) => {
     for (const e of es) {
       if (!e.isIntersecting) continue;
       seen.unobserve(e.target);
-      setTimeout(() => giveUp(e.target as HTMLElement), WAIT_MS);
+      timers.push(window.setTimeout(() => giveUp(e.target as HTMLElement), WAIT_MS));
     }
   });
   el.querySelectorAll<HTMLElement>(".cmp-p").forEach((p) => {
@@ -362,5 +402,11 @@ export function wireCompare(el: HTMLElement) {
         }
       } else if (im.classList.contains("hi")) blank(im);
     });
+    checkLoaded(p);
   });
+  return () => {
+    seen.disconnect();
+    for (const id of timers) clearTimeout(id);
+    for (const fn of cleanups) fn();
+  };
 }
