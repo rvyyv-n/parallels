@@ -1,5 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
-import { cols, manifest } from "./helpers";
+import { cols, expect, manifest, test, type Page } from "./helpers";
 import { latlon, score100 } from "../src/format";
 import { cut } from "../src/zones";
 

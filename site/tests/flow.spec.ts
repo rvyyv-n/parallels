@@ -1,5 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
-import { cols, manifest } from "./helpers";
+import { cols, expect, manifest, test, type Page } from "./helpers";
 import { handScore } from "../src/score";
 import { spread } from "../src/rank";
 

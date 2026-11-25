@@ -1,5 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
-import { cols, manifest } from "./helpers";
+import { cols, expect, manifest, test, type Page } from "./helpers";
 import { score100 } from "../src/format";
 import { km } from "../src/score";
 import { APART_KM, bandOf, countryOf, isNew, PER_COUNTRY, spread, worldOf } from "../src/rank";

@@ -331,9 +331,9 @@ export function card(x: CardInput): string {
     <div class="pl-top">
       <header class="pl-hero" data-body="${x.body}">
         <div class="pl-for">
-          <div class="pl-for-id">
+          <div class="pl-for-id" title="Match on Earth for ${esc(target.name)}">
             <span class="pl-body" data-body="${x.body}">${body}</span>
-            <span class="pl-for-txt">Match for <b>${esc(target.name)}</b></span>
+            <span class="pl-for-txt"><b>${esc(target.short)}</b></span>
           </div>
           <div class="pl-for-ctl">
             <label class="pl-preset" title="Switch mission preset"><span class="sr">Mission preset</span><select class="pl-preset-sel" id="pl-preset" aria-label="Mission preset">${presetOptions}</select>${icon("chevron", "pl-preset-ic")}</label>
@@ -341,21 +341,21 @@ export function card(x: CardInput): string {
           </div>
         </div>
         <div class="pl-id">
-          <div class="pl-id-head">
-            <h1 id="place-h" tabindex="-1">${esc(region)}</h1>
+          <h1 id="place-h" tabindex="-1">${esc(region)}</h1>
+          <p class="pl-meta"><span>${latlon(cells.lat[i], cells.lon[i])}</span><span>${!ttype ? "Terrain: no data" : ttype.key === "none" ? "Other land" : esc(ttype.name)}</span><span>~50 km cell (0.5°)</span></p>
+          <div class="pl-id-bar">
+            ${fresh || isIce(cells, i) ? `<p class="pl-flags">${fresh ? `<span><span class="rk-new">New</span>${num(far)} km from nearest known analog</span>` : ""}${isIce(cells, i) ? `<span><span class="tag ice">Ice sheet</span>${num(cells.ice?.[i])}% permanent ice</span>` : ""}</p>` : `<span></span>`}
             <div class="pl-copy-grp">
               <button type="button" class="pl-copy" data-copy="link" aria-label="Copy link to this place" title="Copy link">${SVG_LINK}<span>Copy link</span></button>
               <button type="button" class="pl-copy" data-copy="coords" data-coords="${esc(rawCoords)}" aria-label="Copy coordinates" title="Copy coordinates">${icon("pin")}<span>Copy coords</span></button>
             </div>
           </div>
-          <p class="pl-meta"><span>${latlon(cells.lat[i], cells.lon[i])}</span><span>${!ttype ? "Terrain: no data" : ttype.key === "none" ? "Other land" : esc(ttype.name)}</span><span>~50 km cell (0.5°)</span></p>
-          ${fresh || isIce(cells, i) ? `<p class="pl-flags">${fresh ? `<span><span class="rk-new">New</span>${num(far)} km from nearest known analog</span>` : ""}${isIce(cells, i) ? `<span><span class="tag ice">Ice sheet</span>${num(cells.ice?.[i])}% permanent ice</span>` : ""}</p>` : ""}
         </div>
         <div class="pl-score-well">
           ${ringHtml(s, b)}
           <div class="pl-summary">
             <div class="pl-rank">
-              ${Number.isFinite(x.place) ? `<p class="pl-rank-main"><b>#${num(x.place)}</b><span>of ${num(x.ranked)} ranked cells · Top ${topShare(x.place, x.ranked)}</span></p>` : `<p class="pl-rank-main">No rank with these settings</p>`}
+              ${Number.isFinite(x.place) ? `<p class="pl-rank-main"><b>#${num(x.place)}</b><span>of ${num(x.ranked)} ranked cells</span><span class="pl-rank-pill">Top ${topShare(x.place, x.ranked)}</span></p>` : `<p class="pl-rank-main">No rank with these settings</p>`}
             </div>
             <p class="pl-verdict">${esc(verdict(x, chs))}</p>
             ${lead ? `<p class="pl-test">${icon("test")}<span><b>Test here:</b> ${esc(lead.what_to_test)}</span></p>` : ""}

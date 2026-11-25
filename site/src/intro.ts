@@ -342,6 +342,7 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
 
   const loader = new THREE.TextureLoader();
   let loaded = 0;
+  let run = () => {};
   // Draw the light copy first so the globe appears quickly, then swap in the sharp copy when the GPU can hold it.
   const paint = (id: Body, mat: THREE.MeshStandardMaterial) => {
     const [lo, hi] = textures[id];
@@ -352,16 +353,20 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
       mat.map = tex;
       mat.needsUpdate = true;
       old?.dispose();
+      run();
     };
     loader.load(
       lo,
       (tex) => {
-        use(tex);
         loaded++;
+        use(tex);
         if (hi && big >= NEED[id] && memory >= 4) loader.load(hi, use, undefined, () => {});
       },
       undefined,
-      () => loaded++,
+      () => {
+        loaded++;
+        run();
+      },
     );
   };
   const globe = (id: Body, flat: number, face: { x: number; y: number }): Globe => {
@@ -579,9 +584,9 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
         size();
       }
     }
-    if (canRun()) raf = requestAnimationFrame(frame);
+    if (canRun() && !still) raf = requestAnimationFrame(frame);
   };
-  const run = () => {
+  run = () => {
     if (!raf && canRun()) {
       last = performance.now();
       raf = requestAnimationFrame(frame);
@@ -601,12 +606,17 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
     const r = renderer.domElement.getBoundingClientRect();
     px = ((e.clientX - r.left) / r.width) * 2 - 1;
     py = ((e.clientY - r.top) / r.height) * 2 - 1;
-    hover = hit(e);
+    const next = hit(e);
+    const changed = next !== hover;
+    hover = next;
     renderer.domElement.style.cursor = hover ? "pointer" : "";
+    if (still && changed) run();
   });
   renderer.domElement.addEventListener("pointerleave", () => {
+    const changed = hover !== null;
     hover = null;
     px = py = 0;
+    if (still && changed) run();
   });
   renderer.domElement.addEventListener("click", (e) => {
     const h = hit(e);

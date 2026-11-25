@@ -18,7 +18,7 @@ import { about } from "./pages/about";
 import { learnPage } from "./pages/learn";
 
 const AI_NOTE =
-  "How we used AI: the idea and the key design decisions are our team's. Claude (Anthropic) helped research the challenge, write our planning documents, and write and test the code and data pipeline. Our logo was drawn with AI. We check its work at each checkpoint.";
+  "How we used AI: the idea and the key design decisions are our team's. AI coding assistants helped research the challenge, write our planning documents, build and polish the site and data pipeline, and test the result. Our logo was drawn with AI. We check all output at each checkpoint.";
 
 const NAV = [
   ["", "Home"],

@@ -1,7 +1,6 @@
-import { expect, test } from "@playwright/test";
 import { latlon } from "../src/format";
 import { top } from "../src/score";
-import { cols, manifest } from "./helpers";
+import { cols, expect, manifest, test } from "./helpers";
 
 const m = manifest();
 const home = (b: "moon" | "mars") => m.targets.find((t) => t.body === b && t.default) ?? m.targets.find((t) => t.body === b)!;

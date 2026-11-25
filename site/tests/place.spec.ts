@@ -1,9 +1,8 @@
 import fs from "node:fs";
-import { expect, test } from "@playwright/test";
 import { trekUrl, worldviewUrl } from "../src/export";
 import { latlon, score100 } from "../src/format";
 import { spread } from "../src/rank";
-import { cols, manifest } from "./helpers";
+import { cols, expect, manifest, test } from "./helpers";
 
 const m = manifest();
 const moonPole = m.targets.find((t) => t.id === "moon-south-pole") ?? m.targets.find((t) => t.body === "moon")!;

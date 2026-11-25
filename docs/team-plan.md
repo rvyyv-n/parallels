@@ -109,7 +109,7 @@ Users can filter matches by type. A clustering step also groups Earth places wit
 - **Overall:** each challenge's score combines its traits; the mission filter's weights then combine the challenge scores. The total is never shown without the trait bars.
 - **Checked on known analogs** before we trust it ([guidelines](guidelines.md#2-doing-the-science-honestly)).
 
-Details: [Claude's plan](claudes-plan.md#3-method).
+Details: [README — Scoring model](../README.md#scoring-model).
 
 ## To consider
 

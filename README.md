@@ -147,7 +147,7 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 
 ## Status
 
-**Version 1 is our submission**, live at [dotcatcher.vercel.app](https://dotcatcher.vercel.app). It ranks every land cell on Earth against eleven base sites, six on the Moon and five on Mars. The map uses method version 1.2; the Balanced preset and the new Moon sites were added without changing the method.
+**Version 1 is our live submission** at [dotcatcher.vercel.app](https://dotcatcher.vercel.app), and **`v3` (active work)** upgrades the site's 3D orbital experience, Finder HUD, Place scorecard, Learn/About presentation, and accessibility without changing the frozen scoring data. The map uses method version 1.2 (with `v1.3` publishing config adding the Balanced preset and extra Moon sites) across eleven base sites: six on the Moon and five on Mars. See [docs/v3-roadmap.md](docs/v3-roadmap.md) for current progress and remaining polish items.
 
 **How well it works:** on the held-out half of the test places, known analogs beat ordinary places 96% of the time for the Moon and 76% for Mars. In the method's latest run, 10 of 15 checks with enough sites pass, and the Balanced preset also passes 10 of 15. Only the Moon's south pole and Jezero are checked against test places. See [Validation](#validation) and `site/public/data/validation.json`.
 
@@ -157,15 +157,12 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 
 - [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, the main brief; start here.
 - [docs/challenge.md](docs/challenge.md): the challenge in plain words, and how we meet the guide's six objectives and answer its seven questions.
-- [docs/team-plan.md](docs/team-plan.md): what we're building.
-- [docs/claudes-plan.md](docs/claudes-plan.md): the build plan from before v1: method, data, checks, stack and roadmap.
-- [docs/v1-spec.md](docs/v1-spec.md): the brief for version 1, including the data file layout.
-- [docs/review-pre-v1.md](docs/review-pre-v1.md): the data and test-place checks made before the build.
+- [docs/team-plan.md](docs/team-plan.md): the team's core idea and challenge breakdown.
+- [docs/v3-roadmap.md](docs/v3-roadmap.md): active `v3` site roadmap, completed phases, UI polish items, and final QA checklist.
 - [docs/judging-notes.md](docs/judging-notes.md): how Space Apps is judged and what past winners did.
-- [docs/v1-roadmap.md](docs/v1-roadmap.md): the last round of site changes, with a tick box for each.
 - [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
-- [CLAUDE.md](CLAUDE.md): instructions for Claude, our AI build assistant.
-- [PRODUCT.md](PRODUCT.md): product and design notes for the site.
+- [AGENTS.md](AGENTS.md): workspace commands and repository rules.
+- [PRODUCT.md](PRODUCT.md): product architecture and design principles for the site.
 - `pipeline/`: the Python data pipeline. Its method settings are in `pipeline/config/`.
 - `site/`: the Vite site. It reads the files in `site/public/data/` and changes none of them.
 - `site/public/data/`: the pre-computed files the site loads. See [The data files](#the-data-files).
@@ -200,7 +197,7 @@ The site is static: it has no server and no keys. Run each command from `site/`.
 | `npm install` | Installs the packages. |
 | `npm run dev` | Starts the site locally. |
 | `npm run build` | Checks the types and builds the site into `site/dist`. |
-| `npm test` | Runs the Playwright tests on port 4319. Run `npx playwright install chromium` first. Set `RUN_NETWORK=1` to also check every source link. |
+| `npm test` | Runs the Playwright suite on port 4319 (1 worker, reduced motion, local tile stubs, and focused phone pass to stay light on CPU; set `PW_WORKERS`, `PW_ALL_PHONE=1`, `LIVE_TILES=1`, or `RUN_NETWORK=1` as needed). Use `npm run test:laptop` for a desktop-only pass. Run `npx playwright install chromium` first. |
 
 ---
 
@@ -227,13 +224,13 @@ How to read the binary files:
 - `score:<filter>` and `score:<filter>:yr` are two bytes each. The values 0 to 10000 mean 0 to 1. The value 65535 means not ranked.
 - `stable:<filter>` is one byte: 1 if the cell stays in the top 20 in at least 90% of 1,000 runs with changed weights, otherwise 0.
 - `keep:<filter>` is one byte: the percent of those runs that kept the cell in the top 20 (0 to 100). Cells that were never in the top 20 have no data.
-- The types are in `site/src/contract.ts`. The layout is in section 6 of [docs/v1-spec.md](docs/v1-spec.md).
+- The TypeScript contract is in [site/src/contract.ts](site/src/contract.ts), and column byte offsets are declared in `site/public/data/manifest.json`.
 
 ---
 
 ## How we used AI
 
-The idea and the key design decisions are our team's. Claude (Anthropic) helped research the challenge, write our planning documents, and write and test the code and data pipeline. Our logo was drawn with AI. We checked its work at each checkpoint.
+The idea and the key design decisions are our team's. AI coding assistants helped research the challenge, write our planning documents, build and polish the site and data pipeline, and test the result. Our logo was drawn with AI. We check all output at each checkpoint.
 
 ---
 
@@ -303,7 +300,9 @@ These images are shown, not scored. No NASA logo or insignia is used.
 | [Lucide icons](https://lucide.dev/) | ISC | Icons in the match view |
 | [Vite](https://vite.dev/) and TypeScript | MIT / Apache-2.0 | Building the site |
 | Playwright | Apache-2.0 | Site tests |
-| [Archivo](https://fontsource.org/fonts/archivo) (variable, by Omnibus-Type) | SIL Open Font Licence 1.1 | Headings, labels and numbers |
+| [Archivo](https://fontsource.org/fonts/archivo) (variable, by Omnibus-Type) | SIL Open Font Licence 1.1 | Display headings and brand wordmark |
+| [Inter](https://fontsource.org/fonts/inter) (variable, by Rasmus Andersson) | SIL Open Font Licence 1.1 | UI labels and body copy |
+| [JetBrains Mono](https://fontsource.org/fonts/jetbrains-mono) (variable, by JetBrains) | SIL Open Font Licence 1.1 | Coordinates, ranks, scores and telemetry |
 
 ---
 
@@ -361,7 +360,7 @@ We graded the method in public. The weights, the pass marks and the held-out hal
 
 ## Team and credits
 
-**TEAM RMD.** The core idea and the key design decisions are the team's. See [How we used AI](#how-we-used-ai) for what Claude did.
+**TEAM RMD.** The core idea and the key design decisions are the team's. See [How we used AI](#how-we-used-ai) for how AI tools assisted.
 
 Every dataset, code library and image we used is listed above, with its source and licence: [data sources](#nasa-and-partner-data-sources), [images](#images-on-the-site) and [technology stack](#technology-stack).
 
