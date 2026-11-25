@@ -151,12 +151,13 @@ function notes(x: TraitInput, r: Row, why: string) {
 
 export function srcChips(x: TraitInput, r: Row) {
   const label = side(x.body, r.tr);
+  const earth = `<b>Earth:</b> ${esc(cite(short(x.m, r.tr.earth_dataset), r.tr.earth_resolution))}`;
   const there = !r.tv
     ? ""
     : r.tr.scored_by === "ideal"
-      ? `<span class="chip"><b>Ideal</b> a goal that we set</span>`
-      : `<span class="chip"><b>${esc(label)}</b> ${esc(cite(short(x.m, r.tv.dataset), r.tv.resolution))}</span>`;
-  return `<span class="chip"><b>Earth</b> ${esc(cite(short(x.m, r.tr.earth_dataset), r.tr.earth_resolution))}</span>${there}`;
+      ? `<b>Ideal:</b> preset mission goal`
+      : `<b>${esc(label)}:</b> ${esc(cite(short(x.m, r.tv.dataset), r.tv.resolution))}`;
+  return `<span class="t-cite">${earth}</span>${there ? `<span class="t-cite-sep" aria-hidden="true">·</span><span class="t-cite">${there}</span>` : ""}`;
 }
 
 export function traitHtml(x: TraitInput, r: Row, why: string) {
@@ -168,16 +169,23 @@ export function traitHtml(x: TraitInput, r: Row, why: string) {
       ? `Not scored: there is no ${esc(label)} value.${r.tv?.note ? ` ${esc(r.tv.note)}` : ""}`
       : "";
   return `<li class="trait${missing ? " miss" : ""}">
-    <div class="t-head"><span class="t-name">${esc(r.tr.label)}</span>${scoreChip(r.rank, r.tr.label)}</div>
-    <p class="t-plain">${esc(first(r.tr.plain))}</p>
+    <div class="t-head">
+      <div class="t-title">
+        <span class="t-name">${esc(r.tr.label)}</span>
+        <p class="t-plain">${esc(first(r.tr.plain))}</p>
+      </div>
+      ${scoreChip(r.rank, r.tr.label)}
+    </div>
     <dl class="t-vals">
       <div class="tv-here"><dt>Here</dt><dd>${val(r.tr, r.ev)}</dd></div>
       <div class="tv-there"><dt>${esc(label)}</dt><dd>${val(r.tr, tv)}</dd></div>
       <div class="tv-gap"><dt>Gap</dt><dd>${gapWords(r)}</dd></div>
     </dl>
     ${missing ? `<p class="t-missing">${icon("info")}<span>${missing}</span></p>` : bullet(r, label)}
-    <p class="t-src">${srcChips(x, r)}</p>
-    ${notes(x, r, why)}
+    <div class="t-foot">
+      <p class="t-src">${srcChips(x, r)}</p>
+      ${notes(x, r, why)}
+    </div>
   </li>`;
 }
 

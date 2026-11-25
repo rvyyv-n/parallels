@@ -64,14 +64,13 @@
 
 .ln-worlds a[aria-current="page"] {
   color: var(--ink);
-  background: var(--surface-1);
-  border-color: var(--rule-2);
+  background: var(--raise);
+  border-color: var(--w);
   box-shadow: var(--edge-hi);
 }
 
-.ln-worlds a[aria-current="page"]::after {
-  transform: scaleX(1);
-  opacity: 1;
+.ln-worlds a::after {
+  display: none;
 }
 
 .ln-sec {

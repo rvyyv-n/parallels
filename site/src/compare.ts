@@ -102,8 +102,9 @@ function polarView(t: Target): View {
       const [x, y] = spXY(r.lat, r.lon);
       const u = ((x - cx) / VIEW_KM + 0.5) * 100;
       const v = (0.5 - (y - cy) / VIEW_KM) * 100;
-      if (u < 4 || u > 96 || v < 4 || v > 96) return "";
-      return `<span class="cmp-mark${u < 50 ? " left" : ""}" style="left:${pc(u)};top:${pc(v)}"><b></b>${esc(r.name)}</span>`;
+      // Keep lunar landmark labels comfortably inside the square frame so names never slice off the border.
+      if (u < 10 || u > 90 || v < 10 || v > 90) return "";
+      return `<span class="cmp-mark${u > 55 ? " left" : ""}" style="left:${pc(u)};top:${pc(v)}"><b></b>${esc(r.name)}</span>`;
     })
     .join("");
   return { tiles: out.join(""), kmPerPx: res / 1000, marks };
@@ -178,16 +179,18 @@ export function compareHtml(x: CompareInput): string {
       <span class="cmp-knob" aria-hidden="true"><span class="cmp-puck"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 6 3.5 10l4 4"/><path d="m12.5 6 4 4-4 4"/></svg></span></span>
       <input class="cmp-range" type="range" min="0" max="100" value="50" step="1" aria-label="Wipe divider: Earth on the left, ${esc(bodyName)} on the right" aria-valuetext="Divider at 50%">
     </div>
-    <div class="cmp-scale"><span class="cmp-sb" aria-hidden="true"><i></i></span><span><b>${BAR_KM} km</b> · both images ${VIEW_KM} km wide, same ground scale</span></div>
-    <figcaption class="cmp-caps">
-      <p class="eimg-cap"><b>Earth</b> ${esc(x.place)} <span class="muted">${latlon(x.lat, x.lon)}</span>${e ? fbNote("earth") : ""}</p>
-      <p class="timg-cap"><b>${esc(bodyName)}</b> ${esc(x.target.name)} <span class="muted">${latlon(x.target.lat, x.target.lon)}</span>${fbNote(x.body)}</p>
-    </figcaption>
-    <details class="cmp-about"><summary>About these images</summary>
-      <p><b>Earth:</b> ${e ? eLayer : "Mercator map tiles stop at 85° latitude, so there is no live image this near the pole."}</p>
-      <p><b>${esc(bodyName)}:</b> ${tLayer}</p>
-      <p>We calculate both scales from the radius of each body (Earth ${num(RADIUS.earth)} km, ${esc(bodyName)} ${num(RADIUS[x.body], 1)} km) and from the map projection at the centre.</p>
-    </details>
+    <div class="cmp-foot">
+      <div class="cmp-scale"><span class="cmp-sb" aria-hidden="true"><i></i></span><span><b>${BAR_KM} km</b> · ${VIEW_KM} km wide, same ground scale</span></div>
+      <figcaption class="cmp-caps">
+        <p class="eimg-cap"><b>Earth</b> <span>${esc(x.place)}</span> <span class="cmp-ll">${latlon(x.lat, x.lon)}</span>${e ? fbNote("earth") : ""}</p>
+        <p class="timg-cap"><b>${esc(bodyName)}</b> <span>${esc(x.target.name)}</span> <span class="cmp-ll">${latlon(x.target.lat, x.target.lon)}</span>${fbNote(x.body)}</p>
+      </figcaption>
+      <details class="cmp-about"><summary>About these images</summary>
+        <p><b>Earth:</b> ${e ? eLayer : "Mercator map tiles stop at 85° latitude, so there is no live image this near the pole."}</p>
+        <p><b>${esc(bodyName)}:</b> ${tLayer}</p>
+        <p>We calculate both scales from the radius of each body (Earth ${num(RADIUS.earth)} km, ${esc(bodyName)} ${num(RADIUS[x.body], 1)} km) and from the map projection at the centre.</p>
+      </details>
+    </div>
   </figure>`;
 }
 

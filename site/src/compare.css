@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .cmp-seg {
@@ -348,13 +348,18 @@
   outline-offset: 2px;
 }
 
+.cmp-foot {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+
 .cmp-scale {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
-  margin-top: 10px;
-  font-size: 12.5px;
-  color: var(--ink-2);
+  gap: 5px;
+  font-size: 12px;
+  color: var(--ink-3);
 }
 
 .cmp-sb {
@@ -369,23 +374,25 @@
 .cmp-sb i {
   display: block;
   width: var(--bar);
-  height: 8px;
-  border: 2px solid var(--ink);
+  height: 7px;
+  border: 1.5px solid var(--ink-2);
   border-top: 0;
 }
 
 .cmp-scale b {
+  font-family: var(--mono);
+  font-weight: 600;
   color: var(--ink);
 }
 
 .cmp-caps {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 10px;
-  margin-top: 12px;
-  font-size: 12.5px;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
   line-height: 1.45;
-  color: var(--ink-3);
+  color: var(--ink-2);
 }
 
 .cmp-caps p {
@@ -395,11 +402,20 @@
 .cmp-caps b {
   color: var(--ink);
   font-weight: 650;
+  margin-right: 4px;
+}
+
+.cmp-ll {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-left: 3px;
 }
 
 .cmp-caps .fb-note {
   display: none;
-  margin-top: 2px;
+  margin-top: 3px;
   color: var(--warn);
 }
 
@@ -409,8 +425,10 @@
 }
 
 .cmp-about {
-  margin-top: 6px;
-  font-size: 12.5px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--rule);
+  font-size: 12px;
   line-height: 1.5;
   color: var(--ink-3);
 }
@@ -418,12 +436,30 @@
 .cmp-about > summary {
   display: inline-flex;
   align-items: center;
-  min-height: 36px;
+  min-height: 30px;
   color: var(--ink-2);
+  font-weight: 500;
   cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: var(--rule-2);
-  text-underline-offset: 4px;
+  list-style: none;
+}
+
+.cmp-about > summary::-webkit-details-marker {
+  display: none;
+}
+
+.cmp-about > summary::after {
+  content: "+";
+  margin-left: 6px;
+  font-family: var(--mono);
+  color: var(--ink-3);
+}
+
+.cmp-about[open] > summary::after {
+  content: "−";
+}
+
+.cmp-about > summary:hover {
+  color: var(--ink);
 }
 
 .cmp-about p {

@@ -1,4 +1,6 @@
 import "@fontsource-variable/archivo/wdth.css";
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
 import "./style.css";
 import "./intro.css";
 import "./work.css";

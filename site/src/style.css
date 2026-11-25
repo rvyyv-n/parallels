@@ -1,42 +1,42 @@
 :root {
-  /* Elevation & surfaces (deep orbital obsidian) */
-  --space: #02070a;
-  --surface-1: #070e14;        /* sidebar & recessed panels */
-  --raise: #0c151d;            /* cards, inputs, drawers */
-  --surface-2: #14202b;        /* hover wells & active pills */
-  --glass: rgba(6, 11, 16, 0.84);
-  --glass-strong: rgba(6, 11, 16, 0.94);
+  /* Elevation & surfaces (deep orbital obsidian & slate-navy) */
+  --space: #03070c;
+  --surface-1: #081018;        /* sidebar & instrument cards */
+  --raise: #0e1824;            /* elevated wells, inputs, drawers */
+  --surface-2: #162433;        /* hover wells & active pills */
+  --glass: rgba(7, 13, 20, 0.82);
+  --glass-strong: rgba(7, 13, 20, 0.93);
 
-  /* Hairlines & inner edge sheen */
-  --rule: rgba(255, 255, 255, 0.11);
-  --rule-2: rgba(255, 255, 255, 0.22);
-  --rule-3: rgba(255, 255, 255, 0.36);
-  --edge-hi: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  /* Hairlines & aerospace aluminum inner edge sheen */
+  --rule: rgba(214, 228, 244, 0.1);
+  --rule-2: rgba(214, 228, 244, 0.19);
+  --rule-3: rgba(214, 228, 244, 0.32);
+  --edge-hi: inset 0 1px 0 rgba(226, 238, 255, 0.07);
 
-  /* Typography & ink */
-  --ink: #eef2f6;
-  --ink-2: #b4bec9;
-  --ink-3: #8a95a2;
+  /* Typography & ink (self-hosted Archivo + Inter + JetBrains Mono) */
+  --ink: #f1f5f9;
+  --ink-2: #a8b7c9;
+  --ink-3: #78889b;
   --display: "Archivo Variable", "Archivo", "Arial Narrow", system-ui, sans-serif;
-  --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, monospace;
+  --body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 
   /* Parallels brand & world accents */
-  --signal: #0297de;
-  --signal-2: #5bbbe9;
-  --signal-tint: rgba(2, 151, 222, 0.13);
-  --mars: #fc734d;
-  --mars-tint: rgba(252, 115, 77, 0.13);
-  --moon: #d3d0c8;
-  --warn: #ffc24a;
-  --pass: #86e3a8;
-  --fail: #ff8f80;
+  --signal: #0ea5e9;
+  --signal-2: #60c5f7;
+  --signal-tint: rgba(14, 165, 233, 0.12);
+  --mars: #f97352;
+  --mars-tint: rgba(249, 115, 82, 0.12);
+  --moon: #d8d4ca;
+  --warn: #f6c052;
+  --pass: #4ade9a;
+  --fail: #f1786b;
 
   /* Challenge / trait score bands (one source of truth) */
-  --band-vc: #5fd09a;   --band-vc-bg: rgba(95, 208, 154, 0.16);  --band-vc-bd: rgba(95, 208, 154, 0.45);
-  --band-c:  #c3df6a;   --band-c-bg:  rgba(195, 223, 106, 0.15); --band-c-bd:  rgba(195, 223, 106, 0.42);
-  --band-p:  #f0b85a;   --band-p-bg:  rgba(240, 184, 90, 0.15);  --band-p-bd:  rgba(240, 184, 90, 0.42);
-  --band-f:  #f07a6e;   --band-f-bg:  rgba(240, 122, 110, 0.16); --band-f-bd:  rgba(240, 122, 110, 0.44);
+  --band-vc: #4ade9a;   --band-vc-bg: rgba(74, 222, 154, 0.14);  --band-vc-bd: rgba(74, 222, 154, 0.38);
+  --band-c:  #b8dc64;   --band-c-bg:  rgba(184, 220, 100, 0.13); --band-c-bd:  rgba(184, 220, 100, 0.36);
+  --band-p:  #f2b754;   --band-p-bg:  rgba(242, 183, 84, 0.14);  --band-p-bd:  rgba(242, 183, 84, 0.38);
+  --band-f:  #f1786b;   --band-f-bg:  rgba(241, 120, 107, 0.14); --band-f-bd:  rgba(241, 120, 107, 0.4);
 
   /* Geometry & shadows */
   --r-xs: 4px;
@@ -108,8 +108,11 @@ body {
   margin: 0;
   background: var(--space);
   color: var(--ink);
-  font: 400 15px/1.5 var(--body);
+  font: 400 14.5px/1.55 var(--body);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
 }

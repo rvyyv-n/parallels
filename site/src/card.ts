@@ -329,30 +329,38 @@ export function card(x: CardInput): string {
   const rawCoords = `${cells.lat[i].toFixed(4)}, ${cells.lon[i].toFixed(4)}`;
   return `<article class="card pl" aria-labelledby="place-h">
     <div class="pl-top">
-      <header class="pl-hero">
+      <header class="pl-hero" data-body="${x.body}">
         <div class="pl-for">
-          <span class="pl-body" data-body="${x.body}">${body}</span>
-          <span class="pl-for-txt">Match on Earth for <b>${esc(target.name)}</b></span>
-          <label class="pl-preset" title="Switch mission preset"><span class="sr">Mission preset</span><select class="pl-preset-sel" id="pl-preset" aria-label="Mission preset">${presetOptions}</select>${icon("chevron", "pl-preset-ic")}</label>
-          <button type="button" class="pl-yr" id="pl-yr" aria-pressed="${x.yr ? "true" : "false"}"${isHand ? ' disabled title="Reset custom weights in Finder to use Year-round"' : ' title="Prefer places usable all year"'}>Year-round</button>
-        </div>
-        <h1 id="place-h" tabindex="-1">${esc(region)}</h1>
-        <div class="pl-meta-row">
-          <p class="pl-meta"><span>${latlon(cells.lat[i], cells.lon[i])}</span><span>${!ttype ? "Terrain: no data" : ttype.key === "none" ? "Other land" : esc(ttype.name)}</span><span>0.5° cell, about 50 km</span></p>
-          <div class="pl-copy-grp">
-            <button type="button" class="pl-copy" data-copy="link" aria-label="Copy link to this place" title="Copy link">${SVG_LINK}<span>Copy link</span></button>
-            <button type="button" class="pl-copy" data-copy="coords" data-coords="${esc(rawCoords)}" aria-label="Copy coordinates" title="Copy coordinates">${icon("pin")}<span>Copy coords</span></button>
+          <div class="pl-for-id">
+            <span class="pl-body" data-body="${x.body}">${body}</span>
+            <span class="pl-for-txt">Match for <b>${esc(target.name)}</b></span>
+          </div>
+          <div class="pl-for-ctl">
+            <label class="pl-preset" title="Switch mission preset"><span class="sr">Mission preset</span><select class="pl-preset-sel" id="pl-preset" aria-label="Mission preset">${presetOptions}</select>${icon("chevron", "pl-preset-ic")}</label>
+            <button type="button" class="pl-yr" id="pl-yr" aria-pressed="${x.yr ? "true" : "false"}"${isHand ? ' disabled title="Reset custom weights in Finder to use Year-round"' : ' title="Prefer places usable all year"'}>Year-round</button>
           </div>
         </div>
-        ${fresh || isIce(cells, i) ? `<p class="pl-flags">${fresh ? `<span><span class="rk-new">New</span>${num(far)} km from the nearest known analog</span>` : ""}${isIce(cells, i) ? `<span><span class="tag ice">Ice sheet</span>${num(cells.ice?.[i])}% permanent ice</span>` : ""}</p>` : ""}
-        <div class="pl-score">
+        <div class="pl-id">
+          <div class="pl-id-head">
+            <h1 id="place-h" tabindex="-1">${esc(region)}</h1>
+            <div class="pl-copy-grp">
+              <button type="button" class="pl-copy" data-copy="link" aria-label="Copy link to this place" title="Copy link">${SVG_LINK}<span>Copy link</span></button>
+              <button type="button" class="pl-copy" data-copy="coords" data-coords="${esc(rawCoords)}" aria-label="Copy coordinates" title="Copy coordinates">${icon("pin")}<span>Copy coords</span></button>
+            </div>
+          </div>
+          <p class="pl-meta"><span>${latlon(cells.lat[i], cells.lon[i])}</span><span>${!ttype ? "Terrain: no data" : ttype.key === "none" ? "Other land" : esc(ttype.name)}</span><span>~50 km cell (0.5°)</span></p>
+          ${fresh || isIce(cells, i) ? `<p class="pl-flags">${fresh ? `<span><span class="rk-new">New</span>${num(far)} km from nearest known analog</span>` : ""}${isIce(cells, i) ? `<span><span class="tag ice">Ice sheet</span>${num(cells.ice?.[i])}% permanent ice</span>` : ""}</p>` : ""}
+        </div>
+        <div class="pl-score-well">
           ${ringHtml(s, b)}
-          <div class="pl-rank">
-            ${Number.isFinite(x.place) ? `<p><b>#${num(x.place)}</b> of ${num(x.ranked)} ranked land cells</p><p class="muted">In the top ${topShare(x.place, x.ranked)} of land</p>` : `<p>No rank with these settings</p>`}
+          <div class="pl-summary">
+            <div class="pl-rank">
+              ${Number.isFinite(x.place) ? `<p class="pl-rank-main"><b>#${num(x.place)}</b><span>of ${num(x.ranked)} ranked cells · Top ${topShare(x.place, x.ranked)}</span></p>` : `<p class="pl-rank-main">No rank with these settings</p>`}
+            </div>
+            <p class="pl-verdict">${esc(verdict(x, chs))}</p>
+            ${lead ? `<p class="pl-test">${icon("test")}<span><b>Test here:</b> ${esc(lead.what_to_test)}</span></p>` : ""}
           </div>
         </div>
-        <p class="pl-verdict">${esc(verdict(x, chs))}</p>
-        ${lead ? `<p class="pl-test">${icon("test")}<span><b>Test here:</b> ${esc(lead.what_to_test)}</span></p>` : ""}
         <div class="pl-folds">
           ${head ? `<details class="pl-fold"><summary>Why this is the main match${icon("chevron", "chev")}</summary><p><b>${esc(head.title)}.</b> ${esc(plainWhy(m, head.why))}</p></details>` : ""}
           <details class="pl-fold"><summary>How the score works${icon("chevron", "chev")}</summary>
@@ -374,9 +382,14 @@ export function card(x: CardInput): string {
     </div>
     <section class="pl-sec pl-chs" aria-labelledby="pl-chs-h">
       <div class="pl-chs-head">
-        <h2 id="pl-chs-h">Challenge by challenge</h2>
-        <p class="key">${BANDS.map((bb) => `<span><i class="fc ${bb.cls}"></i>${bb.word}</span>`).join("")}<span><i class="kk band"></i>Earth's range</span><span><i class="kk here"></i>here</span><span><i class="kk tick"></i>${esc(body)} or ideal</span></p>
-        <button type="button" class="pl-toggle-all" aria-expanded="false">Expand all</button>
+        <div class="pl-chs-top">
+          <h2 id="pl-chs-h">Challenge by challenge</h2>
+          <button type="button" class="pl-toggle-all" aria-expanded="false">Expand all</button>
+        </div>
+        <p class="key">
+          <span class="key-grp">${BANDS.map((bb) => `<span><i class="fc ${bb.cls}"></i>${bb.word}</span>`).join("")}</span>
+          <span class="key-grp"><span><i class="kk band"></i>Earth's range</span><span><i class="kk here"></i>here</span><span><i class="kk tick"></i>${esc(body)} or ideal</span></span>
+        </p>
       </div>
       <ol class="chs">${chs.map((c, k) => chTile(x, c, k === firstOpen)).join("")}</ol>
     </section>
