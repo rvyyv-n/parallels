@@ -248,6 +248,8 @@
 }
 
 .pl-body {
+  flex: none;
+  white-space: nowrap;
   padding: 3px 8px 2px;
   border-radius: var(--r-pill);
   font: 700 10.5px/1.2 var(--mono);
@@ -328,7 +330,7 @@
 }
 
 .pl-yr[aria-pressed="true"] {
-  color: var(--space);
+  color: var(--signal-ink);
   background: var(--signal);
   border-color: var(--signal);
 }
@@ -1201,7 +1203,7 @@
 .se-sw.on-frz {
   background:
     repeating-linear-gradient(135deg, var(--signal-2) 0 2px, transparent 2px 5px),
-    rgba(2, 151, 222, 0.16);
+    rgba(29, 100, 200, 0.16);
 }
 
 .pl .months td.on-rain,
@@ -1447,7 +1449,7 @@
 
 .ds-ag[data-ag="nasa"] {
   color: var(--signal-2);
-  border-color: rgba(91, 187, 233, 0.38);
+  border-color: var(--signal-bd);
   background: var(--signal-tint);
 }
 

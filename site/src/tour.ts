@@ -43,7 +43,7 @@ const STEPS: Step[] = [
     page: "find",
     at: "#earth",
     title: "The map",
-    text: "The map lights the best 2% of land. The numbered pins are the top 20. The buttons under the map show more or less land.",
+    text: "The map lights the best 2% of land. The numbered pins are the top 20. Open the legend pill below to show more or less land.",
   },
   {
     page: "find",

@@ -283,7 +283,7 @@
   background: #fff;
   border: 2px solid var(--signal);
   line-height: 20px;
-  box-shadow: 0 0 0 4px rgba(2, 151, 222, 0.36);
+  box-shadow: 0 0 0 4px var(--signal-bd);
   z-index: 30;
 }
 
@@ -296,6 +296,7 @@
 }
 
 .pin.sel.hot {
+  color: var(--signal-ink);
   background: var(--signal);
 }
 
@@ -316,7 +317,7 @@
 }
 
 .pin-tag.is-dim {
-  opacity: 0;
+  opacity: 0 !important;
   pointer-events: none;
 }
 
@@ -496,7 +497,7 @@
   text-transform: uppercase;
   color: var(--signal-2);
   background: var(--signal-tint);
-  border: 1px solid rgba(91, 187, 233, 0.35);
+  border: 1px solid var(--signal-bd);
 }
 
 .mpop-kind.is-cave {
@@ -563,13 +564,13 @@
   text-decoration: none;
   background: var(--signal);
   border-color: var(--signal);
-  color: var(--space);
+  color: var(--signal-ink);
 }
 
 .mpop-go:hover {
-  background: var(--signal-2);
-  border-color: var(--signal-2);
-  color: var(--space);
+  background: var(--signal-hover);
+  border-color: var(--signal-hover);
+  color: var(--signal-ink);
   text-decoration: none;
 }
 
@@ -893,7 +894,7 @@
 .tog input:checked + .tog-box {
   background: var(--signal);
   border-color: var(--signal);
-  color: var(--space);
+  color: var(--signal-ink);
 }
 
 .tog input:checked + .tog-box .ic {
@@ -904,22 +905,6 @@
   outline: 2px solid var(--signal-2);
   outline-offset: 2px;
   box-shadow: 0 0 0 4px rgba(2, 7, 10, 0.85);
-}
-
-.tog-state {
-  font: 500 11px/1 var(--mono);
-  color: var(--ink-3);
-  padding-left: 2px;
-}
-
-.tog-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding-left: 6px;
-  border-left: 1px solid var(--rule);
-  font-size: 11.5px;
-  color: var(--ink-2);
 }
 
 /* Inline Pill-Gradient Overlay opacity slider */
@@ -957,72 +942,6 @@
   font: 600 11.5px/1 var(--mono);
   font-variant-numeric: tabular-nums;
   color: var(--ink-2);
-}
-
-/* Floating Luminous Guided Tour Pill */
-.map-bar .tour-btn {
-  background: var(--glass-strong);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border-color: rgba(91, 187, 233, 0.36);
-  box-shadow: var(--shadow-float), var(--edge-hi);
-  transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
-}
-
-.tour-lbl {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  line-height: 1;
-}
-
-.tour-name {
-  font: 700 12.5px/1 var(--body);
-  color: var(--ink);
-}
-
-.tour-sub {
-  font: 600 9.5px/1 var(--mono);
-  letter-spacing: 0.1em;
-  color: var(--ink-3);
-}
-
-@media (min-width: 760px) {
-  .map-bar .tour-btn {
-    position: absolute;
-    right: 0;
-    top: 146px;
-    min-height: 44px;
-    padding: 5px 15px 5px 6px;
-    gap: 10px;
-    animation: tour-aura 4.2s ease-in-out infinite;
-  }
-
-  .map-bar .tour-btn i {
-    width: 32px;
-    height: 32px;
-    box-shadow: 0 0 14px rgba(2, 151, 222, 0.55);
-  }
-
-  .map-bar .tour-btn:hover {
-    border-color: var(--signal-2);
-    transform: translateY(-1px);
-  }
-
-  .map-bar .tour-btn:hover .tour-name {
-    color: var(--signal-2);
-  }
-}
-
-@keyframes tour-aura {
-  0%,
-  100% {
-    box-shadow: var(--shadow-float), var(--edge-hi), 0 0 0 0 rgba(2, 151, 222, 0.24);
-  }
-  50% {
-    box-shadow: var(--shadow-float), var(--edge-hi), 0 0 22px 2px rgba(2, 151, 222, 0.34);
-  }
 }
 
 /* Top-Right Rounded Capsule Controls */
@@ -1065,11 +984,7 @@
 
 .fd .maplibregl-ctrl-top-right .maplibregl-ctrl-group button:hover {
   background: var(--signal) !important;
-  color: var(--space) !important;
-}
-
-.fd .maplibregl-ctrl-top-right .maplibregl-ctrl-group button:hover .maplibregl-ctrl-icon {
-  filter: invert(0);
+  color: var(--signal-ink) !important;
 }
 
 .ctl-fit {
@@ -1207,12 +1122,6 @@
   color: var(--ink-3);
 }
 
-@media (max-width: 1240px) {
-  .tog-more {
-    display: none;
-  }
-}
-
 @media (max-width: 1019px) {
   .fd-twin {
     display: none;
@@ -1275,27 +1184,8 @@
     font-size: 12px;
   }
 
-  .tog-state,
-  .tog-more,
   .hud-range {
     display: none;
-  }
-
-  .map-bar .long {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-
-  .map-bar .tour-btn {
-    width: 38px;
-    min-height: 38px;
-    padding: 0;
-    justify-content: center;
-    margin-left: auto;
   }
 
   .fd .maplibregl-ctrl-top-right {

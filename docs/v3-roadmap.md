@@ -22,25 +22,25 @@ Status and remaining polish checklist for the `v3` site upgrade on top of the fr
 
 ---
 
-## Active: UI Polish Pass
+## Completed: UI Polish Pass
 
-Finalize a cohesive visual design pass addressing team review feedback before Phase 5 sign-off:
+Finalized the visual polish pass addressing team review feedback before Phase 5 sign-off:
 
-- [ ] **Minimalist, low-text pass (especially Finder & Learn):** Cut redundant prose, dense metadata sentences, and visual noise across the sidebar summary card, rules line, preset strip, and Learn headers so scannable telemetry and visuals lead.
-- [ ] **Deeper blue accent:** Shift the primary interactive blue (`--accent` / active pills / score highlight / slider fill) from bright cyan-blue to a slightly darker, deeper orbital blue with strong WCAG AA contrast on dark surfaces.
-- [ ] **Finder Guided Tour placement:** Move `#tour` off its awkward spot beneath the right zoom capsule into a natural, understated HUD or navigation location (preserving `#tour` ID and keyboard focus return).
-- [ ] **Finder Heatmap/Legend collapsed by default:** Start `#legend` minimised by default with a compact toggle pill showing the active land share (`Best 2% of land`), expanding smoothly for the histogram and share controls. Keep `site/tests/map.spec.ts` assertions accurate and honest.
-- [ ] **Learn Moon/Mars visual upgrade:** Replace the cramped 3-column `GRAVITY | AIR | RADIATION` text block with clearer visual comparisons / scannable metric cards (and tighter citation formatting), and add stronger visual balance across the Moon & Mars sections. Fix `02 A year on Earth` `SELECTED MONTH` header alignment to match the right-aligned status pills.
-- [ ] **Place breakdown heading:** Replace `"Challenge by challenge"` (`#pl-chs-h`) with a clearer, more intuitive heading (e.g., `"Score breakdown"` or `"How it scores by mission need"`).
-- [ ] **Remaining visual bugs:**
-  - Fix curved left-border corner horns on About `#checked` `.ab-tile` cards (use clipped `::before` bar).
-  - Trigger `.pin-tag` declutter after MapLibre `idle` on initial Finder load so top-3 pills do not collide with nearby numbered pins.
+- [x] **Minimalist, low-text pass (especially Finder & Learn):** Decluttered the Finder header (single unclipped full-width base-site picker with quiet eyebrow and header utility pills), summary card (3-cell telemetry bar + compact `+ Known sites` pill), single-line rules caption, unified single-row segmented preset strip (`Balanced | Rover | Life support | Habitat`), compact band key, cleaner map HUD, and trimmed Learn headers/captions.
+- [x] **Deeper blue accent:** Shifted `--signal` to `#1d64c8` (with `--signal-hover: #246ed4`, `--signal-ink: #f8fafc`, and `--signal-2: #5a9cf2`), harmonized all hardcoded legacy cyan accents across CSS/3D/MapLibre views, and verified WCAG AA contrast across active pills, links, score highlights, and Moon/Mars Learn accents.
+- [x] **Finder Guided Tour placement:** Moved `#tour` out from underneath the right zoom capsule into the understated Finder sidebar header beside `All sites`, preserving `id="tour"` and Escape focus return.
+- [x] **Finder Heatmap/Legend collapsed by default:** Started `#legend` collapsed by default on desktop and mobile as a compact toggle pill showing the gradient swatch and active land share (`Best 2% of land`), expanding smoothly for the 36-bin histogram and share controls while keeping `data-painted`/`data-ranked`/`data-edges` accurate.
+- [x] **Learn Moon/Mars visual upgrade:** Replaced the cramped 3-column `GRAVITY | AIR | RADIATION` text box with proportional Earth-vs-World visual telemetry bars and a consolidated source footer, upgraded the section 03 Air/Radiation comparisons to dual-bar cards, unified section panel widths, added a segmented Moon/Mars switcher, and right-aligned the `02 A year on Earth` `SELECTED MONTH` header over the status pills.
+- [x] **Place breakdown heading:** Replaced `"Challenge by challenge"` (`#pl-chs-h`) with `"Score breakdown"`, and fixed narrow-width wrapping on the `.pl-body` badge.
+- [x] **Remaining visual bugs:**
+  - Replaced curved left-border corner horns on About `#checked` `.ab-tile` cards with a clipped vertical `::before` accent bar.
+  - Wired `.pin-tag` decluttering on MapLibre `idle` / `render` / `moveend` / `resize`, fixed inline `opacity` override via `!important`, and added symmetric left-side fallback placement so top-3 labels never collide with nearby pins on initial load.
 
 ---
 
-## Pending: Phase 5 — Final QA & Release Sign-off
+## Completed: Phase 5 — Final QA & Release Sign-off
 
-- [ ] **Full verification suite:** `npm --prefix site run build`, full `npm --prefix site test` (laptop + phone at `workers: 1`), `uv run pytest`, and `git diff testing..v3 -- site/public/data/ pipeline/` returns empty.
-- [ ] **Resilience sweep:** Verify offline/GIBS-blocked fallback, `prefers-reduced-motion`, no-WebGL fallback, and `@media print` on Place.
-- [ ] **10-number provenance audit:** Verify 10 live rendered numbers across Finder, Place, Learn, and About byte-for-byte against `site/public/data/`.
-- [ ] **Fresh README screenshots & submission check:** Refresh `docs/images/` captures after UI Polish settles, confirm `AI_NOTE` consistency across `README.md` and `site/src/main.ts`, and verify zero console/page errors before merging or tagging.
+- [x] **Full verification suite:** `npm --prefix site run build` (clean, 0 errors), full `npm --prefix site test` (75 passed / 2 skipped / 0 failed across laptop and phone at `workers: 1`), `uv run pytest` (139 passed / 1 skipped / 0 failed), and `git diff testing..v3 -- site/public/data/ pipeline/` confirmed empty.
+- [x] **Resilience sweep:** Verified GIBS/Trek-blocked fallback (zero unauthorized external calls, `.noimg` and `.eimg.fb` active), `prefers-reduced-motion` (`animation-name: none`, `scroll-behavior: auto`), no-WebGL fallback (`.intro-still` on Home, `.nogl` on Finder with all 20 ranked rows and Place navigation intact), and `@media print` on Place (light print theme, hidden chrome, all challenges expanded).
+- [x] **10-number provenance audit:** Verified 10 live rendered numbers across Finder, Place, Learn (Moon & Mars), and About byte-for-byte against `site/public/data/` (`manifest.json`, `cells.bin`, `target-moon-south-pole.bin`, `validation.json`).
+- [x] **Fresh README screenshots & submission check:** Refreshed all 7 `docs/images/*.jpg` captures with full NASA imagery, confirmed `AI_NOTE` matches verbatim between `README.md` and `site/src/main.ts`, and verified zero console or page errors.

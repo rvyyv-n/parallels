@@ -31,7 +31,7 @@
   content: "";
   margin-left: 2px;
   border: 5px solid transparent;
-  border-left: 8px solid #000;
+  border-left: 8px solid var(--signal-ink);
   border-right: 0;
 }
 
@@ -126,7 +126,7 @@
 }
 
 .tour-pip.is-done {
-  background: rgba(91, 187, 233, 0.48);
+  background: rgba(90, 156, 242, 0.48);
 }
 
 .tour-pip.is-now {
@@ -181,15 +181,16 @@
 }
 
 .tour-btns .tour-next {
-  color: var(--space);
+  color: var(--signal-ink);
   background: var(--signal);
   border-color: var(--signal);
   font-weight: 700;
 }
 
 .tour-btns .tour-next:hover {
-  background: var(--signal-2);
-  border-color: var(--signal-2);
+  background: var(--signal-hover);
+  border-color: var(--signal-hover);
+  color: var(--signal-ink);
 }
 
 .tour-btns [data-tour="end"] {

@@ -92,7 +92,7 @@
 
 .cmp-ov[aria-pressed="true"] {
   color: var(--ink);
-  border-color: rgba(91, 187, 233, 0.45);
+  border-color: rgba(90, 156, 242, 0.45);
   background: var(--signal-tint);
 }
 
@@ -320,14 +320,14 @@
   border: 2px solid #fff;
   background: var(--glass-strong);
   color: #fff;
-  box-shadow: 0 0 0 2px rgba(2, 7, 10, 0.78), 0 0 18px rgba(91, 187, 233, 0.45), var(--shadow-float);
+  box-shadow: 0 0 0 2px rgba(2, 7, 10, 0.78), 0 0 18px rgba(90, 156, 242, 0.45), var(--shadow-float);
   transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
 
 .cmp[data-mode="wipe"] .cmp-stage:hover .cmp-puck,
 .cmp[data-mode="wipe"] .cmp-stage:has(.cmp-range:active) .cmp-puck {
   transform: translate(-50%, -50%) scale(1.08);
-  box-shadow: 0 0 0 2px rgba(2, 7, 10, 0.85), 0 0 22px rgba(91, 187, 233, 0.65), var(--shadow-float);
+  box-shadow: 0 0 0 2px rgba(2, 7, 10, 0.85), 0 0 22px rgba(90, 156, 242, 0.65), var(--shadow-float);
 }
 
 .cmp[data-mode="wipe"] .cmp-range {

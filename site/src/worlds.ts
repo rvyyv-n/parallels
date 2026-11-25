@@ -130,7 +130,7 @@ export async function thumb(cv: HTMLCanvasElement, t: Target) {
   ctx.strokeStyle = "rgba(2, 7, 10, 0.76)";
   trace();
   ctx.lineWidth = n / 68;
-  ctx.strokeStyle = "#5bbbe9";
+  ctx.strokeStyle = "#5a9cf2";
   trace();
   ctx.restore();
 }

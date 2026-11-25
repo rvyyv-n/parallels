@@ -190,7 +190,7 @@
   border-radius: 50%;
   background: var(--signal-2);
   border: 2px solid var(--space);
-  box-shadow: 0 0 0 1.5px var(--signal), 0 0 8px rgba(91, 187, 233, 0.42);
+  box-shadow: 0 0 0 1.5px var(--signal), 0 0 8px rgba(90, 156, 242, 0.42);
   pointer-events: none;
   z-index: 2;
 }

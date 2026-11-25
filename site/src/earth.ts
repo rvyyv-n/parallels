@@ -20,8 +20,8 @@ const WORLD: [[number, number], [number, number], [number, number], [number, num
 ];
 
 const GLOBE_SKY: maplibregl.SkySpecification = {
-  "sky-color": "#0297de",
-  "horizon-color": "#3d8eff",
+  "sky-color": "#1a56b0",
+  "horizon-color": "#3b7ee6",
   "sky-horizon-blend": 0.55,
   "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.88, 4.5, 0.48, 7, 0.08],
 };
@@ -248,8 +248,8 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           layout: { "line-join": "round", "line-cap": "round" },
           paint: { "line-color": "#ffd97d", "line-width": 1.35, "line-opacity": 0.96 },
         },
-        { id: "par", type: "line", source: "sel", filter: ["==", ["get", "k"], "par"], paint: { "line-color": "#5bbbe9", "line-width": 1, "line-dasharray": [2, 3], "line-opacity": 0.75 } },
-        { id: "cell", type: "line", source: "sel", filter: ["==", ["get", "k"], "cell"], paint: { "line-color": "#5bbbe9", "line-width": 2.5 } },
+        { id: "par", type: "line", source: "sel", filter: ["==", ["get", "k"], "par"], paint: { "line-color": "#5a9cf2", "line-width": 1, "line-dasharray": [2, 3], "line-opacity": 0.75 } },
+        { id: "cell", type: "line", source: "sel", filter: ["==", ["get", "k"], "cell"], paint: { "line-color": "#5a9cf2", "line-width": 2.5 } },
         {
           id: "analogs",
           type: "circle",
@@ -257,7 +257,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           filter: ["==", ["get", "kind"], "known_analog"],
           paint: {
             "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 4.2, 5, 6.2],
-            "circle-color": "rgba(91, 187, 233, 0.28)",
+            "circle-color": "rgba(90, 156, 242, 0.28)",
             "circle-stroke-color": "#ffffff",
             "circle-stroke-width": 1.6,
           },
@@ -404,19 +404,62 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
   };
 
   const declutter = () => {
-    const boxes: DOMRect[] = markers.map((m) => m.getElement().getBoundingClientRect());
-    for (const t of tags.map((m) => m.getElement())) {
-      const b = t.getBoundingClientRect();
+    const stage = el.getBoundingClientRect();
+    if (stage.width <= 0 || stage.height <= 0) return;
+    const pad = 4;
+    type Box = { id: number; left: number; right: number; top: number; bottom: number };
+    const obstacles: Box[] = [];
+    for (const m of markers) {
+      const mEl = m.getElement();
+      const id = Number(mEl.dataset.i);
+      const r = mEl.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0 && mEl.style.opacity !== "0" && facing(g.lat[id], g.lon[id])) {
+        obstacles.push({ id, left: r.left, right: r.right, top: r.top, bottom: r.bottom });
+      }
+    }
+    const hits = (cand: { left: number; right: number; top: number; bottom: number }, ownId: number) =>
+      obstacles.some(
+        (o) =>
+          o.id !== ownId &&
+          cand.left < o.right + pad &&
+          cand.right > o.left - pad &&
+          cand.top < o.bottom + pad &&
+          cand.bottom > o.top - pad,
+      );
+    for (const tm of tags) {
+      const t = tm.getElement();
       const i = Number(t.dataset.i);
-      const lap = boxes.some((o) => b.left < o.right && b.right > o.left && b.top < o.bottom && b.bottom > o.top);
-      const dim = lap || !facing(g.lat[i], g.lon[i]);
-      t.classList.toggle("is-dim", dim);
-      if (!dim) boxes.push(b);
+      t.style.marginLeft = "";
+      if (!facing(g.lat[i], g.lon[i]) || t.style.opacity === "0") {
+        t.classList.add("is-dim");
+        continue;
+      }
+      const b = t.getBoundingClientRect();
+      if (b.width <= 0 || b.height <= 0) {
+        t.classList.add("is-dim");
+        continue;
+      }
+      const rightBox = { left: b.left, right: b.right, top: b.top, bottom: b.bottom };
+      if (rightBox.right <= stage.right - 6 && !hits(rightBox, i)) {
+        t.classList.remove("is-dim");
+        obstacles.push({ id: -1, ...rightBox });
+        continue;
+      }
+      const leftOffset = -(b.width + 32);
+      const leftBox = { left: b.left + leftOffset, right: b.right + leftOffset, top: b.top, bottom: b.bottom };
+      if (leftBox.left >= stage.left + 6 && !hits(leftBox, i)) {
+        t.style.marginLeft = `${Math.round(leftOffset)}px`;
+        t.classList.remove("is-dim");
+        obstacles.push({ id: -1, ...leftBox });
+        continue;
+      }
+      t.classList.add("is-dim");
     }
   };
   map.on("move", () => on.moved());
   map.on("moveend", declutter);
   map.on("resize", declutter);
+  map.on("idle", declutter);
 
   const visible = () => {
     if (selected < 0) return true;
@@ -448,6 +491,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
       check();
       declutter();
     } else map.flyTo({ center, zoom: z, duration: 1100, essential: false });
+    map.once("idle", declutter);
   };
 
   let flyToken = 0;
@@ -541,6 +585,8 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         });
         declutter();
         requestAnimationFrame(declutter);
+        map.once("render", declutter);
+        map.once("idle", declutter);
       });
     },
     strength(v) {
@@ -560,7 +606,10 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         map.setProjection({ type: onFlag ? "mercator" : "globe" });
         map.setPaintProperty("space", "background-opacity", onFlag ? 1 : 0);
         map.setSky(onFlag ? { "atmosphere-blend": 0 } : GLOBE_SKY);
-        map.once("idle", check);
+        map.once("idle", () => {
+          check();
+          declutter();
+        });
       });
     },
     hover(i) {

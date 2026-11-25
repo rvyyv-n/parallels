@@ -383,7 +383,7 @@ export function card(x: CardInput): string {
     <section class="pl-sec pl-chs" aria-labelledby="pl-chs-h">
       <div class="pl-chs-head">
         <div class="pl-chs-top">
-          <h2 id="pl-chs-h">Challenge by challenge</h2>
+          <h2 id="pl-chs-h">Score breakdown</h2>
           <button type="button" class="pl-toggle-all" aria-expanded="false">Expand all</button>
         </div>
         <p class="key">

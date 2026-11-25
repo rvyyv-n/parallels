@@ -36,26 +36,26 @@ export const chips = (v: View, i: number) => `<span class="rk-chips" style="--n:
 
 export function summary(v: View): string {
   const { m, cells, ids } = v;
-  if (!ids.length) return `<p class="sum-k">No match</p><p class="muted">No ranked land agrees with these settings. Select "All land" in the terrain filter, or include the known analog sites.</p>`;
+  if (!ids.length)
+    return `<div class="sum-top"><p class="sum-k">No match</p><button type="button" class="sum-toggle" id="known" aria-pressed="${v.known}">${v.known ? "Known included" : "+ Known sites"}</button></div><p class="sum-empty muted">No ranked land agrees with these settings. Select "All land" in the terrain filter, or include known sites.</p>`;
   const best = ids[0];
   const countries = new Set(ids.map((i) => countryOf(m, cells, i)).filter(Boolean)).size;
   const fresh = ids.filter((i) => isNew(m, cells, i)).length;
   const held = v.robust ? ids.filter((i) => v.t[`stable:${v.robust}`]?.[i] === 1).length : null;
-  return `<p class="sum-k">Best match on Earth</p>
+  return `<div class="sum-top"><p class="sum-k">Best match</p><button type="button" class="sum-toggle" id="known" aria-pressed="${v.known}">${v.known ? "Known included" : "+ Known sites"}</button></div>
     <p class="sum-best"><a href="${v.href(best)}" class="sum-name">${esc(placeName(m, cells, best))}</a><span class="sum-score"><b>${score100(v.score[best])}</b> / 100</span></p>
     <ul class="sum-facts">
-      <li><b>${num(ids.length)}</b> ${ids.length === 1 ? "site" : "sites"} in <b>${num(countries)}</b> ${countries === 1 ? "country" : "countries"}</li>
-      <li><b>${num(fresh)}</b>${v.known ? ` of ${num(ids.length)}` : ""} ${fresh === 1 ? "is" : "are"} <span class="sum-new">new</span>: not in our list of known analog sites</li>
-      ${held == null ? `<li class="muted">We did robustness tests only on the four presets without year-round scores. This view has no test results.</li>` : `<li><b>${num(held)}</b> of ${num(ids.length)} hold their place in every robustness test</li>`}
-    </ul>
-    <button type="button" class="sum-link" id="known">${v.known ? "Show new sites only" : "Include known analog sites"}</button>`;
+      <li title="${esc(`${num(ids.length)} ${ids.length === 1 ? "site" : "sites"} in ${num(countries)} ${countries === 1 ? "country" : "countries"}`)}"><b>${num(ids.length)}<small> ${ids.length === 1 ? "site" : "sites"}</small></b><span>${num(countries)} ${countries === 1 ? "country" : "countries"}</span></li>
+      <li title="Not in our list of known analog sites"><b class="sum-new">${num(fresh)}${v.known ? `/${num(ids.length)}` : ""}</b><span>new</span></li>
+      ${held == null ? `<li class="muted" title="Robustness tests apply to the four presets without year-round scores"><b>—</b><span>robust</span></li>` : `<li title="Hold their place in every robustness test"><b>${num(held)}/${num(ids.length)}</b><span>robust</span></li>`}
+    </ul>`;
 }
 
 export const rules = (v: View) =>
-  `Top ${LIST} of ${num(v.pool)} land cells · ${v.known ? "new and known sites" : "new sites only"} · ${num(APART_KM)} km apart · ${PER_COUNTRY} per country at most`;
+  `Top ${LIST} of ${num(v.pool)} cells · ${v.known ? "all sites" : "new only"} · ≥${num(APART_KM)} km · ≤${PER_COUNTRY}/country`;
 
 export const key = () =>
-  `<p>Each strip shows how close a site is on every challenge:</p><ul>${BANDS.map((b) => `<li><i class="fc ${b.cls}" aria-hidden="true"></i>${b.word}</li>`).join("")}<li><i class="fc b-na" aria-hidden="true"></i>no data</li></ul>`;
+  `<span class="key-k">Key</span><ul>${BANDS.map((b) => `<li><i class="fc ${b.cls}" aria-hidden="true"></i>${b.word}</li>`).join("")}<li><i class="fc b-na" aria-hidden="true"></i>no data</li></ul>`;
 
 export function list(v: View, shut: Set<string>, moved: Map<number, number>, byRegion: boolean): string {
   const { m, cells, ids } = v;

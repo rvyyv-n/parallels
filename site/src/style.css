@@ -22,9 +22,12 @@
   --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 
   /* Parallels brand & world accents */
-  --signal: #0ea5e9;
-  --signal-2: #60c5f7;
-  --signal-tint: rgba(14, 165, 233, 0.12);
+  --signal: #1d64c8;
+  --signal-hover: #246ed4;
+  --signal-ink: #f8fafc;
+  --signal-2: #5a9cf2;
+  --signal-tint: rgba(29, 100, 200, 0.14);
+  --signal-bd: rgba(90, 156, 242, 0.36);
   --mars: #f97352;
   --mars-tint: rgba(249, 115, 82, 0.12);
   --moon: #d8d4ca;
@@ -118,7 +121,7 @@ body {
 }
 
 ::selection {
-  background: rgba(2, 151, 222, 0.5);
+  background: rgba(29, 100, 200, 0.52);
   color: #fff;
 }
 
@@ -486,7 +489,7 @@ option {
 
 .switch input:checked::after {
   transform: translateX(18px);
-  background: var(--signal);
+  background: var(--signal-2);
 }
 
 .switch input:disabled {

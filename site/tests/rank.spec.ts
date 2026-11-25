@@ -44,9 +44,15 @@ test("C1: the summary card counts come from the data", async ({ page }) => {
   await expect(sum.locator(".sum-score b")).toHaveText(score100(s[ids[0]]));
   const facts = sum.locator(".sum-facts li");
   const countries = new Set(ids.map((i) => countryOf(m, cells, i))).size;
-  await expect(facts.nth(0)).toHaveText(`20 sites in ${countries} countries`);
-  await expect(facts.nth(1)).toContainText(`${ids.filter((i) => isNew(m, cells, i)).length} are new: not in our list of known analog sites`);
-  await expect(facts.nth(2)).toHaveText(`${ids.filter((i) => t[`stable:${balanced.id}`][i] === 1).length} of 20 hold their place in every robustness test`);
+  const fresh = ids.filter((i) => isNew(m, cells, i)).length;
+  const held = ids.filter((i) => t[`stable:${balanced.id}`][i] === 1).length;
+  await expect(facts).toHaveCount(3);
+  await expect(facts.nth(0).locator("b")).toHaveText("20 sites");
+  await expect(facts.nth(0).locator("span")).toHaveText(`${countries} ${countries === 1 ? "country" : "countries"}`);
+  await expect(facts.nth(1).locator("b")).toHaveText(String(fresh));
+  await expect(facts.nth(1).locator("span")).toHaveText("new");
+  await expect(facts.nth(2).locator("b")).toHaveText(`${held}/20`);
+  await expect(facts.nth(2).locator("span")).toHaveText("robust");
   await sum.locator("#known").click();
   await expect(page).toHaveURL(/known=1/);
   await expect.poll(() => order(page)).toEqual(spread(m, s, cells, () => true, true).ids);
@@ -74,7 +80,7 @@ test("C2: top 20 with spread, one list by rank by default, grouped by world regi
     }
     expect(Math.max(...per.values())).toBeLessThanOrEqual(PER_COUNTRY);
     expect(ids.every((i) => isNew(m, cells, i))).toBe(true);
-    await expect(page.locator("#rules")).toHaveText(`Top 20 of ${want.pool.toLocaleString("en-US")} land cells · new sites only · 800 km apart · 2 per country at most`);
+    await expect(page.locator("#rules")).toHaveText(`Top 20 of ${want.pool.toLocaleString("en-US")} cells · new only · ≥800 km · ≤2/country`);
     for (const g of await page.locator(".rk-grp").all()) {
       const name = await g.getAttribute("data-group");
       const gi = await g.locator("li[data-i]").evaluateAll((els) => els.map((e) => Number((e as HTMLElement).dataset.i)));
@@ -101,7 +107,10 @@ test("C3: one chip per challenge, coloured by its band, with the band in the lab
       await expect(chips.nth(k)).toHaveAttribute("aria-label", b ? `${c.name}: ${score100(v)} / 100, ${b.word}` : `${c.name}: no data`);
     }
   }
-  await expect(page.locator("#key")).toContainText("Each strip shows how close a site is on every challenge:");
+  const keyEl = page.locator("#key");
+  for (const word of ["very close", "close", "partly", "far off", "no data"]) {
+    await expect(keyEl).toContainText(word);
+  }
   await expect(page.locator("#rank")).not.toContainText("%  match");
 });
 

@@ -28,23 +28,37 @@ const shareTitle = (v: number) => (v >= 1 ? "All ranked land" : `Best ${shareLab
 const shareShort = (v: number) => `best ${shareLabel(v)}`;
 
 const presets = (m: Manifest) => [...m.filters].sort((a, b) => Number(b.id === "balanced") - Number(a.id === "balanced"));
+const PRESET_LABEL: Record<string, string> = {
+  balanced: "Balanced",
+  rover: "Rover",
+  life_support: "Life support",
+  habitat: "Habitat",
+};
 
 const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby="find-h">
   <aside class="fd-side" id="fd-side" aria-label="Ranked places and controls">
     <button type="button" class="fd-grip" id="fd-grip" aria-label="Toggle map and list height" aria-expanded="false"><span aria-hidden="true"></span></button>
     <header class="fd-head">
-      <h1 id="find-h" tabindex="-1">Earth's best places for this base site</h1>
+      <div class="fd-top">
+        <h1 id="find-h" tabindex="-1">Earth's best places</h1>
+        <div class="fd-util">
+          <button type="button" class="fd-util-btn" id="tour" title="Guided tour" aria-label="Guided tour"><i class="fd-play" aria-hidden="true"></i><span>Tour</span></button>
+          <a class="fd-util-btn" id="now-change" href="#ch-moon">${icon("site")}<span>All sites</span></a>
+        </div>
+      </div>
       <div class="fd-site">
         <label class="fd-pick"><span class="sr">Base site</span><i class="fd-dot" aria-hidden="true"></i><select id="pick-target">${(["moon", "mars"] as const)
           .map((b) => `<optgroup label="${BODY[b]}">${m.targets.filter((t) => t.body === b).map((t) => `<option value="${esc(t.id)}">${esc(t.short)}</option>`).join("")}</optgroup>`)
           .join("")}</select>${icon("chevron")}</label>
-        <a class="fd-change" id="now-change" href="#ch-moon">${icon("site")}<span>All sites</span></a>
       </div>
     </header>
     <div class="fd-block fd-sum" id="summary" aria-live="polite"><p class="sum-k">The list is loading…</p></div>
     <p class="fd-rules" id="rules"></p>
     <div class="presets" role="group" aria-label="Rank by">${presets(m)
-      .map((f) => `<button type="button" data-filter="${esc(f.id)}" aria-pressed="false" title="${esc(f.plain)}">${esc(f.name)}</button>`)
+      .map((f) => {
+        const short = PRESET_LABEL[f.id] ?? f.name;
+        return `<button type="button" data-filter="${esc(f.id)}" aria-pressed="false" aria-label="${esc(f.name)}" title="${esc(`${f.name} — ${f.plain}`)}">${esc(short)}</button>`;
+      })
       .join("")}</div>
     <details class="fd-block fd-w" id="weights">
       <summary><span>Filters and weights</span><span class="w-mine" id="w-mine" hidden>your weights</span>${icon("chevron")}</summary>
@@ -65,7 +79,7 @@ const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby=
     <div class="fd-rank" id="rank"><p class="rk-empty" role="status">The list is loading…</p></div>
     <div class="fd-cmp" id="compare" hidden></div>
   </aside>
-  <div class="earth-col">
+  <div class="earth-col lg-collapsed">
     <button type="button" class="fd-fold" id="fold" aria-controls="fd-side" aria-expanded="true" title="Hide the list"><span class="sr">Hide the list</span>${icon("chevron")}</button>
     <div class="earth-stage" id="earth-stage">
       <canvas class="fd-stars" id="fd-stars" aria-hidden="true"></canvas>
@@ -73,18 +87,18 @@ const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby=
       <div class="earth" id="earth" role="region" aria-label="Map of the land on Earth. The colour shows the match score. Use the ranked list with the keyboard."></div>
       <div class="map-bar">
         <div class="fd-search" id="fd-search-wrap"></div>
-        <div class="seg" id="view-seg" role="group" aria-label="Map view"><button type="button" data-view="globe" aria-pressed="true">Globe</button><button type="button" data-view="flat" aria-pressed="false">Flat<span class="long"> map</span></button></div>
-        <label class="tog"><input type="checkbox" id="pick-labels" checked><span class="tog-box">${icon("check")}</span><i class="k-analog" aria-hidden="true"></i><span class="tog-lbl">Known analogs</span><span class="tog-state" id="tog-state">Shown</span><span class="tog-more"><i class="k-cave" aria-hidden="true"></i>caves</span></label>
+        <div class="seg" id="view-seg" role="group" aria-label="Map view"><button type="button" data-view="globe" aria-pressed="true">Globe</button><button type="button" data-view="flat" aria-pressed="false">Flat</button></div>
+        <label class="tog" title="Show known analog sites and caves"><input type="checkbox" id="pick-labels" checked><span class="tog-box">${icon("check")}</span><i class="k-analog" aria-hidden="true"></i><span class="tog-lbl">Known analogs</span></label>
         <label class="hud-range"><span class="hud-range-k">Overlay</span><input type="range" id="pick-strength" min="0" max="100" step="5" value="100"><output id="strength-out">100%</output></label>
-        <button type="button" class="tour-btn" id="tour" title="Guided tour"><i aria-hidden="true"></i><span class="tour-lbl long"><span class="tour-name">Guided tour</span><small class="tour-sub">9 STEPS</small></span></button>
       </div>
       <button type="button" class="back" id="back" hidden>Go back to the selected place</button>
       <div class="status" id="status"><span class="st-scale" id="st-scale"></span><span class="st-at" id="st-at" aria-hidden="true"></span></div>
     </div>
-    <div class="legend" id="legend">
+    <div class="legend is-collapsed" id="legend">
       <div class="lg-head">
+        <span class="lg-swatch" aria-hidden="true" style="background:${gradient()}"></span>
         <p class="lg-title" id="lg-title">${shareTitle(0.02)}</p>
-        <button type="button" class="lg-fold" id="lg-fold" aria-expanded="true" aria-controls="lg-body" title="Collapse legend" aria-label="Collapse legend">${icon("chevron")}</button>
+        <button type="button" class="lg-fold" id="lg-fold" aria-expanded="false" aria-controls="lg-body" title="Expand legend" aria-label="Expand legend">${icon("chevron")}</button>
       </div>
       <div class="lg-body" id="lg-body">
         <div class="lg-share" id="lg-share" role="group" aria-labelledby="lg-title">${SHARES.map(
@@ -286,7 +300,7 @@ export function finder(ctx: Ctx): Page {
       ? "We calculated year-round scores only for the presets. This switch is off when you set the weights."
       : m.scoring.yearround_rule;
     $("#w-mine").hidden = !s.hand;
-    $("#find-h").innerHTML = `<span>Earth's best places for</span> <b>${esc(t.name)}</b>`;
+    $("#find-h").innerHTML = `Earth's best places<span class="sr"> for ${esc(t.name)}</span>`;
     siteLink(t.body);
     twin?.update(t);
   };
@@ -627,8 +641,9 @@ export function finder(ctx: Ctx): Page {
     pop = createPopup(earthCol, { info, open, closed: () => {} }, explore);
 
     $("#legend").addEventListener("click", (e) => {
-      const foldBtn = (e.target as HTMLElement).closest<HTMLButtonElement>("#lg-fold");
-      if (foldBtn) {
+      const targetEl = e.target as HTMLElement;
+      if (targetEl.closest(".lg-head")) {
+        const foldBtn = $<HTMLButtonElement>("#lg-fold");
         const collapsed = $("#legend").classList.toggle("is-collapsed");
         earthCol.classList.toggle("lg-collapsed", collapsed);
         const expanded = !collapsed;
@@ -638,7 +653,7 @@ export function finder(ctx: Ctx): Page {
         foldBtn.setAttribute("aria-label", word);
         return;
       }
-      const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-share]");
+      const b = targetEl.closest<HTMLButtonElement>("[data-share]");
       if (!b || !d || Number(b.dataset.share) === share) return;
       share = Number(b.dataset.share);
       threshold = cut(score, share);
@@ -682,7 +697,6 @@ export function finder(ctx: Ctx): Page {
     $("#back").addEventListener("click", () => earth?.back());
     $<HTMLInputElement>("#pick-labels").addEventListener("change", (e) => {
       const on = (e.target as HTMLInputElement).checked;
-      $("#tog-state").textContent = on ? "Shown" : "Hidden";
       if (!on) analogTip?.hide();
       earth?.labels(on);
     });

@@ -28,6 +28,7 @@ const painted = (share: number) => {
 
 test("the map colours only the best 2% of land by default, and the switch changes the share", async ({ page }) => {
   await ready(page);
+  await expect(legend(page).locator("#lg-fold")).toHaveAttribute("aria-expanded", "false");
   await expect(legend(page).locator(".lg-title")).toHaveText("Best 2% of land");
   await expect(legend(page)).toHaveAttribute("data-ranked", String(ranked));
   const n2 = Number(await legend(page).getAttribute("data-painted"));
@@ -35,6 +36,8 @@ test("the map colours only the best 2% of land by default, and the switch change
   expect(n2).toBeGreaterThanOrEqual(Math.ceil(0.02 * ranked));
   expect(n2 - Math.ceil(0.02 * ranked)).toBeLessThan(0.002 * ranked);
   expect(Number(await legend(page).getAttribute("data-edges"))).toBeGreaterThan(0);
+  await legend(page).locator("#lg-fold").click();
+  await expect(legend(page).locator("#lg-fold")).toHaveAttribute("aria-expanded", "true");
   for (const [label, share] of [["5%", 0.05], ["1%", 0.01], ["10%", 0.1]] as const) {
     await legend(page).getByRole("button", { name: label, exact: true }).click();
     await expect(legend(page)).toHaveAttribute("data-painted", String(painted(share)));
@@ -113,6 +116,28 @@ test("the top three pins carry a name and score label", async ({ page }) => {
   await expect(page.locator(".pin-tag")).toHaveCount(3);
   const id = Number(await row(page, 1).getAttribute("data-i"));
   await expect(page.locator(`.pin-tag[data-i="${id}"]`)).toContainText(`${score100(score[id])} / 100`);
+  await expect
+    .poll(async () =>
+      page.evaluate(() => {
+        const overlaps: string[] = [];
+        const pins = [...document.querySelectorAll<HTMLElement>(".pin")]
+          .map((el) => ({ id: el.dataset.i ?? "", op: getComputedStyle(el).opacity, r: el.getBoundingClientRect() }))
+          .filter((p) => p.op !== "0" && p.r.width > 0 && p.r.height > 0);
+        const tags = [...document.querySelectorAll<HTMLElement>(".pin-tag:not(.is-dim)")]
+          .map((el) => ({ id: el.dataset.i ?? "", op: getComputedStyle(el).opacity, r: el.getBoundingClientRect() }))
+          .filter((t) => t.op !== "0" && t.r.width > 0 && t.r.height > 0);
+        for (const t of tags) {
+          for (const p of pins) {
+            if (p.id === t.id) continue;
+            if (t.r.left < p.r.right && t.r.right > p.r.left && t.r.top < p.r.bottom && t.r.bottom > p.r.top) {
+              overlaps.push(`tag:${t.id}@pin:${p.id}`);
+            }
+          }
+        }
+        return overlaps;
+      }),
+    )
+    .toEqual([]);
 });
 
 test("clicking a pin opens a popup, and Details opens that place", async ({ page }, info) => {
@@ -178,6 +203,8 @@ test("legend renders a live 36-bin score histogram synced with the active share"
   await ready(page);
   const bins = legend(page).locator(".lg-hist .lg-bin");
   await expect(bins).toHaveCount(36);
+  await legend(page).locator("#lg-fold").click();
+  await expect(legend(page).locator("#lg-fold")).toHaveAttribute("aria-expanded", "true");
   const activeCount = () => legend(page).locator(".lg-hist .lg-bin.is-active").count();
   const at2 = await activeCount();
   expect(at2).toBeGreaterThan(0);

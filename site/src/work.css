@@ -41,7 +41,7 @@
   z-index: var(--z-bar);
   pointer-events: none;
   overflow: hidden;
-  background: rgba(2, 151, 222, 0.16);
+  background: var(--signal-tint);
 }
 
 .fd-progress[hidden] {
@@ -87,7 +87,7 @@
   height: 9px;
   border-radius: 50%;
   border: 1.5px solid #fff;
-  background: rgba(91, 187, 233, 0.28);
+  background: rgba(90, 156, 242, 0.28);
   flex: none;
 }
 
@@ -154,7 +154,7 @@
   min-height: 36px;
   padding: 0 15px;
   font: 600 12.5px/1 var(--body);
-  color: var(--space);
+  color: var(--signal-ink);
   background: var(--signal);
   border: 0;
   border-radius: var(--r-pill);
@@ -164,7 +164,7 @@
 }
 
 .back:hover {
-  background: var(--signal-2);
+  background: var(--signal-hover);
 }
 
 .back[hidden] {
@@ -205,12 +205,22 @@
 .lg-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.lg-swatch {
+  width: 28px;
+  height: 7px;
+  border-radius: var(--r-pill);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  flex: none;
 }
 
 .lg-title {
   margin: 0;
+  margin-right: auto;
   white-space: nowrap;
   font: 700 11.5px/1.2 var(--display);
   font-stretch: 88%;
@@ -254,6 +264,21 @@
   display: grid;
   gap: 9px;
   margin-top: 9px;
+}
+
+.legend:not(.is-collapsed) .lg-body {
+  animation: lg-open 180ms var(--ease);
+}
+
+@keyframes lg-open {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .lg-hist-wrap {
@@ -495,15 +520,10 @@
 
   .legend.is-collapsed {
     width: auto;
-    padding: 10px 14px 28px;
+    padding: 9px 14px 26px;
     border-radius: 0;
   }
 
-  .legend.is-collapsed .lg-body {
-    display: grid;
-  }
-
-  .lg-fold,
   .lg-marks {
     display: none;
   }
@@ -546,5 +566,15 @@
 
   .back {
     min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .legend:not(.is-collapsed) .lg-body {
+    animation: none;
+  }
+
+  .lg-fold .ic {
+    transition: none;
   }
 }

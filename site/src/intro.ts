@@ -67,8 +67,8 @@ const clamp = (v: number) => Math.max(0, Math.min(1, v));
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const mix = (a: number, b: number, s: number) => a + (b - a) * s;
-// Palette: accent #0297DE. Thin lines drawn over the globes use a lighter tint of it so they stay visible on blue oceans.
-const SIGNAL = 0x5bbbe9;
+// Palette: accent #1D64C8. Thin lines drawn over the globes use a lighter tint of it so they stay visible on blue oceans.
+const SIGNAL = 0x5a9cf2;
 const AMBER = 0xffc24a;
 const MARS = 0xfc734d;
 const FAR = 10;
@@ -381,7 +381,7 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
     paint(id, mat);
     return { tilt, spin, mesh, mat, cur: { ...face }, goal: { ...face }, r: 1, grow: 1 };
   };
-  const earth = globe("earth", 0x0297de, { x: 0.3, y: -2.2 });
+  const earth = globe("earth", 0x1d64c8, { x: 0.3, y: -2.2 });
   const worlds: Record<World, Globe> = {
     moon: globe("moon", 0xd3d0c8, facing(homes.moon, 0.9)),
     mars: globe("mars", MARS, facing(homes.mars, 0.9)),

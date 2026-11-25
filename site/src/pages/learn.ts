@@ -1,6 +1,6 @@
 import "./learn.css";
 import { placeName } from "../card";
-import type { Body, LabelPoint, Manifest, Target, Trait } from "../contract";
+import type { Body, CantCopy, LabelPoint, Manifest, Target, Trait } from "../contract";
 import { bindPillRange, syncPillRange } from "../controls";
 import type { Cols } from "../data";
 import { bits, esc, num, reduced, unit } from "../format";
@@ -11,6 +11,7 @@ import { LOADS, PHOTOS } from "./learn-data";
 
 const IMG = `${import.meta.env.BASE_URL}img/`;
 const WORLD = { moon: "the Moon", mars: "Mars" };
+const WORLD_TAB = { moon: "The Moon", mars: "Mars" };
 const NAME = { earth: "Earth", moon: "Moon", mars: "Mars" };
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const MONTH_LETTERS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
@@ -22,15 +23,36 @@ const TEMPS: Record<string, [string, string]> = {
   day_swing_ground: ["Day to night, ground", "How much the ground temperature changes between day and night."],
 };
 const KELVIN: Record<string, string> = { cold: "t_min_k" };
-const LEDE: Record<Body, (t: Target) => string> = {
-  moon: () => "A base at the south pole of the Moon has low gravity, no air, very low temperatures and strong radiation. On Earth, crews can practise for some of these conditions, but not for all.",
-  mars: (t) => `A base at ${t.short} has low gravity, thin air, cold nights, dust and radiation. On Earth, crews can practise for some of these conditions, but not for all.`,
+const LEDE: Record<Body, string> = {
+  moon: "Low gravity, vacuum, extreme cold, and high radiation. Earth can match the terrain and light—not the rest.",
+  mars: "One-third gravity, thin air, cold nights, and fine dust. Earth can match the rock and dryness—not the rest.",
 };
-const STATS = [
-  ["Gravity", "Gravity"],
-  ["Air", "Air"],
-  ["Radiation on the surface", "Radiation"],
-] as const;
+
+type VitalId = "gravity" | "air" | "radiation";
+
+const ICONS: Record<VitalId, string> = {
+  gravity:
+    '<svg class="ln-ico" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v8M5 7.5 8 10.5l3-3M3 13.5h10"/></svg>',
+  air: '<svg class="ln-ico" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 5.5h8.5a2 2 0 1 0-1.9-2.6M2 8.5h11a1.75 1.75 0 1 1-1.65 2.35M2 11.5h5.5"/></svg>',
+  radiation:
+    '<svg class="ln-ico" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v2.2M8 12v2.2M1.8 8H4M12 8h2.2M3.6 3.6l1.55 1.55M10.85 10.85l1.55 1.55M12.4 3.6l-1.55 1.55M5.15 10.85 3.6 12.4"/></svg>',
+};
+
+interface Vital {
+  id: VitalId;
+  label: string;
+  worldValue: string;
+  worldSub: string;
+  earthLabel: string;
+  pill: string;
+  worldPct: number;
+  earthPct: number;
+  trace: boolean;
+  alert: boolean;
+  note: string;
+  source: string;
+  url: string;
+}
 
 interface Side {
   value: number;
@@ -51,6 +73,7 @@ const defaultFilter = (m: Manifest) => m.filters.find((f) => f.id === "balanced"
 const ext = (url: string, text: string, cls = "") => `<a${cls ? ` class="${cls}"` : ""} href="${esc(url)}" target="_blank" rel="noopener">${esc(text)}</a>`;
 const short = (s: string) => s.split(" (")[0];
 const cap = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+const cleanSource = (s: string) => s.replace(/;\s*/g, " / ");
 const host = (url: string) => {
   try {
     return new URL(url).hostname.replace(/^www\./, "");
@@ -59,6 +82,7 @@ const host = (url: string) => {
   }
 };
 const firstNumber = (s: string) => Number(s.replace(/,/g, "").match(/\d+(\.\d+)?/)?.[0] ?? NaN);
+const fmtCompact = (x: number) => (Number.isInteger(x) ? num(x) : num(x, 1));
 const heading = (id: string, n: number, text: string) =>
   `<h2 id="${id}" class="ln-h"><span class="ln-n" aria-hidden="true">${String(n).padStart(2, "0")}</span>${esc(text)}</h2>`;
 
@@ -77,6 +101,122 @@ function gravity(m: Manifest) {
   if (!g) return null;
   const v = { earth: firstNumber(g.earth), moon: firstNumber(g.moon), mars: firstNumber(g.mars) };
   return Object.values(v).every(Number.isFinite) ? { row: g, v } : null;
+}
+
+function parseVital(r: CantCopy, w: Body): Vital | null {
+  const rawW = r[w];
+  const rawE = r.earth;
+
+  if (r.name === "Gravity") {
+    const e = firstNumber(rawE);
+    const v = firstNumber(rawW);
+    if (!Number.isFinite(e) || !Number.isFinite(v) || e <= 0) return null;
+    const ratio = v / e;
+    return {
+      id: "gravity",
+      label: "Gravity",
+      worldValue: `${num(v, 2)} m/s²`,
+      worldSub: "",
+      earthLabel: `${num(e, 2)} m/s²`,
+      pill: `${num(ratio, 2)}× Earth`,
+      worldPct: Math.max(0, Math.min(100, ratio * 100)),
+      earthPct: 100,
+      trace: false,
+      alert: false,
+      note: "",
+      source: r.source,
+      url: r.url,
+    };
+  }
+
+  if (r.name === "Air") {
+    const e = firstNumber(rawE);
+    if (!Number.isFinite(e) || e <= 0) return null;
+    const isVacuum = /^none\b/i.test(rawW) || /×10⁻/.test(rawW);
+    if (isVacuum) {
+      const sci = rawW.match(/\d+(?:\.\d+)?\s*×\s*10[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+\s*bar/i)?.[0] ?? "";
+      return {
+        id: "air",
+        label: "Air",
+        worldValue: "Vacuum",
+        worldSub: sci,
+        earthLabel: `${num(e)} mbar`,
+        pill: "~0% Earth",
+        worldPct: 0,
+        earthPct: 100,
+        trace: true,
+        alert: false,
+        note: "",
+        source: r.source,
+        url: r.url,
+      };
+    }
+    const v = firstNumber(rawW);
+    if (!Number.isFinite(v)) return null;
+    const pct = (v / e) * 100;
+    return {
+      id: "air",
+      label: "Air",
+      worldValue: `${num(v, 2)} mbar`,
+      worldSub: "",
+      earthLabel: `${num(e)} mbar`,
+      pill: `${num(pct, 1)}% Earth`,
+      worldPct: Math.max(0, Math.min(100, pct)),
+      earthPct: 100,
+      trace: false,
+      alert: false,
+      note: "",
+      source: r.source,
+      url: r.url,
+    };
+  }
+
+  if (r.name === "Radiation on the surface") {
+    const e = firstNumber(rawE);
+    const v = firstNumber(rawW);
+    if (!Number.isFinite(e) || !Number.isFinite(v) || e <= 0 || v <= 0) return null;
+    const eApprox = /^about\b/i.test(rawE) ? "~" : "";
+    const vApprox = /^about\b/i.test(rawW) ? "~" : "";
+    const ratio = Math.round(v / e);
+    const note = (rawW.match(/\(([^)]+)\)/)?.[1] ?? "").replace(/;\s*/g, " · ");
+    return {
+      id: "radiation",
+      label: "Radiation",
+      worldValue: `${vApprox}${fmtCompact(v)} µSv/day`,
+      worldSub: "",
+      earthLabel: `${eApprox}${fmtCompact(e)} µSv/day`,
+      pill: `~${num(ratio)}× Earth`,
+      worldPct: 100,
+      earthPct: Math.max(0, Math.min(100, (e / v) * 100)),
+      trace: false,
+      alert: true,
+      note,
+      source: r.source,
+      url: r.url,
+    };
+  }
+
+  return null;
+}
+
+function vitals(m: Manifest, w: Body): Vital[] {
+  const out: Vital[] = [];
+  for (const r of m.cant_copy) {
+    const v = parseVital(r, w);
+    if (v) out.push(v);
+  }
+  return out;
+}
+
+function dedupeSources(rows: Vital[], w: Body): { source: string; url: string }[] {
+  const byLabel = new Map<string, { source: string; url: string }>();
+  for (const r of rows) {
+    const prev = byLabel.get(r.source);
+    if (!prev || (!prev.url.includes(w) && r.url.includes(w))) {
+      byLabel.set(r.source, { source: cleanSource(r.source), url: r.url });
+    }
+  }
+  return [...byLabel.values()];
 }
 
 function testedThere(note: string | undefined) {
@@ -151,16 +291,39 @@ const temp = (s: Side, tr: Trait) => `${num(s.value, 1)}${unit(tr.unit)}${s.kelv
 const srcLine = (s: Side) => `<span class="ln-src">${s.url ? ext(s.url, s.source) : esc(s.source)} · ${esc(short(s.res))}</span>`;
 
 function meet(m: Manifest, t: Target, w: Body) {
-  const rows = STATS.map(([n, label]) => ({ r: m.cant_copy.find((x) => x.name === n), label })).filter((x) => x.r);
+  const rows = vitals(m, w);
+  const sources = dedupeSources(rows, w);
   return `<section class="ln-sec ln-meet" data-testid="learn-meet" aria-labelledby="meet-h">
     <div class="ln-globe" role="img" aria-label="${esc(`${NAME[w]}, turning: a NASA photo map`)}" style="--map:url('${IMG}${w}.jpg')"></div>
     <div class="ln-copy">
-      <p class="ln-k">First time with ${esc(WORLD[w])}?</p>
+      <p class="ln-k">Field primer</p>
       <h1 id="meet-h" tabindex="-1">Meet ${esc(WORLD[w])}</h1>
-      <p class="ln-lede">${esc(LEDE[w](t))}</p>
-      <dl class="ln-stats">${rows
-        .map(({ r, label }) => `<div><dt>${esc(label)}</dt><dd class="ln-stat">${esc(r![w])}</dd><dd class="ln-src">${ext(r!.url, r!.source)}</dd></div>`)
-        .join("")}</dl>
+      <p class="ln-lede">${esc(LEDE[w])}</p>
+      ${
+        rows.length
+          ? `<div class="ln-vitals" aria-label="${esc(`${NAME[w]} surface conditions compared with Earth`)}">${rows
+              .map((v) => {
+                const track = v.alert
+                  ? `<span class="ln-v-fill is-rad" style="width:100%"></span><span class="ln-v-earth-tick" style="width:${Math.max(1.2, v.earthPct).toFixed(2)}%"></span>`
+                  : v.trace
+                    ? `<span class="ln-v-fill is-trace"></span>`
+                    : `<span class="ln-v-fill${v.worldPct < 3 ? " is-thin" : ""}" style="width:${v.worldPct.toFixed(2)}%"></span>`;
+                return `<div class="ln-vital" data-vital="${v.id}">
+                  <div class="ln-v-head">
+                    <span class="ln-v-label">${ICONS[v.id]}${esc(v.label)}</span>
+                    <span class="ln-v-val"><b>${esc(v.worldValue)}</b>${v.worldSub ? `<small>${esc(v.worldSub)}</small>` : ""}<span class="ln-v-pill${
+                      v.alert ? " is-rad" : ""
+                    }">${esc(v.pill)}</span></span>
+                  </div>
+                  <div class="ln-v-track" aria-hidden="true">${track}</div>
+                  <div class="ln-v-meta">${v.note ? `<span class="ln-v-note">${esc(v.note)}</span>` : "<span></span>"}<span class="ln-v-ref${
+                    v.alert ? " is-tick" : ""
+                  }">Earth ${esc(v.earthLabel)}</span></div>
+                </div>`;
+              })
+              .join("")}<p class="ln-vitals-src">Sources: ${sources.map((s) => ext(s.url, s.source)).join(" · ")}</p></div>`
+          : ""
+      }
       ${
         t.facts.length
           ? `<details class="ln-more"><summary>About the base site: ${esc(t.short)}</summary><ul class="ln-facts">${t.facts
@@ -174,14 +337,12 @@ function meet(m: Manifest, t: Target, w: Body) {
 
 function cant(m: Manifest, w: Body) {
   const g = gravity(m);
-  const others = STATS.slice(1)
-    .map(([n, label]) => ({ r: m.cant_copy.find((x) => x.name === n), label }))
-    .filter((x) => x.r);
+  const others = vitals(m, w).filter((v) => v.id !== "gravity");
   return `<section class="ln-sec ln-cant" data-testid="learn-cant" aria-labelledby="cant-h">
     ${heading("cant-h", 3, "What Earth cannot copy")}
     ${
       g
-        ? `<p class="ln-lede">Weight is the force of gravity on a mass: mass × gravity, in newtons (N). Select a load.</p>
+        ? `<p class="ln-lede">Same mass, different weight (mass × gravity). Select hardware.</p>
       <div class="chips ln-switch" role="group" aria-label="Load">${LOADS.map(
         (l, k) => `<button type="button" class="chip" data-load="${esc(l.id)}" aria-pressed="${k === 0}">${esc(l.short)}</button>`,
       ).join("")}</div>
@@ -193,11 +354,33 @@ function cant(m: Manifest, w: Body) {
         : ""
     }
     <dl class="ln-pairs">${others
-      .map(
-        ({ r, label }) => `<div><dt>${esc(label)}</dt><dd><span>Earth: ${esc(r!.earth)}</span><span class="ln-ne" aria-label="is not">≠</span><span>${esc(NAME[w])}: ${esc(
-          r![w],
-        )}</span>${ext(r!.url, r!.source, "ln-src")}</dd></div>`,
-      )
+      .map((v) => {
+        const earthFill = `<span class="ln-cmp-fill is-earth${v.earthPct < 3 ? " is-thin" : ""}" style="width:${v.earthPct.toFixed(2)}%"></span>`;
+        const worldFill = v.trace
+          ? `<span class="ln-cmp-fill is-trace"></span>`
+          : `<span class="ln-cmp-fill${v.alert ? " is-rad" : ""}${v.worldPct < 3 ? " is-thin" : ""}" style="width:${v.worldPct.toFixed(2)}%"></span>`;
+        return `<div class="ln-cmp" data-vital="${v.id}">
+          <dt class="ln-cmp-head"><span class="ln-cmp-title">${ICONS[v.id]}${esc(v.label)}</span><span class="ln-ne-pill${v.alert ? " is-rad" : ""}"><span class="ln-ne" aria-label="is not">≠</span> ${esc(
+            v.pill,
+          )}</span></dt>
+          <dd class="ln-cmp-body">
+            <div class="ln-cmp-rows">
+              <div class="ln-cmp-row">
+                <div class="ln-cmp-line"><span class="ln-cmp-who">Earth</span><span class="ln-cmp-val">${esc(v.earthLabel)}</span></div>
+                <div class="ln-cmp-track" aria-hidden="true">${earthFill}</div>
+              </div>
+              <div class="ln-cmp-row" data-side="world">
+                <div class="ln-cmp-line"><span class="ln-cmp-who">${esc(NAME[w])}</span><span class="ln-cmp-val"><b>${esc(v.worldValue)}</b>${
+                  v.worldSub ? `<small>${esc(v.worldSub)}</small>` : ""
+                }</span></div>
+                <div class="ln-cmp-track" aria-hidden="true">${worldFill}</div>
+              </div>
+            </div>
+            ${v.note ? `<span class="ln-cmp-note">${esc(v.note)}</span>` : ""}
+            ${ext(v.url, cleanSource(v.source), "ln-src")}
+          </dd>
+        </div>`;
+      })
       .join("")}</dl>
   </section>`;
 }
@@ -223,7 +406,7 @@ function weights(m: Manifest, w: Body, id: string) {
 function photos() {
   return `<section class="ln-sec ln-photos" data-testid="learn-photos" aria-labelledby="photos-h">
     ${heading("photos-h", 5, "Same process, two worlds")}
-    <p class="ln-lede">The same forces change the surface of Earth and of its neighbours. These NASA photos show one pair for each process. Select a pair to enlarge it.</p>
+    <p class="ln-lede">Shared geology on Earth and its neighbours. Select a pair to enlarge.</p>
     <div class="ln-pairs-grid">${PHOTOS.map(
       (p, k) => `<figure class="ln-pair" data-pair="${esc(p.pair)}"><button type="button" class="ln-pair-btn" data-pair-open="${k}" aria-label="${esc(
         `Enlarge ${p.pair} photo pair`,
@@ -413,7 +596,7 @@ export function learnPage(ctx: Ctx): Page {
       tempPairs = pairs(m, t, cells, cols, i);
       const { name, country } = split(bestName);
       tempsBox.innerHTML = tempPairs.length
-        ? `<p class="ln-lede">The base site and its best place on Earth for the ${esc(filter.name.toLowerCase())} test: <b>${esc(name)}</b>${country ? `, ${esc(country)}` : ""}.</p>
+        ? `<p class="ln-lede">${esc(t.short)} vs. top Earth match: <b>${esc(name)}</b>${country ? `, ${esc(country)}` : ""}.</p>
           <div class="chips ln-switch" role="group" aria-label="Temperature to show">${tempPairs
             .map((p, k) => `<button type="button" class="chip" data-temp="${k}" aria-pressed="${k === 0}">${esc(TEMPS[p.trait.id][0])}</button>`)
             .join("")}</div><div id="ln-temp"></div>`
@@ -424,12 +607,12 @@ export function learnPage(ctx: Ctx): Page {
 
     const yr = $("#ln-year")!;
     masks = ids.map((i) => ({ name: placeName(m, cells, i), best: cells.m_best?.[i] ?? NaN, freeze: cells.m_freeze?.[i] ?? NaN, rain: cells.m_rain?.[i] ?? NaN }));
-    $("#ln-year-lede")!.textContent = `The season sets when a test can start. Move the slider or pick any month square to see each month at the five best places for ${t.short} (${filter.name.toLowerCase()} test).`;
+    $("#ln-year-lede")!.textContent = `Monthly testing windows at the top 5 Earth matches for ${t.short}. Drag the slider or click a month.`;
     drawYear(true);
     yr.setAttribute("aria-busy", "false");
 
     points = labels.filter((l) => l.kind === "known_analog" && l.groups?.some((g) => g.startsWith(`${w}-`))).sort((a, b) => a.lon - b.lon);
-    $("#ln-analog-lede")!.textContent = `Teams practise for ${WORLD[w]} at these ${points.length} places. Select a place.`;
+    $("#ln-analog-lede")!.textContent = `${points.length} training analog sites for ${WORLD[w]}. Select a pin.`;
     $("#ln-pins")!.innerHTML = points
       .map((p) => {
         const leftPct = ((p.lon + 180) / 360) * 100;
@@ -452,9 +635,12 @@ export function learnPage(ctx: Ctx): Page {
     const filter = defaultFilter(m);
     el.dataset.world = w;
     el.innerHTML = `<div class="ln" data-testid="learn" data-world="${w}">
-      <nav class="ln-worlds" aria-label="World">${(["moon", "mars"] as const)
-        .map((b) => `<a href="#/learn?world=${b}" data-world="${b}"${b === w ? ' aria-current="page"' : ""}>Explore ${esc(WORLD[b])}</a>`)
-        .join("")}</nav>
+      <nav class="ln-worlds" aria-label="World"><div class="ln-worlds-seg">${(["moon", "mars"] as const)
+        .map(
+          (b) =>
+            `<a href="#/learn?world=${b}" data-world="${b}"${b === w ? ' aria-current="page"' : ""}><span class="ln-wdot" aria-hidden="true"></span>${esc(WORLD_TAB[b])}</a>`,
+        )
+        .join("")}</div></nav>
       ${meet(m, target, w)}
       <section class="ln-sec" id="ln-temps" data-testid="learn-temps" aria-labelledby="temps-h" aria-busy="true">
         ${heading("temps-h", 1, "Hot and cold")}
@@ -462,24 +648,24 @@ export function learnPage(ctx: Ctx): Page {
       </section>
       <section class="ln-sec" id="ln-year" data-testid="learn-year" aria-labelledby="year-h" aria-busy="true">
         ${heading("year-h", 2, "A year on Earth")}
-        <p class="ln-lede" id="ln-year-lede">The season sets when a test can start.</p>
+        <p class="ln-lede" id="ln-year-lede">Monthly testing windows at the top 5 Earth matches.</p>
         <div class="ln-panel ln-year-panel">
           <div class="ln-month">
             <label for="ln-month" class="sr">Month</label>
             <input id="ln-month" class="ln-slider" type="range" min="0" max="11" step="1" value="${month}" aria-valuetext="${MONTHS[month]}">
             <output for="ln-month" class="ln-month-name" id="ln-month-name" data-testid="month-name">${MONTHS[month]}</output>
           </div>
-          <p class="ln-key"><span><i data-best></i>Best month: no freeze–thaw, no rain and no frost</span><span><i data-avoid></i>Freeze–thaw, rainy or frozen</span></p>
+          <p class="ln-key"><span><i data-best></i>Best window</span><span><i data-avoid></i>Freeze–thaw, rain, or frost</span></p>
           <ol class="ln-places" id="ln-places"></ol>
-          <p class="ln-src">Months from ${ext(m.datasets.find((x) => x.id === "power_merra2")?.url ?? "https://power.larc.nasa.gov/", "NASA POWER climatology (MERRA-2)")}, for each patch of approximately 50 km. We rank the places with the ${esc(
-            filter.name.toLowerCase(),
-          )} test, as the Finder does.</p>
+          <p class="ln-src">${ext(m.datasets.find((x) => x.id === "power_merra2")?.url ?? "https://power.larc.nasa.gov/", "NASA POWER (MERRA-2)")} · ~50 km grid · ${esc(
+            filter.name,
+          )} ranking.</p>
         </div>
       </section>
       ${cant(m, w)}
       <section class="ln-sec" id="ln-analogs" data-testid="learn-analogs" aria-labelledby="analogs-h" aria-busy="true">
         ${heading("analogs-h", 4, "First tested on Earth")}
-        <p class="ln-lede" id="ln-analog-lede">Teams practise at these places.</p>
+        <p class="ln-lede" id="ln-analog-lede">Training analog sites.</p>
         <div class="ln-map-wrap">
           <div class="ln-map"><img src="${IMG}blue-marble-4k.jpg" alt="" width="4096" height="2048" loading="lazy" decoding="async"><div class="ln-pins" id="ln-pins"></div></div>
           <div class="ln-analog" id="ln-analog" data-testid="analog-card" aria-live="polite"></div>
@@ -488,8 +674,8 @@ export function learnPage(ctx: Ctx): Page {
       ${photos()}
       <section class="ln-sec ln-end" aria-labelledby="end-h">
         <h2 id="end-h" class="ln-h">Now you try</h2>
-        <p class="ln-lede">See where Earth matches ${esc(target.short)}, and where the match breaks.</p>
-        <a class="ln-cta" data-testid="learn-find" href="#/find?t=${encodeURIComponent(target.id)}">Find the matches on Earth <span aria-hidden="true">→</span></a>
+        <p class="ln-lede">Explore Earth matches for ${esc(target.short)} and see where each analogy breaks.</p>
+        <a class="ln-cta" data-testid="learn-find" href="#/find?t=${encodeURIComponent(target.id)}">Open in Finder <span aria-hidden="true">→</span></a>
       </section>
       <dialog class="ln-lightbox" id="ln-lightbox" aria-labelledby="ln-lb-h"></dialog>
     </div>`;
