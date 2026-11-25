@@ -31,9 +31,19 @@ const sitesOf = (m: Manifest, b: Body) => {
 };
 
 const site = (t: Target, i: number) =>
-  `<li><a class="site" href="#/find?t=${esc(t.id)}" data-site="${esc(t.id)}" tabindex="${i ? -1 : 0}"${i ? "" : ' aria-current="true"'}><canvas class="site-thumb" width="128" height="128" data-thumb="${esc(
+  `<li><a class="site" href="#/find?t=${esc(t.id)}" data-site="${esc(t.id)}" tabindex="${i ? -1 : 0}"${i ? "" : ' aria-current="true"'}><span class="site-frame" aria-hidden="true"><canvas class="site-thumb" width="128" height="128" data-thumb="${esc(
     t.id,
-  )}" aria-hidden="true"></canvas><span class="site-n">${esc(t.name)}</span><span class="site-at">${latlon(t.lat, t.lon, 1)}</span></a></li>`;
+  )}" aria-hidden="true"></canvas></span><span class="site-n">${esc(t.name)}</span><span class="site-at">${latlon(t.lat, t.lon, 1)}</span><span class="site-go" aria-hidden="true">${icon("chevron")}</span></a></li>`;
+
+function placeCaption(p: LabelPoint): string {
+  const raw = (p.note ?? "")
+    .replace(/^(?:Analog for:[^.]*\.\s*)?/i, "")
+    .replace(/^Used for:[^.]*\.\s*/i, "")
+    .trim();
+  if (!raw) return "";
+  const m = raw.match(/^.+?[.!?](?=\s|$)/);
+  return m ? m[0] : raw;
+}
 
 function cant(m: Manifest, b: Body) {
   const src = [...new Map(m.cant_copy.map((c) => [c.source, c.url])).entries()];
@@ -85,6 +95,7 @@ const html = (m: Manifest) => `<section id="intro" class="intro" aria-labelledby
         <h2 id="known-h">Crews already train on Earth for the Moon and Mars.</h2>
         <p class="intro-lede">Crews practised Moon and Mars work at these places. Click a place to see it on the globe.</p>
         <ul class="places" aria-label="Known analog places"></ul>
+        <p class="place-note" id="place-note" aria-live="polite"></p>
       </div>
     </section>
     <section class="chap chap-go" id="ch-go" data-chap="5" aria-label="Open the Finder">
@@ -99,6 +110,7 @@ export function homePage(ctx: Ctx): Page {
   let intro: Intro | null = null;
   let place = () => {};
   let counted = false;
+  let visible = false;
   const picked: Record<Body, Target | undefined> = { moon: home(m, "moon"), mars: home(m, "mars") };
   let places: LabelPoint[] = [];
   let spot = 0;
@@ -179,6 +191,7 @@ export function homePage(ctx: Ctx): Page {
       }
 
       const list = el.querySelector<HTMLElement>(".places")!;
+      const noteEl = el.querySelector<HTMLElement>("#place-note");
       const choose = (i: number) => {
         const p = places[i];
         if (!p) return;
@@ -187,6 +200,13 @@ export function homePage(ctx: Ctx): Page {
           x.setAttribute("aria-pressed", String(n === i));
           x.tabIndex = n === i ? 0 : -1;
         });
+        if (noteEl) {
+          const sentence = placeCaption(p);
+          const url = p.analog_source ?? p.source;
+          noteEl.innerHTML = sentence
+            ? `${esc(sentence)}${url ? ` <a class="place-src" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Source</a>` : ""}`
+            : "";
+        }
         intro?.place(p, p.country ? `${p.name}, ${p.country}` : p.name);
       };
       list.addEventListener("click", (e) => {
@@ -213,9 +233,9 @@ export function homePage(ctx: Ctx): Page {
           ? places
               .map(
                 (p, i) =>
-                  `<li><button type="button" data-i="${i}" aria-pressed="${i === 0}" tabindex="${i ? -1 : 0}"><span class="place-n">${esc(p.name)}</span>${
+                  `<li><button type="button" data-i="${i}" aria-pressed="${i === 0}" tabindex="${i ? -1 : 0}"><i class="place-dot" aria-hidden="true"></i><span class="place-txt"><span class="place-n">${esc(p.name)}</span>${
                     p.country ? `<span class="place-c">${esc(p.country)}</span>` : ""
-                  }</button></li>`,
+                  }</span></button></li>`,
               )
               .join("")
           : `<li class="muted">No data: the list of known analog places did not load.</li>`;
@@ -247,11 +267,14 @@ export function homePage(ctx: Ctx): Page {
           }
           intro.known(known);
           if (places.length) choose(spot);
-          place();
+          if (!visible || el.hidden) intro.pause();
+          else place();
         })
         .catch(() => {});
     },
     show() {
+      visible = true;
+      intro?.resume();
       requestAnimationFrame(place);
       const t = home(m, "moon");
       if (counted || !t) return;
@@ -265,6 +288,10 @@ export function homePage(ctx: Ctx): Page {
         .catch(() => {
           counted = false;
         });
+    },
+    hide() {
+      visible = false;
+      intro?.pause();
     },
   };
 }

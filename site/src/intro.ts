@@ -14,6 +14,8 @@ export interface Intro {
   known(spots: Spot[]): void;
   place(site: Spot, name: string): void;
   chapter(at: number): void;
+  pause(): void;
+  resume(): void;
 }
 
 type Body = "earth" | World;
@@ -48,6 +50,7 @@ interface Globe {
 
 interface Mark {
   group: THREE.Group;
+  outer: THREE.Mesh;
   ring: THREE.MeshBasicMaterial;
   halo: THREE.MeshBasicMaterial;
   lit: number;
@@ -122,23 +125,78 @@ function stick(obj: THREE.Object3D, s: Spot, r: number) {
   return obj;
 }
 
+function starSprite() {
+  const cv = document.createElement("canvas");
+  cv.width = cv.height = 16;
+  const ctx = cv.getContext("2d");
+  if (ctx) {
+    const g = ctx.createRadialGradient(8, 8, 0, 8, 8, 8);
+    g.addColorStop(0, "rgba(255,255,255,1)");
+    g.addColorStop(0.35, "rgba(255,255,255,0.85)");
+    g.addColorStop(0.7, "rgba(255,255,255,0.18)");
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 16, 16);
+  }
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
 function stars() {
-  const n = 1400;
-  const pos = new Float32Array(n * 3);
   let seed = 7;
   const rnd = () => {
     seed = (seed * 16807) % 2147483647;
     return seed / 2147483647;
   };
-  for (let i = 0; i < n; i++) {
-    const u = rnd() * 2 - 1;
-    const a = rnd() * Math.PI * 2;
-    const k = Math.sqrt(1 - u * u);
-    pos.set([Math.cos(a) * k * 60, u * 60, Math.sin(a) * k * 60], i * 3);
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  return new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffffff, size: 1.4, sizeAttenuation: false, transparent: true, opacity: 0 }));
+  const sprite = starSprite();
+  const layer = (count: number, rMin: number, rSpan: number, lumMin: number, lumSpan: number, baseSize: number) => {
+    const pos = new Float32Array(count * 3);
+    const col = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const u = rnd() * 2 - 1;
+      const a = rnd() * Math.PI * 2;
+      const k = Math.sqrt(1 - u * u);
+      const radDist = rMin + rnd() * rSpan;
+      pos.set([Math.cos(a) * k * radDist, u * radDist, Math.sin(a) * k * radDist], i * 3);
+      const lum = lumMin + Math.pow(rnd(), 1.8) * lumSpan;
+      const tint = rnd();
+      // Subtle stellar temperature spread: cool blue-white, neutral, soft warm.
+      const r = tint < 0.25 ? 0.86 : tint > 0.82 ? 1.0 : 0.96;
+      const g = tint < 0.25 ? 0.93 : tint > 0.82 ? 0.93 : 0.98;
+      const b = tint < 0.25 ? 1.0 : tint > 0.82 ? 0.84 : 1.0;
+      col.set([r * lum, g * lum, b * lum], i * 3);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    const mat = new THREE.PointsMaterial({
+      size: baseSize,
+      sizeAttenuation: false,
+      vertexColors: true,
+      map: sprite,
+      alphaTest: 0.01,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    });
+    return { points: new THREE.Points(geo, mat), mat, baseSize };
+  };
+  const dust = layer(1500, 62, 12, 0.24, 0.44, 2.0);
+  const bright = layer(240, 56, 8, 0.68, 0.32, 3.4);
+  const group = new THREE.Group();
+  group.add(dust.points, bright.points);
+  return {
+    group,
+    setOpacity(p: number) {
+      dust.mat.opacity = 0.64 * p;
+      bright.mat.opacity = 0.92 * p;
+    },
+    setScale(dpr: number) {
+      dust.mat.size = dust.baseSize * dpr;
+      bright.mat.size = bright.baseSize * dpr;
+    },
+  };
 }
 
 function glow(tint: [number, number, number], reach: number) {
@@ -154,6 +212,101 @@ function glow(tint: [number, number, number], reach: number) {
   return { mesh: new THREE.Mesh(new THREE.SphereGeometry(reach, 64, 48), mat), mat };
 }
 
+function earthAtmosphere() {
+  // Outer BackSide shell computes exact line-of-sight impact parameter to Earth's center so the horizon peaks cleanly and decays to zero inside the mesh edge.
+  const haloMat = new THREE.ShaderMaterial({
+    uniforms: { k: { value: 0 } },
+    vertexShader: `
+      varying vec3 vPos;
+      varying vec3 vCenter;
+      varying float vRadius;
+      varying vec3 vSunDir;
+      void main() {
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vPos = mv.xyz;
+        vCenter = (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+        vRadius = length(modelViewMatrix[0].xyz);
+        vSunDir = normalize((viewMatrix * vec4(-5.0, 3.2, 5.5, 0.0)).xyz);
+        gl_Position = projectionMatrix * mv;
+      }
+    `,
+    fragmentShader: `
+      uniform float k;
+      varying vec3 vPos;
+      varying vec3 vCenter;
+      varying float vRadius;
+      varying vec3 vSunDir;
+      void main() {
+        vec3 rd = normalize(vPos);
+        vec3 pClosest = rd * dot(vCenter, rd);
+        vec3 radial = pClosest - vCenter;
+        float b = length(radial) / max(vRadius, 1e-4);
+        float h = max(0.0, b - 1.0);
+        float scatter = exp(-h * 24.0) * 0.78 + exp(-h * 9.5) * 0.22;
+        float edge = 1.0 - smoothstep(0.08, 0.175, h);
+        vec3 limbDir = normalize(radial + vec3(0.0, 1e-5, 0.0));
+        float sunLit = mix(0.36, 1.0, smoothstep(-0.55, 0.55, dot(limbDir, normalize(vSunDir))));
+        vec3 col = mix(vec3(0.008, 0.592, 0.871), vec3(0.42, 0.74, 1.0), exp(-h * 34.0));
+        float a = clamp(scatter * edge * sunLit * k, 0.0, 1.0);
+        gl_FragColor = vec4(col, a);
+      }
+    `,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    transparent: true,
+    depthWrite: false,
+  });
+
+  // Subtle FrontSide inner limb rim bridges Earth's surface edge smoothly into the cerulean halo.
+  const rimMat = new THREE.ShaderMaterial({
+    uniforms: { k: { value: 0 } },
+    vertexShader: `
+      varying vec3 vNormal;
+      varying vec3 vViewDir;
+      varying vec3 vSunDir;
+      void main() {
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vNormal = normalize(normalMatrix * normal);
+        vViewDir = normalize(-mv.xyz);
+        vSunDir = normalize((viewMatrix * vec4(-5.0, 3.2, 5.5, 0.0)).xyz);
+        gl_Position = projectionMatrix * mv;
+      }
+    `,
+    fragmentShader: `
+      uniform float k;
+      varying vec3 vNormal;
+      varying vec3 vViewDir;
+      varying vec3 vSunDir;
+      void main() {
+        vec3 N = normalize(vNormal);
+        vec3 V = normalize(vViewDir);
+        float ndotv = clamp(dot(N, V), 0.0, 1.0);
+        float fresnel = pow(1.0 - ndotv, 4.0);
+        float sunLit = mix(0.25, 1.0, smoothstep(-0.4, 0.55, dot(N, normalize(vSunDir))));
+        vec3 col = mix(vec3(0.008, 0.592, 0.871), vec3(0.54, 0.83, 1.0), pow(1.0 - ndotv, 5.0));
+        float a = clamp(fresnel * sunLit * k, 0.0, 1.0);
+        gl_FragColor = vec4(col, a);
+      }
+    `,
+    side: THREE.FrontSide,
+    blending: THREE.AdditiveBlending,
+    transparent: true,
+    depthWrite: false,
+  });
+
+  const halo = new THREE.Mesh(new THREE.SphereGeometry(1.18, 128, 96), haloMat);
+  const rim = new THREE.Mesh(new THREE.SphereGeometry(1.003, 128, 96), rimMat);
+  return {
+    halo,
+    rim,
+    set(p: number, dim: number) {
+      const s = p * dim;
+      haloMat.uniforms.k.value = s * 0.58;
+      rimMat.uniforms.k.value = s * 0.36;
+    },
+  };
+}
+
 function mark(color: number): Mark {
   const ring = new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide, transparent: true, opacity: 0 });
   const halo = new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide, transparent: true, opacity: 0 });
@@ -162,7 +315,7 @@ function mark(color: number): Mark {
   const outer = new THREE.Mesh(new THREE.RingGeometry(0.042, 0.046, 48), halo);
   group.add(inner, outer);
   group.visible = false;
-  return { group, ring, halo, lit: 0 };
+  return { group, outer, ring, halo, lit: 0 };
 }
 
 export function createIntro(el: HTMLElement, textures: Textures, homes: Record<World, Spot>, on: { world(w: World): void }): Intro {
@@ -185,7 +338,7 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
   sun.position.set(-5, 3.2, 5.5);
   scene.add(sun);
   const sky = stars();
-  scene.add(sky);
+  scene.add(sky.group);
 
   const loader = new THREE.TextureLoader();
   let loaded = 0;
@@ -233,6 +386,8 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
     ["moon", worlds.moon],
     ["mars", worlds.mars],
   ];
+  const atmo = earthAtmosphere();
+  earth.tilt.add(atmo.halo, atmo.rim);
   const haze = glow([0.99, 0.45, 0.3], 1.05);
   worlds.mars.tilt.add(haze.mesh);
 
@@ -250,6 +405,7 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
   let px = 0;
   let py = 0;
   let seen = true;
+  let active = true;
   let t0 = 0;
   let last = 0;
   let raf = 0;
@@ -262,12 +418,23 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
   let atGoal = 0;
   let frames = 0;
   let spent = 0;
-  let tagW = 0;
+
+  const canRun = () => active && seen && !document.hidden;
+  const stop = () => {
+    if (raf) {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    }
+  };
 
   const size = () => {
-    vw = el.clientWidth;
-    vh = Math.max(1, el.clientHeight);
+    const w = el.clientWidth;
+    const h = el.clientHeight;
+    if (!w || !h) return;
+    vw = w;
+    vh = h;
     renderer.setSize(vw, vh, false);
+    sky.setScale(ratio);
     camera.aspect = vw / vh;
     hh = FAR * Math.tan(rad(15));
     hw = hh * camera.aspect;
@@ -300,7 +467,7 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
   };
   const frame = (now: number) => {
     raf = 0;
-    if (!seen) return;
+    if (!canRun()) return;
     if (!t0) t0 = last = now;
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
@@ -316,8 +483,10 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
     const k1 = keys[i + 1];
     const val = (n: "lon" | "free" | "tilt" | "spot" | "known" | "dim") => mix(k0[n], k1[n], s);
     const free = val("free");
+    const dim = val("dim");
     const orb = k0.orb.map((n, j) => mix(n, k1.orb[j], s));
     const rise = still ? 0 : (1 - ease(clamp(t / 2.4))) * 0.5;
+    const pulse = still ? 0 : 0.5 + 0.5 * Math.sin(t * 2.1);
 
     for (const [id, g] of bodies) {
       const from = k0[id];
@@ -347,24 +516,27 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
         const sway = still ? 0 : Math.sin(t * 0.12) * 0.2;
         g.spin.rotation.y = mix(g.cur.y, g.cur.y + wrap(face - g.cur.y) + sway, free);
       } else g.spin.rotation.y = g.cur.y + (still ? 0 : Math.sin(t * 0.2 + (id === "moon" ? 1 : 4)) * 0.04);
-      g.mat.color.setScalar(p * (id === "earth" ? val("dim") : 1));
+      g.mat.color.setScalar(p * (id === "earth" ? dim : 1));
       g.mat.emissiveIntensity = (1 - p) * 0.8;
       const m = marks[id];
       m.lit += (1 - m.lit) * (still ? 1 : 1 - Math.exp(-dt * 6));
       const w = (id === "earth" ? val("spot") : 1) * p;
+      m.outer.scale.setScalar(still ? 1 : 1 + pulse * 0.16);
       m.ring.opacity = 0.95 * m.lit * w;
-      m.halo.opacity = 0.5 * m.lit * w;
+      m.halo.opacity = (still ? 0.5 : 0.32 + 0.3 * (1 - pulse)) * m.lit * w;
     }
+    atmo.set(p, dim);
     haze.mat.uniforms.k.value = p * 0.35;
     faint.opacity = 0.12 * p;
     dotMat.opacity = 0.8 * p;
-    (sky.material as THREE.PointsMaterial).opacity = 0.75 * p;
+    sky.setOpacity(p);
     knownMat.opacity = val("known") * p * 0.95;
     olds.visible = knownMat.opacity > 0.01;
 
     const e = earth.tilt.position;
     camera.position.set(still ? 0 : px * 0.18, still ? 0 : -py * 0.12, FAR);
     camera.lookAt(0, 0, 0);
+    camera.updateMatrixWorld();
 
     const spot = val("spot") * p;
     const em = marks.earth;
@@ -375,9 +547,24 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
       const front = n.dot(ou.copy(camera.position).sub(v).normalize());
       v.project(camera);
       const x = ((v.x + 1) / 2) * vw;
-      const left = x + tagW + 36 > vw;
+      const y = ((1 - v.y) / 2) * vh;
+      const w = tag.offsetWidth || tag.getBoundingClientRect().width;
+      const h = tag.offsetHeight || 30;
+      const rightGutter = vw >= 900 ? 52 : 12;
+      const leftMargin = 12;
+      const topMargin = 16;
+      const offset = 28;
+      const left = x + offset + w > vw - rightGutter;
+      const bothClip = left && x - offset - w < leftMargin;
+      const rawX = bothClip ? x - w / 2 : left ? x - offset - w : x + offset;
+      const maxX = Math.max(leftMargin, vw - rightGutter - w);
+      const tx = Math.max(leftMargin, Math.min(maxX, rawX));
+      const overlapsDot = bothClip || (tx < x + 12 && tx + w > x - 12);
+      const rawY = overlapsDot ? (y - h - 18 >= topMargin ? y - h - 18 : y + 18) : y - h / 2;
+      const maxY = Math.max(topMargin, Math.min(vh - 40, vh - h - 16));
+      const ty = Math.max(topMargin, Math.min(maxY, rawY));
       tag.classList.toggle("left", left);
-      tag.style.transform = `translate(${left ? x - tagW : x}px, ${((1 - v.y) / 2) * vh}px)`;
+      tag.style.transform = `translate3d(${Math.round(tx)}px, ${Math.round(ty)}px, 0)`;
       tag.style.opacity = String(spot * clamp((front - 0.15) * 5));
     } else tag.style.opacity = "0";
 
@@ -392,10 +579,13 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
         size();
       }
     }
-    raf = requestAnimationFrame(frame);
+    if (canRun()) raf = requestAnimationFrame(frame);
   };
   const run = () => {
-    if (!raf && seen) raf = requestAnimationFrame(frame);
+    if (!raf && canRun()) {
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
   };
 
   const ray = new THREE.Raycaster();
@@ -429,9 +619,13 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
   }).observe(el);
   new IntersectionObserver(([e]) => {
     seen = e.isIntersecting;
-    last = performance.now();
-    run();
+    if (!seen) stop();
+    else run();
   }).observe(el);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stop();
+    else run();
+  });
   size();
   run();
 
@@ -461,11 +655,19 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
     },
     place(s, name) {
       tag.textContent = name;
-      tagW = tag.offsetWidth;
       pin(earth, marks.earth, s, 0.9, { lat: Math.max(-70, Math.min(70, s.lat)), lon: s.lon });
     },
     chapter(c) {
       atGoal = Math.max(0, Math.min(keys.length - 1, c));
+      run();
+    },
+    pause() {
+      active = false;
+      stop();
+    },
+    resume() {
+      active = true;
+      size();
       run();
     },
   };

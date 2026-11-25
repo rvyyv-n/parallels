@@ -99,12 +99,38 @@ export async function thumb(cv: HTMLCanvasElement, t: Target) {
   }
   stretch(out.data);
   ctx.putImageData(out, 0, 0);
-  ctx.lineWidth = n / 40;
-  ctx.strokeStyle = "rgba(2, 7, 10, 0.7)";
-  ctx.beginPath();
-  ctx.arc(n / 2, n / 2, n * 0.11, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.lineWidth = n / 64;
+  ctx.save();
+  // Subtle optical vignette gives each orbital crop clean instrument framing.
+  const vig = ctx.createRadialGradient(n / 2, n / 2, n * 0.34, n / 2, n / 2, n * 0.74);
+  vig.addColorStop(0, "rgba(2, 7, 10, 0)");
+  vig.addColorStop(1, "rgba(2, 7, 10, 0.36)");
+  ctx.fillStyle = vig;
+  ctx.fillRect(0, 0, n, n);
+
+  const cx = n / 2;
+  const cy = n / 2;
+  const r = n * 0.115;
+  const t0 = r + n * 0.035;
+  const t1 = r + n * 0.09;
+  const trace = () => {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.moveTo(cx, cy - t0);
+    ctx.lineTo(cx, cy - t1);
+    ctx.moveTo(cx, cy + t0);
+    ctx.lineTo(cx, cy + t1);
+    ctx.moveTo(cx - t0, cy);
+    ctx.lineTo(cx - t1, cy);
+    ctx.moveTo(cx + t0, cy);
+    ctx.lineTo(cx + t1, cy);
+    ctx.stroke();
+  };
+  ctx.lineCap = "round";
+  ctx.lineWidth = n / 38;
+  ctx.strokeStyle = "rgba(2, 7, 10, 0.76)";
+  trace();
+  ctx.lineWidth = n / 68;
   ctx.strokeStyle = "#5bbbe9";
-  ctx.stroke();
+  trace();
+  ctx.restore();
 }
