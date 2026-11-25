@@ -171,3 +171,19 @@ test("E3: the tour from Home picks a Moon site, walks the Finder, opens a Place,
   await box.locator(".tour-next").click();
   await expect(box).toBeHidden();
 });
+
+test("E3b: the guided tour renders 9 step pips alongside exact step text and supports ArrowRight and ArrowLeft", async ({ page }) => {
+  await page.goto("/#/");
+  await page.locator("#tour-home").click();
+  const box = page.locator(".tour-box");
+  await expect(box.locator(".tour-n")).toHaveText("1 of 9");
+  await expect(box.locator(".tour-pip")).toHaveCount(9);
+  await expect(box.locator(".tour-pip.is-now")).toHaveCount(1);
+  await page.keyboard.press("ArrowRight");
+  await expect(box.locator(".tour-n")).toHaveText("2 of 9");
+  await expect(page).toHaveURL(/#\/find\?t=moon-/);
+  await page.keyboard.press("ArrowLeft");
+  await expect(box.locator(".tour-n")).toHaveText("1 of 9");
+  await page.keyboard.press("Escape");
+  await expect(box).toBeHidden();
+});

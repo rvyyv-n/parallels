@@ -1,6 +1,7 @@
 import "./learn.css";
 import { placeName } from "../card";
 import type { Body, LabelPoint, Manifest, Target, Trait } from "../contract";
+import { bindPillRange, syncPillRange } from "../controls";
 import type { Cols } from "../data";
 import { bits, esc, num, reduced, unit } from "../format";
 import type { Page } from "../router";
@@ -12,6 +13,7 @@ const IMG = `${import.meta.env.BASE_URL}img/`;
 const WORLD = { moon: "the Moon", mars: "Mars" };
 const NAME = { earth: "Earth", moon: "Moon", mars: "Mars" };
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const MONTH_LETTERS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
 const CLOSE = 0.8;
 const TEMPS: Record<string, [string, string]> = {
   cold: ["Coldest", "The lowest temperature of the ground."],
@@ -45,8 +47,10 @@ interface Pair {
   close: boolean;
 }
 
+const defaultFilter = (m: Manifest) => m.filters.find((f) => f.id === "balanced") ?? m.filters[0];
 const ext = (url: string, text: string, cls = "") => `<a${cls ? ` class="${cls}"` : ""} href="${esc(url)}" target="_blank" rel="noopener">${esc(text)}</a>`;
 const short = (s: string) => s.split(" (")[0];
+const cap = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 const host = (url: string) => {
   try {
     return new URL(url).hostname.replace(/^www\./, "");
@@ -86,6 +90,39 @@ function usedFor(note: string | undefined, w: Body) {
   const parts = m[1].split(";").map((s) => s.trim());
   if (parts.length === 1 && !/^(Moon|Mars):/.test(parts[0])) return parts[0];
   return parts.find((p) => p.startsWith(`${NAME[w]}:`))?.replace(/^\w+:\s*/, "") ?? "";
+}
+
+function findCell(cells: Cols | null, lat: number, lon: number): number {
+  if (!cells?.lat || !cells?.lon) return -1;
+  const r = Math.floor((90 - lat) / 0.5);
+  const c = Math.floor((lon + 180) / 0.5);
+  const n = cells.lat.length;
+  let best = -1;
+  let bestD2 = Infinity;
+  for (let i = 0; i < n; i++) {
+    const la = cells.lat[i];
+    const lo = cells.lon[i];
+    if (Math.floor((90 - la) / 0.5) === r && Math.floor((lo + 180) / 0.5) === c) return i;
+    const dLat = Math.abs(la - lat);
+    const dLon = Math.abs(lo - lon);
+    if (dLat <= 0.5 && dLon <= 0.5) {
+      const d2 = dLat * dLat + dLon * dLon;
+      if (d2 < bestD2) {
+        bestD2 = d2;
+        best = i;
+      }
+    }
+  }
+  return best;
+}
+
+function monthTags(best: boolean[], frz: boolean[], rain: boolean[], i: number): [string, string][] {
+  if (best[i]) return [["Best month", "is-match"]];
+  const tags: [string, string][] = [];
+  if (frz[i]) tags.push(["Freeze–thaw", "is-break"]);
+  if (rain[i]) tags.push(["Rainy", "is-break"]);
+  if (!tags.length) tags.push(["Frozen", "is-break"]);
+  return tags;
 }
 
 function pairs(m: Manifest, t: Target, cells: Cols, cols: Cols, i: number): Pair[] {
@@ -148,9 +185,11 @@ function cant(m: Manifest, w: Body) {
       <div class="chips ln-switch" role="group" aria-label="Load">${LOADS.map(
         (l, k) => `<button type="button" class="chip" data-load="${esc(l.id)}" aria-pressed="${k === 0}">${esc(l.short)}</button>`,
       ).join("")}</div>
-      <p class="ln-load" id="ln-load"></p>
-      <ul class="ln-weights" id="ln-weights"></ul>
-      <p class="ln-src">Gravity: ${ext(g.row.url, g.row.source)}</p>`
+      <div class="ln-panel">
+        <p class="ln-load" id="ln-load"></p>
+        <ul class="ln-weights" id="ln-weights"></ul>
+        <p class="ln-src">Gravity: ${ext(g.row.url, g.row.source)}</p>
+      </div>`
         : ""
     }
     <dl class="ln-pairs">${others
@@ -184,14 +223,18 @@ function weights(m: Manifest, w: Body, id: string) {
 function photos() {
   return `<section class="ln-sec ln-photos" data-testid="learn-photos" aria-labelledby="photos-h">
     ${heading("photos-h", 5, "Same process, two worlds")}
-    <p class="ln-lede">The same forces change the surface of Earth and of its neighbours. These NASA photos show one pair for each process.</p>
+    <p class="ln-lede">The same forces change the surface of Earth and of its neighbours. These NASA photos show one pair for each process. Select a pair to enlarge it.</p>
     <div class="ln-pairs-grid">${PHOTOS.map(
-      (p) => `<figure class="ln-pair" data-pair="${esc(p.pair)}"><div class="ln-pair-imgs">${p.photos
+      (p, k) => `<figure class="ln-pair" data-pair="${esc(p.pair)}"><button type="button" class="ln-pair-btn" data-pair-open="${k}" aria-label="${esc(
+        `Enlarge ${p.pair} photo pair`,
+      )}"><span class="ln-pair-imgs">${p.photos
         .map(
           (x) =>
-            `<div class="ln-photo"><img src="${IMG}learn/${esc(x.file)}" alt="${esc(x.alt)}" loading="lazy" decoding="async"><span class="ln-tag">${esc(x.world)}</span></div>`,
+            `<span class="ln-photo"><img src="${IMG}learn/${esc(x.file)}" alt="${esc(x.alt)}" loading="lazy" decoding="async"><span class="ln-tag">${esc(x.world)}</span></span>`,
         )
-        .join("")}</div><figcaption>${esc(p.line)}<small>${p.photos.map((x) => `${esc(x.credit)} (${esc(x.id)})`).join(" · ")}</small></figcaption></figure>`,
+        .join("")}</span><span class="ln-zoom-hint" aria-hidden="true">Enlarge</span></button><figcaption>${esc(p.line)}<small>${p.photos
+        .map((x) => `${esc(x.credit)} (${esc(x.id)})`)
+        .join(" · ")}</small></figcaption></figure>`,
     ).join("")}</div>
   </section>`;
 }
@@ -207,6 +250,9 @@ export function learnPage(ctx: Ctx): Page {
   let bestName = "";
   let target: Target;
   let points: LabelPoint[] = [];
+  let gridCells: Cols | null = null;
+  let unbindMonth: (() => void) | null = null;
+  let lightboxTrigger: HTMLElement | null = null;
 
   const $ = <T extends HTMLElement>(q: string) => el.querySelector<T>(q);
 
@@ -235,28 +281,75 @@ export function learnPage(ctx: Ctx): Page {
       }</p>`;
   };
 
-  const drawYear = () => {
+  const drawYear = (rebuild = false) => {
     const out = $("#ln-month-name");
     if (out) out.textContent = MONTHS[month];
+    const slider = $<HTMLInputElement>("#ln-month");
+    if (slider) {
+      if (slider.value !== String(month)) slider.value = String(month);
+      slider.setAttribute("aria-valuetext", MONTHS[month]);
+      syncPillRange(slider);
+    }
     const list = $("#ln-places");
     if (!list) return;
-    list.innerHTML = masks
-      .map((p) => {
+
+    const existing = list.querySelectorAll<HTMLLIElement>('[data-testid="year-place"]');
+    if (!rebuild && existing.length === masks.length && masks.length > 0) {
+      for (const h of list.querySelectorAll<HTMLElement>(".ln-mhead [data-hm]")) {
+        h.toggleAttribute("data-now", Number(h.dataset.hm) === month);
+      }
+      masks.forEach((p, idx) => {
+        const li = existing[idx];
         const best = bits(p.best);
         const frz = bits(p.freeze);
         const rain = bits(p.rain);
-        const tags = best[month]
-          ? [["Best month", "is-match"]]
-          : [frz[month] && ["Freeze–thaw", "is-break"], rain[month] && ["Rainy", "is-break"]].filter((x): x is string[] => !!x);
-        if (!tags.length) tags.push(["Frozen", "is-break"]);
-        const { name, country } = split(p.name);
-        return `<li data-testid="year-place" data-best="${best[month]}" data-freeze="${frz[month]}" data-rain="${rain[month]}">
-          <span class="ln-place">${esc(name)}${country ? `<small>${esc(country)}</small>` : ""}</span>
-          <span class="ln-cells" aria-hidden="true">${best.map((on, i) => `<i${on ? " data-best" : " data-avoid"}${i === month ? " data-now" : ""}></i>`).join("")}</span>
-          <span class="ln-tags">${tags.map(([t, c]) => `<b class="${c}">${esc(t)}</b>`).join("")}</span>
-        </li>`;
-      })
-      .join("");
+        const tags = monthTags(best, frz, rain, month);
+        li.dataset.best = String(best[month]);
+        li.dataset.freeze = String(frz[month]);
+        li.dataset.rain = String(rain[month]);
+        for (const btn of li.querySelectorAll<HTMLButtonElement>(".ln-mcell")) {
+          const isNow = Number(btn.dataset.m) === month;
+          btn.toggleAttribute("data-now", isNow);
+          btn.setAttribute("aria-pressed", String(isNow));
+        }
+        const tagBox = li.querySelector<HTMLElement>(".ln-tags");
+        if (tagBox) tagBox.innerHTML = tags.map(([t, c]) => `<b class="${c}">${esc(t)}</b>`).join("");
+      });
+      return;
+    }
+
+    const head = masks.length
+      ? `<li class="ln-places-head" aria-hidden="true"><span class="ln-ph-place">Place</span><span class="ln-mhead">${MONTH_LETTERS.map(
+          (ch, i) => `<i data-hm="${i}"${i === month ? " data-now" : ""}>${ch}</i>`,
+        ).join("")}</span><span class="ln-ph-status">Selected month</span></li>`
+      : "";
+    list.innerHTML =
+      head +
+      masks
+        .map((p) => {
+          const best = bits(p.best);
+          const frz = bits(p.freeze);
+          const rain = bits(p.rain);
+          const tags = monthTags(best, frz, rain, month);
+          const { name, country } = split(p.name);
+          const cellsHtml = best
+            .map((on, i) => {
+              const status = monthTags(best, frz, rain, i)
+                .map(([t]) => t.toLowerCase())
+                .join(", ");
+              const label = `${name}, ${MONTHS[i]}: ${status}`;
+              return `<button type="button" class="ln-mcell" data-m="${i}" aria-label="${esc(label)}" aria-pressed="${i === month}" title="${esc(
+                `${MONTHS[i]}: ${status}`,
+              )}"${on ? " data-best" : " data-avoid"}${i === month ? " data-now" : ""}></button>`;
+            })
+            .join("");
+          return `<li data-testid="year-place" data-best="${best[month]}" data-freeze="${frz[month]}" data-rain="${rain[month]}">
+            <span class="ln-place">${esc(name)}${country ? `<small>${esc(country)}</small>` : ""}</span>
+            <span class="ln-cells" role="group" aria-label="${esc(`${name} by month`)}">${cellsHtml}</span>
+            <span class="ln-tags">${tags.map(([t, c]) => `<b class="${c}">${esc(t)}</b>`).join("")}</span>
+          </li>`;
+        })
+        .join("");
   };
 
   const drawAnalog = (id: string) => {
@@ -266,17 +359,50 @@ export function learnPage(ctx: Ctx): Page {
     for (const b of el.querySelectorAll<HTMLButtonElement>(".ln-pin")) b.setAttribute("aria-pressed", String(b.dataset.id === p.id));
     const link = p.analog_source ?? p.source;
     const used = usedFor(p.note, world);
+    const filter = defaultFilter(m);
+    const cell = findCell(gridCells, p.lat, p.lon);
+    const inspectHref =
+      cell >= 0
+        ? `#/place?t=${encodeURIComponent(target.id)}&f=${encodeURIComponent(filter.id)}&c=${cell}`
+        : `#/find?t=${encodeURIComponent(target.id)}&known=1`;
     card.innerHTML = `<h3>${esc(p.name)}</h3>${p.country ? `<p class="ln-country">${esc(p.country)}</p>` : ""}${
       used ? `<p class="ln-used">Practised here: <b>${esc(used)}</b></p>` : ""
-    }<p>${esc(testedThere(p.note))}</p>${link ? `<p>${ext(link, `Source: ${host(link)}`, "ln-src")}</p>` : ""}`;
+    }<p>${esc(testedThere(p.note))}</p><div class="ln-analog-foot"><a class="ln-inspect" href="${inspectHref}">Inspect in Finder <span aria-hidden="true">→</span></a>${
+      link ? ext(link, `Source: ${host(link)}`, "ln-src") : ""
+    }</div>`;
+  };
+
+  const openLightbox = (k: number, trigger: HTMLElement) => {
+    const p = PHOTOS[k];
+    const dlg = $<HTMLDialogElement>("#ln-lightbox");
+    if (!p || !dlg) return;
+    lightboxTrigger = trigger;
+    dlg.innerHTML = `<div class="ln-lb-head">
+        <div>
+          <p class="ln-k">Same process, two worlds</p>
+          <h3 id="ln-lb-h">${esc(cap(p.pair))}</h3>
+        </div>
+        <button type="button" class="ln-lb-x" aria-label="Close photo view">×</button>
+      </div>
+      <div class="ln-lb-grid">${p.photos
+        .map(
+          (x) => `<figure class="ln-lb-fig">
+            <div class="ln-lb-img"><img src="${IMG}learn/${esc(x.file)}" alt="${esc(x.alt)}" decoding="async"><span class="ln-tag">${esc(x.world)}</span></div>
+            <figcaption><b>${esc(x.title)}</b><small>${esc(x.credit)} · NASA ID ${esc(x.id)}</small></figcaption>
+          </figure>`,
+        )
+        .join("")}</div>
+      <p class="ln-lb-line">${esc(p.line)}</p>`;
+    if (!dlg.open) dlg.showModal();
   };
 
   async function fill(w: Body, mine: number) {
     const t = target;
-    const filter = m.filters[0];
+    const filter = defaultFilter(m);
     const [d, cols, labels] = await Promise.all([ctx.data(), ctx.cols(t), ctx.labels()]);
     if (mine !== seq) return;
     const cells = d.cells;
+    gridCells = cells;
     const score = cols[`score:${filter.id}`];
     const ids = score ? top(score, 5, cells).ids : [];
 
@@ -298,27 +424,32 @@ export function learnPage(ctx: Ctx): Page {
 
     const yr = $("#ln-year")!;
     masks = ids.map((i) => ({ name: placeName(m, cells, i), best: cells.m_best?.[i] ?? NaN, freeze: cells.m_freeze?.[i] ?? NaN, rain: cells.m_rain?.[i] ?? NaN }));
-    $("#ln-year-lede")!.textContent = `The season sets when a test can start. Move the slider to see each month at the five best places for ${t.short} (${filter.name.toLowerCase()} test).`;
-    drawYear();
+    $("#ln-year-lede")!.textContent = `The season sets when a test can start. Move the slider or pick any month square to see each month at the five best places for ${t.short} (${filter.name.toLowerCase()} test).`;
+    drawYear(true);
     yr.setAttribute("aria-busy", "false");
 
     points = labels.filter((l) => l.kind === "known_analog" && l.groups?.some((g) => g.startsWith(`${w}-`))).sort((a, b) => a.lon - b.lon);
     $("#ln-analog-lede")!.textContent = `Teams practise for ${WORLD[w]} at these ${points.length} places. Select a place.`;
     $("#ln-pins")!.innerHTML = points
-      .map(
-        (p) =>
-          `<button type="button" class="ln-pin" data-id="${esc(p.id)}" style="left:${(((p.lon + 180) / 360) * 100).toFixed(3)}%;top:${(((90 - p.lat) / 180) * 100).toFixed(3)}%" aria-label="${esc(
-            p.country ? `${p.name}, ${p.country}` : p.name,
-          )}" aria-pressed="false"></button>`,
-      )
+      .map((p) => {
+        const leftPct = ((p.lon + 180) / 360) * 100;
+        const topPct = ((90 - p.lat) / 180) * 100;
+        const tipX = leftPct < 22 ? ' data-tip-x="left"' : leftPct > 78 ? ' data-tip-x="right"' : "";
+        const tipY = topPct < 22 ? ' data-tip-y="below"' : "";
+        return `<button type="button" class="ln-pin" data-id="${esc(p.id)}" data-tip="${esc(p.name)}"${tipX}${tipY} style="left:${leftPct.toFixed(3)}%;top:${topPct.toFixed(3)}%" aria-label="${esc(
+          p.country ? `${p.name}, ${p.country}` : p.name,
+        )}" aria-pressed="false"></button>`;
+      })
       .join("");
     drawAnalog(points.some((p) => p.id === "haughton-crater-devon-island") ? "haughton-crater-devon-island" : (points[0]?.id ?? ""));
     $("#ln-analogs")!.setAttribute("aria-busy", "false");
   }
 
   function render(w: Body) {
+    unbindMonth?.();
+    unbindMonth = null;
     target = home(m, w)!;
-    const filter = m.filters[0];
+    const filter = defaultFilter(m);
     el.dataset.world = w;
     el.innerHTML = `<div class="ln" data-testid="learn" data-world="${w}">
       <nav class="ln-worlds" aria-label="World">${(["moon", "mars"] as const)
@@ -332,16 +463,18 @@ export function learnPage(ctx: Ctx): Page {
       <section class="ln-sec" id="ln-year" data-testid="learn-year" aria-labelledby="year-h" aria-busy="true">
         ${heading("year-h", 2, "A year on Earth")}
         <p class="ln-lede" id="ln-year-lede">The season sets when a test can start.</p>
-        <div class="ln-month">
-          <label for="ln-month" class="sr">Month</label>
-          <input id="ln-month" class="ln-slider" type="range" min="0" max="11" step="1" value="${month}" aria-valuetext="${MONTHS[month]}">
-          <output for="ln-month" class="ln-month-name" id="ln-month-name" data-testid="month-name">${MONTHS[month]}</output>
+        <div class="ln-panel ln-year-panel">
+          <div class="ln-month">
+            <label for="ln-month" class="sr">Month</label>
+            <input id="ln-month" class="ln-slider" type="range" min="0" max="11" step="1" value="${month}" aria-valuetext="${MONTHS[month]}">
+            <output for="ln-month" class="ln-month-name" id="ln-month-name" data-testid="month-name">${MONTHS[month]}</output>
+          </div>
+          <p class="ln-key"><span><i data-best></i>Best month: no freeze–thaw, no rain and no frost</span><span><i data-avoid></i>Freeze–thaw, rainy or frozen</span></p>
+          <ol class="ln-places" id="ln-places"></ol>
+          <p class="ln-src">Months from ${ext(m.datasets.find((x) => x.id === "power_merra2")?.url ?? "https://power.larc.nasa.gov/", "NASA POWER climatology (MERRA-2)")}, for each patch of approximately 50 km. We rank the places with the ${esc(
+            filter.name.toLowerCase(),
+          )} test, as the Finder does.</p>
         </div>
-        <p class="ln-key"><span><i data-best></i>Best month: no freeze–thaw, no rain and no frost</span><span><i data-avoid></i>Freeze–thaw, rainy or frozen</span></p>
-        <ol class="ln-places" id="ln-places"></ol>
-        <p class="ln-src">Months from ${ext(m.datasets.find((x) => x.id === "power_merra2")?.url ?? "https://power.larc.nasa.gov/", "NASA POWER climatology (MERRA-2)")}, for each patch of approximately 50 km. We rank the places with the ${esc(
-          filter.name.toLowerCase(),
-        )} test, as the Finder does.</p>
       </section>
       ${cant(m, w)}
       <section class="ln-sec" id="ln-analogs" data-testid="learn-analogs" aria-labelledby="analogs-h" aria-busy="true">
@@ -358,7 +491,21 @@ export function learnPage(ctx: Ctx): Page {
         <p class="ln-lede">See where Earth matches ${esc(target.short)}, and where the match breaks.</p>
         <a class="ln-cta" data-testid="learn-find" href="#/find?t=${encodeURIComponent(target.id)}">Find the matches on Earth <span aria-hidden="true">→</span></a>
       </section>
+      <dialog class="ln-lightbox" id="ln-lightbox" aria-labelledby="ln-lb-h"></dialog>
     </div>`;
+
+    const monthInput = $<HTMLInputElement>("#ln-month");
+    if (monthInput) unbindMonth = bindPillRange(monthInput);
+
+    const dlg = $<HTMLDialogElement>("#ln-lightbox");
+    dlg?.addEventListener("click", (ev) => {
+      if (ev.target === dlg || (ev.target as Element).closest(".ln-lb-x")) dlg.close();
+    });
+    dlg?.addEventListener("close", () => {
+      if (lightboxTrigger?.isConnected) lightboxTrigger.focus({ preventScroll: true });
+      lightboxTrigger = null;
+    });
+
     drawLoad(LOADS[0].id);
     const mine = ++seq;
     fill(w, mine).catch(() => {
@@ -375,17 +522,22 @@ export function learnPage(ctx: Ctx): Page {
     mount(e) {
       el = e;
       el.addEventListener("click", (ev) => {
-        const b = (ev.target as Element).closest<HTMLElement>("[data-load],[data-temp],.ln-pin");
+        const b = (ev.target as Element).closest<HTMLElement>("[data-load],[data-temp],.ln-pin,[data-m],[data-pair-open]");
         if (!b) return;
         if (b.dataset.load) drawLoad(b.dataset.load);
         else if (b.dataset.temp) drawTemp(Number(b.dataset.temp));
         else if (b.dataset.id) drawAnalog(b.dataset.id);
+        else if (b.dataset.m != null) {
+          month = Number(b.dataset.m);
+          drawYear();
+        } else if (b.dataset.pairOpen != null) {
+          openLightbox(Number(b.dataset.pairOpen), b);
+        }
       });
       el.addEventListener("input", (ev) => {
         const s = ev.target as HTMLInputElement;
         if (s.id !== "ln-month") return;
         month = Number(s.value);
-        s.setAttribute("aria-valuetext", MONTHS[month]);
         drawYear();
       });
       el.classList.toggle("ln-still", reduced());
@@ -396,6 +548,10 @@ export function learnPage(ctx: Ctx): Page {
       world = w;
       render(w);
       $("h1")?.focus({ preventScroll: true });
+    },
+    hide() {
+      const dlg = $<HTMLDialogElement>("#ln-lightbox");
+      if (dlg?.open) dlg.close();
     },
   };
 }

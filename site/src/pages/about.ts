@@ -10,6 +10,8 @@ import type { Ctx } from "./ctx";
 
 const pc = (v: number) => `${num(Math.floor(v * 100 + 1e-9))}%`;
 
+const TOC_IDS = ["scoring", "checked", "challenge", "data", "limits", "credits"] as const;
+
 const head = (id: string, k: string, title: string, lede = "") =>
   `<header class="ab-head"><p class="sec-k">${esc(k)}</p><h2 id="${id}-h">${esc(title)}</h2>${lede ? `<p class="ab-lede">${lede}</p>` : ""}</header>`;
 
@@ -30,7 +32,7 @@ function intro(m: Manifest) {
       ["limits", "Limits"],
       ["credits", "Team"],
     ]
-      .map(([id, t]) => `<a href="#${id}">${t}</a>`)
+      .map(([id, t]) => `<a href="#${id}" data-toc="${id}">${t}</a>`)
       .join("")}</nav>
   </section>`;
 }
@@ -52,12 +54,12 @@ function scoring(m: Manifest) {
     "scoring",
     "Method",
     "How scoring works",
-    `<ol class="ab-steps">${steps.map(([t, x], i) => `<li><span class="ab-n">${i + 1}</span><b>${t}</b><p>${x}</p></li>`).join("")}</ol>
+    `<ol class="ab-steps">${steps.map(([t, x], i) => `<li><span class="ab-n">${String(i + 1).padStart(2, "0")}</span><b>${t}</b><p>${x}</p></li>`).join("")}</ol>
     <details class="ab-fold"><summary>The exact rule</summary><p>${esc(m.scoring.rule)}</p><p>${esc(m.scoring.yearround_rule)}</p></details>`,
   );
 }
 
-type Run = { title: string; tests: ValidationTest[]; adopted?: boolean; preset?: string };
+type Run = { title: string; tests: ValidationTest[]; adopted?: boolean; preset?: string; method_change?: string };
 
 const judged = (r: Run) => r.tests.flatMap((t) => t.checks).filter((c) => c.passed != null);
 const tally = (r: Run) => `${num(judged(r).filter((c) => c.passed).length)} of ${num(judged(r).length)}`;
@@ -66,6 +68,108 @@ function pooled(r: Run, body: string) {
   const t = r.tests.find((x) => x.title.toLowerCase().startsWith(body) && x.title.toLowerCase().includes("challenge by challenge"));
   const c = t?.checks.find((x) => /^all challenges pooled/i.test(x.name));
   return c && c.result != null ? c : null;
+}
+
+function runLabel(r: Run, i: number) {
+  if (r.preset) return `${r.preset[0].toUpperCase()}${r.preset.slice(1)} preset`;
+  const ver = r.title.match(/method version ([\d.]+)/i)?.[1];
+  return ver ? `Run ${i + 1} · v${ver}` : `Run ${i + 1}`;
+}
+
+function placeLabel(t: ValidationTest, slug: string) {
+  return t.places?.find((p) => p.id === slug)?.name ?? slug.replace(/-/g, " ");
+}
+
+function valDetails(v: Validation, runs: Run[], now: Run) {
+  const prog = `<div class="ab-prog" aria-label="Method progression">${runs
+    .map((r, i) => {
+      const mPool = pooled(r, "moon");
+      const rPool = pooled(r, "mars");
+      const status =
+        r === now
+          ? `<span class="ab-badge is-pass">Adopted</span>`
+          : r.preset
+            ? `<span class="ab-badge is-info">Preset</span>`
+            : i === 0
+              ? `<span class="ab-badge">Baseline</span>`
+              : `<span class="ab-badge">Prior</span>`;
+      const held =
+        mPool?.held_out_only != null && rPool?.held_out_only != null
+          ? `<span class="ab-prog-ho">Held-out: Moon ${pc(mPool.held_out_only)} · Mars ${pc(rPool.held_out_only)}</span>`
+          : `<span class="ab-prog-ho">Whole-site checks only</span>`;
+      return `<div class="ab-prog-card${r === now ? " is-now" : ""}">
+        <div class="ab-prog-top"><b>${esc(runLabel(r, i))}</b>${status}</div>
+        <p class="ab-prog-tally"><strong>${tally(r)}</strong> checks pass</p>
+        ${held}
+      </div>`;
+    })
+    .join("")}</div>`;
+
+  const checksTable = `<div class="ab-vscroll"><table class="ab-vtable">
+    <thead><tr><th scope="col">Check</th><th scope="col" class="n">Result</th><th scope="col" class="n">Held-out</th><th scope="col" class="n">Pass mark</th><th scope="col">Status</th></tr></thead>
+    ${now.tests
+      .map(
+        (t) =>
+          `<tbody><tr class="ab-vtg"><th scope="rowgroup" colspan="5">${esc(t.title)}</th></tr>${t.checks
+            .map((c) => {
+              const badge =
+                c.passed === true
+                  ? `<span class="ab-badge is-pass">Pass</span>`
+                  : c.passed === false
+                    ? `<span class="ab-badge is-fail">Miss</span>`
+                    : `<span class="ab-badge">Too few</span>`;
+              return `<tr>
+                <th scope="row">${esc(c.name)}</th>
+                <td class="n" data-col="Result">${c.result != null ? pc(c.result) : "—"}</td>
+                <td class="n" data-col="Held-out">${c.held_out_only != null ? pc(c.held_out_only) : "—"}</td>
+                <td class="n" data-col="Pass mark">${pc(c.pass_mark)}</td>
+                <td data-col="Status">${badge}</td>
+              </tr>`;
+            })
+            .join("")}</tbody>`,
+      )
+      .join("")}
+  </table></div>`;
+
+  const seenMiss = new Set<string>();
+  const misses: { group: string; name: string; why: string }[] = [];
+  for (const t of now.tests) {
+    for (const ms of t.misses ?? []) {
+      const key = `${ms.place}|${ms.why}`;
+      if (seenMiss.has(key)) continue;
+      seenMiss.add(key);
+      misses.push({ group: t.title, name: placeLabel(t, ms.place), why: ms.why });
+    }
+  }
+  const missHtml = misses.length
+    ? `<h4 class="ab-vh">Honest misses in this run (${num(misses.length)})</h4>
+      <ul class="ab-misses">${misses
+        .map((x) => `<li><b>${esc(x.name)}</b> <span class="ab-miss-g">${esc(x.group)}</span><p>${esc(x.why)}</p></li>`)
+        .join("")}</ul>`
+    : "";
+
+  const notes: string[] = [];
+  if (v.stability) notes.push(`<div class="ab-vnote"><h4>Weight stability (1,000 runs)</h4><p>${esc(v.stability)}</p></div>`);
+  if (v.not_blind_note) notes.push(`<div class="ab-vnote"><h4>Split and independence note</h4><p>${esc(v.not_blind_note)}</p></div>`);
+  if (v.data_checks?.length) {
+    notes.push(
+      `<div class="ab-vnote"><h4>Data sanity checks</h4><ul class="ab-dchecks">${v.data_checks
+        .map((d) => `<li><span class="ab-badge ${d.passed ? "is-pass" : "is-fail"}">${d.passed ? "Pass" : "Miss"}</span><span>${esc(d.name)}: <b>${esc(d.result)}</b></span></li>`)
+        .join("")}</ul></div>`,
+    );
+  }
+
+  return `<details class="ab-fold ab-val-runs" id="val-runs">
+    <summary>Explore all validation runs, misses and weight stability</summary>
+    <div class="ab-val-body">
+      <h4 class="ab-vh">Method progression</h4>
+      ${prog}
+      <h4 class="ab-vh">Per-challenge checks (${esc(now.title)})</h4>
+      ${checksTable}
+      ${missHtml}
+      ${notes.length ? `<div class="ab-vnotes">${notes.join("")}</div>` : ""}
+    </div>
+  </details>`;
 }
 
 function checked(v: Validation | null) {
@@ -118,7 +222,8 @@ function checked(v: Validation | null) {
       <div class="ab-tiles">${tiles}</div>
       ${chart}
     </div>
-    <p class="ab-total">In the current run${ver ? ` (method ${esc(ver)})` : ""}, <b>${tally(now)}</b> checks pass${bal ? `; the Balanced preset passes <b>${tally(bal)}</b>` : ""}. Only the Moon's south pole and Jezero are checked against test places. <a href="${BASE}validation.json">Every check, as data</a></p>`,
+    <p class="ab-total">In the current run${ver ? ` (method ${esc(ver)})` : ""}, <b>${tally(now)}</b> checks pass${bal ? `; the Balanced preset passes <b>${tally(bal)}</b>` : ""}. Only the Moon's south pole and Jezero are checked against test places. <a href="${BASE}validation.json">Every check, as data</a></p>
+    ${valDetails(v, runs, now)}`,
     "Places where crews already train for the Moon and Mars should beat ordinary places. We set the pass marks before the results came in. The held-out half is the test places we set aside in a fixed split.",
   );
 }
@@ -155,6 +260,7 @@ function challenge(m: Manifest) {
 }
 
 const AGENCY: Record<string, string> = { NASA: "NASA", USGS: "USGS", ESA: "ESA (partner)", partner: "Partner", other: "Other open sources", computed: "Worked out from the data" };
+const AGENCY_PILL: Record<string, string> = { NASA: "NASA", USGS: "USGS", ESA: "ESA", partner: "Partner", other: "Other", computed: "Calculated" };
 
 const photoUrl = (id: string) => (/^PIA\d+$/.test(id) ? `https://photojournal.jpl.nasa.gov/catalog/${id}` : `https://images.nasa.gov/details/${encodeURIComponent(id)}`);
 
@@ -162,12 +268,22 @@ function data(m: Manifest) {
   const order = ["NASA", "USGS", "ESA", "partner", "other", "computed"];
   const groups = order.map((a) => [a, m.datasets.filter((d) => d.agency === a)] as const).filter(([, ds]) => ds.length);
   const archives = new Set(m.datasets.map((d) => d.archive).filter((a): a is string => !!a && !/^(computed|published paper)$/i.test(a)));
+  const pills = `<div class="ab-agency-pills" role="group" aria-label="Filter datasets by agency">
+    <button type="button" class="ab-apill" data-agency="all" aria-pressed="true">All (${num(m.datasets.length)})</button>${groups
+      .map(
+        ([a, ds]) =>
+          `<button type="button" class="ab-apill" data-agency="${esc(a)}" aria-pressed="false" title="${esc(`${AGENCY[a] ?? a} (${ds.length})`)}" data-count="${ds.length}">${esc(
+            AGENCY_PILL[a] ?? a,
+          )}</button>`,
+      )
+      .join("")}
+  </div>`;
   const table = `<div class="ab-scroll"><table class="ab-table">
     <thead><tr><th scope="col">Dataset and what we use it for</th><th scope="col">Licence</th></tr></thead>
     ${groups
       .map(
         ([a, ds]) =>
-          `<tbody><tr class="ab-tg"><th scope="rowgroup" colspan="2">${esc(AGENCY[a] ?? a)} <span>${num(ds.length)}</span></th></tr>${ds
+          `<tbody data-agency="${esc(a)}"><tr class="ab-tg"><th scope="rowgroup" colspan="2">${esc(AGENCY[a] ?? a)} <span>${num(ds.length)}</span></th></tr>${ds
             .map(
               (d) =>
                 `<tr><th scope="row">${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>` : esc(d.name)}<span>${esc(d.used_for)}</span></th><td>${esc(d.licence)}</td></tr>`,
@@ -191,7 +307,7 @@ function data(m: Manifest) {
     "data",
     "Data",
     "Data",
-    `<h3>${num(m.datasets.length)} datasets</h3>${table}
+    `<div class="ab-data-bar"><h3 id="ab-ds-h">${num(m.datasets.length)} datasets</h3>${pills}</div>${table}
     <h3>Images we show but do not score</h3><p class="ab-muted">The map and planet images, and the ${num(photos.length)} photos on the Learn page. All are NASA or NASA and USGS images, free to use.</p>${images}
     <h3>Code and fonts</h3>${code}`,
     `Every number on this site comes from one of these, from ${num(archives.size)} open archives. NASA data does most of the scoring.`,
@@ -219,17 +335,80 @@ export function about(ctx: Ctx): Page {
   const { m } = ctx;
   let el: HTMLElement;
   let done = false;
+  let spy: IntersectionObserver | null = null;
+  const visible = new Set<string>();
+
+  const setActiveToc = (id: string) => {
+    for (const a of el.querySelectorAll<HTMLAnchorElement>(".ab-toc a[data-toc]")) {
+      const on = a.dataset.toc === id;
+      a.classList.toggle("is-active", on);
+      if (on) a.setAttribute("aria-current", "location");
+      else a.removeAttribute("aria-current");
+    }
+  };
+
+  const stopSpy = () => {
+    spy?.disconnect();
+    spy = null;
+    visible.clear();
+  };
+
+  const startSpy = () => {
+    stopSpy();
+    if (typeof IntersectionObserver === "undefined") return;
+    spy = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const id = (e.target as HTMLElement).id;
+          if (e.isIntersecting) visible.add(id);
+          else visible.delete(id);
+        }
+        const hit = TOC_IDS.find((id) => visible.has(id));
+        if (hit) setActiveToc(hit);
+      },
+      { rootMargin: "-18% 0px -62% 0px", threshold: [0, 0.1] },
+    );
+    for (const id of TOC_IDS) {
+      const s = el.querySelector<HTMLElement>(`#${id}`);
+      if (s) spy.observe(s);
+    }
+  };
+
   return {
     title: () => "About",
     mount(root) {
       el = root;
       el.innerHTML = `<div class="ab">${intro(m)}${scoring(m)}${sec("checked", "Validation", "How we checked it", `<p class="ab-muted">Loading…</p>`)}${challenge(m)}${data(m)}${limits(m)}${credits}</div>`;
+      el.addEventListener("click", (ev) => {
+        const tocLink = (ev.target as Element).closest<HTMLAnchorElement>(".ab-toc a[data-toc]");
+        if (tocLink?.dataset.toc) setActiveToc(tocLink.dataset.toc);
+
+        const pill = (ev.target as Element).closest<HTMLButtonElement>(".ab-agency-pills [data-agency]");
+        if (!pill) return;
+        const agency = pill.dataset.agency ?? "all";
+        for (const b of el.querySelectorAll<HTMLButtonElement>(".ab-agency-pills [data-agency]")) {
+          b.setAttribute("aria-pressed", String(b === pill));
+        }
+        let shown = 0;
+        for (const tb of el.querySelectorAll<HTMLElement>(".ab-table tbody[data-agency]")) {
+          const match = agency === "all" || tb.dataset.agency === agency;
+          tb.hidden = !match;
+          if (match) shown += tb.querySelectorAll("tr:not(.ab-tg)").length;
+        }
+        const h = el.querySelector<HTMLElement>("#ab-ds-h");
+        if (h) h.textContent = agency === "all" ? `${num(m.datasets.length)} datasets` : `${num(shown)} of ${num(m.datasets.length)} datasets`;
+      });
     },
     async show() {
+      startSpy();
       if (done) return;
       const v = await ctx.validation();
       done = true;
       el.querySelector("#checked")!.outerHTML = checked(v);
+      startSpy();
+    },
+    hide() {
+      stopSpy();
     },
   };
 }

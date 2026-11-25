@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
-import { manifest } from "./helpers";
+import { latlon } from "../src/format";
+import { top } from "../src/score";
+import { cols, manifest } from "./helpers";
 
 const m = manifest();
 const home = (b: "moon" | "mars") => m.targets.find((t) => t.body === b && t.default) ?? m.targets.find((t) => t.body === b)!;
@@ -67,4 +69,35 @@ test("at 390 px the Learn page stacks and nothing overflows", async ({ page }) =
     expect(wide.scroll).toBeLessThanOrEqual(wide.W);
     expect(wide.bad).toBe(0);
   }
+});
+
+test("Learn uses balanced scores, clickable month cells, 44px analog pins, and a photo lightbox", async ({ page }) => {
+  const moonTarget = home("moon");
+  const balanced = m.filters.find((f) => f.id === "balanced") ?? m.filters[0];
+  const { t, cells } = cols(m, moonTarget.id);
+  const want = top(t[`score:${balanced.id}`], 5, cells).ids.map((i) => {
+    const r = cells.region?.[i];
+    const full = (Number.isFinite(r) && m.regions[r]) || latlon(cells.lat[i], cells.lon[i], 2);
+    const comma = full.lastIndexOf(", ");
+    return comma < 0 ? full : full.slice(0, comma);
+  });
+
+  await page.goto("/#/learn?world=moon");
+  await expect(page.locator(`${page$}[data-testid="year-place"]`)).toHaveCount(5);
+  const got = (await page.locator(`${page$}[data-testid="year-place"] .ln-place`).allInnerTexts()).map((s) => s.split("\n")[0].trim());
+  expect(got).toEqual(want);
+
+  const pinBox = await page.locator(`${page$}.ln-pin`).first().boundingBox();
+  expect(pinBox!.width).toBeGreaterThanOrEqual(44);
+  expect(pinBox!.height).toBeGreaterThanOrEqual(44);
+
+  await page.locator(`${page$}[data-testid="year-place"]`).first().locator('[data-m="6"]').click();
+  await expect(page.locator(`${page$}#ln-month`)).toHaveValue("6");
+  await expect(page.locator(`${page$}[data-testid="month-name"]`)).toHaveText("July");
+
+  await page.locator(`${page$}.ln-pair .ln-photo`).first().click();
+  const dlg = page.locator(`${page$}dialog.ln-lightbox[open]`);
+  await expect(dlg).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(dlg).toHaveCount(0);
 });

@@ -220,3 +220,27 @@ test("a check of a preset shows only as that preset's total on About", async ({ 
   await expect(page.locator("#checked .ab-total")).toContainText(`the Balanced preset passes 0 of ${n}`);
   await expect(page.locator("#checked .ab-total")).not.toContainText(`, 0 of ${n} checks pass`);
 });
+
+test("About agency filter pills filter dataset rows and val-runs expands cleanly with zero ML", async ({ page }) => {
+  await page.goto("/#/about");
+  const visibleRows = page.locator(".ab-table tbody:not([hidden]) tr:not(.ab-tg)");
+  await expect(visibleRows).toHaveCount(m.datasets.length);
+
+  const nasaCount = m.datasets.filter((d) => d.agency === "NASA").length;
+  await page.locator('.ab-agency-pills [data-agency="NASA"]').click();
+  await expect(page.locator('.ab-agency-pills [data-agency="NASA"]')).toHaveAttribute("aria-pressed", "true");
+  await expect(visibleRows).toHaveCount(nasaCount);
+
+  await page.locator('.ab-agency-pills [data-agency="all"]').click();
+  await expect(visibleRows).toHaveCount(m.datasets.length);
+
+  const valRuns = page.locator("#val-runs");
+  await expect(valRuns).toBeAttached();
+  await expect(valRuns).not.toHaveAttribute("open", "");
+  await valRuns.locator("> summary").click();
+  await expect(valRuns).toHaveAttribute("open", "");
+  expect(await valRuns.locator(".ab-prog-card").count()).toBeGreaterThanOrEqual(4);
+  expect(await valRuns.locator(".ab-vtable tbody tr:not(.ab-vtg)").count()).toBeGreaterThan(0);
+  await expect(valRuns).not.toContainText("ML");
+  await expect(page.locator(".page:not([hidden])")).not.toContainText("ML");
+});

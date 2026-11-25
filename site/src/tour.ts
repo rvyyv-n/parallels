@@ -12,6 +12,13 @@ interface Step {
   leave?: () => void;
 }
 
+interface Rect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 const PLAY_MS = 7000;
 
 const one = (q: string) => [...document.querySelectorAll<HTMLElement>(q)].find((e) => e.getClientRects().length > 0) ?? null;
@@ -94,17 +101,125 @@ let timer = 0;
 let playing = true;
 let from: HTMLElement | null = null;
 let target: HTMLElement | null = null;
+let lastQuad = 0;
+let lastHoleKey = "";
+let lastBoxKey = "";
+
+const padRect = (r: Rect, p: number): Rect => ({ left: r.left - p, top: r.top - p, right: r.right + p, bottom: r.bottom + p });
+
+const overlap = (a: Rect, b: Rect) => {
+  const w = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+  const h = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+  return w * h;
+};
+
+const safeTop = () => {
+  const bar = document.querySelector<HTMLElement>(".top");
+  const bottom = bar ? Math.min(120, Math.max(0, bar.getBoundingClientRect().bottom)) : 62;
+  return Math.max(16, Math.round(bottom + 12));
+};
+
+function placeBox(hr: Rect, snap: boolean) {
+  const vw = innerWidth;
+  const vh = innerHeight;
+  const topMin = safeTop();
+  const bw = box.offsetWidth || Math.min(380, vw - 28);
+  const bh = box.offsetHeight || 220;
+
+  let left: number;
+  let top: number;
+
+  if (vw < 760) {
+    const m = 14;
+    const midY = (hr.top + hr.bottom) / 2;
+    left = m;
+    top = midY < vh / 2 ? Math.max(topMin, vh - bh - m) : topMin;
+    top = Math.max(topMin, Math.min(vh - bh - m, top));
+  } else {
+    const m = 18;
+    const clampX = (x: number) => Math.max(m, Math.min(vw - bw - m, x));
+    const clampY = (y: number) => Math.max(topMin, Math.min(vh - bh - m, y));
+    const hc = one(".hovercard:not([hidden])");
+    const cr = hc ? hc.getBoundingClientRect() : null;
+    const cardRect: Rect | null = cr && cr.width > 0 && cr.height > 0 ? padRect({ left: cr.left, top: cr.top, right: cr.right, bottom: cr.bottom }, 12) : null;
+    const holePadded = padRect(hr, 14);
+    const workH = Math.max(1, vh - topMin);
+
+    const candidates: { x: number; y: number; clearArea: number }[] = [
+      // bottom-right
+      { x: clampX(vw - bw - m), y: clampY(vh - bh - m), clearArea: Math.max(Math.max(0, vw - hr.right) * workH, Math.max(0, vh - hr.bottom) * vw) },
+      // bottom-left
+      { x: clampX(m), y: clampY(vh - bh - m), clearArea: Math.max(Math.max(0, hr.left) * workH, Math.max(0, vh - hr.bottom) * vw) },
+      // top-right
+      { x: clampX(vw - bw - m), y: clampY(topMin), clearArea: Math.max(Math.max(0, vw - hr.right) * workH, Math.max(0, hr.top - topMin) * vw) },
+      // top-left
+      { x: clampX(m), y: clampY(topMin), clearArea: Math.max(Math.max(0, hr.left) * workH, Math.max(0, hr.top - topMin) * vw) },
+    ];
+
+    let bestIdx = 0;
+    let bestPenalty = Infinity;
+    let bestClear = -1;
+
+    for (let i = 0; i < candidates.length; i++) {
+      const c = candidates[i];
+      const boxRect: Rect = { left: c.x, top: c.y, right: c.x + bw, bottom: c.y + bh };
+      const pen = overlap(boxRect, holePadded) * 2 + (cardRect ? overlap(boxRect, cardRect) * 3 : 0);
+      const area = c.clearArea * (i === lastQuad && pen === 0 ? 1.05 : 1);
+      if (pen < bestPenalty - 1 || (Math.abs(pen - bestPenalty) <= 1 && area > bestClear)) {
+        bestPenalty = pen;
+        bestClear = area;
+        bestIdx = i;
+      }
+    }
+    lastQuad = bestIdx;
+    left = candidates[bestIdx].x;
+    top = candidates[bestIdx].y;
+  }
+
+  const rx = Math.round(left);
+  const ry = Math.round(top);
+  const key = `${rx},${ry}`;
+  if (key !== lastBoxKey) {
+    lastBoxKey = key;
+    if (snap) box.classList.add("tour-snap");
+    box.style.left = `${rx}px`;
+    box.style.top = `${ry}px`;
+    if (snap) {
+      void box.offsetWidth;
+      box.classList.remove("tour-snap");
+    }
+  }
+}
+
+function syncGeometry(el: HTMLElement, snap = false) {
+  const r = el.getBoundingClientRect();
+  const left = Math.max(r.left, 0);
+  const top = Math.max(r.top, 0);
+  const right = Math.min(r.right, innerWidth);
+  const bottom = Math.min(r.bottom, innerHeight);
+  const w = Math.max(0, right - left);
+  const h = Math.max(0, bottom - top);
+  const key = `${Math.round(left)},${Math.round(top)},${Math.round(w)},${Math.round(h)}`;
+  if (key !== lastHoleKey) {
+    lastHoleKey = key;
+    if (snap) hole.classList.add("tour-snap");
+    hole.style.left = `${left}px`;
+    hole.style.top = `${top}px`;
+    hole.style.width = `${w}px`;
+    hole.style.height = `${h}px`;
+    if (snap) {
+      void hole.offsetWidth;
+      hole.classList.remove("tour-snap");
+    }
+  }
+  placeBox({ left, top, right, bottom }, snap);
+}
 
 const track = () => {
   raf = 0;
   if (n < 0) return;
   const el = one(steps[n].at);
-  if (el) {
-    const r = el.getBoundingClientRect();
-    const top = Math.max(r.top, 0);
-    const bottom = Math.min(r.bottom, innerHeight);
-    hole.style.cssText = `left:${Math.max(r.left, 0)}px;top:${top}px;width:${Math.min(r.right, innerWidth) - Math.max(r.left, 0)}px;height:${Math.max(0, bottom - top)}px`;
-  }
+  if (el) syncGeometry(el, false);
   raf = requestAnimationFrame(track);
 };
 
@@ -141,29 +256,47 @@ function setPlaying(on: boolean) {
   schedule();
 }
 
+function syncPips(k: number) {
+  const wrap = box.querySelector<HTMLElement>(".tour-pips");
+  if (!wrap) return;
+  if (wrap.children.length !== steps.length) {
+    wrap.innerHTML = steps.map(() => `<span class="tour-pip"></span>`).join("");
+  }
+  for (let i = 0; i < wrap.children.length; i++) {
+    const pip = wrap.children[i];
+    pip.classList.toggle("is-done", i < k);
+    pip.classList.toggle("is-now", i === k);
+  }
+}
+
 async function show(k: number) {
   steps[n]?.leave?.();
   clearTimeout(timer);
   const mine = ++token;
   n = k;
   const st = steps[k];
+  const wasHidden = Boolean(hole.hidden);
+  const switching = at() !== st.page;
   target = null;
-  hole.hidden = true;
+  if (switching) hole.hidden = true;
   box.setAttribute("aria-busy", "true");
-  if (at() !== st.page) go(st.href?.() ?? hrefFor(st.page));
+  if (switching) go(st.href?.() ?? hrefFor(st.page));
   const el = await wait(st.at, mine);
   if (mine !== token) return;
   box.removeAttribute("aria-busy");
   if (!el) return end();
   target = el;
   box.querySelector(".tour-n")!.textContent = `${k + 1} of ${steps.length}`;
+  syncPips(k);
   box.querySelector(".tour-t")!.textContent = st.title;
   box.querySelector(".tour-p")!.textContent = st.text;
   box.querySelector<HTMLButtonElement>('[data-tour="back"]')!.disabled = k === 0;
   box.querySelector('[data-tour="next"]')!.textContent = k === steps.length - 1 ? "Finish" : "Next";
   el.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: el.offsetHeight > innerHeight * 0.6 ? "start" : "center" });
   st.enter?.(el);
+  const snap = wasHidden || switching;
   hole.hidden = box.hidden = false;
+  syncGeometry(el, snap);
   document.documentElement.classList.add("touring");
   if (!box.contains(document.activeElement)) box.querySelector<HTMLButtonElement>(".tour-next")!.focus({ preventScroll: true });
   if (!raf) raf = requestAnimationFrame(track);
@@ -176,6 +309,8 @@ function end() {
   token++;
   n = -1;
   target = null;
+  lastHoleKey = "";
+  lastBoxKey = "";
   hole.hidden = box.hidden = true;
   box.classList.remove("ticking");
   document.documentElement.classList.remove("touring");
@@ -194,7 +329,8 @@ function build() {
   box.hidden = true;
   box.setAttribute("role", "dialog");
   box.setAttribute("aria-label", "Guided tour");
-  box.innerHTML = `<p class="tour-n" aria-hidden="true"></p><div aria-live="polite"><h2 class="tour-t"></h2><p class="tour-p"></p></div>
+  box.innerHTML = `<div class="tour-head"><p class="tour-n" aria-hidden="true"></p><div class="tour-pips" aria-hidden="true"></div></div>
+    <div aria-live="polite"><h2 class="tour-t"></h2><p class="tour-p"></p></div>
     <div class="tour-bar" aria-hidden="true"><i></i></div>
     <div class="tour-btns"><button type="button" data-tour="back">Back</button><button type="button" data-tour="play" aria-pressed="false">Pause</button><button type="button" data-tour="next" class="tour-next">Next</button><button type="button" data-tour="end" aria-label="Close the tour">Close</button></div>`;
   document.body.append(hole, box);
@@ -209,7 +345,29 @@ function build() {
   box.addEventListener("pointerenter", () => clearTimeout(timer));
   box.addEventListener("pointerleave", () => schedule());
   document.addEventListener("keydown", (e) => {
-    if (n >= 0 && e.key === "Escape") end();
+    if (n < 0 || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "Escape") {
+      e.preventDefault();
+      end();
+      return;
+    }
+    const active = document.activeElement as HTMLElement | null;
+    const tag = active?.tagName;
+    if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA" || active?.isContentEditable) return;
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      next();
+    } else if (e.key === "ArrowLeft") {
+      if (n > 0) {
+        e.preventDefault();
+        void show(n - 1);
+      }
+    } else if (e.key === " " || e.code === "Space") {
+      if (tag !== "BUTTON" && tag !== "A") {
+        e.preventDefault();
+        setPlaying(!playing);
+      }
+    }
   });
   document.addEventListener(
     "pointerdown",
