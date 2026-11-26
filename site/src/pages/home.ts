@@ -1,9 +1,10 @@
 import type { Body, LabelPoint, Manifest, Target } from "../contract";
+import type { Cols } from "../data";
 import { esc, latlon, num, webgl } from "../format";
 import { icon } from "../icons";
 import type { Intro } from "../intro";
 import { logo } from "../logo";
-import { reveal, type Page } from "../router";
+import { go, reveal, type Page } from "../router";
 import { tourButton } from "../tour";
 import { headline, NAME, SHARP, TEXTURE, thumb, TITLE } from "../worlds";
 import { home, rankedOf, type Ctx } from "./ctx";
@@ -43,6 +44,36 @@ function placeCaption(p: LabelPoint): string {
   if (!raw) return "";
   const m = raw.match(/^.+?[.!?](?=\s|$)/);
   return m ? m[0] : raw;
+}
+
+function findCell(cells: Cols | null, lat: number, lon: number): number {
+  if (!cells?.lat || !cells?.lon) return -1;
+  const r = Math.floor((90 - lat) / 0.5);
+  const c = Math.floor((lon + 180) / 0.5);
+  const n = cells.lat.length;
+  let best = -1;
+  let bestD2 = Infinity;
+  for (let i = 0; i < n; i++) {
+    const la = cells.lat[i];
+    const lo = cells.lon[i];
+    if (Math.floor((90 - la) / 0.5) === r && Math.floor((lo + 180) / 0.5) === c) return i;
+    const dLat = Math.abs(la - lat);
+    const dLon = Math.abs(lo - lon);
+    if (dLat <= 0.5 && dLon <= 0.5) {
+      const d2 = dLat * dLat + dLon * dLon;
+      if (d2 < bestD2) {
+        bestD2 = d2;
+        best = i;
+      }
+    }
+  }
+  return best;
+}
+
+function defaultTargetFor(m: Manifest, p: LabelPoint): Target {
+  const first = p.groups?.[0] ?? "";
+  const body: Body = first.startsWith("moon-") ? "moon" : first.startsWith("mars-") ? "mars" : p.groups?.some((g) => g.startsWith("mars-")) ? "mars" : "moon";
+  return home(m, body) ?? m.targets[0];
 }
 
 function cant(m: Manifest, b: Body) {
@@ -93,9 +124,9 @@ const html = (m: Manifest) => `<section id="intro" class="intro" aria-labelledby
     <section class="chap chap-known" id="ch-known" data-chap="4" aria-labelledby="known-h">
       <div class="copy">
         <h2 id="known-h">Crews already train on Earth for the Moon and Mars.</h2>
-        <p class="intro-lede">Crews practised Moon and Mars work at these places. Click a place to see it on the globe.</p>
+        <p class="intro-lede">Crews practised Moon and Mars work at these places. Hover to locate one on the globe, or select it to inspect its Earth match.</p>
         <ul class="places" aria-label="Known analog places"></ul>
-        <p class="place-note" id="place-note" aria-live="polite"></p>
+        <div class="place-note" id="place-note" aria-live="polite"></div>
       </div>
     </section>
     <section class="chap chap-go" id="ch-go" data-chap="5" aria-label="Open the Finder">
@@ -192,35 +223,124 @@ export function homePage(ctx: Ctx): Page {
 
       const list = el.querySelector<HTMLElement>(".places")!;
       const noteEl = el.querySelector<HTMLElement>("#place-note");
+      const defaultFilterId = (m.filters.find((f) => f.id === "balanced") ?? m.filters[0]).id;
+      let gridCells: Cols | null = null;
+      let cellsReq: Promise<Cols | null> | null = null;
+
+      const hrefFor = (p: LabelPoint) => {
+        const tgt = defaultTargetFor(m, p);
+        const cell = findCell(gridCells, p.lat, p.lon);
+        return cell >= 0
+          ? `#/place?t=${encodeURIComponent(tgt.id)}&f=${encodeURIComponent(defaultFilterId)}&known=1&c=${cell}`
+          : `#/find?t=${encodeURIComponent(tgt.id)}&known=1`;
+      };
+
+      const syncPlaceHrefs = () => {
+        list.querySelectorAll<HTMLAnchorElement>("a.place-link").forEach((a, i) => {
+          if (places[i]) a.href = hrefFor(places[i]);
+        });
+        const openLink = noteEl?.querySelector<HTMLAnchorElement>(".place-open");
+        if (openLink && places[spot]) openLink.href = hrefFor(places[spot]);
+      };
+
+      const ensureCells = () => {
+        if (gridCells) return Promise.resolve(gridCells);
+        if (!cellsReq) {
+          cellsReq = ctx
+            .data()
+            .then((d) => {
+              gridCells = d.cells;
+              syncPlaceHrefs();
+              return gridCells;
+            })
+            .catch(() => {
+              cellsReq = null;
+              return null;
+            });
+        }
+        return cellsReq;
+      };
+
+      const knownSec = el.querySelector<HTMLElement>("#ch-known");
+      if (knownSec) {
+        const knownIo = new IntersectionObserver(
+          ([entry]) => {
+            if (!entry.isIntersecting) return;
+            knownIo.disconnect();
+            void ensureCells();
+          },
+          { rootMargin: "450px 0px" },
+        );
+        knownIo.observe(knownSec);
+      }
+
       const choose = (i: number) => {
         const p = places[i];
         if (!p) return;
         spot = i;
-        list.querySelectorAll<HTMLButtonElement>("button").forEach((x, n) => {
-          x.setAttribute("aria-pressed", String(n === i));
+        list.querySelectorAll<HTMLAnchorElement>("a.place-link").forEach((x, n) => {
+          if (n === i) x.setAttribute("aria-current", "true");
+          else x.removeAttribute("aria-current");
           x.tabIndex = n === i ? 0 : -1;
         });
         if (noteEl) {
           const sentence = placeCaption(p);
           const url = p.analog_source ?? p.source;
+          const tgt = defaultTargetFor(m, p);
           noteEl.innerHTML = sentence
-            ? `${esc(sentence)}${url ? ` <a class="place-src" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Source</a>` : ""}`
+            ? `<p style="margin:0">${esc(sentence)}</p><div class="place-note-links"><a class="place-open" href="${esc(hrefFor(p))}">Inspect match vs ${esc(
+                tgt.short,
+              )} <span aria-hidden="true">→</span></a>${url ? `<a class="place-src" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Source</a>` : ""}</div>`
             : "";
         }
         intro?.place(p, p.country ? `${p.name}, ${p.country}` : p.name);
       };
+
+      list.addEventListener("pointerenter", (e) => {
+        const x = (e.target as Element).closest<HTMLAnchorElement>("a.place-link[data-i]");
+        if (x) {
+          void ensureCells();
+          choose(Number(x.dataset.i));
+        }
+      }, true);
+      list.addEventListener("focusin", (e) => {
+        const x = (e.target as Element).closest<HTMLAnchorElement>("a.place-link[data-i]");
+        if (x) {
+          void ensureCells();
+          choose(Number(x.dataset.i));
+        }
+      });
       list.addEventListener("click", (e) => {
-        const x = (e.target as Element).closest<HTMLButtonElement>("button[data-i]");
-        if (x) choose(Number(x.dataset.i));
+        const x = (e.target as Element).closest<HTMLAnchorElement>("a.place-link[data-i]");
+        if (!x || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        const idx = Number(x.dataset.i);
+        const p = places[idx];
+        if (!p) return;
+        choose(idx);
+        if (!gridCells) {
+          e.preventDefault();
+          void Promise.race([ensureCells(), new Promise<null>((res) => setTimeout(() => res(null), 1800))]).then(() => {
+            go(hrefFor(p));
+          });
+        }
       });
       list.addEventListener("keydown", (e) => {
-        const bs = [...list.querySelectorAll<HTMLButtonElement>("button")];
+        const as = [...list.querySelectorAll<HTMLAnchorElement>("a.place-link")];
+        if (!as.length) return;
         const k = e.key;
-        const to = k === "ArrowDown" ? (spot + 1) % bs.length : k === "ArrowUp" ? (spot - 1 + bs.length) % bs.length : -1;
+        const to =
+          k === "ArrowDown" || k === "ArrowRight"
+            ? (spot + 1) % as.length
+            : k === "ArrowUp" || k === "ArrowLeft"
+              ? (spot - 1 + as.length) % as.length
+              : k === "Home"
+                ? 0
+                : k === "End"
+                  ? as.length - 1
+                  : -1;
         if (to < 0) return;
         e.preventDefault();
-        bs[to].focus();
-        choose(to);
+        as[to].focus();
       });
 
       let known: LabelPoint[] = [];
@@ -233,9 +353,11 @@ export function homePage(ctx: Ctx): Page {
           ? places
               .map(
                 (p, i) =>
-                  `<li><button type="button" data-i="${i}" aria-pressed="${i === 0}" tabindex="${i ? -1 : 0}"><i class="place-dot" aria-hidden="true"></i><span class="place-txt"><span class="place-n">${esc(p.name)}</span>${
+                  `<li><a class="place-link" href="${esc(hrefFor(p))}" data-i="${i}" tabindex="${i ? -1 : 0}"${
+                    i ? "" : ' aria-current="true"'
+                  }><i class="place-dot" aria-hidden="true"></i><span class="place-txt"><span class="place-n">${esc(p.name)}</span>${
                     p.country ? `<span class="place-c">${esc(p.country)}</span>` : ""
-                  }</span></button></li>`,
+                  }</span><span class="place-go" aria-hidden="true">${icon("chevron")}</span></a></li>`,
               )
               .join("")
           : `<li class="muted">No data: the list of known analog places did not load.</li>`;

@@ -452,13 +452,45 @@ export function learnPage(ctx: Ctx): Page {
     const p = tempPairs[k];
     if (!box || !p) return;
     for (const b of el.querySelectorAll<HTMLButtonElement>("[data-temp]")) b.setAttribute("aria-pressed", String(Number(b.dataset.temp) === k));
-    const max = Math.max(Math.abs(p.world.value), Math.abs(p.earth.value)) || 1;
-    const row = (kind: string, who: string, s: Side) =>
-      `<li class="ln-temp" data-kind="${kind}"><span class="ln-who">${esc(who)}</span><span class="ln-bar" aria-hidden="true"><i style="transform:scaleX(${(Math.abs(s.value) / max).toFixed(
-        4,
-      )})"></i></span><span class="ln-num" data-testid="temp-${kind}">${temp(s, p.trait)}</span>${srcLine(s)}</li>`;
+    const wv = p.world.value;
+    const ev = p.earth.value;
+    const isAbs = p.trait.id === "cold";
+    const step = isAbs ? 50 : 20;
+    const minScale = isAbs ? Math.floor(Math.min(wv, ev, 0) / step) * step : 0;
+    const rawMax = Math.ceil(Math.max(wv, ev, isAbs ? 0 : step) / step) * step;
+    const maxScale = rawMax <= minScale ? minScale + step : rawMax;
+    const span = maxScale - minScale;
+    const pct = (v: number) => Math.max(0, Math.min(100, ((v - minScale) / span) * 100));
+    const wp = pct(wv);
+    const ep = pct(ev);
+    const lo = Math.min(wp, ep);
+    const hi = Math.max(wp, ep);
+    const diff = Math.abs(wv - ev);
+    const zeroPct = minScale < 0 && maxScale > 0 ? pct(0) : null;
+    const u = unit(p.trait.unit);
+    const card = (kind: string, who: string, s: Side) =>
+      `<li class="ln-temp-card" data-kind="${kind}"><div class="ln-tc-head"><span class="ln-tc-dot" aria-hidden="true"></span><span class="ln-who">${esc(
+        who,
+      )}</span></div><span class="ln-num" data-testid="temp-${kind}">${temp(s, p.trait)}</span>${srcLine(s)}</li>`;
     box.innerHTML = `<p class="ln-note">${esc(TEMPS[p.trait.id][1])}</p>
-      <ul class="ln-rows">${row("world", target.short, p.world)}${row("earth", bestName, p.earth)}</ul>
+      <div class="ln-scale" aria-hidden="true">
+        <div class="ln-scale-head">
+          <span>Shared temperature scale</span>
+          <span class="ln-scale-gap-lbl ${p.close ? "is-match" : "is-break"}">Gap: ${num(diff, 1)}${u}</span>
+        </div>
+        <div class="ln-scale-track">
+          ${zeroPct != null ? `<span class="ln-scale-zero" style="left:${zeroPct.toFixed(2)}%"></span>` : ""}
+          <span class="ln-scale-span ${p.close ? "is-match" : "is-break"}" style="left:${lo.toFixed(2)}%;width:${Math.max(0.8, hi - lo).toFixed(2)}%"></span>
+          <span class="ln-scale-pin" data-kind="earth" style="left:${ep.toFixed(2)}%"></span>
+          <span class="ln-scale-pin" data-kind="world" style="left:${wp.toFixed(2)}%"></span>
+        </div>
+        <div class="ln-scale-ticks">
+          <span>${num(minScale)}${u}</span>
+          ${zeroPct != null ? `<span class="ln-scale-zero-t" style="left:${zeroPct.toFixed(2)}%">0${u}</span>` : ""}
+          <span>${num(maxScale)}${u}</span>
+        </div>
+      </div>
+      <ul class="ln-temp-cards">${card("world", target.short, p.world)}${card("earth", bestName, p.earth)}</ul>
       <p class="ln-verdict ${p.close ? "is-match" : "is-break"}"><span aria-hidden="true">${p.close ? "=" : "≠"}</span>${
         p.close ? "Near: crews can practise this on Earth." : "Far apart: Earth cannot copy this."
       }</p>`;
@@ -651,11 +683,13 @@ export function learnPage(ctx: Ctx): Page {
         <p class="ln-lede" id="ln-year-lede">Monthly testing windows at the top 5 Earth matches.</p>
         <div class="ln-panel ln-year-panel">
           <div class="ln-month">
-            <label for="ln-month" class="sr">Month</label>
-            <input id="ln-month" class="ln-slider" type="range" min="0" max="11" step="1" value="${month}" aria-valuetext="${MONTHS[month]}">
+            <p class="ln-key"><span><i data-best></i>Best window</span><span><i data-avoid></i>Freeze–thaw, rain, or frost</span></p>
+            <div class="ln-month-ctl">
+              <label for="ln-month" class="sr">Month</label>
+              <input id="ln-month" class="ln-slider" type="range" min="0" max="11" step="1" value="${month}" aria-valuetext="${MONTHS[month]}">
+            </div>
             <output for="ln-month" class="ln-month-name" id="ln-month-name" data-testid="month-name">${MONTHS[month]}</output>
           </div>
-          <p class="ln-key"><span><i data-best></i>Best window</span><span><i data-avoid></i>Freeze–thaw, rain, or frost</span></p>
           <ol class="ln-places" id="ln-places"></ol>
           <p class="ln-src">${ext(m.datasets.find((x) => x.id === "power_merra2")?.url ?? "https://power.larc.nasa.gov/", "NASA POWER (MERRA-2)")} · ~50 km grid · ${esc(
             filter.name,

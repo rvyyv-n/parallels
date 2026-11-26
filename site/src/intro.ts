@@ -67,10 +67,10 @@ const clamp = (v: number) => Math.max(0, Math.min(1, v));
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const smooth = (t: number) => t * t * (3 - 2 * t);
 const mix = (a: number, b: number, s: number) => a + (b - a) * s;
-// Palette: accent #1D64C8. Thin lines drawn over the globes use a lighter tint of it so they stay visible on blue oceans.
-const SIGNAL = 0x5a9cf2;
-const AMBER = 0xffc24a;
-const MARS = 0xfc734d;
+// Palette: Titanium & Oxide solar-gold marker accent (#e5aa4c) and Mars iron-oxide (#e0623e).
+const SIGNAL = 0xe5aa4c;
+const AMBER = 0xe5aa4c;
+const MARS = 0xe0623e;
 const FAR = 10;
 // Away from the orbit each body sits at its own depth, so overlapping bodies hide each other cleanly. Positions are corrected so the layout on screen is unchanged.
 const DEPTH: Record<Body, number> = { earth: -3, moon: 0.8, mars: 0.4 };
@@ -84,16 +84,16 @@ const OFF_TALL: Orbit = [1.5, 1.6, 0.1, 1, 1, 9];
 // Chapters: opening, all of Earth's land, the Moon, Mars, known analog places, the Finder. Scrolling from the Moon to Mars turns the shared orbit,
 // so the Moon swings up and back while Mars rises to the front. Then both leave the view and the Earth takes the right side, then the bottom.
 const WIDE: Key[] = [
-  { earth: [0, -2.24, 2], moon: [-0.62, 0.66, 0.085], mars: [0.66, 0.5, 0.06], orb: [0.58, 0.02, 0.94, 0, 0, 6], lon: 62, free: 1, tilt: -0.62, spot: 0, known: 0, dim: 1 },
+  { earth: [0, -2.42, 1.88], moon: [-0.66, 0.6, 0.082], mars: [0.68, 0.46, 0.056], orb: [0.58, 0.02, 0.94, 0, 0, 6], lon: 62, free: 1, tilt: -0.62, spot: 0, known: 0, dim: 1 },
   { earth: [0, -0.04, 0.8], moon: [0.62, 0.7, 0.075], mars: [0.84, 0.52, 0.055], orb: [0.58, 0.02, 0.94, 0, 0, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 1, dim: 0.34 },
   { earth: [0.95, -1.45, 0.5], moon: [0.58, 0.02, 0.94], mars: [0.58, 0.02, 0.6], orb: [0.58, 0.02, 0.94, 0, 1, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 0, dim: 0.8 },
   { earth: [0.95, -1.45, 0.5], moon: [0.58, 0.02, 0.6], mars: [0.58, 0.02, 0.94], orb: [0.58, 0.02, 0.94, 1, 1, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 0, dim: 0.8 },
   { earth: [0.52, 0, 0.88], moon: [1.3, 1.45, 0.16], mars: [1.3, 1.45, 0.16], orb: OFF, lon: -72, free: 0, tilt: 0.3, spot: 1, known: 1, dim: 1 },
-  { earth: [0, -2.3, 1.9], moon: [1.3, 1.45, 0.16], mars: [1.3, 1.45, 0.16], orb: OFF, lon: 20, free: 1, tilt: -0.5, spot: 0, known: 0, dim: 1 },
+  { earth: [0, -2.38, 1.86], moon: [1.3, 1.45, 0.16], mars: [1.3, 1.45, 0.16], orb: OFF, lon: 20, free: 1, tilt: -0.5, spot: 0, known: 0, dim: 1 },
 ];
 
 const TALL: Key[] = [
-  { earth: [0, -1.62, 1.1], moon: [-0.55, -0.12, 0.05], mars: [0.6, -0.2, 0.036], orb: [0, 0.44, 0.4, 0, 0, 6], lon: 62, free: 1, tilt: -0.62, spot: 0, known: 0, dim: 1 },
+  { earth: [0, -1.78, 1.04], moon: [-0.55, -0.14, 0.048], mars: [0.6, -0.22, 0.034], orb: [0, 0.44, 0.4, 0, 0, 6], lon: 62, free: 1, tilt: -0.62, spot: 0, known: 0, dim: 1 },
   { earth: [0, -0.5, 0.36], moon: [-0.7, -0.05, 0.04], mars: [0.72, -0.12, 0.03], orb: [0, 0.44, 0.4, 0, 0, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 1, dim: 0.7 },
   { earth: [1.2, -1.3, 0.36], moon: [0, 0.44, 0.4], mars: [0, 0.44, 0.28], orb: [0, 0.44, 0.4, 0, 1, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 0, dim: 0.8 },
   { earth: [1.2, -1.3, 0.36], moon: [0, 0.44, 0.28], mars: [0, 0.44, 0.4], orb: [0, 0.44, 0.4, 1, 1, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 0, dim: 0.8 },
@@ -161,10 +161,10 @@ function stars() {
       pos.set([Math.cos(a) * k * radDist, u * radDist, Math.sin(a) * k * radDist], i * 3);
       const lum = lumMin + Math.pow(rnd(), 1.8) * lumSpan;
       const tint = rnd();
-      // Subtle stellar temperature spread: cool blue-white, neutral, soft warm.
-      const r = tint < 0.25 ? 0.86 : tint > 0.82 ? 1.0 : 0.96;
-      const g = tint < 0.25 ? 0.93 : tint > 0.82 ? 0.93 : 0.98;
-      const b = tint < 0.25 ? 1.0 : tint > 0.82 ? 0.84 : 1.0;
+      // Subtle warm-neutral stellar spread: chalk-white, bone, and pale amber.
+      const r = tint < 0.25 ? 0.91 : tint > 0.78 ? 1.0 : 0.96;
+      const g = tint < 0.25 ? 0.92 : tint > 0.78 ? 0.93 : 0.95;
+      const b = tint < 0.25 ? 0.94 : tint > 0.78 ? 0.82 : 0.92;
       col.set([r * lum, g * lum, b * lum], i * 3);
     }
     const geo = new THREE.BufferGeometry();
@@ -213,7 +213,7 @@ function glow(tint: [number, number, number], reach: number) {
 }
 
 function earthAtmosphere() {
-  // Outer BackSide shell computes exact line-of-sight impact parameter to Earth's center so the horizon peaks cleanly and decays to zero inside the mesh edge.
+  // Outer BackSide shell computes exact line-of-sight impact parameter to Earth's center with a restrained Rayleigh limb tied to the grazing sun.
   const haloMat = new THREE.ShaderMaterial({
     uniforms: { k: { value: 0 } },
     vertexShader: `
@@ -226,7 +226,7 @@ function earthAtmosphere() {
         vPos = mv.xyz;
         vCenter = (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
         vRadius = length(modelViewMatrix[0].xyz);
-        vSunDir = normalize((viewMatrix * vec4(-5.0, 3.2, 5.5, 0.0)).xyz);
+        vSunDir = normalize((viewMatrix * vec4(-7.2, 2.6, 3.2, 0.0)).xyz);
         gl_Position = projectionMatrix * mv;
       }
     `,
@@ -242,11 +242,11 @@ function earthAtmosphere() {
         vec3 radial = pClosest - vCenter;
         float b = length(radial) / max(vRadius, 1e-4);
         float h = max(0.0, b - 1.0);
-        float scatter = exp(-h * 24.0) * 0.78 + exp(-h * 9.5) * 0.22;
-        float edge = 1.0 - smoothstep(0.08, 0.175, h);
+        float scatter = exp(-h * 46.0) * 0.74 + exp(-h * 18.0) * 0.26;
+        float edge = 1.0 - smoothstep(0.032, 0.068, h);
         vec3 limbDir = normalize(radial + vec3(0.0, 1e-5, 0.0));
-        float sunLit = mix(0.36, 1.0, smoothstep(-0.55, 0.55, dot(limbDir, normalize(vSunDir))));
-        vec3 col = mix(vec3(0.008, 0.592, 0.871), vec3(0.42, 0.74, 1.0), exp(-h * 34.0));
+        float sunLit = mix(0.14, 1.0, smoothstep(-0.35, 0.65, dot(limbDir, normalize(vSunDir))));
+        vec3 col = mix(vec3(0.16, 0.28, 0.44), vec3(0.48, 0.59, 0.72), exp(-h * 55.0));
         float a = clamp(scatter * edge * sunLit * k, 0.0, 1.0);
         gl_FragColor = vec4(col, a);
       }
@@ -257,7 +257,7 @@ function earthAtmosphere() {
     depthWrite: false,
   });
 
-  // Subtle FrontSide inner limb rim bridges Earth's surface edge smoothly into the cerulean halo.
+  // Subtle FrontSide inner limb rim bridges Earth's surface edge cleanly into the horizon scatter.
   const rimMat = new THREE.ShaderMaterial({
     uniforms: { k: { value: 0 } },
     vertexShader: `
@@ -268,7 +268,7 @@ function earthAtmosphere() {
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         vNormal = normalize(normalMatrix * normal);
         vViewDir = normalize(-mv.xyz);
-        vSunDir = normalize((viewMatrix * vec4(-5.0, 3.2, 5.5, 0.0)).xyz);
+        vSunDir = normalize((viewMatrix * vec4(-7.2, 2.6, 3.2, 0.0)).xyz);
         gl_Position = projectionMatrix * mv;
       }
     `,
@@ -281,9 +281,9 @@ function earthAtmosphere() {
         vec3 N = normalize(vNormal);
         vec3 V = normalize(vViewDir);
         float ndotv = clamp(dot(N, V), 0.0, 1.0);
-        float fresnel = pow(1.0 - ndotv, 4.0);
-        float sunLit = mix(0.25, 1.0, smoothstep(-0.4, 0.55, dot(N, normalize(vSunDir))));
-        vec3 col = mix(vec3(0.008, 0.592, 0.871), vec3(0.54, 0.83, 1.0), pow(1.0 - ndotv, 5.0));
+        float fresnel = pow(1.0 - ndotv, 4.5);
+        float sunLit = mix(0.12, 1.0, smoothstep(-0.3, 0.65, dot(N, normalize(vSunDir))));
+        vec3 col = mix(vec3(0.18, 0.3, 0.46), vec3(0.54, 0.64, 0.76), pow(1.0 - ndotv, 5.0));
         float a = clamp(fresnel * sunLit * k, 0.0, 1.0);
         gl_FragColor = vec4(col, a);
       }
@@ -294,15 +294,15 @@ function earthAtmosphere() {
     depthWrite: false,
   });
 
-  const halo = new THREE.Mesh(new THREE.SphereGeometry(1.18, 128, 96), haloMat);
+  const halo = new THREE.Mesh(new THREE.SphereGeometry(1.07, 128, 96), haloMat);
   const rim = new THREE.Mesh(new THREE.SphereGeometry(1.003, 128, 96), rimMat);
   return {
     halo,
     rim,
     set(p: number, dim: number) {
       const s = p * dim;
-      haloMat.uniforms.k.value = s * 0.58;
-      rimMat.uniforms.k.value = s * 0.36;
+      haloMat.uniforms.k.value = s * 0.26;
+      rimMat.uniforms.k.value = s * 0.16;
     },
   };
 }
@@ -326,6 +326,8 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
   let ratio = Math.min(devicePixelRatio, big >= 16384 ? 2 : 1.5);
   renderer.setPixelRatio(ratio);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.8;
   el.append(renderer.domElement);
   const tag = document.createElement("span");
   tag.className = "intro-tag";
@@ -333,9 +335,9 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
   camera.position.set(0, 0, FAR);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.16));
-  const sun = new THREE.DirectionalLight(0xffffff, 3);
-  sun.position.set(-5, 3.2, 5.5);
+  scene.add(new THREE.AmbientLight(0xebe6dc, 0.06));
+  const sun = new THREE.DirectionalLight(0xfffaf0, 2.3);
+  sun.position.set(-7.2, 2.6, 3.2);
   scene.add(sun);
   const sky = stars();
   scene.add(sky.group);
@@ -381,9 +383,9 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
     paint(id, mat);
     return { tilt, spin, mesh, mat, cur: { ...face }, goal: { ...face }, r: 1, grow: 1 };
   };
-  const earth = globe("earth", 0x1d64c8, { x: 0.3, y: -2.2 });
+  const earth = globe("earth", 0x25303d, { x: 0.3, y: -2.2 });
   const worlds: Record<World, Globe> = {
-    moon: globe("moon", 0xd3d0c8, facing(homes.moon, 0.9)),
+    moon: globe("moon", 0xd8d3c8, facing(homes.moon, 0.9)),
     mars: globe("mars", MARS, facing(homes.mars, 0.9)),
   };
   const bodies: [Body, Globe][] = [
@@ -393,7 +395,7 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
   ];
   const atmo = earthAtmosphere();
   earth.tilt.add(atmo.halo, atmo.rim);
-  const haze = glow([0.99, 0.45, 0.3], 1.05);
+  const haze = glow([0.88, 0.38, 0.24], 1.04);
   worlds.mars.tilt.add(haze.mesh);
 
   const faint = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
@@ -521,8 +523,8 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
         const sway = still ? 0 : Math.sin(t * 0.12) * 0.2;
         g.spin.rotation.y = mix(g.cur.y, g.cur.y + wrap(face - g.cur.y) + sway, free);
       } else g.spin.rotation.y = g.cur.y + (still ? 0 : Math.sin(t * 0.2 + (id === "moon" ? 1 : 4)) * 0.04);
-      g.mat.color.setScalar(p * (id === "earth" ? dim : 1));
-      g.mat.emissiveIntensity = (1 - p) * 0.8;
+      g.mat.color.setScalar(p * (id === "earth" ? dim * 0.8 : id === "moon" ? 0.84 : 0.82));
+      g.mat.emissiveIntensity = (1 - p) * 0.7;
       const m = marks[id];
       m.lit += (1 - m.lit) * (still ? 1 : 1 - Math.exp(-dt * 6));
       const w = (id === "earth" ? val("spot") : 1) * p;
@@ -531,7 +533,7 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
       m.halo.opacity = (still ? 0.5 : 0.32 + 0.3 * (1 - pulse)) * m.lit * w;
     }
     atmo.set(p, dim);
-    haze.mat.uniforms.k.value = p * 0.35;
+    haze.mat.uniforms.k.value = p * 0.16;
     faint.opacity = 0.12 * p;
     dotMat.opacity = 0.8 * p;
     sky.setOpacity(p);

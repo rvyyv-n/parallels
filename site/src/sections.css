@@ -1,10 +1,9 @@
 .sec-k {
   margin: 0 0 14px;
-  font: 600 12px/1 var(--display);
-  font-stretch: 85%;
-  letter-spacing: 0.12em;
+  font: 700 13px/1 var(--display);
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--signal);
+  color: var(--signal-2);
 }
 
 .foot {

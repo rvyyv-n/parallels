@@ -32,7 +32,7 @@ test("every route opens its page with its heading, focus and title", async ({ pa
   await page.goto(`/#/place?t=${main.id}&f=${f0.id}&c=${c}`);
   await expect(page.locator(".pl-for")).toContainText(main.name);
   await expect(h1(page)).not.toHaveText("A match on Earth");
-  await expect(page).toHaveTitle(`${await h1(page).innerText()} · Parallels`);
+  await expect(page).toHaveTitle(`${(await h1(page).textContent())?.trim()} · Parallels`);
   expect(errors).toEqual([]);
 });
 
@@ -89,7 +89,7 @@ test("Home and About don't wait for the land file", async ({ page }) => {
     await expect(page.locator(`#ch-${b} .cant dl > div`)).toHaveCount(m.cant_copy.length);
     await expect(page.locator(`#ch-${b} a.site`)).toHaveCount(m.targets.filter((t) => t.body === b).length);
   }
-  await expect(page.locator(".places button")).toHaveCount(6);
+  await expect(page.locator(".places a.place-link")).toHaveCount(6);
   await expect(page.locator("#count-ranked")).toHaveText(/^[\d,]+$/);
   await page.locator('.top nav a[data-route="about"]').evaluate((a) => (a as HTMLElement).click());
   await expect(page.locator(".ab-table tbody tr:not(.ab-tg)")).toHaveCount(m.datasets.length);
@@ -156,7 +156,7 @@ test("old shared links open the new pages and leave no old URL behind", async ({
   await expect(page.locator("#back-find")).toHaveAttribute("href", new RegExp(`c=${c}`));
   await page.goto(`/?t=${main.id}`);
   await expect(page).toHaveURL(new RegExp(`/#/find\\?t=${main.id}$`));
-  await expect(page.locator("#pick-target")).toHaveValue(main.id);
+  await expect(page.locator("#pick-target")).toHaveAttribute("data-value", main.id);
   await page.goto("/#third-run");
   await expect(page).toHaveURL(/#\/about$/);
   await expect(page.locator("#checked")).toBeInViewport();

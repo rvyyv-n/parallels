@@ -20,9 +20,8 @@
   min-height: 44px;
   min-width: 44px;
   padding: 0 14px;
-  font: 600 12px/1 var(--display);
-  font-stretch: 85%;
-  letter-spacing: 0.08em;
+  font: 600 13px/1 var(--display);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink);
   background: transparent;

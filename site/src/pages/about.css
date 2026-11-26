@@ -19,16 +19,16 @@
 
 .ab-top h1 {
   margin: 0 0 16px;
-  font: 800 clamp(38px, 4.8vw, 62px) / 1.02 var(--display);
-  font-stretch: 88%;
-  letter-spacing: -0.015em;
+  font: 800 clamp(42px, 5.2vw, 68px) / 0.96 var(--display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .ab-big {
-  max-width: 36ch;
+  max-width: 38ch;
   margin: 0 0 12px;
-  font: 600 clamp(19px, 2vw, 24px) / 1.35 var(--display);
-  font-stretch: 92%;
+  font: 600 clamp(20px, 2.1vw, 25px) / 1.25 var(--display);
+  letter-spacing: 0.015em;
   color: var(--ink);
 }
 
@@ -84,15 +84,16 @@
 
 .ab-head h2 {
   margin: 0 0 10px;
-  font: 800 clamp(28px, 3.2vw, 42px) / 1.06 var(--display);
-  font-stretch: 88%;
-  letter-spacing: -0.01em;
+  font: 800 clamp(32px, 3.6vw, 48px) / 1 var(--display);
+  letter-spacing: 0.015em;
+  text-transform: uppercase;
 }
 
 .ab h3 {
   margin: 34px 0 12px;
-  font: 700 17px/1.2 var(--display);
-  font-stretch: 92%;
+  font: 700 18px/1.15 var(--display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--ink);
 }
 
@@ -456,7 +457,8 @@
 }
 
 .ab-prog-card.is-now {
-  background: linear-gradient(155deg, var(--signal-tint), transparent 64%), var(--raise);
+  background: var(--surface-2);
+  box-shadow: inset 0 2px 0 var(--signal-2);
 }
 
 .ab-prog-top {
@@ -574,9 +576,11 @@
 
 .ab-vtable .ab-vtg th {
   padding: 10px 12px;
-  font: 700 12px/1.2 var(--display);
+  font: 700 13px/1.2 var(--display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--signal-2);
-  background: rgba(29, 100, 200, 0.08);
+  background: rgba(229, 170, 76, 0.07);
 }
 
 .ab-misses {
@@ -921,9 +925,11 @@
 
 .ab-table .ab-tg th {
   padding-top: 13px;
-  font: 700 12.5px/1.2 var(--display);
+  font: 700 13.5px/1.2 var(--display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--signal-2);
-  background: rgba(29, 100, 200, 0.07);
+  background: rgba(229, 170, 76, 0.07);
 }
 
 .ab-table .ab-tg th > span {

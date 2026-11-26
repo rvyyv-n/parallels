@@ -102,8 +102,8 @@ export async function thumb(cv: HTMLCanvasElement, t: Target) {
   ctx.save();
   // Subtle optical vignette gives each orbital crop clean instrument framing.
   const vig = ctx.createRadialGradient(n / 2, n / 2, n * 0.34, n / 2, n / 2, n * 0.74);
-  vig.addColorStop(0, "rgba(2, 7, 10, 0)");
-  vig.addColorStop(1, "rgba(2, 7, 10, 0.36)");
+  vig.addColorStop(0, "rgba(7, 7, 9, 0)");
+  vig.addColorStop(1, "rgba(7, 7, 9, 0.38)");
   ctx.fillStyle = vig;
   ctx.fillRect(0, 0, n, n);
 
@@ -127,10 +127,10 @@ export async function thumb(cv: HTMLCanvasElement, t: Target) {
   };
   ctx.lineCap = "round";
   ctx.lineWidth = n / 38;
-  ctx.strokeStyle = "rgba(2, 7, 10, 0.76)";
+  ctx.strokeStyle = "rgba(7, 7, 9, 0.78)";
   trace();
   ctx.lineWidth = n / 68;
-  ctx.strokeStyle = "#5a9cf2";
+  ctx.strokeStyle = "#e5aa4c";
   trace();
   ctx.restore();
 }

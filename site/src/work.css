@@ -20,7 +20,7 @@
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: radial-gradient(ellipse at 50% 48%, transparent 56%, rgba(2, 7, 10, 0.36) 85%, rgba(2, 7, 10, 0.68) 100%);
+  background: radial-gradient(ellipse at 50% 48%, transparent 56%, rgba(7, 7, 9, 0.36) 85%, rgba(7, 7, 9, 0.7) 100%);
 }
 
 .fd-stars {
@@ -87,16 +87,16 @@
   height: 9px;
   border-radius: 50%;
   border: 1.5px solid #fff;
-  background: rgba(90, 156, 242, 0.28);
+  background: rgba(229, 170, 76, 0.26);
   flex: none;
 }
 
 .k-cave {
   width: 6px;
   height: 6px;
-  background: #ffd97d;
+  background: var(--warn);
   border: 0;
-  box-shadow: 0 0 0 1px rgba(2, 7, 10, 0.7);
+  box-shadow: 0 0 0 1px rgba(7, 7, 9, 0.78);
 }
 
 .status {
@@ -125,8 +125,8 @@
   height: 17px;
   font: 600 10.5px/15px var(--mono);
   color: var(--ink-2);
-  background: rgba(6, 11, 16, 0.56);
-  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(10, 10, 13, 0.64);
+  border: 1px solid rgba(242, 240, 235, 0.3);
   border-top: 0;
   border-radius: 0 0 var(--r-xs) var(--r-xs);
   box-sizing: border-box;
@@ -138,7 +138,7 @@
   white-space: nowrap;
   padding: 3px 7px;
   border-radius: var(--r-pill);
-  background: rgba(6, 11, 16, 0.56);
+  background: rgba(10, 10, 13, 0.64);
 }
 
 .st-at:empty {
@@ -222,8 +222,7 @@
   margin: 0;
   margin-right: auto;
   white-space: nowrap;
-  font: 700 11.5px/1.2 var(--display);
-  font-stretch: 88%;
+  font: 700 12.5px/1.15 var(--display);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink);
@@ -307,8 +306,8 @@
 }
 
 .lg-bin.is-active {
-  background: linear-gradient(180deg, #f6d746 0%, #fca50a 100%);
-  box-shadow: 0 0 6px rgba(252, 165, 10, 0.28);
+  background: linear-gradient(180deg, #f5ebc4 0%, #e5aa4c 100%);
+  box-shadow: 0 0 5px rgba(229, 170, 76, 0.25);
 }
 
 .lg-bar {
@@ -347,9 +346,9 @@
   width: 12px;
   height: 8px;
   border-radius: 2px;
-  border: 1.4px solid #ffd97d;
-  background: rgba(252, 165, 10, 0.38);
-  box-shadow: 0 0 6px rgba(255, 194, 74, 0.45);
+  border: 1.4px solid #f5ebc4;
+  background: rgba(229, 170, 76, 0.32);
+  box-shadow: 0 0 5px rgba(229, 170, 76, 0.36);
 }
 
 .mk-top {
@@ -361,8 +360,8 @@
   font: 700 8.5px/1 var(--display);
   font-style: normal;
   color: var(--ink);
-  background: rgba(2, 7, 10, 0.9);
-  border: 1.2px solid rgba(255, 255, 255, 0.9);
+  background: rgba(7, 7, 9, 0.92);
+  border: 1.2px solid rgba(242, 240, 235, 0.9);
 }
 
 .mk-minor {
@@ -371,7 +370,7 @@
   border-radius: 50%;
   background: var(--warn);
   border: 1px solid var(--space);
-  box-shadow: 0 0 0 1px rgba(255, 224, 138, 0.45);
+  box-shadow: 0 0 0 1px rgba(245, 235, 196, 0.42);
 }
 
 .lg-foot {

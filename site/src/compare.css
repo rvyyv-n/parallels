@@ -92,7 +92,7 @@
 
 .cmp-ov[aria-pressed="true"] {
   color: var(--ink);
-  border-color: rgba(90, 156, 242, 0.45);
+  border-color: var(--signal-bd);
   background: var(--signal-tint);
 }
 
@@ -118,6 +118,7 @@
 
 .cmp-p {
   position: relative;
+  isolation: isolate;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: var(--r-md);
@@ -284,7 +285,13 @@
   grid-area: 1 / 1;
 }
 
+.cmp[data-mode="wipe"] .eimg {
+  z-index: 1;
+  clip-path: inset(0 calc(100% - var(--wipe)) 0 0);
+}
+
 .cmp[data-mode="wipe"] .timg {
+  z-index: 2;
   clip-path: inset(0 0 0 var(--wipe));
 }
 
@@ -301,8 +308,8 @@
   left: var(--wipe);
   width: 2px;
   margin-left: -1px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 0 0 1px rgba(2, 7, 10, 0.72), 0 0 10px rgba(2, 7, 10, 0.7);
+  background: rgba(242, 240, 235, 0.94);
+  box-shadow: 0 0 0 1px rgba(7, 7, 9, 0.72), 0 0 10px rgba(0, 0, 0, 0.7);
   pointer-events: none;
   z-index: 4;
 }
@@ -317,17 +324,17 @@
   height: 34px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 2px solid #fff;
+  border: 2px solid var(--ink);
   background: var(--glass-strong);
-  color: #fff;
-  box-shadow: 0 0 0 2px rgba(2, 7, 10, 0.78), 0 0 18px rgba(90, 156, 242, 0.45), var(--shadow-float);
-  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+  color: var(--ink);
+  box-shadow: 0 0 0 2px rgba(7, 7, 9, 0.8), 0 6px 18px rgba(0, 0, 0, 0.65);
+  transition: transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
 }
 
 .cmp[data-mode="wipe"] .cmp-stage:hover .cmp-puck,
 .cmp[data-mode="wipe"] .cmp-stage:has(.cmp-range:active) .cmp-puck {
   transform: translate(-50%, -50%) scale(1.08);
-  box-shadow: 0 0 0 2px rgba(2, 7, 10, 0.85), 0 0 22px rgba(90, 156, 242, 0.65), var(--shadow-float);
+  border-color: var(--signal-2);
 }
 
 .cmp[data-mode="wipe"] .cmp-range {

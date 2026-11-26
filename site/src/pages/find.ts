@@ -10,6 +10,7 @@ import { rankOf } from "../score";
 import { cut, focus, type Zones } from "../zones";
 import { createAnalogTip, createHoverCard, createPopup, type AnalogTip, type HoverCard, type Popup } from "../hovercard";
 import { createSearch, createStarfield, createTargetTwin, renderHistogram, type SearchBox, type Starfield, type TargetTwin } from "../finder-hud";
+import { createPicker, type PickerHandle } from "../picker";
 import { isNew, spread } from "../rank";
 import { compare, fmtMul, key, list, rules, sliders, sortBar, summary, type View } from "../ranklist";
 import { tourButton } from "../tour";
@@ -47,9 +48,7 @@ const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby=
         </div>
       </div>
       <div class="fd-site">
-        <label class="fd-pick"><span class="sr">Base site</span><i class="fd-dot" aria-hidden="true"></i><select id="pick-target">${(["moon", "mars"] as const)
-          .map((b) => `<optgroup label="${BODY[b]}">${m.targets.filter((t) => t.body === b).map((t) => `<option value="${esc(t.id)}">${esc(t.short)}</option>`).join("")}</optgroup>`)
-          .join("")}</select>${icon("chevron")}</label>
+        <div class="fd-pick-wrap" id="pick-target-wrap"></div>
       </div>
     </header>
     <div class="fd-block fd-sum" id="summary" aria-live="polite"><p class="sum-k">The list is loading…</p></div>
@@ -63,10 +62,7 @@ const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby=
     <details class="fd-block fd-w" id="weights">
       <summary><span>Filters and weights</span><span class="w-mine" id="w-mine" hidden>your weights</span>${icon("chevron")}</summary>
       <div class="fd-w-in">
-        <label class="ctl"><span>Terrain type</span><select id="pick-type"><option value="">All land</option>${m.terrain_types
-          .filter((t) => t.key !== "none")
-          .map((t) => `<option value="${t.id}">${esc(t.name)} (${num(t.cells)} cells)</option>`)
-          .join("")}</select></label>
+        <div class="ctl"><span id="pick-type-lbl">Terrain type</span><div id="pick-type-wrap"></div></div>
         <label class="ctl switch"><input type="checkbox" id="pick-yr" role="switch"><span>Year-round testing</span></label>
         <p class="w-note" id="yr-note"></p>
         <div class="w-head"><h2>Weights</h2><button type="button" class="sum-link" id="w-reset">Reset</button></div>
@@ -152,6 +148,8 @@ export function finder(ctx: Ctx): Page {
   let stars: Starfield | null = null;
   let twin: TargetTwin | null = null;
   let search: SearchBox | null = null;
+  let targetPicker: PickerHandle | null = null;
+  let typePicker: PickerHandle | null = null;
   const hovers = matchMedia("(hover: hover)");
   let terr: Float32Array | undefined;
   let picking = 0;
@@ -289,11 +287,10 @@ export function finder(ctx: Ctx): Page {
 
   const renderControls = () => {
     const t = target();
-    $<HTMLSelectElement>("#pick-target").value = s.target;
-    $(".fd-dot").dataset.body = t.body;
+    targetPicker?.setValue(s.target);
     for (const b of el.querySelectorAll<HTMLButtonElement>("[data-filter]")) b.setAttribute("aria-pressed", String(b.dataset.filter === s.filter));
     const yr = $<HTMLInputElement>("#pick-yr");
-    $<HTMLSelectElement>("#pick-type").value = s.type == null ? "" : String(s.type);
+    typePicker?.setValue(s.type == null ? "" : String(s.type));
     yr.checked = s.yr && !s.hand;
     yr.disabled = !!s.hand;
     $("#yr-note").textContent = s.hand
@@ -392,16 +389,15 @@ export function finder(ctx: Ctx): Page {
     cancelSliderRaf();
     const t = target();
     const mine = ++picking;
-    const pick = $<HTMLSelectElement>("#pick-target");
     const prog = $("#fd-progress");
-    pick.value = s.target;
-    pick.setAttribute("aria-busy", "true");
+    targetPicker?.setValue(s.target);
+    targetPicker?.setBusy(true);
     prog.hidden = false;
     ctx.site(t);
     twin?.update(t);
     const next = await ctx.cols(t).catch(() => null);
     if (mine !== picking) return;
-    pick.removeAttribute("aria-busy");
+    targetPicker?.setBusy(false);
     prog.hidden = true;
     if (!next) {
       $("#rank").innerHTML = `<p class="rk-empty" role="alert">The data for this base site did not load. Reload the page.</p>`;
@@ -529,26 +525,47 @@ export function finder(ctx: Ctx): Page {
       }
     });
 
-    $<HTMLSelectElement>("#pick-target").addEventListener("change", (e) => {
-      const id = (e.target as HTMLSelectElement).value;
-      if (id === s.target) return;
-      const was = Object.fromEntries(chs().map((c) => [c.id, mulOf(c.id)]));
-      const hand = s.hand;
-      s.target = id;
-      s.cell = -1;
-      s.cmp = [];
-      if (hand) {
-        const b = base();
-        const live = chs().filter((c) => b[c.id]);
-        s.hand = live.every((c) => (was[c.id] ?? 1) === 1) ? null : Object.fromEntries(live.map((c) => [c.id, Math.round(b[c.id] * (was[c.id] ?? 1) * 100) / 100]));
-      }
-      save();
-      void apply(false);
+    targetPicker = createPicker($("#pick-target-wrap"), {
+      id: "pick-target",
+      ariaLabel: "Base site",
+      variant: "field",
+      options: (["moon", "mars"] as const).flatMap((b) =>
+        m.targets
+          .filter((t) => t.body === b)
+          .map((t) => ({ value: t.id, label: t.short, group: BODY[b], dot: b })),
+      ),
+      value: s.target,
+      onChange(id) {
+        if (id === s.target) return;
+        const was = Object.fromEntries(chs().map((c) => [c.id, mulOf(c.id)]));
+        const hand = s.hand;
+        s.target = id;
+        s.cell = -1;
+        s.cmp = [];
+        if (hand) {
+          const b = base();
+          const live = chs().filter((c) => b[c.id]);
+          s.hand = live.every((c) => (was[c.id] ?? 1) === 1) ? null : Object.fromEntries(live.map((c) => [c.id, Math.round(b[c.id] * (was[c.id] ?? 1) * 100) / 100]));
+        }
+        save();
+        void apply(false);
+      },
     });
-    $<HTMLSelectElement>("#pick-type").addEventListener("change", (e) => {
-      const v = (e.target as HTMLSelectElement).value;
-      s.type = v === "" ? null : Number(v);
-      changed(false);
+    typePicker = createPicker($("#pick-type-wrap"), {
+      id: "pick-type",
+      ariaLabel: "Terrain type",
+      variant: "field",
+      options: [
+        { value: "", label: "All land" },
+        ...m.terrain_types
+          .filter((t) => t.key !== "none")
+          .map((t) => ({ value: String(t.id), label: t.name, meta: `${num(t.cells)} cells` })),
+      ],
+      value: s.type == null ? "" : String(s.type),
+      onChange(v) {
+        s.type = v === "" ? null : Number(v);
+        changed(false);
+      },
     });
     $<HTMLInputElement>("#pick-yr").addEventListener("change", (e) => {
       s.yr = (e.target as HTMLInputElement).checked;
@@ -672,7 +689,7 @@ export function finder(ctx: Ctx): Page {
       }
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       const tgt = e.target as HTMLElement | null;
-      if (tgt && tgt.closest('input, select, textarea, [contenteditable="true"]')) return;
+      if (tgt && tgt.closest('input, select, textarea, [contenteditable="true"], [role="combobox"], [role="listbox"]')) return;
       if (e.key === "/") {
         e.preventDefault();
         search?.focus();
@@ -840,6 +857,8 @@ export function finder(ctx: Ctx): Page {
       cancelSliderRaf();
       stars?.stop();
       search?.close();
+      targetPicker?.close(false);
+      typePicker?.close(false);
       card?.hide();
       analogTip?.hide();
       pop?.hide(false);

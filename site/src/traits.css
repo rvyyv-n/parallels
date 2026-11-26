@@ -37,8 +37,9 @@
 
 .pl .t-name {
   display: block;
-  font: 680 15px/1.25 var(--display);
-  font-stretch: 96%;
+  font: 700 17px/1.15 var(--display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   color: var(--ink);
 }
 
@@ -190,7 +191,7 @@
   border-radius: 50%;
   background: var(--signal-2);
   border: 2px solid var(--space);
-  box-shadow: 0 0 0 1.5px var(--signal), 0 0 8px rgba(90, 156, 242, 0.42);
+  box-shadow: 0 0 0 1.5px var(--ink);
   pointer-events: none;
   z-index: 2;
 }
@@ -217,7 +218,7 @@
   margin-left: -1.5px;
   border-radius: 1.5px;
   background: var(--ink);
-  box-shadow: 0 0 0 1px rgba(2, 7, 10, 0.8);
+  box-shadow: 0 0 0 1px rgba(7, 7, 9, 0.85);
   z-index: 3;
 }
 
@@ -284,8 +285,8 @@
 }
 
 .cnt-r.here .pp i.on {
-  background: var(--signal);
-  border-color: var(--signal);
+  background: var(--signal-2);
+  border-color: var(--signal-2);
 }
 
 .cnt-r.there .pp i.on {
@@ -354,7 +355,7 @@
   margin: 6px 0 4px;
   padding: 12px;
   border: 1px solid var(--rule);
-  border-left: 2px solid var(--signal);
+  border-left: 2px solid var(--signal-2);
   border-radius: var(--r-sm);
   background: var(--surface-1);
 }

@@ -42,6 +42,6 @@ export const CODE = [
   { name: "MapLibre GL JS", url: "https://maplibre.org/", licence: "BSD-3-Clause", use: "Earth globe and map" },
   { name: "three.js", url: "https://threejs.org/", licence: "MIT", use: "3D Earth, Moon and Mars in the intro" },
   { name: "Lucide icons 1.73.0", url: "https://lucide.dev/", licence: "ISC", use: "Icons on the match page" },
-  { name: "Archivo (variable font, by Omnibus-Type)", url: "https://fontsource.org/fonts/archivo", licence: "SIL Open Font Licence 1.1", use: "Headings, labels and numbers" },
+  { name: "Barlow Condensed, Inter, and JetBrains Mono (via Fontsource)", url: "https://fontsource.org/fonts/barlow-condensed", licence: "SIL Open Font Licence 1.1", use: "Headings, UI text, and telemetry numbers" },
   { name: "Vite and TypeScript", url: "https://vite.dev/", licence: "MIT / Apache-2.0", use: "Tools that build the site" },
 ];

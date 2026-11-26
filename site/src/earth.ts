@@ -10,7 +10,7 @@ const GIBS =
 const MAXLAT = 85.051129;
 const W = 720;
 const H = 1024;
-// Gentle dimming over uncolored Earth when spotlighting top-share zones (rgba(2, 7, 10, 0.38)).
+// Gentle dimming over uncolored Earth when spotlighting top-share zones (rgba(7, 7, 9, 0.38)).
 const DIM = 97;
 const WORLD: [[number, number], [number, number], [number, number], [number, number]] = [
   [-180, MAXLAT],
@@ -20,10 +20,10 @@ const WORLD: [[number, number], [number, number], [number, number], [number, num
 ];
 
 const GLOBE_SKY: maplibregl.SkySpecification = {
-  "sky-color": "#1a56b0",
-  "horizon-color": "#3b7ee6",
-  "sky-horizon-blend": 0.55,
-  "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.88, 4.5, 0.48, 7, 0.08],
+  "sky-color": "#131720",
+  "horizon-color": "#2a3342",
+  "sky-horizon-blend": 0.42,
+  "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.44, 4.5, 0.24, 7, 0.04],
 };
 
 export interface Grid {
@@ -106,27 +106,27 @@ function painter(far: HTMLCanvasElement, near: HTMLCanvasElement, px: Int32Array
       const i = px[p];
       const o = p * 4;
       if (i < 0 || (focused && !keep[i])) {
-        d[o] = e[o] = 2;
+        d[o] = e[o] = 7;
         d[o + 1] = e[o + 1] = 7;
-        d[o + 2] = e[o + 2] = 10;
+        d[o + 2] = e[o + 2] = 9;
         d[o + 3] = e[o + 3] = focused ? DIM : 0;
         continue;
       }
       const v = s[i];
       if (Number.isNaN(v)) {
         d[o] = e[o] = 120;
-        d[o + 1] = e[o + 1] = 126;
-        d[o + 2] = e[o + 2] = 134;
+        d[o + 1] = e[o + 1] = 122;
+        d[o + 2] = e[o + 2] = 126;
         d[o + 3] = e[o + 3] = keep[i] ? 70 : 30;
         continue;
       }
       const c = Math.max(0, Math.min(1, v));
       const l = Math.round(c * 255) * 3;
       if (focused) {
-        // Blend a 12% warm golden wash (#ffc24a) inside focused spotlight cells.
-        d[o] = e[o] = Math.round(LUT[l] * 0.88 + 255 * 0.12);
-        d[o + 1] = e[o + 1] = Math.round(LUT[l + 1] * 0.88 + 194 * 0.12);
-        d[o + 2] = e[o + 2] = Math.round(LUT[l + 2] * 0.88 + 74 * 0.12);
+        // Blend a 12% warm solar-gold wash (#e5aa4c) inside focused spotlight cells.
+        d[o] = e[o] = Math.round(LUT[l] * 0.88 + 229 * 0.12);
+        d[o + 1] = e[o + 1] = Math.round(LUT[l + 1] * 0.88 + 170 * 0.12);
+        d[o + 2] = e[o + 2] = Math.round(LUT[l + 2] * 0.88 + 76 * 0.12);
       } else {
         d[o] = e[o] = LUT[l];
         d[o + 1] = e[o + 1] = LUT[l + 1];
@@ -231,25 +231,25 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         },
       },
       layers: [
-        { id: "space", type: "background", paint: { "background-color": "#02070a", "background-opacity": 0 } },
-        { id: "fallback", type: "raster", source: "fallback", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.9, "raster-fade-duration": 0 } },
-        { id: "bm", type: "raster", source: "bm", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.9, "raster-contrast": 0.05 } },
+        { id: "space", type: "background", paint: { "background-color": "#070709", "background-opacity": 0 } },
+        { id: "fallback", type: "raster", source: "fallback", paint: { "raster-saturation": -0.24, "raster-brightness-max": 0.84, "raster-fade-duration": 0 } },
+        { id: "bm", type: "raster", source: "bm", paint: { "raster-saturation": -0.24, "raster-brightness-max": 0.84, "raster-contrast": 0.05 } },
         {
           id: "zone-glow",
           type: "line",
           source: "zone",
           layout: { "line-join": "round", "line-cap": "round" },
-          paint: { "line-color": "#ffc24a", "line-width": 6, "line-blur": 5, "line-opacity": 0.65 },
+          paint: { "line-color": "#e5aa4c", "line-width": 6, "line-blur": 5, "line-opacity": 0.55 },
         },
         {
           id: "zone-line",
           type: "line",
           source: "zone",
           layout: { "line-join": "round", "line-cap": "round" },
-          paint: { "line-color": "#ffd97d", "line-width": 1.35, "line-opacity": 0.96 },
+          paint: { "line-color": "#f5ebc4", "line-width": 1.35, "line-opacity": 0.94 },
         },
-        { id: "par", type: "line", source: "sel", filter: ["==", ["get", "k"], "par"], paint: { "line-color": "#5a9cf2", "line-width": 1, "line-dasharray": [2, 3], "line-opacity": 0.75 } },
-        { id: "cell", type: "line", source: "sel", filter: ["==", ["get", "k"], "cell"], paint: { "line-color": "#5a9cf2", "line-width": 2.5 } },
+        { id: "par", type: "line", source: "sel", filter: ["==", ["get", "k"], "par"], paint: { "line-color": "#e5aa4c", "line-width": 1, "line-dasharray": [2, 3], "line-opacity": 0.72 } },
+        { id: "cell", type: "line", source: "sel", filter: ["==", ["get", "k"], "cell"], paint: { "line-color": "#e5aa4c", "line-width": 2.5 } },
         {
           id: "analogs",
           type: "circle",
@@ -257,8 +257,8 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           filter: ["==", ["get", "kind"], "known_analog"],
           paint: {
             "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 4.2, 5, 6.2],
-            "circle-color": "rgba(90, 156, 242, 0.28)",
-            "circle-stroke-color": "#ffffff",
+            "circle-color": "rgba(229, 170, 76, 0.26)",
+            "circle-stroke-color": "#f2f0eb",
             "circle-stroke-width": 1.6,
           },
         },
@@ -269,8 +269,8 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           filter: ["==", ["get", "kind"], "cave"],
           paint: {
             "circle-radius": ["interpolate", ["linear"], ["zoom"], 1, 3.4, 5, 5.2],
-            "circle-color": "#ffd97d",
-            "circle-stroke-color": "#02070a",
+            "circle-color": "#e5aa4c",
+            "circle-stroke-color": "#070709",
             "circle-stroke-width": 1.3,
           },
         },

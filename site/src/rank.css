@@ -15,11 +15,11 @@
 .fd-side {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 12px 14px 0;
+  padding: 10px 14px 0;
   background: var(--surface-1);
   border-right: 1px solid var(--rule);
   scrollbar-width: thin;
@@ -33,7 +33,7 @@
 
 .fd-head {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .fd-grip {
@@ -107,71 +107,9 @@
   align-items: stretch;
 }
 
-.fd-pick {
-  position: relative;
+.fd-pick-wrap {
   flex: 1 1 auto;
   min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-left: 11px;
-  border: 1px solid var(--rule-2);
-  border-radius: var(--r-md);
-  background: var(--raise);
-  box-shadow: var(--edge-hi);
-  transition: border-color var(--t-fast) var(--ease);
-}
-
-.fd-pick:hover,
-.fd-pick:focus-within {
-  border-color: var(--signal);
-}
-
-.fd-pick > .ic {
-  position: absolute;
-  right: 10px;
-  width: 16px;
-  height: 16px;
-  color: var(--ink-2);
-  pointer-events: none;
-}
-
-.fd-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--moon);
-  flex: none;
-}
-
-.fd-dot[data-body="mars"] {
-  background: var(--mars);
-}
-
-.fd-pick select {
-  appearance: none;
-  min-height: 40px;
-  width: 100%;
-  min-width: 0;
-  padding: 4px 32px 4px 0;
-  font: 600 13.5px/1.2 var(--body);
-  color: var(--ink);
-  background: transparent;
-  border: 0;
-  outline: none;
-  cursor: pointer;
-  text-overflow: ellipsis;
-}
-
-.fd-pick select option,
-.fd-pick select optgroup {
-  color: var(--ink);
-  background: var(--raise);
-}
-
-.fd-pick select[aria-busy="true"] {
-  cursor: progress;
-  opacity: 0.7;
 }
 
 .fd-block {
@@ -181,11 +119,11 @@
   box-shadow: var(--edge-hi);
 }
 
-/* Best match summary card with subtle diagonal orbital-blue wash */
+/* Best match summary card — clean flat obsidian instrument well */
 .fd-sum {
-  padding: 11px 13px 10px;
-  background: linear-gradient(155deg, var(--signal-tint), transparent 58%), var(--raise);
-  border-color: var(--signal-bd);
+  padding: 9px 12px 9px;
+  background: var(--raise);
+  border-color: var(--rule-2);
 }
 
 .sum-top {
@@ -193,7 +131,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin: 0 0 6px;
+  margin: 0 0 4px;
 }
 
 .sum-k {
@@ -236,15 +174,15 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 10px;
-  margin: 0 0 10px;
+  margin: 0 0 7px;
 }
 
 .sum-name {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font: 750 18.5px/1.18 var(--display);
-  font-stretch: 88%;
+  font: 700 20px/1.1 var(--display);
+  letter-spacing: 0.015em;
   color: var(--ink);
   text-decoration: none;
   transition: color var(--t-fast) var(--ease);
@@ -287,7 +225,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
-  padding: 8px 0 0;
+  padding: 6px 0 0;
   list-style: none;
   border-top: 1px solid var(--rule);
 }
@@ -406,9 +344,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 42px;
-  padding: 0 12px 0 14px;
-  font: 600 14px/1.2 var(--body);
+  min-height: 36px;
+  padding: 0 12px 0 13px;
+  font: 600 13px/1.2 var(--body);
   cursor: pointer;
   list-style: none;
 }
@@ -457,8 +395,9 @@
   color: var(--ink-2);
 }
 
-.fd-w-in .ctl select {
-  border-radius: var(--r-sm);
+.fd-w-in .ctl {
+  display: grid;
+  gap: 6px;
 }
 
 .w-head {
@@ -585,22 +524,22 @@
 
 /* Solid band styles (used in compare table & badges) */
 .b-vc {
-  color: #04130b;
+  color: #070709;
   background: var(--band-vc);
 }
 
 .b-c {
-  color: #141a04;
+  color: #070709;
   background: var(--band-c);
 }
 
 .b-p {
-  color: #1d1203;
+  color: #070709;
   background: var(--band-p);
 }
 
 .b-f {
-  color: #1f0603;
+  color: #070709;
   background: var(--band-f);
 }
 
@@ -614,7 +553,7 @@
 .rk-chips .fc,
 .fd-key i.fc {
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.035);
   border-left: 3px solid transparent;
   border-radius: var(--r-xs);
 }
@@ -630,7 +569,7 @@
 .fd-key i.fc.b-vc {
   background: var(--band-vc-bg);
   border-left-color: var(--band-vc);
-  box-shadow: inset 0 0 0 1px rgba(95, 208, 154, 0.24);
+  box-shadow: inset 0 0 0 1px rgba(245, 235, 196, 0.22);
 }
 
 .rk-chips .fc.b-vc::before,
@@ -645,7 +584,7 @@
 .fd-key i.fc.b-c {
   background: var(--band-c-bg);
   border-left-color: var(--band-c);
-  box-shadow: inset 0 0 0 1px rgba(195, 223, 106, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(229, 170, 76, 0.24);
 }
 
 .rk-chips .fc.b-c::before,
@@ -661,7 +600,7 @@
 .fd-key i.fc.b-p {
   background: var(--band-p-bg);
   border-left-color: var(--band-p);
-  box-shadow: inset 0 0 0 1px rgba(240, 184, 90, 0.24);
+  box-shadow: inset 0 0 0 1px rgba(223, 109, 71, 0.25);
 }
 
 .rk-chips .fc.b-p::before,
@@ -676,7 +615,7 @@
 .fd-key i.fc.b-f {
   background: var(--band-f-bg);
   border-left-color: var(--band-f);
-  box-shadow: inset 0 0 0 1px rgba(240, 122, 110, 0.26);
+  box-shadow: inset 0 0 0 1px rgba(184, 118, 150, 0.26);
 }
 
 .rk-chips .fc.b-f::before,
@@ -777,8 +716,9 @@
 }
 
 .g-n {
-  font: 650 15px/1.2 var(--display);
-  font-stretch: 92%;
+  font: 700 16px/1.15 var(--display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .g-m {
@@ -801,8 +741,8 @@
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr) auto;
   grid-template-areas: "n name score" "n badges score" "n chips chips";
-  gap: 4px 10px;
-  padding: 10px 14px 10px 12px;
+  gap: 3px 10px;
+  padding: 9px 14px 9px 12px;
   color: var(--ink);
   text-decoration: none;
   border-left: 2px solid transparent;
@@ -816,12 +756,12 @@
 }
 
 .rk-row:focus-visible {
-  outline: 2px solid var(--signal);
+  outline: 2px solid var(--signal-2);
   outline-offset: -2px;
 }
 
 .rk-row.on {
-  border-left-color: var(--signal);
+  border-left-color: var(--signal-2);
   background: var(--signal-tint);
 }
 
@@ -831,28 +771,28 @@
   place-items: center;
   width: 26px;
   height: 26px;
-  font: 700 12.5px/1 var(--display);
+  font: 700 13px/1 var(--display);
   border: 1px solid var(--rule-2);
   border-radius: 50%;
   transition: background-color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
 
 .rk[data-rank="1"] .rk-n {
-  border-color: rgba(255, 194, 74, 0.72);
+  border-color: rgba(229, 170, 76, 0.72);
   color: var(--warn);
-  background: rgba(255, 194, 74, 0.12);
+  background: rgba(229, 170, 76, 0.12);
 }
 
 .rk[data-rank="2"] .rk-n {
-  border-color: rgba(211, 222, 235, 0.55);
+  border-color: rgba(216, 211, 200, 0.55);
   color: var(--ink);
   background: rgba(255, 255, 255, 0.06);
 }
 
 .rk[data-rank="3"] .rk-n {
-  border-color: rgba(240, 168, 108, 0.52);
-  color: #f4ba86;
-  background: rgba(240, 168, 108, 0.08);
+  border-color: rgba(224, 98, 62, 0.52);
+  color: #ef8c6b;
+  background: rgba(224, 98, 62, 0.1);
 }
 
 .rk-row.on .rk-n,
@@ -885,7 +825,7 @@
 .rk-new {
   padding: 1px 7px;
   color: var(--pass);
-  border: 1px solid rgba(134, 227, 168, 0.45);
+  border: 1px solid var(--band-vc-bd);
   border-radius: var(--r-pill);
 }
 
@@ -976,7 +916,7 @@
   width: 14px;
   height: 14px;
   margin: 0;
-  accent-color: var(--signal);
+  accent-color: var(--signal-2);
   cursor: pointer;
 }
 
@@ -995,7 +935,7 @@
   background: var(--glass-strong);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
-  border-top: 2px solid var(--signal);
+  border-top: 1px solid var(--signal-2);
   box-shadow: 0 -14px 34px rgba(0, 0, 0, 0.62), var(--edge-hi);
 }
 
@@ -1191,6 +1131,10 @@
     min-height: 32px;
   }
 
+  .fd-w > summary {
+    min-height: 44px;
+  }
+
   .fd .presets {
     flex-wrap: wrap;
   }
@@ -1198,10 +1142,6 @@
   .fd .presets button {
     min-height: 40px;
     padding: 0 8px;
-  }
-
-  .fd-pick select {
-    min-height: 44px;
   }
 
   .rk-tick {

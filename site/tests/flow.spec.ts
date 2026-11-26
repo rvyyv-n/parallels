@@ -30,7 +30,7 @@ test("main flow: pick a site in its world's chapter on Home, pick a filter, open
   await expect(page).toHaveURL(new RegExp(`#/find\\?t=${target.id}`));
   await expect(rows(page)).toHaveCount(20);
   await expect(page.locator("#find-h")).toContainText(target.name);
-  await expect(page.locator("#pick-target")).toHaveValue(target.id);
+  await expect(page.locator("#pick-target")).toHaveAttribute("data-value", target.id);
   await page.locator(`.presets [data-filter="${filter.id}"]`).click();
   await expect(page.locator(`.presets [data-filter="${filter.id}"]`)).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".card")).toHaveCount(0);
@@ -228,7 +228,11 @@ test("keyboard alone reaches the pickers, the ranked list, the scorecard and the
   const pick = page.locator("#pick-target");
   const other = m.targets.find((x) => x.id !== main.id)!;
   await pick.focus();
-  await pick.selectOption(other.id);
+  await page.keyboard.press("Enter");
+  await expect(pick).toHaveAttribute("aria-expanded", "true");
+  await page.locator(`#pick-target-listbox [role="option"][data-value="${other.id}"]`).click();
+  await expect(pick).toHaveAttribute("aria-expanded", "false");
+  await expect(pick).toHaveAttribute("data-value", other.id);
   await expect(page).toHaveURL(new RegExp(`t=${other.id}`));
   await expect(rows(page)).toHaveCount(20);
   const second = row(page, 2).locator(".rk-row");
@@ -370,12 +374,17 @@ test("Home counts the land, says what Earth can't copy for each world, and turns
     await expect(page.locator(`#ch-${b} .cant dl > div`)).toHaveCount(m.cant_copy.length);
     await expect(page.locator(`#ch-${b} .w-val, #ch-${b} .w-solve, #ch-${b} .w-analog`)).toHaveCount(0);
   }
-  const places = page.locator(".places button");
+  const places = page.locator(".places a.place-link");
   await expect(places).toHaveCount(6);
-  await expect(places.first()).toHaveAttribute("aria-pressed", "true");
+  await expect(places.first()).toHaveAttribute("aria-current", "true");
+  await places.nth(3).focus();
+  await expect(places.nth(3)).toHaveAttribute("aria-current", "true");
+  await expect(places.first()).not.toHaveAttribute("aria-current");
+  await expect(page.locator("#place-note .place-open")).toBeVisible();
   await places.nth(3).click();
-  await expect(places.nth(3)).toHaveAttribute("aria-pressed", "true");
-  await expect(places.first()).toHaveAttribute("aria-pressed", "false");
+  await expect(page).toHaveURL(/#\/place\?.*known=1.*c=\d+/);
+  await expect(page.locator(".card")).toHaveCount(1);
+  await page.goBack();
   await page.locator("#ch-go a.go").click();
   await expect(page).toHaveURL(/#\/find/);
 });

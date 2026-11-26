@@ -125,7 +125,14 @@ export function place(ctx: Ctx): Page {
           yr,
           ranges,
         });
+        const orderedFilters = [...m.filters].sort((a, bb) => Number(bb.id === "balanced") - Number(a.id === "balanced"));
+        const presetOptions = [
+          ...(s.hand ? [{ value: "__custom", label: "Custom weights" }] : []),
+          ...orderedFilters.map((fl) => ({ value: fl.id, label: fl.name })),
+        ];
         disposeCard = wireCard(box, {
+          presetOptions,
+          presetValue: s.hand ? "__custom" : f.id,
           onPreset(filterId) {
             refocusId = "pl-preset";
             go(`#/place?${query({ ...s, filter: filterId, hand: null })}`, true);

@@ -5,6 +5,7 @@ import type { Cols } from "./data";
 import { trekUrl, worldviewUrl } from "./export";
 import { MONTHS, bits, esc, latlon, monthList, num, score100, unit } from "./format";
 import { icon } from "./icons";
+import { createPicker, type PickerOption } from "./picker";
 import { BANDS, bandOf, isNew, shortName } from "./rank";
 import { coverage } from "./score";
 import { BODY, breakRows, ds, row, same, scoreChip, scoredRows, short, traitHtml, val, type Row, type TraitInput } from "./traits";
@@ -31,6 +32,8 @@ export interface CardInput extends TraitInput {
 }
 
 export interface CardHandlers {
+  presetOptions?: PickerOption[];
+  presetValue?: string;
   onPreset?: (filterId: string) => void;
   onYearRound?: () => void;
   onCsv?: () => void;
@@ -118,7 +121,7 @@ function chTile(x: CardInput, c: Challenge, open: boolean) {
   const cov = coverage(x.t[`cov:${c.id}`], v, x.i);
   const state = !c.traits.length ? "not scored" : cov <= 0 ? "no data here" : cov < 1 ? "some data missing" : "";
   const b = bandOf(v);
-  return `<li class="ch${w > 0 ? "" : " off"}">
+  return `<li class="ch${w > 0 ? "" : " off"}" id="ch-item-${esc(c.id)}">
     <details${open ? " open" : ""}>
       <summary>
         <span class="ch-ic">${icon(c.id)}</span>
@@ -304,6 +307,30 @@ function checkStrip(x: CardInput) {
   </div>`;
 }
 
+function snapStrip(x: CardInput, chs: Challenge[]) {
+  const usable = x.cells.usable?.[x.i];
+  const usableTxt = Number.isFinite(usable) ? `${num(usable)} / 12 mo usable` : "";
+  const items = chs
+    .map((c) => {
+      const v = chScore(x, c);
+      const w = x.weights[c.id] ?? 0;
+      const b = bandOf(v);
+      const pct = b ? (v * 100).toFixed(1) : "0";
+      return `<a class="pl-snap-row${w > 0 ? "" : " is-off"}" href="#ch-item-${esc(c.id)}" data-open-ch="${esc(c.id)}" data-band="${b ? b.cls : "b-na"}">
+        <span class="pl-snap-top"><span class="pl-snap-n">${esc(shortName(c.id, c.name))}</span><span class="pl-snap-v">${b ? score100(v) : "—"}</span></span>
+        <span class="pl-snap-bar" aria-hidden="true"><i style="width:${pct}%"></i></span>
+      </a>`;
+    })
+    .join("");
+  return `<div class="pl-snap" aria-label="Score overview by challenge">
+    <div class="pl-snap-head">
+      <span>Score overview</span>
+      ${usableTxt ? `<a class="pl-snap-mo" href="#pl-se-h">${esc(usableTxt)}</a>` : ""}
+    </div>
+    <div class="pl-snap-grid">${items}</div>
+  </div>`;
+}
+
 export function card(x: CardInput): string {
   const { m, i, cells, target } = x;
   const body = BODY[x.body];
@@ -320,12 +347,7 @@ export function card(x: CardInput): string {
   const b = bandOf(s);
   const ok = Number.isFinite(s);
   const fresh = isNew(m, cells, i);
-  const orderedFilters = [...m.filters].sort((a, bb) => Number(bb.id === "balanced") - Number(a.id === "balanced"));
-  const filterId = x.filterId ?? "balanced";
   const isHand = !!x.hand;
-  const presetOptions = `${isHand ? `<option value="__custom" selected>Custom weights</option>` : ""}${orderedFilters
-    .map((f) => `<option value="${esc(f.id)}"${!isHand && f.id === filterId ? " selected" : ""}>${esc(f.name)}</option>`)
-    .join("")}`;
   const rawCoords = `${cells.lat[i].toFixed(4)}, ${cells.lon[i].toFixed(4)}`;
   return `<article class="card pl" aria-labelledby="place-h">
     <div class="pl-top">
@@ -336,7 +358,7 @@ export function card(x: CardInput): string {
             <span class="pl-for-txt"><b>${esc(target.short)}</b></span>
           </div>
           <div class="pl-for-ctl">
-            <label class="pl-preset" title="Switch mission preset"><span class="sr">Mission preset</span><select class="pl-preset-sel" id="pl-preset" aria-label="Mission preset">${presetOptions}</select>${icon("chevron", "pl-preset-ic")}</label>
+            <span class="pl-preset" id="pl-preset-wrap" title="Switch mission preset"></span>
             <button type="button" class="pl-yr" id="pl-yr" aria-pressed="${x.yr ? "true" : "false"}"${isHand ? ' disabled title="Reset custom weights in Finder to use Year-round"' : ' title="Prefer places usable all year"'}>Year-round</button>
           </div>
         </div>
@@ -361,6 +383,7 @@ export function card(x: CardInput): string {
             ${lead ? `<p class="pl-test">${icon("test")}<span><b>Test here:</b> ${esc(lead.what_to_test)}</span></p>` : ""}
           </div>
         </div>
+        ${snapStrip(x, chs)}
         <div class="pl-folds">
           ${head ? `<details class="pl-fold"><summary>Why this is the main match${icon("chevron", "chev")}</summary><p><b>${esc(head.title)}.</b> ${esc(plainWhy(m, head.why))}</p></details>` : ""}
           <details class="pl-fold"><summary>How the score works${icon("chevron", "chev")}</summary>
@@ -436,9 +459,29 @@ export function wireCard(el: HTMLElement, handlers?: CardHandlers): () => void {
   const disposeCompare = wireCompare(el);
   const timers: number[] = [];
 
-  const preset = el.querySelector<HTMLSelectElement>("#pl-preset");
-  preset?.addEventListener("change", () => {
-    if (preset.value && preset.value !== "__custom") handlers?.onPreset?.(preset.value);
+  const presetHost = el.querySelector<HTMLElement>("#pl-preset-wrap");
+  const presetPicker =
+    presetHost && handlers?.presetOptions?.length
+      ? createPicker(presetHost, {
+          id: "pl-preset",
+          ariaLabel: "Mission preset",
+          options: handlers.presetOptions,
+          value: handlers.presetValue ?? handlers.presetOptions[0].value,
+          variant: "pill",
+          align: "right",
+          minMenuWidth: 204,
+          onChange(val) {
+            if (val && val !== "__custom") handlers.onPreset?.(val);
+          },
+        })
+      : null;
+
+  el.querySelectorAll<HTMLAnchorElement>(".pl-snap-row[data-open-ch]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const targetLi = el.querySelector<HTMLElement>(`#ch-item-${CSS.escape(link.dataset.openCh ?? "")}`);
+      const det = targetLi?.querySelector<HTMLDetailsElement>("details");
+      if (det && !det.open) det.open = true;
+    });
   });
 
   const yr = el.querySelector<HTMLButtonElement>("#pl-yr");
@@ -506,6 +549,7 @@ export function wireCard(el: HTMLElement, handlers?: CardHandlers): () => void {
   }
 
   return () => {
+    presetPicker?.destroy();
     disposeCompare();
     for (const id of timers) clearTimeout(id);
   };

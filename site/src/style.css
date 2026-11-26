@@ -1,45 +1,45 @@
 :root {
-  /* Elevation & surfaces (deep orbital obsidian & slate-navy) */
-  --space: #03070c;
-  --surface-1: #081018;        /* sidebar & instrument cards */
-  --raise: #0e1824;            /* elevated wells, inputs, drawers */
-  --surface-2: #162433;        /* hover wells & active pills */
-  --glass: rgba(7, 13, 20, 0.82);
-  --glass-strong: rgba(7, 13, 20, 0.93);
+  /* Elevation & surfaces (neutral carbon-obsidian — zero blue-navy cast) */
+  --space: #070709;
+  --surface-1: #0d0d10;        /* sidebar & instrument cards */
+  --raise: #141419;            /* elevated wells, inputs, drawers */
+  --surface-2: #1c1c23;        /* hover wells & subtle controls */
+  --glass: rgba(10, 10, 13, 0.84);
+  --glass-strong: rgba(10, 10, 13, 0.94);
 
-  /* Hairlines & aerospace aluminum inner edge sheen */
-  --rule: rgba(214, 228, 244, 0.1);
-  --rule-2: rgba(214, 228, 244, 0.19);
-  --rule-3: rgba(214, 228, 244, 0.32);
-  --edge-hi: inset 0 1px 0 rgba(226, 238, 255, 0.07);
+  /* Hairlines & subtle titanium inner edge sheen */
+  --rule: rgba(242, 240, 235, 0.09);
+  --rule-2: rgba(242, 240, 235, 0.16);
+  --rule-3: rgba(242, 240, 235, 0.28);
+  --edge-hi: inset 0 1px 0 rgba(255, 255, 255, 0.055);
 
-  /* Typography & ink (self-hosted Archivo + Inter + JetBrains Mono) */
-  --ink: #f1f5f9;
-  --ink-2: #a8b7c9;
-  --ink-3: #78889b;
-  --display: "Archivo Variable", "Archivo", "Arial Narrow", system-ui, sans-serif;
+  /* Typography & ink (self-hosted Barlow Condensed + Inter + JetBrains Mono) */
+  --ink: #f2f0eb;
+  --ink-2: #a8a6a0;
+  --ink-3: #8c8a84;
+  --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
   --body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 
-  /* Parallels brand & world accents */
-  --signal: #1d64c8;
-  --signal-hover: #246ed4;
-  --signal-ink: #f8fafc;
-  --signal-2: #5a9cf2;
-  --signal-tint: rgba(29, 100, 200, 0.14);
-  --signal-bd: rgba(90, 156, 242, 0.36);
-  --mars: #f97352;
-  --mars-tint: rgba(249, 115, 82, 0.12);
-  --moon: #d8d4ca;
-  --warn: #f6c052;
-  --pass: #4ade9a;
-  --fail: #f1786b;
+  /* Parallels Titanium & Oxide palette (Inferno-aligned, zero blue/green chrome) */
+  --signal: #f2f0eb;
+  --signal-hover: #ffffff;
+  --signal-ink: #070709;
+  --signal-2: #e5aa4c;
+  --signal-tint: rgba(229, 170, 76, 0.11);
+  --signal-bd: rgba(229, 170, 76, 0.34);
+  --mars: #e0623e;
+  --mars-tint: rgba(224, 98, 62, 0.12);
+  --moon: #d8d3c8;
+  --warn: #e5aa4c;
+  --pass: #f5ebc4;
+  --fail: #df6d47;
 
-  /* Challenge / trait score bands (one source of truth) */
-  --band-vc: #4ade9a;   --band-vc-bg: rgba(74, 222, 154, 0.14);  --band-vc-bd: rgba(74, 222, 154, 0.38);
-  --band-c:  #b8dc64;   --band-c-bg:  rgba(184, 220, 100, 0.13); --band-c-bd:  rgba(184, 220, 100, 0.36);
-  --band-p:  #f2b754;   --band-p-bg:  rgba(242, 183, 84, 0.14);  --band-p-bd:  rgba(242, 183, 84, 0.38);
-  --band-f:  #f1786b;   --band-f-bg:  rgba(241, 120, 107, 0.14); --band-f-bd:  rgba(241, 120, 107, 0.4);
+  /* Challenge / trait score bands (Inferno-aligned, CVD-safe with geometric pips) */
+  --band-vc: #f5ebc4;   --band-vc-bg: rgba(245, 235, 196, 0.13); --band-vc-bd: rgba(245, 235, 196, 0.34);
+  --band-c:  #e5aa4c;   --band-c-bg:  rgba(229, 170, 76, 0.13);  --band-c-bd:  rgba(229, 170, 76, 0.36);
+  --band-p:  #df6d47;   --band-p-bg:  rgba(223, 109, 71, 0.14);  --band-p-bd:  rgba(223, 109, 71, 0.38);
+  --band-f:  #b87696;   --band-f-bg:  rgba(184, 118, 150, 0.15); --band-f-bd:  rgba(184, 118, 150, 0.38);
 
   /* Geometry & shadows */
   --r-xs: 4px;
@@ -121,7 +121,7 @@ body {
 }
 
 ::selection {
-  background: rgba(29, 100, 200, 0.52);
+  background: rgba(229, 170, 76, 0.34);
   color: #fff;
 }
 
@@ -138,7 +138,7 @@ a:hover {
 :focus-visible {
   outline: 2px solid var(--signal-2);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(2, 7, 10, 0.85);
+  box-shadow: 0 0 0 4px rgba(7, 7, 9, 0.85);
 }
 
 h1,
@@ -205,8 +205,7 @@ p {
 
 .tag {
   display: inline-block;
-  font: 600 10.5px/1 var(--display);
-  font-stretch: 80%;
+  font: 700 11px/1 var(--display);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 3px 6px 2px;
@@ -217,8 +216,8 @@ p {
 }
 
 .tag.ice {
-  border-color: #cfe9ff;
-  color: #cfe9ff;
+  border-color: var(--moon);
+  color: var(--moon);
 }
 
 .tag.warn {
@@ -297,7 +296,7 @@ p {
 
 .lg-par {
   fill: none;
-  stroke: var(--signal);
+  stroke: var(--signal-2);
   stroke-width: 1.6;
   stroke-linecap: round;
   stroke-dasharray: 1;
@@ -328,9 +327,8 @@ p {
 
 .wordmark {
   position: relative;
-  font: 800 25px/1 var(--display);
-  font-stretch: 70%;
-  letter-spacing: 0.035em;
+  font: 800 26px/1 var(--display);
+  letter-spacing: 0.055em;
   text-transform: uppercase;
   color: var(--ink);
   text-decoration: none;
@@ -347,7 +345,7 @@ p {
 }
 
 .wordmark.small {
-  font-size: 18px;
+  font-size: 19px;
   display: inline-block;
 }
 
@@ -367,9 +365,8 @@ p {
 
 .top nav a {
   position: relative;
-  font: 600 12px/1 var(--display);
-  font-stretch: 85%;
-  letter-spacing: 0.08em;
+  font: 600 13.5px/1 var(--display);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-2);
   text-decoration: none;
@@ -483,7 +480,7 @@ option {
 }
 
 .switch input:checked {
-  border-color: var(--signal);
+  border-color: var(--signal-2);
   background: var(--signal-tint);
 }
 
@@ -588,7 +585,7 @@ option {
 .prange:has(> input:focus-visible) .prange-track {
   outline: 2px solid var(--signal-2);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(2, 7, 10, 0.85);
+  box-shadow: 0 0 0 4px rgba(7, 7, 9, 0.85);
 }
 
 .prange-fill {
@@ -598,11 +595,11 @@ option {
   left: 0;
   width: calc(var(--pr-knob) + var(--pr-pad) * 2 + (100% - var(--pr-knob) - var(--pr-pad) * 2) * var(--ratio, 0));
   border-radius: var(--r-pill);
-  background: var(--pr-fill, var(--signal));
+  background: var(--pr-fill, var(--signal-2));
 }
 
 .prange-grad .prange-fill {
-  background: linear-gradient(90deg, rgba(238, 242, 246, 0.92), var(--signal));
+  background: linear-gradient(90deg, rgba(242, 240, 235, 0.35), var(--signal-2));
 }
 
 .prange-knob {
@@ -612,8 +609,8 @@ option {
   width: var(--pr-knob);
   height: var(--pr-knob);
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  background: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   transform: translateY(-50%);
   transition: transform var(--t-fast) var(--ease);
 }
@@ -657,7 +654,7 @@ option {
 }
 
 .months td.on-frz {
-  background: repeating-linear-gradient(135deg, var(--signal) 0 2px, transparent 2px 5px);
+  background: repeating-linear-gradient(135deg, var(--band-f) 0 2px, transparent 2px 5px);
 }
 
 .months td.on-rain {
@@ -877,7 +874,7 @@ table.data .n {
 }
 
 .maplibregl-cooperative-gesture-screen {
-  background: rgba(2, 7, 10, 0.78);
+  background: rgba(7, 7, 9, 0.78);
   font-family: var(--body);
 }
 

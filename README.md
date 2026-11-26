@@ -29,7 +29,7 @@ No single place on Earth can stand in for a Moon or Mars base. So we split base-
 <td width="50%" valign="top"><img src="docs/images/place.jpg" alt="One match"><br><b>One match</b><br><sub>The place on Earth beside the base site at the same ground scale, with the match score, what matches, what breaks and the dataset behind each value.</sub></td>
 </tr>
 <tr>
-<td width="50%" valign="top"><img src="docs/images/known.jpg" alt="Where crews already train"><br><b>Where crews already train</b><br><sub>Known analog sites on Earth. Click one to fly the globe there.</sub></td>
+<td width="50%" valign="top"><img src="docs/images/known.jpg" alt="Where crews already train"><br><b>Where crews already train</b><br><sub>Known analog sites on Earth. Hover one to fly the globe there, or select it to inspect its Earth match.</sub></td>
 <td width="50%" valign="top"><img src="docs/images/learn.jpg" alt="Learn"><br><b>Learn</b><br><sub>The Moon and Mars in six short sections: temperatures, seasons on Earth, what Earth cannot copy, and NASA photo pairs.</sub></td>
 </tr>
 <tr>
@@ -300,7 +300,7 @@ These images are shown, not scored. No NASA logo or insignia is used.
 | [Lucide icons](https://lucide.dev/) | ISC | Icons in the match view |
 | [Vite](https://vite.dev/) and TypeScript | MIT / Apache-2.0 | Building the site |
 | Playwright | Apache-2.0 | Site tests |
-| [Archivo](https://fontsource.org/fonts/archivo) (variable, by Omnibus-Type) | SIL Open Font Licence 1.1 | Display headings and brand wordmark |
+| [Barlow Condensed](https://fontsource.org/fonts/barlow-condensed) (500–800, by Jeremy Tribby) | SIL Open Font Licence 1.1 | Display headings and brand wordmark |
 | [Inter](https://fontsource.org/fonts/inter) (variable, by Rasmus Andersson) | SIL Open Font Licence 1.1 | UI labels and body copy |
 | [JetBrains Mono](https://fontsource.org/fonts/jetbrains-mono) (variable, by JetBrains) | SIL Open Font Licence 1.1 | Coordinates, ranks, scores and telemetry |
 

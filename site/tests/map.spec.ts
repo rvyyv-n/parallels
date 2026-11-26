@@ -53,7 +53,9 @@ test("the terrain filter still applies on top of the zones", async ({ page }) =>
   await ready(page);
   const type = m.terrain_types.find((x) => x.key !== "none")!;
   await page.locator("#weights > summary").click();
-  await page.locator("#pick-type").selectOption(String(type.id));
+  await page.locator("#pick-type").click();
+  await page.locator(`#pick-type-listbox [role="option"][data-value="${type.id}"]`).click();
+  await expect(page.locator("#pick-type")).toHaveAttribute("data-value", String(type.id));
   const c = cut(score, 0.02);
   const want = score.filter((v, i) => v >= c && cells.terrain_type[i] === type.id).length;
   await expect(legend(page)).toHaveAttribute("data-painted", String(want));

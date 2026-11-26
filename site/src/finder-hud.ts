@@ -32,7 +32,7 @@ function makeStars(count: number): Star[] {
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-  const tints = ["238,244,252", "194,228,255", "255,244,226", "178,212,248"];
+  const tints = ["244,241,235", "236,228,214", "252,238,214", "222,224,230"];
   const stars: Star[] = [];
   for (let i = 0; i < count; i++) {
     const big = rnd() > 0.86;

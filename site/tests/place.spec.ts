@@ -74,14 +74,18 @@ test("inline preset switcher and Year-round toggle update URL, score ring, and F
   await page.goto(`/#/place?t=${moonPole.id}&f=${balanced.id}&c=${id}`);
   const preset = page.locator(".pl-for #pl-preset");
   const yrBtn = page.locator(".pl-for #pl-yr");
+  const pickPreset = async (val: string) => {
+    await page.locator(".pl-for #pl-preset").click();
+    await page.locator(`#pl-preset-listbox [role="option"][data-value="${val}"]`).click();
+  };
 
-  await expect(preset).toHaveValue(balanced.id);
+  await expect(preset).toHaveAttribute("data-value", balanced.id);
   await expect(yrBtn).toHaveAttribute("aria-pressed", "false");
   await expect(page.locator(".card .ring b")).toHaveText(score100(t[`score:${balanced.id}`][id]));
 
-  await preset.selectOption(rover.id);
+  await pickPreset(rover.id);
   await expect(page).toHaveURL(new RegExp(`#/place\\?.*f=${rover.id}.*c=${id}`));
-  await expect(page.locator(".pl-for #pl-preset")).toHaveValue(rover.id);
+  await expect(page.locator(".pl-for #pl-preset")).toHaveAttribute("data-value", rover.id);
   await expect(page.locator(".card .ring b")).toHaveText(score100(t[`score:${rover.id}`][id]));
   await expect(page.locator("#back-find")).toHaveAttribute("href", new RegExp(`f=${rover.id}`));
 
@@ -96,9 +100,9 @@ test("inline preset switcher and Year-round toggle update URL, score ring, and F
   await expect(page.locator(".pl-for #pl-yr")).toHaveAttribute("aria-pressed", "false");
 
   await page.goto(`/#/place?t=${moonPole.id}&f=${balanced.id}&w=surface:2,heat:1&c=${id}`);
-  await expect(page.locator(".pl-for #pl-preset")).toHaveValue("__custom");
+  await expect(page.locator(".pl-for #pl-preset")).toHaveAttribute("data-value", "__custom");
   await expect(page.locator(".pl-for #pl-yr")).toBeDisabled();
-  await page.locator(".pl-for #pl-preset").selectOption(balanced.id);
+  await pickPreset(balanced.id);
   await expect(page).not.toHaveURL(/w=/);
   await expect(page.locator(".pl-for #pl-yr")).toBeEnabled();
 });
@@ -204,6 +208,33 @@ test("image compare Overlays toggle hides markers and Side by side / Wipe segmen
   await expect(wipeBtn).toHaveAttribute("aria-pressed", "true");
   await expect(splitBtn).toHaveAttribute("aria-pressed", "false");
   await expect(cmp.locator(".cmp-puck")).toBeVisible();
+
+  const wipeStack = await cmp.evaluate((el) => {
+    const eimg = el.querySelector<HTMLElement>(".eimg")!;
+    const timg = el.querySelector<HTMLElement>(".timg")!;
+    const eStyle = getComputedStyle(eimg);
+    const tStyle = getComputedStyle(timg);
+    const stage = el.querySelector<HTMLElement>(".cmp-stage")!;
+    const r = stage.getBoundingClientRect();
+    const hits = document.elementsFromPoint(r.left + r.width * 0.75, r.top + r.height * 0.5);
+    const tIdx = hits.indexOf(timg);
+    const eIdx = hits.indexOf(eimg);
+    return {
+      eIso: eStyle.isolation,
+      tIso: tStyle.isolation,
+      eZ: Number(eStyle.zIndex),
+      tZ: Number(tStyle.zIndex),
+      eClip: eStyle.clipPath,
+      tClip: tStyle.clipPath,
+      tAboveE: tIdx >= 0 && (eIdx < 0 || tIdx < eIdx),
+    };
+  });
+  expect(wipeStack.eIso).toBe("isolate");
+  expect(wipeStack.tIso).toBe("isolate");
+  expect(wipeStack.tZ).toBeGreaterThan(wipeStack.eZ);
+  expect(wipeStack.eClip).toContain("inset");
+  expect(wipeStack.tClip).toContain("inset");
+  expect(wipeStack.tAboveE).toBe(true);
 
   await splitBtn.click();
   await expect(cmp).toHaveAttribute("data-mode", "split");

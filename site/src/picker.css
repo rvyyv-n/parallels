@@ -1,0 +1,255 @@
+/* Custom accessible obsidian glass combobox / listbox picker */
+
+.pk {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  width: 100%;
+}
+
+.pk[data-variant="pill"] {
+  width: auto;
+  display: inline-flex;
+}
+
+.pk-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 11px;
+  font: 600 13.5px/1.2 var(--body);
+  color: var(--ink);
+  text-align: left;
+  background: var(--raise);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-md);
+  box-shadow: var(--edge-hi);
+  cursor: pointer;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    background-color var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+
+.pk[data-variant="pill"] .pk-btn {
+  width: auto;
+  min-height: 30px;
+  padding: 0 10px 0 12px;
+  gap: 6px;
+  font: 600 12px/1 var(--body);
+  border-radius: var(--r-pill);
+}
+
+.pk-btn:hover,
+.pk[data-open="true"] .pk-btn {
+  border-color: var(--rule-3);
+  background: var(--surface-2);
+}
+
+.pk[data-open="true"] .pk-btn {
+  border-color: var(--signal-2);
+}
+
+.pk-btn[aria-busy="true"] {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.pk-val {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pk-chev {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin-left: auto;
+  color: var(--ink-3);
+  transition: transform var(--t-state) var(--ease), color var(--t-fast) var(--ease);
+}
+
+.pk[data-variant="pill"] .pk-chev {
+  width: 13px;
+  height: 13px;
+}
+
+.pk[data-open="true"] .pk-chev {
+  transform: rotate(180deg);
+  color: var(--ink);
+}
+
+.pk-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+
+.pk-dot[hidden] {
+  display: none;
+}
+
+.pk-dot[data-dot="moon"] {
+  background: var(--moon);
+}
+
+.pk-dot[data-dot="mars"] {
+  background: var(--mars);
+}
+
+/* Floating obsidian glass listbox mounted on body to avoid overflow clipping */
+.pk-pop {
+  position: fixed;
+  z-index: calc(var(--z-pop, 14) + 30);
+  display: grid;
+  gap: 1px;
+  padding: 5px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--glass-strong);
+  -webkit-backdrop-filter: blur(16px) saturate(125%);
+  backdrop-filter: blur(16px) saturate(125%);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-pop), var(--edge-hi);
+  animation: pk-in 130ms var(--ease);
+}
+
+.pk-pop[hidden] {
+  display: none;
+}
+
+@keyframes pk-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pk-pop[data-flip="up"] {
+  animation-name: pk-in-up;
+}
+
+@keyframes pk-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.pk-grp {
+  padding: 7px 9px 4px;
+  font: 700 10.5px/1 var(--display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.pk-grp:not(:first-child) {
+  margin-top: 4px;
+  padding-top: 9px;
+  border-top: 1px solid var(--rule);
+}
+
+.pk-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 9px;
+  font: 500 13px/1.25 var(--body);
+  color: var(--ink-2);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--r-md) - 4px);
+  cursor: pointer;
+  transition: background-color 110ms var(--ease), color 110ms var(--ease);
+}
+
+.pk-opt:hover,
+.pk-opt.is-active {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.pk-opt.is-selected {
+  color: var(--ink);
+  font-weight: 600;
+  background: rgba(242, 240, 235, 0.06);
+}
+
+.pk-opt.is-selected.is-active {
+  background: var(--surface-2);
+}
+
+.pk-opt:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.pk-opt-lbl {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pk-opt-meta {
+  flex: none;
+  font: 500 11px/1 var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+}
+
+.pk-opt-chk {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  color: var(--signal-2);
+}
+
+.pk-opt-chk .ic {
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 759px) {
+  .pk-btn {
+    min-height: 44px;
+  }
+
+  .pk-opt {
+    min-height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-pop {
+    animation: none;
+  }
+
+  .pk-chev {
+    transition: none;
+  }
+}
