@@ -6,7 +6,7 @@ Status and remaining polish checklist for the `v3` site upgrade on top of the fr
 
 - **Data and scoring are frozen:** `pipeline/` and `site/public/data/` do not change. Every number on screen traces directly to `site/public/data/`.
 - **Honest scientific framing:** Show `N / 100 match score` (never `% similar` or `% match`). Never label scoring as `"ML"` or `"AI"`. Every match states what matches, where it breaks in real units, and what Earth cannot copy.
-- **Self-contained static site:** Zero external font hosts (display, body, and mono faces bundled locally). Only external tile hosts are `gibs.earthdata.nasa.gov` and `trek.nasa.gov`, with local fallbacks. No NASA logos or insignia.
+- **Self-contained static site:** Zero external font hosts (display, body, and mono faces bundled locally). Only external tile hosts are `gibs.earthdata.nasa.gov`, `trek.nasa.gov`, and `tiles.maps.eox.at` (ESA Copernicus Sentinel-2 Cloudless partner layer, with NASA Blue Marble and local fallbacks). No NASA logos or insignia.
 - **Low-CPU verification:** Playwright defaults to `workers: 1`, `reducedMotion: "reduce"`, 1× DPR on phone, memoized binary fixtures, local tile stubs (`LIVE_TILES=1` for live tiles), and a focused phone suite (`PW_ALL_PHONE=1` for every test on phone; `npm --prefix site run test:laptop` for desktop-only).
 
 ---
@@ -77,3 +77,35 @@ Completed visual and interaction overhaul addressing live review feedback across
 
 ### 6.5 Phase 6 Verification & Sign-off
 - [x] **Full automated & visual QA:** `npm --prefix site run build` (clean, 0 errors), full `npm --prefix site test` (75 passed / 2 skipped / 0 failed across laptop and phone), `pytest` (139 passed / 1 skipped / 0 failed), `git diff testing..v3 -- site/public/data/ pipeline/` confirmed empty, live visual verification across desktop (`1440×900`) and phone (`390×844`), all 7 `docs/images/*.jpg` refreshed, and `AI_NOTE` parity confirmed.
+
+---
+
+## Active: Phase 7 — UI Polish 2
+
+Targeted refinement pass built on top of Phase 6 while keeping `pipeline/` and `site/public/data/` frozen and byte-identical:
+
+### 7.1 Home 3D Calibration & Uniform Card Borders
+- [ ] **Balanced Home hero lighting & globe presence (`site/src/intro.ts`, `site/src/intro.css`):** Lift tone-mapping exposure (`0.80 → 0.94`), warm ambient fill (`0.06 → 0.11`), key sun intensity (`2.3 → 2.45`, slightly more forward at `(-6.4, 2.9, 4.4)`), and planet surface albedos (`0.80 → 0.90` Earth, `0.92` Moon, `0.90` Mars) with crisp subtle horizon scatter (`halo k: 0.30`, `rim k: 0.20`). Raise Earth's opening limb slightly (`WIDE[0].earth: [0, -2.18, 1.90]`, `TALL[0].earth: [0, -1.62, 1.08]`) to ~32% viewport height while preserving a clear starfield gap below the CTA buttons.
+- [ ] **Uniform sleek 1px active borders across rounded cards (`site/src/intro.css`, `site/src/rank.css`, `site/src/traits.css`, `site/src/style.css`, `site/src/pages/pages.css`):** Remove curved `inset 3px 0 0` flares on Home Moon, Mars, and Known Sites cards (`aria-current="true"` / `:hover`) and audit rounded challenge chips, `.sn-grid`, and callout boxes so active borders remain clean, thin, and uniform all the way around.
+
+### 7.2 Finder Cockpit Controls, Search Focus Fix & Globe Polar Cap
+- [ ] **Streamlined Finder mid-controls (`site/src/pages/find.ts`, `site/src/ranklist.ts`, `site/src/rank.css`):** Pair a sleeker `#weights` (`Filters & weights`) drawer trigger with a compact obsidian `Rank | Region` segmented toggle on one row, and strip heavy double boxes off the 5 CVD-safe `#key` band markers onto a quiet hairline legend strip directly below (preserving `#weights > summary`, `#key` band words, and `[data-sort]` test contracts).
+- [ ] **Search bar focus bug fix (`site/src/map.css`):** Clear inherited global `:focus-visible` `box-shadow` on `.fd-search-in:focus-visible`, add `overflow: hidden` on `.fd-search-field`, and render a clean outer focus ring on `.fd-search-field:focus-within`.
+- [ ] **Eliminate MapLibre globe polar cone distortion (`site/src/earth.ts`):** Add 3-ring feathered GeoJSON polar caps (`84.3°–90° N` Arctic Ocean and `84.3°–90° S` interior Antarctic ice, mounted above `bm` and below `match-far` / `zone-glow` / `analogs`, hidden in Flat Mercator mode) to remove Web Mercator's `±85.05°` radial pinch artifact without touching any land cell.
+
+### 7.3 Place Imagery: 1:1 Ground Scale & Seamless Relief / Satellite Layers
+- [ ] **Matched 70 km / 140 km scale & `Relief | Satellite` modes (`site/src/compare.ts`, `site/src/compare.css`, `site/tests/helpers.ts`, `site/tests/flow.spec.ts`, `site/tests/place.spec.ts`, `README.md`):**
+  - Tighten default comparison window to **`70 km`** across on both panels (exact 1:1 ground scale, `25 km` scale bar, Earth's 50 km cell filling ~71% of the frame) with a `70 km | 140 km` scale toggle in `.cmp-bar`.
+  - Add an Earth layer toggle **`Relief | Satellite`**: `Relief` uses NASA GIBS `ASTER_GDEM_Greyscale_Shaded_Relief` (Level 12, 30 m/px, seamless across all latitudes including Arctic and Antarctic), defaulting active on Lunar South Pole targets to match LRO LOLA greyscale shaded relief directly; `Satellite` uses ESA Copernicus Sentinel-2 Cloudless 2024 (`tiles.maps.eox.at`, 10 m, zero scan-line seams, automatic fallback to NASA Blue Marble over Antarctica/offline).
+  - Update attribution notes in `compare.ts`, `card.ts`, and `README.md`, and update external-host allowlist/stubbing in Playwright helpers and tests (`gibs.earthdata.nasa.gov`, `trek.nasa.gov`, `tiles.maps.eox.at`).
+
+### 7.4 Target Casing, Place Header Clarity & Telemetry Redesign
+- [ ] **Title-cased target display names (`site/src/format.ts`, `site/src/pages/home.ts`, `site/src/pages/find.ts`, `site/src/card.ts`, `site/src/finder-hud.ts`, `site/src/pages/learn.ts`):** Add a pure UI display helper formatting target names cleanly without altering frozen `site/public/data/manifest.json` (`Moon's South Pole (Artemis III Regions)`, `Shackleton Rim`, `Arsia Mons Caves`, preserving authentic IAU/NASA `"de Gerlache Rim 2"`).
+- [ ] **Self-explanatory Place header controls (`site/src/picker.ts`, `site/src/picker.css`, `site/src/card.ts`, `site/src/card.css`, `site/src/pages/place.ts`):** Add optional `prefix` and option `sub` support to `createPicker()` so `#pl-preset` displays `FOCUS | Balanced ▾` with 1-line preset descriptions inside the dropdown, and add an on/off indicator dot to `#pl-yr` (`Year-round`).
+- [ ] **Balanced Learn vitals & real HTML `<sup>` exponents (`site/src/format.ts`, `site/src/pages/learn.ts`, `site/src/pages/learn.css`):** Anchor each vital's primary reading on the left above a slimmer `5px` comparison bar (`1.62 m/s²`, `Vacuum 3×10⁻¹⁵ bar`, `1,369 µSv/day`), pair Earth's reference value across from it, keep only the quiet ratio badge top-right, and format Unicode superscripts (`⁻⁰¹²³⁴⁵⁶⁷⁸⁹`) into semantic `<sup>` tags so `−15` renders crisply in JetBrains Mono.
+- [ ] **Redesigned Place `Seasons` & `Earth cannot copy` cards (`site/src/card.ts`, `site/src/card.css`, `site/tests/flow.spec.ts`):**
+  - Replace `Seasons`'s 3×12 table and duplicate text list with an interactive 12-month vertical calendar strip where every month displays its real climate regime (`Best`, `Freeze–thaw`, `Rainy`, or `Frozen`), with hover/click readout and compact range summary.
+  - Replace `Earth cannot copy`'s 4-column table and loud yellow link column with the same left-anchored proportional telemetry rows as Learn (semantic `<sup>`, ratio pills, quiet consolidated source footer), updating any affected Playwright selector cleanly.
+
+### 7.5 Phase 7 Verification & Sign-off
+- [ ] **Section-by-section checks + final full QA:** Fast `npm --prefix site run build` + targeted Playwright spec after each track (7.1–7.4), followed by full `npm --prefix site test` (laptop + phone), `pytest`, empty frozen-data diff check (`git diff testing..HEAD -- site/public/data/ pipeline/`), live visual inspection in T3 Preview Browser (desktop + phone), refreshed `docs/images/*.jpg`, checked-off Phase 7 in `docs/v3-roadmap.md`, and a clean commit on `v3` as `rvyyv-n`.
