@@ -117,7 +117,6 @@ export function place(ctx: Ctx): Page {
           score,
           place: placeRank,
           ranked,
-          filterId: f.id,
           hand: !!s.hand,
           weights,
           weightsName,

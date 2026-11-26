@@ -102,7 +102,7 @@ export interface Hooks {
   scale: HTMLElement;
 }
 
-export const cellAt = (lat: number, lon: number) => {
+const cellAt = (lat: number, lon: number) => {
   const r = Math.floor((90 - lat) / 0.5);
   const c = Math.floor((lon + 180) / 0.5);
   return r >= 0 && r < 360 && c >= 0 && c < 720 ? r * 720 + c : -1;

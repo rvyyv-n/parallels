@@ -6,7 +6,9 @@ Our NASA Space Apps 2026 entry for **Identify Earth Locations that Analog the Pe
 
 ## Layout
 
-- `docs/`: our rules and working guidelines (`guidelines.md`), our local event's Challenge Guide (`challenge-guide.pdf`, the main brief: its six benchmarks and seven questions are what we build to), the challenge in plain words (`challenge.md`), how judging works (`judging-notes.md`), the team's core idea (`team-plan.md`), and the active v3 build/polish roadmap (`v3-roadmap.md`).
+- `docs/`: our rules and working guidelines (`guidelines.md`), our local event's Challenge Guide (`challenge-guide.pdf`, the main brief: its six benchmarks and seven questions are what we build to), the challenge in plain words (`challenge.md`), how judging works (`judging-notes.md`), the team's core idea (`team-plan.md`), and the completed `v3` build/polish roadmap and QA record (`v3-roadmap.md`, Phases 0–7).
+- `PRODUCT.md`: site architecture, Titanium & Oxide visual system, module layout, and design principles.
+- `t3.json`: workspace scripts (setup, dev server, pipeline/site tests, site build).
 - `pipeline/`: the Python data pipeline. Raw downloads go in the gitignored `data/`.
 - `site/`: the Vite site. Pre-computed files are in `site/public/data/`.
 - `assets/`: logo and other images.
@@ -14,12 +16,13 @@ Our NASA Space Apps 2026 entry for **Identify Earth Locations that Analog the Pe
 ## Commands & Verify
 
 ```powershell
-uv sync                      # install Python pipeline dependencies
-uv run pytest                # run pipeline tests
-npm --prefix site ci         # install site dependencies
-npm --prefix site run dev    # start Vite dev server
-npm --prefix site run build  # typecheck and build site
-npm --prefix site test       # run Playwright site tests
+uv sync                          # install Python pipeline dependencies
+uv run pytest                    # run pipeline tests
+npm --prefix site ci             # install site dependencies
+npm --prefix site run dev        # start Vite dev server
+npm --prefix site run build      # typecheck and build site
+npm --prefix site test           # run Playwright site tests (laptop + focused phone)
+npm --prefix site run test:laptop # desktop-only Playwright pass
 ```
 
 ## Working Rules

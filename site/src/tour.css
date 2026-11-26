@@ -35,11 +35,6 @@
   border-right: 0;
 }
 
-.tour-btn small {
-  font-size: 12px;
-  color: var(--ink-3);
-}
-
 .tour-btn:hover {
   border-color: var(--signal-2);
   color: var(--signal-2);

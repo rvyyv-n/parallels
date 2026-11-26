@@ -166,7 +166,7 @@ export function createStarfield(canvas: HTMLCanvasElement, host: HTMLElement): S
 
 /* ---------- Live 36-Bin Score Histogram ---------- */
 
-export const HIST_BINS = 36;
+const HIST_BINS = 36;
 
 export function renderHistogram(
   host: HTMLElement,
@@ -261,7 +261,7 @@ export function createTargetTwin(host: HTMLElement): TargetTwin {
 
 /* ---------- Direct Coordinate Parser & Local Search Combobox ---------- */
 
-export type SearchHit =
+type SearchHit =
   | { kind: "coord"; label: string; sub: string; lat: number; lon: number; cell: number }
   | { kind: "label"; label: string; sub: string; point: LabelPoint; cell: number }
   | { kind: "region"; label: string; sub: string; cell: number };
@@ -285,7 +285,7 @@ const COORD_PLAIN = /^\s*([+-]?\d+(?:\.\d+)?)\s*°?\s*(?:,\s*|\s+)([+-]?\d+(?:\.
 const COORD_HEMI =
   /^\s*([NS])?\s*([+-]?\d+(?:\.\d+)?)\s*°?\s*([NS])?\s*(?:,\s*|\s+)([EW])?\s*([+-]?\d+(?:\.\d+)?)\s*°?\s*([EW])?\s*$/i;
 
-export function parseCoords(raw: string): { lat: number; lon: number } | null {
+function parseCoords(raw: string): { lat: number; lon: number } | null {
   const s = raw.trim();
   if (!s) return null;
   let lat: number;

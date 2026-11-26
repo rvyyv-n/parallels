@@ -40,7 +40,7 @@ function parse(hash: string) {
   return { path: i < 0 ? s : s.slice(0, i), q: new URLSearchParams(i < 0 ? "" : s.slice(i + 1)) };
 }
 
-export const holder = (id: string) => HOLDS.find(([r]) => r.test(id))?.[1] ?? null;
+const holder = (id: string) => HOLDS.find(([r]) => r.test(id))?.[1] ?? null;
 
 export const hrefFor = (path: string) => last.get(path) ?? `#/${path}`;
 

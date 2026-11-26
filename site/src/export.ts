@@ -40,13 +40,13 @@ const cleanNum = (v: number, digits: number) => {
 
 const cleanCoord = (v: number) => String(Number(v.toFixed(4)));
 
-export function csvCell(value: unknown): string {
+function csvCell(value: unknown): string {
   const s = value == null ? "" : String(value);
   if (/[",\r\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }
 
-export function csvRow(values: unknown[]): string {
+function csvRow(values: unknown[]): string {
   return values.map(csvCell).join(",");
 }
 
@@ -233,5 +233,3 @@ export function downloadCsv(filename: string, csv: string): void {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-
-export type { Body };

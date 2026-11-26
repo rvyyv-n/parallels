@@ -171,18 +171,6 @@
   justify-content: center;
 }
 
-.intro-k i {
-  display: inline-grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  font-style: normal;
-  letter-spacing: 0;
-  color: var(--signal-ink);
-  background: var(--signal);
-  border-radius: var(--r-xs);
-}
-
 .intro h1,
 .intro h2 {
   margin: 0;
@@ -205,10 +193,6 @@
 
 .chap-count h2 {
   font-size: clamp(34px, 4.4vw, 66px);
-}
-
-.intro h2 .ln {
-  display: block;
 }
 
 .intro .w-moon {
@@ -847,21 +831,6 @@
   background: var(--signal);
   border-color: var(--signal);
   color: var(--signal-ink);
-}
-
-.chip[aria-busy="true"] {
-  cursor: progress;
-  animation: chip-busy 0.9s ease-in-out infinite alternate;
-}
-
-@keyframes chip-busy {
-  to {
-    opacity: 0.72;
-  }
-}
-
-.chip[hidden] {
-  display: none;
 }
 
 .go {

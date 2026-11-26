@@ -7,7 +7,7 @@ import { icon } from "./icons";
 export type ScaleKm = 70 | 140;
 export type EarthLayer = "relief" | "satellite";
 
-export const VIEW_KM: ScaleKm = 70;
+const VIEW_KM: ScaleKm = 70;
 const BAR_KM: Record<ScaleKm, number> = { 70: 25, 140: 50 };
 const TARGET_WIN_KM = 10;
 const RADIUS: Record<Body | "earth", number> = { earth: 6371, moon: 1737.4, mars: 3389.5 };
@@ -150,7 +150,7 @@ function isPolarTarget(body: Body, lat: number, viewKm: ScaleKm): boolean {
   return body === "moon" && lat <= -90 + (SP_EDGE_KM - viewKm / 2) / ((Math.PI * RADIUS.moon) / 180);
 }
 
-export function defaultEarthLayer(body: Body, target: Pick<Target, "lat">): EarthLayer {
+function defaultEarthLayer(body: Body, target: Pick<Target, "lat">): EarthLayer {
   return isPolarTarget(body, target.lat, VIEW_KM) ? "relief" : "satellite";
 }
 

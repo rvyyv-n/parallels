@@ -144,7 +144,3 @@
     border-color: var(--signal-bd);
   }
 }
-
-a.chip {
-  text-decoration: none;
-}

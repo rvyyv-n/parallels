@@ -26,11 +26,11 @@ No single place on Earth can stand in for a Moon or Mars base. So we split base-
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="docs/images/hover.jpg" alt="The Finder"><br><b>The Finder</b><br><sub>The best 2% of land lit on the globe, the top 20 places in a sidebar with a colour chip for every challenge, and a card for each place on hover.</sub></td>
-<td width="50%" valign="top"><img src="docs/images/place.jpg" alt="One match"><br><b>One match</b><br><sub>The place on Earth beside the base site at the same ground scale, with the match score, what matches, what breaks and the dataset behind each value.</sub></td>
+<td width="50%" valign="top"><img src="docs/images/place.jpg" alt="One match"><br><b>One match</b><br><sub>The place on Earth beside the base site at matched 1:1 ground scale (70 km or 140 km, Relief or Satellite), with the match score, what matches, what breaks, seasons and the dataset behind each value.</sub></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="docs/images/known.jpg" alt="Where crews already train"><br><b>Where crews already train</b><br><sub>Known analog sites on Earth. Hover one to fly the globe there, or select it to inspect its Earth match.</sub></td>
-<td width="50%" valign="top"><img src="docs/images/learn.jpg" alt="Learn"><br><b>Learn</b><br><sub>The Moon and Mars in six short sections: temperatures, seasons on Earth, what Earth cannot copy, and NASA photo pairs.</sub></td>
+<td width="50%" valign="top"><img src="docs/images/learn.jpg" alt="Learn"><br><b>Learn</b><br><sub>The Moon and Mars in six short sections: surface conditions, temperatures, seasons on Earth, what Earth cannot copy, known analogs and NASA photo pairs.</sub></td>
 </tr>
 <tr>
 <td width="50%" valign="top"><img src="docs/images/phone.jpg" alt="The site on a phone" width="60%"><br><b>On a phone</b><br><sub>The map on top and the ranked list in a sheet that slides up over it.</sub></td>
@@ -38,7 +38,7 @@ No single place on Earth can stand in for a Moon or Mars base. So we split base-
 </tr>
 </table>
 
-The screenshots show the site on 15 November 2026.
+The screenshots show the completed `v3` site (Phase 7 captures, 26 November 2026) with live NASA and ESA Copernicus imagery.
 
 ---
 
@@ -82,21 +82,21 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 
 | Capability | Description |
 |---|---|
-| **Base sites** | Eleven. On the Moon: the south pole (NASA's nine Artemis III regions combined), four of those regions on their own (Haworth, Malapert Massif, Nobile Rim 1, de Gerlache Rim 2) and the Shackleton rim. On Mars: Jezero, Gale, Arcadia Planitia, Deuteronilus Mensae and the Arsia Mons caves. Each value names its dataset or paper in `manifest.json`. |
+| **Base sites** | Eleven, displayed in clean Title Case (preserving IAU/NASA `de Gerlache Rim 2`). On the Moon: Moon's South Pole (Artemis III Regions, NASA's nine regions combined), four regions on their own (Haworth, Malapert Massif, Nobile Rim 1, de Gerlache Rim 2) and Shackleton Rim. On Mars: Jezero, Gale, Arcadia Planitia, Deuteronilus Mensae and Arsia Mons Caves. Each value names its dataset or paper in `manifest.json`. |
 | **Parts of a base** | The Moon has eight challenges and Mars has seven, such as Surface, Resources, Heat swing and Atmosphere and dust. Parts that cannot be measured on both sides are shown, not scored, with the reason. |
-| **Presets** | Balanced (every challenge counts the same; the default) and three mission presets: Rover mobility, Life support and Habitat structure. Sliders change each challenge's weight from 0 to 2×, and the list re-ranks at once. |
-| **Search of all land** | Every square of land is ranked on 17 traits against all of Earth's land, not against a hand-picked list. The globe lights the best 2% of land, with a switch for 1%, 5%, 10% and all land. |
-| **Top 20 places** | The twenty best places, at least 800 km apart and at most two per country, grouped by world region. Each row has a colour chip for every challenge (very close, close, partly, far off), a "New" badge and how often it held its place in the robustness runs. |
+| **Presets & custom weights** | Balanced (every challenge counts the same; the default) and three mission presets: Rover mobility, Life support and Habitat structure. Inside the Finder's `Filters & weights` drawer, sliders adjust each challenge weight from 0 to 2× and re-rank at once; on a Place page, a custom `Focus` picker switches presets with one-line mission descriptions beside a `Year-round` toggle. |
+| **Search of all land** | Every square of land is ranked on 17 traits against all of Earth's land, not against a hand-picked list. The orbital globe lights the best 2% of land (with a collapsible legend pill and live 36-bin histogram to switch between 1%, 2%, 5%, 10% and all land), paired with `Globe \| Flat` projection views, local place/coordinate search, and feathered polar globe caps that remove high-latitude Mercator pinch. |
+| **Top 20 places** | The twenty best places, at least 800 km apart and at most two per country, toggleable between `Rank` and `Region` views in the Finder toolbar beside `Filters & weights`. Each row has a colour-vision-safe chip for every challenge (very close, close, partly, far off), a "New" badge and how often it held its place in the robustness runs. |
 | **Hover card and popup** | Hovering a place shows a NASA Blue Marble picture of it, its coordinates and its match score; clicking opens a popup with its share of land and a link to the full match. |
-| **Side by side** | The Earth place (NASA ASTER GDEM shaded relief or ESA Copernicus Sentinel-2 Cloudless 2024 satellite imagery, over NASA Blue Marble) beside the Moon or Mars site (LOLA relief, LRO WAC mosaic, or Viking colour), drawn at matched 70 km or 140 km ground scale, with a wipe to compare. Display only, not scored. |
-| **Match and break** | Each trait shows the Earth value against the base-site value in real units, Earth's whole range, and both datasets. Missing data is shown as missing. |
-| **New places** | "New" marks places more than 100 km from all 50 known analog sites in our list. By default the top 20 shows new places only; one click adds the known sites back. |
-| **Seasons** | Best months, freeze–thaw months and rainy months for each place, and a switch for year-round testing. |
-| **Terrain types** | Arid basin, high-altitude volcanic field, salt flat, frozen ground, and cave or lava tube, each from a visible rule. Filter the list by type. |
+| **Side by side & wipe** | The Earth place (`Relief` via NASA ASTER GDEM shaded relief, defaulting on polar lunar targets to match LOLA relief, or `Satellite` via ESA Copernicus Sentinel-2 Cloudless 2024, over NASA Blue Marble) beside the Moon or Mars site (LOLA south-pole relief, LRO WAC global mosaic, or Viking colour), drawn at matched 1:1 `70 km` or `140 km` ground scale with `Side by side`, `Wipe` and `Overlays` controls. Display only, not scored. |
+| **Match, break & limits** | Rounded score ring and clickable score overview linking straight to each challenge. Every trait shows the Earth value against the base-site value in real units, Earth's full range, and both datasets, paired with proportional `Earth cannot copy` telemetry bars (gravity, air, radiation). Missing data is shown as missing. |
+| **New places** | "New" marks places more than 100 km from all 50 known analog sites in our list. By default the top 20 shows new places only; one click (`+ Known sites`) adds the known sites back. |
+| **Seasons** | Interactive 12-month calendar strip showing each month's climate regime (`Best`, `Freeze–thaw`, `Rainy`, or `Frozen`) with hover and keyboard readout, plus a `Year-round` testing switch. |
+| **Terrain types** | Arid basin, high-altitude volcanic field, salt flat, frozen ground, and cave or lava tube, each from a visible rule. Filter the list via a custom accessible picker with cell counts inside `Filters & weights`. |
 | **Compare** | Tick two or three places to see their chips and scores side by side. |
-| **Learn** | The Moon and Mars for newcomers: the base site against its best Earth place, a month slider over the best places, what a spacesuit, rover or habitat module weighs on each world, a map of known analogs and NASA photo pairs. |
+| **Learn** | The Moon and Mars for newcomers: proportional surface-condition telemetry, a shared real-scale temperature comparison against the best Earth match, an interactive 12-month seasonality matrix, what a spacesuit, rover or habitat module weighs on each world, a map of known analogs linking into Place/Finder, and NASA photo pairs with lightbox zoom. |
 | **Guided tour** | Nine steps that play by themselves, from choosing a base site on Home through the Finder to where a match breaks. Picking a site or a place during the tour carries it on. |
-| **Shareable views** | The address holds the base site, preset, weights and place, so a link opens the same view. |
+| **Shareable views & exports** | The address holds the base site, preset, weights and place, so a link opens the same view. Place pages also include copy link/coordinates, CSV download, print/PDF styling, and direct links to NASA Worldview and NASA Moon/Mars Trek. |
 | **A public check** | Known analogs must beat ordinary places and plain deserts. The rules were fixed in git before each run. See [Validation](#validation). |
 
 **Design rule:** the browser computes nothing new for the default view. It selects, groups and displays what the pipeline already computed, so every number on screen traces to a named dataset. Weight sliders combine the pre-computed ranks; they never recompute a rank or a value.
@@ -147,7 +147,7 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 
 ## Status
 
-**Version 1 is our live submission** at [dotcatcher.vercel.app](https://dotcatcher.vercel.app), and **`v3` (active work)** upgrades the site's 3D orbital experience, Finder HUD, Place scorecard, Learn/About presentation, and accessibility without changing the frozen scoring data. The map uses method version 1.2 (with `v1.3` publishing config adding the Balanced preset and extra Moon sites) across eleven base sites: six on the Moon and five on Mars. See [docs/v3-roadmap.md](docs/v3-roadmap.md) for current progress and remaining polish items.
+**Version 1 is our Space Apps submission** at [dotcatcher.vercel.app](https://dotcatcher.vercel.app), and **`v3` (Phases 0–7 complete)** finishes the full site upgrade—Titanium & Oxide visual system, calibrated 3D orbital stage, Finder cockpit with feathered polar globe caps, 1:1 `70 km | 140 km` Relief/Satellite imagery comparator, interactive seasonal and telemetry cards, custom accessible pickers, Learn/About polish, and full automated/visual QA—without changing the frozen scoring data. The map uses method version 1.2 (with `v1.3` publishing config adding the Balanced preset and extra Moon sites) across eleven base sites: six on the Moon and five on Mars. See [docs/v3-roadmap.md](docs/v3-roadmap.md) for the complete Phase 0–7 record and QA sign-off.
 
 **How well it works:** on the held-out half of the test places, known analogs beat ordinary places 96% of the time for the Moon and 76% for Mars. In the method's latest run, 10 of 15 checks with enough sites pass, and the Balanced preset also passes 10 of 15. Only the Moon's south pole and Jezero are checked against test places. See [Validation](#validation) and `site/public/data/validation.json`.
 
@@ -158,11 +158,11 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 - [docs/challenge-guide.pdf](docs/challenge-guide.pdf): our local event's Challenge Guide, the main brief; start here.
 - [docs/challenge.md](docs/challenge.md): the challenge in plain words, and how we meet the guide's six objectives and answer its seven questions.
 - [docs/team-plan.md](docs/team-plan.md): the team's core idea and challenge breakdown.
-- [docs/v3-roadmap.md](docs/v3-roadmap.md): active `v3` site roadmap, completed phases, UI polish items, and final QA checklist.
+- [docs/v3-roadmap.md](docs/v3-roadmap.md): completed `v3` site roadmap (Phases 0–7), invariants, and QA sign-off.
 - [docs/judging-notes.md](docs/judging-notes.md): how Space Apps is judged and what past winners did.
 - [docs/guidelines.md](docs/guidelines.md): how we work, the official rules and our submission checklist.
 - [AGENTS.md](AGENTS.md): workspace commands and repository rules.
-- [PRODUCT.md](PRODUCT.md): product architecture and design principles for the site.
+- [PRODUCT.md](PRODUCT.md): product architecture, Titanium & Oxide visual system, module layout, and design principles for the site.
 - `pipeline/`: the Python data pipeline. Its method settings are in `pipeline/config/`.
 - `site/`: the Vite site. It reads the files in `site/public/data/` and changes none of them.
 - `site/public/data/`: the pre-computed files the site loads. See [The data files](#the-data-files).
@@ -174,30 +174,28 @@ So Parallels asks a narrower question. For each part of a base, where on Earth i
 Pipeline (Python 3.13). Run each command from the repository root.
 
 1. `uv sync` installs the packages into `.venv`.
-2. Run the pipeline stages in this order. Raw downloads go to `data/`, which is not in git. Results go to `data/derived/`.
+2. Run the pipeline stages in this order (with `uv run python -m ...`, or directly via `.venv/Scripts/python` on Windows / `.venv/bin/python` on macOS and Linux). Raw downloads go to `data/`, which is not in git. Results go to `data/derived/`.
 
 | Stage | Command | What it does |
 |---|---|---|
-| Climate | `.venv/Scripts/python -m pipeline.climate` | Reads NASA POWER climate data and Natural Earth land. Writes the 0.5 degree climate grid. |
-| Terrain | `.venv/Scripts/python -m pipeline.terrain_grid` | Reads Copernicus DEM GLO-90 tiles. Writes slope and relief for each cell. Takes about 30 minutes. |
-| Surface | `.venv/Scripts/python -m pipeline.surface` | Reads GLiM rock, NASA EMIT minerals and MODIS land cover. Writes the surface grid. Needs a free NASA Earthdata login in `~/.netrc`. |
-| Targets | `.venv/Scripts/python -m pipeline.targets` | Reads Moon and Mars maps. Writes `pipeline/derived/targets_v1.json`. |
-| Export | `.venv/Scripts/python -m pipeline.export --method 1.2 --method-commit b070766 --weights-commit 16b6a1c --publish 1.3 --publish-commit e21a971` | Ranks the cells, runs every validation run and writes the files in `site/public/data/`. `--method 1.2` runs method versions 1.1 and 1.2 as further runs; `--publish 1.3` adds the extra Moon sites and the Balanced preset. With these arguments the output matches the committed files byte for byte. |
+| Climate | `uv run python -m pipeline.climate` | Reads NASA POWER climate data and Natural Earth land. Writes the 0.5 degree climate grid. |
+| Terrain | `uv run python -m pipeline.terrain_grid` | Reads Copernicus DEM GLO-90 tiles. Writes slope and relief for each cell. Takes about 30 minutes. |
+| Surface | `uv run python -m pipeline.surface` | Reads GLiM rock, NASA EMIT minerals and MODIS land cover. Writes the surface grid. Needs a free NASA Earthdata login in `~/.netrc`. |
+| Targets | `uv run python -m pipeline.targets` | Reads Moon and Mars maps. Writes `pipeline/derived/targets_v1.json`. |
+| Export | `uv run python -m pipeline.export --method 1.2 --method-commit b070766 --weights-commit 16b6a1c --publish 1.3 --publish-commit e21a971` | Ranks the cells, runs every validation run and writes the files in `site/public/data/`. `--method 1.2` runs method versions 1.1 and 1.2 as further runs; `--publish 1.3` adds the extra Moon sites and the Balanced preset. With these arguments the output matches the committed files byte for byte. |
 
-3. Run the tests: `.venv/Scripts/python -m pytest`.
-
-On macOS and Linux, use `.venv/bin/python` in place of `.venv/Scripts/python`.
+3. Run the tests: `uv run pytest` (or `.venv/Scripts/python -m pytest` on Windows / `.venv/bin/python -m pytest` on macOS and Linux).
 
 ### The site
 
-The site is static: it has no server and no keys. Run each command from `site/`.
+The site is static: it has no server and no keys. Run each command from `site/` (or pass `--prefix site` from the repository root, e.g. `npm --prefix site test`).
 
 | Command | What it does |
 |---|---|
-| `npm install` | Installs the packages. |
-| `npm run dev` | Starts the site locally. |
-| `npm run build` | Checks the types and builds the site into `site/dist`. |
-| `npm test` | Runs the Playwright suite on port 4319 (1 worker, reduced motion, local tile stubs, and focused phone pass to stay light on CPU; set `PW_WORKERS`, `PW_ALL_PHONE=1`, `LIVE_TILES=1`, or `RUN_NETWORK=1` as needed). Use `npm run test:laptop` for a desktop-only pass. Run `npx playwright install chromium` first. |
+| `npm ci` | Installs the locked packages (or `npm install`). |
+| `npm run dev` | Starts the Vite dev server locally. |
+| `npm run build` | Typechecks with TypeScript and builds the static site into `site/dist`. |
+| `npm test` | Runs the Playwright suite on port 4319 (1 worker, reduced motion, 1× DPR on phone, local tile stubs, and a focused phone pass to stay light on CPU; set `PW_WORKERS`, `PW_ALL_PHONE=1`, `PW_GPU=1`, `LIVE_TILES=1`, or `RUN_NETWORK=1` as needed). Use `npm run test:laptop` for a desktop-only pass. Run `npx playwright install chromium` first. |
 
 ---
 
@@ -283,7 +281,8 @@ These images are shown, not scored. No NASA logo or insignia is used.
 | [Blue Marble: Shaded Relief and Bathymetry](https://nasa-gibs.github.io/gibs-api-docs/) | NASA Earth Observatory via NASA GIBS | NASA open data, no restrictions | Earth map background, the 3D Earth in the intro, the hover card and popup pictures in the Finder, and the base/Antarctic/fallback layer of the Earth close-up (live tiles). We bundle three copies, `site/public/img/blue-marble.jpg` (1,024 px), `blue-marble-4k.jpg` (4,096 px) and `blue-marble-8k.jpg` (8,192 px), the larger two fetched from GIBS on 2026-11-15. The intro draws a light copy first and swaps in a sharper one when the graphics card can hold it. The bundled copy takes over if the live tile service is down. |
 | [ASTER GDEM Greyscale Shaded Relief](https://nasa-gibs.github.io/gibs-api-docs/) | NASA / METI ASTER GDEM, via NASA GIBS | NASA open data, no restrictions | Earth side of the close-up in Relief mode (30 m source, default on lunar south-pole targets to match LRO LOLA relief; live tiles up to zoom 12). Blue Marble shows beyond 83° latitude or when offline. |
 | [Copernicus Sentinel-2 Cloudless 2024](https://s2maps.eu/) (`tiles.maps.eox.at`) | ESA Copernicus Sentinel-2, processed by EOX | CC BY 4.0 | Earth side of the close-up in Satellite mode (10 m source, default on Mars and non-polar targets; live tiles). Blue Marble shows where Sentinel-2 has no coverage at high Antarctic latitudes. |
-| [LOLA south-pole shaded relief, 87.5° S to the pole](https://trek.nasa.gov/moon/) | NASA LRO LOLA, via NASA Moon Trek tiles | Public domain (NASA) | Moon side of the close-up (live tiles). Shaded relief from laser altimetry, not a photo. |
+| [LOLA south-pole shaded relief, 87.5° S to the pole](https://trek.nasa.gov/moon/) | NASA LRO LOLA, via NASA Moon Trek tiles | Public domain (NASA) | Moon side of the close-up for polar sites inside 87.5° S (Moon's South Pole, Shackleton Rim, de Gerlache Rim 2; live tiles). Shaded relief from laser altimetry, not a photo. |
+| [LRO WAC global mosaic (303 ppd)](https://trek.nasa.gov/moon/) | NASA LRO LROC, via NASA Moon Trek tiles | Public domain (NASA) | Moon side of the close-up for sites north of the LOLA polar mosaic boundary (Haworth, Malapert Massif, Nobile Rim 1; live tiles). |
 | [CGI Moon Kit: LROC colour map with filled poles](https://svs.gsfc.nasa.gov/4720) | NASA Scientific Visualization Studio (LRO data) | Public domain (NASA) | The 3D Moon in the intro (`site/public/img/moon.jpg`, 2,048 px, and `moon-4k.jpg`, 4,096 px, from the kit's 4K colour map), and the bundled fallback for the Moon close-up. |
 | [Viking MDIM 2.1 global colour mosaic](https://trek.nasa.gov/mars/) | NASA / USGS Astrogeology, via NASA Mars Trek tiles | Public domain (NASA / USGS) | The 3D Mars in the intro (`site/public/img/mars.jpg`, 2,048 px, and `mars-4k.jpg`, 4,096 px, stitched from the 128 Mars Trek tiles at zoom level 3 on 2026-11-15), and the Mars side of the close-up (live tiles, with the bundled copy as fallback). |
 | Site pictures in the Moon and Mars lists | Cut from the CGI Moon Kit and Viking MDIM maps above | Public domain (NASA / USGS) | One square picture per base site, centred on the site; the south-pole sites use a view from above the pole with raised contrast. |
@@ -296,9 +295,9 @@ These images are shown, not scored. No NASA logo or insignia is used.
 | Library | Licence | Use |
 |---|---|---|
 | numpy, scipy, pandas, xarray, zarr, fsspec, s3fs, aiohttp, netCDF4, h5netcdf, rasterio (GDAL), pyproj, pyshp, requests, earthaccess, pyhdf, pytest | Open-source licences, set by each package | Data pipeline and its tests (see `pyproject.toml`) |
-| [MapLibre GL JS](https://maplibre.org/) | BSD-3-Clause | Earth globe and map |
+| [MapLibre GL JS](https://maplibre.org/) | BSD-3-Clause | Earth orbital globe and flat map |
 | [three.js](https://threejs.org/) | MIT | 3D Earth, Moon and Mars in the intro |
-| [Lucide icons](https://lucide.dev/) | ISC | Icons in the match view |
+| [Lucide icons](https://lucide.dev/) | ISC | Inline SVG icons across the site |
 | [Vite](https://vite.dev/) and TypeScript | MIT / Apache-2.0 | Building the site |
 | Playwright | Apache-2.0 | Site tests |
 | [Barlow Condensed](https://fontsource.org/fonts/barlow-condensed) (500–800, by Jeremy Tribby) | SIL Open Font Licence 1.1 | Display headings and brand wordmark |

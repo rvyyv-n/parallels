@@ -54,7 +54,7 @@ const WORLD: Record<string, string[]> = {
 
 const REGION = new Map(Object.entries(WORLD).flatMap(([r, cs]) => cs.map((c) => [c, r] as const)));
 
-export const OTHER = "Other places";
+const OTHER = "Other places";
 
 export function countryOf(m: Manifest, cells: Cols, i: number): string | null {
   const r = cells.region?.[i];

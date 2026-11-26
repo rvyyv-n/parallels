@@ -1,44 +1,44 @@
 # v3 Roadmap
 
-Status and remaining polish checklist for the `v3` site upgrade on top of the frozen v1.2/v1.3 scoring data (11 base sites, 91,971 land cells).
+Completed build, polish, and QA record for the `v3` site upgrade (**Phases 0–7 complete**) on top of the frozen v1.2/v1.3 scoring data (11 base sites, 91,971 land cells).
 
 ## Invariants
 
 - **Data and scoring are frozen:** `pipeline/` and `site/public/data/` do not change. Every number on screen traces directly to `site/public/data/`.
 - **Honest scientific framing:** Show `N / 100 match score` (never `% similar` or `% match`). Never label scoring as `"ML"` or `"AI"`. Every match states what matches, where it breaks in real units, and what Earth cannot copy.
-- **Self-contained static site:** Zero external font hosts (display, body, and mono faces bundled locally). Only external tile hosts are `gibs.earthdata.nasa.gov`, `trek.nasa.gov`, and `tiles.maps.eox.at` (ESA Copernicus Sentinel-2 Cloudless partner layer, with NASA Blue Marble and local fallbacks). No NASA logos or insignia.
+- **Self-contained static site:** Zero external font hosts (`Barlow Condensed`, `Inter Variable`, and `JetBrains Mono Variable` bundled locally). Only external tile hosts are `gibs.earthdata.nasa.gov`, `trek.nasa.gov`, and `tiles.maps.eox.at` (ESA Copernicus Sentinel-2 Cloudless partner layer, with NASA Blue Marble and local fallbacks). No NASA logos or insignia.
 - **Low-CPU verification:** Playwright defaults to `workers: 1`, `reducedMotion: "reduce"`, 1× DPR on phone, memoized binary fixtures, local tile stubs (`LIVE_TILES=1` for live tiles), and a focused phone suite (`PW_ALL_PHONE=1` for every test on phone; `npm --prefix site run test:laptop` for desktop-only).
 
 ---
 
-## Completed on `v3`
+## Completed: Phases 0–4 — Core `v3` Build
 
 - [x] **Phase 0 — Foundations (`0e0251e`):** Unified `:root` design tokens, flattened CSS cascade, hash-aware preloader, shared segmented/range controls (`site/src/controls.ts`), iterative 3-way descending quickselect cutoff (`site/src/zones.ts`, bit-for-bit parity), rAF slider coalescing, OG metadata and boot screen.
 - [x] **Phase 1 — Home 3D Orbital Stage (`1944fae`):** Dual-shell Earth atmospheric limb halo, two-layer starfield, pulsing reticle, viewport-clamped floating labels, WebGL `pause()`/`resume()` lifecycle.
 - [x] **Phase 2 — Finder Orbital HUD (`3e78229`):** MapLibre GL 6 sky atmosphere + starfield canvas, floating glass top HUD with local ARIA search, `Globe | Flat` toggle, `Known analogs` switch, inline overlay opacity slider, collapsible legend with live 36-bin `sqrt` histogram, collapsible target preview card, rank-priority pin z-index, interactive analog/cave markers, CVD-safe challenge chips, mobile sheet & popup fixes.
 - [x] **Phase 3 — Place Scorecard (`75dae5d`):** Range-and-gap bullet plots with clamped target ticks, rounded-cap SVG score ring, inline preset and year-round switcher, `Expand all` / `Collapse all`, NASA image compare wipe + overlays toggle + loading skeleton, clean-room CSV / Worldview / Trek export (`site/src/export.ts`), copy link/coords, `@media print`.
 - [x] **Phase 4 — Learn, About & Guided Tour (`f3f21b3`):** Learn aligned to Balanced preset, clickable month matrix, 44px analog pins with tooltips and Finder/Place links, NASA photo lightbox; About scroll-spy TOC, scoring strip, folded validation runs, agency filter pills; non-overlapping Guided Tour with step pips and keyboard navigation.
-- [x] **Typography, Orbital Palette & Place Dossier (`ef1b296` + follow-up):** Self-hosted `Inter Variable` and `JetBrains Mono Variable`, refined slate-navy surface hierarchy, matched Place Mission Dossier + Imagery cards, fixed lunar crater label edge clamping, connected `Previous | 1 of 20 | Next` capsule, clean tapered card top accents.
+- [x] **Typography, Orbital Palette & Place Dossier (`ef1b296`, `7e14ad3`):** Self-hosted `Inter Variable` and `JetBrains Mono Variable`, refined surface hierarchy, matched Place Mission Dossier + Imagery cards, fixed lunar crater label edge clamping, connected `Previous | 1 of 20 | Next` capsule, clean tapered card top accents.
 
 ---
 
-## Completed: UI Polish Pass
+## Completed: UI Polish Pass 1 (`85d50ee`)
 
-Finalized the visual polish pass addressing team review feedback before Phase 5 sign-off:
+Visual polish pass addressing team review feedback ahead of Phase 5 sign-off (palette later upgraded to Titanium & Oxide in Phase 6):
 
 - [x] **Minimalist, low-text pass (especially Finder & Learn):** Decluttered the Finder header (single unclipped full-width base-site picker with quiet eyebrow and header utility pills), summary card (3-cell telemetry bar + compact `+ Known sites` pill), single-line rules caption, unified single-row segmented preset strip (`Balanced | Rover | Life support | Habitat`), compact band key, cleaner map HUD, and trimmed Learn headers/captions.
-- [x] **Deeper blue accent:** Shifted `--signal` to `#1d64c8` (with `--signal-hover: #246ed4`, `--signal-ink: #f8fafc`, and `--signal-2: #5a9cf2`), harmonized all hardcoded legacy cyan accents across CSS/3D/MapLibre views, and verified WCAG AA contrast across active pills, links, score highlights, and Moon/Mars Learn accents.
+- [x] **Deeper blue accent (later superseded by Titanium & Oxide in Phase 6):** Shifted `--signal` to `#1d64c8` (with `--signal-hover: #246ed4`, `--signal-ink: #f8fafc`, and `--signal-2: #5a9cf2`), harmonized hardcoded legacy cyan accents across CSS/3D/MapLibre views, and verified WCAG AA contrast across active pills, links, score highlights, and Moon/Mars Learn accents.
 - [x] **Finder Guided Tour placement:** Moved `#tour` out from underneath the right zoom capsule into the understated Finder sidebar header beside `All sites`, preserving `id="tour"` and Escape focus return.
 - [x] **Finder Heatmap/Legend collapsed by default:** Started `#legend` collapsed by default on desktop and mobile as a compact toggle pill showing the gradient swatch and active land share (`Best 2% of land`), expanding smoothly for the 36-bin histogram and share controls while keeping `data-painted`/`data-ranked`/`data-edges` accurate.
 - [x] **Learn Moon/Mars visual upgrade:** Replaced the cramped 3-column `GRAVITY | AIR | RADIATION` text box with proportional Earth-vs-World visual telemetry bars and a consolidated source footer, upgraded the section 03 Air/Radiation comparisons to dual-bar cards, unified section panel widths, added a segmented Moon/Mars switcher, and right-aligned the `02 A year on Earth` `SELECTED MONTH` header over the status pills.
 - [x] **Place breakdown heading:** Replaced `"Challenge by challenge"` (`#pl-chs-h`) with `"Score breakdown"`, and fixed narrow-width wrapping on the `.pl-body` badge.
-- [x] **Remaining visual bugs:**
+- [x] **Visual bug fixes:**
   - Replaced curved left-border corner horns on About `#checked` `.ab-tile` cards with a clipped vertical `::before` accent bar.
   - Wired `.pin-tag` decluttering on MapLibre `idle` / `render` / `moveend` / `resize`, fixed inline `opacity` override via `!important`, and added symmetric left-side fallback placement so top-3 labels never collide with nearby pins on initial load.
 
 ---
 
-## Completed: Phase 5 — Final QA & Release Sign-off
+## Completed: Phase 5 — Initial QA & Release Sign-off (`85d50ee`)
 
 - [x] **Full verification suite:** `npm --prefix site run build` (clean, 0 errors), full `npm --prefix site test` (75 passed / 2 skipped / 0 failed across laptop and phone at `workers: 1`), `uv run pytest` (139 passed / 1 skipped / 0 failed), and `git diff testing..v3 -- site/public/data/ pipeline/` confirmed empty.
 - [x] **Resilience sweep:** Verified GIBS/Trek-blocked fallback (zero unauthorized external calls, `.noimg` and `.eimg.fb` active), `prefers-reduced-motion` (`animation-name: none`, `scroll-behavior: auto`), no-WebGL fallback (`.intro-still` on Home, `.nogl` on Finder with all 20 ranked rows and Place navigation intact), and `@media print` on Place (light print theme, hidden chrome, all challenges expanded).
@@ -47,7 +47,7 @@ Finalized the visual polish pass addressing team review feedback before Phase 5 
 
 ---
 
-## Completed: Phase 6 — Editorial Design Overhaul & Interactive Polish
+## Completed: Phase 6 — Editorial Design Overhaul & Interactive Polish (`10b39e0`)
 
 Completed visual and interaction overhaul addressing live review feedback across all routes while keeping `pipeline/` and `site/public/data/` frozen and byte-identical:
 
@@ -61,9 +61,9 @@ Completed visual and interaction overhaul addressing live review feedback across
 - [x] **Zero-overlap Home hero composition (`site/src/intro.ts`, `site/src/intro.css`):** Lowered Earth's opening limb to the lower quarter of the viewport and centered the hero lockup and CTA pills cleanly in dark starfield space between the top header and Earth's limb across desktop and mobile viewports.
 - [x] **Home Known Sites typography & click-to-open dossier (`site/src/pages/home.ts`, `site/src/intro.css`, `site/tests/flow.spec.ts`):** Unified known-site list typography with `Barlow Condensed` + `JetBrains Mono`, tightened the chapter so the citation card and dossier link fit above the fold, kept hover/focus rotating Earth to preview each site, and made selecting any known site open its matched 0.5° grid cell directly in Place (`#/place?t=...&known=1&c=<cell>`).
 
-### 6.3 Design System Overhaul (Uppercase Display Typography & Non-Blue/Green Obsidian Palette)
-- [x] **Active Uppercase Display Typography (`site/package.json`, `site/src/main.ts`, `site/src/style.css`, all page CSS):** Preserved the uppercase editorial heading style while replacing artificially stretched `Archivo` with self-hosted **`Barlow Condensed`** (`@fontsource/barlow-condensed`, weights 500/600/700/800) paired with **`Inter Variable`** and **`JetBrains Mono Variable`**.
-- [x] **Active Palette — Option A: Titanium & Oxide (`site/src/style.css`, `site/src/logo.ts`, `assets/logo.svg`, component CSS):** Neutral carbon-obsidian surfaces (`#070709` → `#0d0d10` → `#141419` → `#1c1c23`) with hairline borders, zero card gradient washes, chalk-titanium active controls (`#f2f0eb` / `#070709` ink), burnished solar-gold highlights & links (`#e5aa4c`), lunar bone (`#d8d3c8`) and Mars iron-oxide (`#e0623e`) world accents, muted slate Earth mark, and Inferno-aligned CVD-safe score bands (`#f5ebc4` / `#e5aa4c` / `#df6d47` / `#b87696`) with WCAG AA contrast everywhere.
+### 6.3 Design System Overhaul (Uppercase Display Typography & Titanium & Oxide Palette)
+- [x] **Shipping Uppercase Display Typography (`site/package.json`, `site/src/main.ts`, `site/src/style.css`, all page CSS):** Preserved the uppercase editorial heading style while replacing artificially stretched `Archivo` with self-hosted **`Barlow Condensed`** (`@fontsource/barlow-condensed`, weights 500/600/700/800) paired with **`Inter Variable`** and **`JetBrains Mono Variable`**.
+- [x] **Shipping Palette — Option A: Titanium & Oxide (`site/src/style.css`, `site/src/logo.ts`, `assets/logo.svg`, component CSS):** Neutral carbon-obsidian surfaces (`#070709` → `#0d0d10` → `#141419` → `#1c1c23`) with hairline borders, zero card gradient washes, chalk-titanium active controls (`#f2f0eb` / `#070709` ink), burnished solar-gold highlights & links (`#e5aa4c`), lunar bone (`#d8d3c8`) and Mars iron-oxide (`#e0623e`) world accents, muted slate Earth mark, and Inferno-aligned CVD-safe score bands (`#f5ebc4` / `#e5aa4c` / `#df6d47` / `#b87696`) with WCAG AA contrast everywhere.
 - **Documented Swappable Alternatives (retained for future swaps):**
   - *Palette B — Helios Amber:* Warm carbon surfaces (`#080706` → `#161410`), burnished kapton-gold primary buttons (`#d9922e` / `#080706` ink) and `#f2b656` highlights, Mars `#df5d3b`, warm Inferno bands (`#fae89e` / `#e8a848` / `#d86840` / `#c4849f`).
   - *Palette C — Copper & Iris:* Cool graphite-obsidian surfaces (`#07070b` → `#14131d`), terracotta primary buttons (`#c9593a` / `#faf8f6` ink), direct 4-stop Inferno bands (`#f4d86c` gold / `#e8893c` tangerine / `#c44d6c` crimson / `#ad92db` iris-violet).
@@ -76,11 +76,11 @@ Completed visual and interaction overhaul addressing live review feedback across
 - [x] **Learn visual field-guide upgrade (`site/src/pages/learn.ts`, `site/src/pages/learn.css`):** Upgraded `01 Hot and cold` to a shared real-scale °C axis showing Earth vs. Moon/Mars values and exact gap directly, pixel-aligned the `02 A year on Earth` scrubber directly above the 12-month matrix columns, darkened and desaturated `04 First tested on Earth` with a subtle lat/lon graticule, and harmonized all Moon/Mars accents to Titanium & Oxide.
 
 ### 6.5 Phase 6 Verification & Sign-off
-- [x] **Full automated & visual QA:** `npm --prefix site run build` (clean, 0 errors), full `npm --prefix site test` (75 passed / 2 skipped / 0 failed across laptop and phone), `pytest` (139 passed / 1 skipped / 0 failed), `git diff testing..v3 -- site/public/data/ pipeline/` confirmed empty, live visual verification across desktop (`1440×900`) and phone (`390×844`), all 7 `docs/images/*.jpg` refreshed, and `AI_NOTE` parity confirmed.
+- [x] **Full automated & visual QA:** `npm --prefix site run build` (clean, 0 errors), full `npm --prefix site test` (75 passed / 2 skipped / 0 failed across laptop and phone), `uv run pytest` (139 passed / 1 skipped / 0 failed), `git diff testing..v3 -- site/public/data/ pipeline/` confirmed empty, live visual verification across desktop (`1440×900`) and phone (`390×844`), all 7 `docs/images/*.jpg` refreshed, and `AI_NOTE` parity confirmed.
 
 ---
 
-## Completed: Phase 7 — UI Polish 2
+## Completed: Phase 7 — UI Polish 2 & Final Sign-off (`7e5a515`)
 
 Targeted refinement pass built on top of Phase 6 while keeping `pipeline/` and `site/public/data/` frozen and byte-identical:
 
@@ -108,4 +108,4 @@ Targeted refinement pass built on top of Phase 6 while keeping `pipeline/` and `
   - Replaced `Earth cannot copy`'s 4-column table and loud yellow link column with the shared left-anchored proportional telemetry rows (semantic `<sup>`, ratio pills, quiet consolidated source footer).
 
 ### 7.5 Phase 7 Verification & Sign-off
-- [x] **Full automated & live visual QA:** `npm --prefix site run build` (clean, 0 errors), full `npm --prefix site test` (`78 passed / 2 skipped / 0 failed` across laptop and phone at `workers: 1`), `pytest` (`139 passed / 1 skipped / 0 failed`), `git diff testing..HEAD -- site/public/data/ pipeline/` confirmed empty, live visual verification across desktop (`1440×900`) and phone (`390×844`) with zero console errors, all 7 `docs/images/*.jpg` refreshed with live tiles and inspected, and `AI_NOTE` parity confirmed verbatim between `README.md` and `site/src/main.ts`.
+- [x] **Full automated & live visual QA:** `npm --prefix site run build` (clean, 0 errors), full `npm --prefix site test` (`78 passed / 2 skipped / 0 failed` across laptop and phone at `workers: 1`), `uv run pytest` (`139 passed / 1 skipped / 0 failed`), `git diff testing..HEAD -- site/public/data/ pipeline/` confirmed empty, live visual verification across desktop (`1440×900`) and phone (`390×844`) with zero console errors, all 7 `docs/images/*.jpg` refreshed with live tiles and inspected, and `AI_NOTE` parity confirmed verbatim between `README.md` and `site/src/main.ts`.

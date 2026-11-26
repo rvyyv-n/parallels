@@ -107,7 +107,7 @@ function place(box: HTMLElement, host: HTMLElement, x: number, y: number, gap: n
   box.style.top = `${Math.round(at[1] + offsetY)}px`;
 }
 
-export function topShare(rank: number, of: number) {
+function topShare(rank: number, of: number) {
   const p = Math.max(0.1, (rank / of) * 100);
   return p < 10 ? `${num(Math.ceil(p * 10) / 10, 1)}%` : `${num(Math.ceil(p))}%`;
 }

@@ -103,7 +103,7 @@ const TALL: Key[] = [
 
 const wrap = (d: number) => ((((d + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
 
-export function onSphere(lat: number, lon: number, r: number) {
+function onSphere(lat: number, lon: number, r: number) {
   const a = rad(lat);
   const b = rad(lon);
   return new THREE.Vector3(Math.cos(a) * Math.cos(b) * r, Math.sin(a) * r, -Math.cos(a) * Math.sin(b) * r);

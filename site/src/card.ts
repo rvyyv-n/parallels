@@ -25,7 +25,6 @@ export interface CardInput extends TraitInput {
   score: Float32Array;
   place: number;
   ranked: number;
-  filterId?: string;
   hand?: boolean;
   weightsName: string;
   plain: string;
@@ -53,7 +52,7 @@ const chScore = (x: CardInput, c: Challenge) => x.t[`ch:${c.id}`]?.[x.i] ?? NaN;
 
 const words = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}` : (xs[0] ?? ""));
 
-export function verdict(x: CardInput, chs: Challenge[]) {
+function verdict(x: CardInput, chs: Challenge[]) {
   const sc = chs
     .filter((c) => x.weights[c.id] > 0)
     .map((c) => ({ c, v: chScore(x, c) }))

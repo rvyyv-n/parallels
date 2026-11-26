@@ -32,7 +32,7 @@ const chipOf = (v: View, c: Challenge, i: number, text?: string, best = false) =
 
 const across = (n: number) => (n > 5 ? Math.ceil(n / 2) : n);
 
-export const chips = (v: View, i: number) => `<span class="rk-chips" style="--n:${across(v.chs.length)}">${v.chs.map((c) => chipOf(v, c, i)).join("")}</span>`;
+const chips = (v: View, i: number) => `<span class="rk-chips" style="--n:${across(v.chs.length)}">${v.chs.map((c) => chipOf(v, c, i)).join("")}</span>`;
 
 export function summary(v: View): string {
   const { m, cells, ids } = v;

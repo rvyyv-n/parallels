@@ -38,7 +38,7 @@ export function num(v: number, digits = 0): string {
 
 export const score100 = (v: number) => (Number.isFinite(v) ? num(v * 100, 0) : "—");
 
-export function deg(v: number, pos: string, neg: string, digits = 2): string {
+function deg(v: number, pos: string, neg: string, digits = 2): string {
   return `${num(Math.abs(v), digits)}° ${v < 0 ? neg : pos}`;
 }
 

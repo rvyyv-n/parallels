@@ -193,24 +193,6 @@ sup {
   padding: 40px 20px;
 }
 
-.pass {
-  color: var(--pass);
-  font-weight: 650;
-}
-
-.fail {
-  color: var(--fail);
-  font-weight: 650;
-}
-
-.note {
-  max-width: 75ch;
-  padding: 10px 14px;
-  border: 1px solid var(--signal-bd);
-  border-radius: var(--r-sm);
-  background: #0f0d07;
-}
-
 .tag {
   display: inline-block;
   font: 700 11px/1 var(--display);
@@ -419,19 +401,12 @@ sup {
   opacity: 1;
 }
 
-option {
-  background: var(--raise);
-  color: var(--ink);
-  font-size: 16px;
-}
-
 /* Shared form controls */
 .ctl {
   display: grid;
   gap: 6px;
 }
 
-.ctl select,
 .btn {
   font: inherit;
   color: var(--ink);
@@ -663,36 +638,6 @@ table.data .n {
   white-space: nowrap;
 }
 
-.pips {
-  display: grid;
-  gap: 4px;
-  margin: 8px 0 4px;
-  font-size: 12px;
-}
-
-.pips span {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.pips b {
-  width: 56px;
-  color: var(--ink-2);
-  font-weight: 600;
-}
-
-.pips i {
-  width: 14px;
-  height: 10px;
-  border: 1.5px solid var(--ink-3);
-}
-
-.pips i.on {
-  background: var(--ink);
-  border-color: var(--ink);
-}
-
 .t-notes {
   margin-top: 4px;
   font-size: 12.5px;
@@ -749,36 +694,6 @@ table.data .n {
   margin-left: 0;
 }
 
-.pair {
-  display: grid;
-  grid-template-columns: 256px minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
-}
-
-.eimg {
-  margin: 0;
-}
-
-.eimg.fb img {
-  display: none;
-}
-
-.eimg figcaption {
-  font-size: 11.5px;
-  color: var(--ink-3);
-  margin-top: 6px;
-  max-width: 256px;
-}
-
-.fb-note {
-  display: none;
-}
-
-.eimg.fb .fb-note {
-  display: inline;
-}
-
 .eimg.none p {
   font-size: 13px;
   color: var(--ink-2);
@@ -826,31 +741,9 @@ table.data .n {
   filter: invert(1);
 }
 
-.maplibregl-ctrl-attrib {
-  background: var(--glass) !important;
-  color: var(--ink-3);
-}
-
-.maplibregl-ctrl-attrib a {
-  color: var(--ink-2);
-}
-
-.maplibregl-ctrl-attrib-button {
-  filter: invert(1);
-}
-
 .maplibregl-cooperative-gesture-screen {
   background: rgba(7, 7, 9, 0.78);
   font-family: var(--body);
-}
-
-@keyframes draw {
-  from {
-    stroke-dashoffset: var(--len);
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
 }
 
 @media (max-width: 759px) {
@@ -865,21 +758,10 @@ table.data .n {
   .card {
     padding: 14px 14px 24px;
   }
-
-  .breaks li,
-  .labels li {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2px;
-  }
 }
 
 @media (max-width: 459px) {
-  .pair {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .switch,
-  .ctl select {
+  .switch {
     min-height: 44px;
   }
 }

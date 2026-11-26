@@ -33,7 +33,7 @@ export const cleanSource = (s: string) => s.replace(/;\s*/g, " / ");
 export const firstNumber = (s: string) => Number(s.replace(/,/g, "").match(/\d+(\.\d+)?/)?.[0] ?? NaN);
 const fmtCompact = (x: number) => (Number.isInteger(x) ? num(x) : num(x, 1));
 
-export function parseVital(r: CantCopy, w: Body): Vital {
+function parseVital(r: CantCopy, w: Body): Vital {
   const rawW = r[w];
   const rawE = r.earth;
 

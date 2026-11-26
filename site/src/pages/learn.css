@@ -328,16 +328,13 @@
   color: var(--ink-2);
 }
 
-.ln-ico,
 .ln .vt-ico {
   flex: none;
   color: var(--w-text);
   opacity: 0.92;
 }
 
-.ln-vital[data-vital="radiation"] .ln-ico,
 .ln-vital[data-vital="radiation"] .vt-ico,
-.ln-cmp[data-vital="radiation"] .ln-ico,
 .ln-cmp[data-vital="radiation"] .vt-ico {
   color: var(--fail);
 }
@@ -689,7 +686,6 @@
   grid-area: auto;
 }
 
-.ln-rows,
 .ln-weights {
   margin: 18px 0 0;
   padding: 0;
@@ -698,7 +694,6 @@
   gap: 20px;
 }
 
-.ln-temp,
 .ln-weights li {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -727,10 +722,6 @@
   color: var(--ink-3);
 }
 
-.ln-temp .ln-src {
-  grid-area: src;
-}
-
 .ln-bar {
   grid-area: bar;
   display: block;
@@ -749,14 +740,6 @@
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 60%);
   transform-origin: left;
   transition: transform 0.6s var(--ease);
-}
-
-.ln-temp[data-kind="world"] .ln-bar i {
-  background-color: var(--w);
-}
-
-.ln-temp[data-kind="earth"] .ln-bar i {
-  background-color: var(--ink);
 }
 
 .ln-verdict {
@@ -1821,7 +1804,6 @@
     height: auto;
   }
 
-  .ln-temp,
   .ln-weights li {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas: "who" "num" "bar" "src";

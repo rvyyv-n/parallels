@@ -61,7 +61,7 @@ export function row(x: TraitInput, id: string): Row | null {
 
 const yesNo = (tr: Trait) => tr.scored_by === "presence" && tr.unit === "%";
 const count = (tr: Trait) => tr.scored_by === "presence" && tr.unit !== "%";
-export const side = (body: Body, tr: Trait) => (tr.scored_by === "ideal" ? "Ideal" : BODY[body]);
+const side = (body: Body, tr: Trait) => (tr.scored_by === "ideal" ? "Ideal" : BODY[body]);
 
 export function val(tr: Trait, v: number | null | undefined) {
   if (v == null || !Number.isFinite(v)) return "no data";
@@ -149,7 +149,7 @@ function notes(x: TraitInput, r: Row, why: string) {
   </div></details>`;
 }
 
-export function srcChips(x: TraitInput, r: Row) {
+function srcChips(x: TraitInput, r: Row) {
   const label = side(x.body, r.tr);
   const earth = `<b>Earth:</b> ${esc(cite(short(x.m, r.tr.earth_dataset), r.tr.earth_resolution))}`;
   const there = !r.tv

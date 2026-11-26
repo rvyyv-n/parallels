@@ -23,12 +23,11 @@ const PATHS = {
   check: `<path d="M20 6 9 17l-5-5"/>`,
   x: `<path d="M18 6 6 18"/><path d="m6 6 12 12"/>`,
   sources: `<path d="M12 5v16"/><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"/>`,
-  limit: `<path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/>`,
   pin: `<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>`,
   dust: `<circle cx="5" cy="17" r="1.5"/><circle cx="10" cy="19" r="1"/><circle cx="15" cy="16" r="1.5"/><circle cx="19" cy="19.5" r="1"/><circle cx="8" cy="12.5" r="1"/><circle cx="13" cy="10" r="1"/><circle cx="18" cy="11" r="1.5"/><path d="M2 22h20"/><path d="M4 6c2.5-2 5-2 7.5 0s5 2 7.5 0"/>`,
 };
 
-export type IconName = keyof typeof PATHS;
+type IconName = keyof typeof PATHS;
 
 export function icon(name: string, cls = ""): string {
   const d = PATHS[name as IconName] ?? PATHS.info;
