@@ -28,12 +28,13 @@ export function cols(m: Manifest, target: string) {
   return { cells, t: td, target: t };
 }
 
-// Block live remote NASA tile fetches during local tests so SwiftShader doesn't decode hundreds of remote JPEGs.
-// Set LIVE_TILES=1 to exercise live GIBS and Trek tiles.
+// Block live remote map tile fetches during local tests so SwiftShader doesn't decode hundreds of remote JPEGs.
+// Set LIVE_TILES=1 to exercise live GIBS, EOX Sentinel-2, and Trek tiles.
 export const test = base.extend({
   page: async ({ page }, use) => {
     if (!process.env.LIVE_TILES) {
       await page.route("**://gibs.earthdata.nasa.gov/**", (r) => r.abort());
+      await page.route("**://tiles.maps.eox.at/**", (r) => r.abort());
       await page.route("**://trek.nasa.gov/**", (r) => r.abort());
     }
     await use(page);

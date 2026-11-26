@@ -55,7 +55,7 @@ export const rules = (v: View) =>
   `Top ${LIST} of ${num(v.pool)} cells · ${v.known ? "all sites" : "new only"} · ≥${num(APART_KM)} km · ≤${PER_COUNTRY}/country`;
 
 export const key = () =>
-  `<span class="key-k">Key</span><ul>${BANDS.map((b) => `<li><i class="fc ${b.cls}" aria-hidden="true"></i>${b.word}</li>`).join("")}<li><i class="fc b-na" aria-hidden="true"></i>no data</li></ul>`;
+  `<ul>${BANDS.map((b) => `<li><i class="key-mk ${b.cls}" aria-hidden="true"></i>${b.word}</li>`).join("")}<li><i class="key-mk b-na" aria-hidden="true"></i>no data</li></ul>`;
 
 export function list(v: View, shut: Set<string>, moved: Map<number, number>, byRegion: boolean): string {
   const { m, cells, ids } = v;
@@ -92,9 +92,9 @@ export function list(v: View, shut: Set<string>, moved: Map<number, number>, byR
 }
 
 export const sortBar = (byRegion: boolean) =>
-  `<span class="rk-sort-k" id="rk-sort-k">Sort</span><span class="rk-sort-seg">${[
-    ["rank", "By rank"],
-    ["region", "By region"],
+  `<span class="sr" id="rk-sort-k">Sort</span><span class="rk-sort-seg">${[
+    ["rank", "Rank"],
+    ["region", "Region"],
   ]
     .map(([k, t]) => `<button type="button" data-sort="${k}" aria-pressed="${(k === "region") === byRegion}">${t}</button>`)
     .join("")}</span>`;

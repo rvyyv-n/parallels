@@ -9,11 +9,18 @@ export const IMAGERY = [
     use: "The background of the Earth map, the 3D Earth on Home and the bottom layer of the Earth close-up. If the tile service is down, the site uses its own copy of the same images.",
   },
   {
-    name: "Landsat WELD true colour, global annual mosaic (Earth close-up, live tiles)",
-    by: "NASA / USGS Landsat, via NASA GIBS",
+    name: "ASTER GDEM Greyscale Shaded Relief (Earth close-up relief mode, live tiles)",
+    by: "NASA / METI ASTER GDEM, via NASA GIBS",
     url: "https://nasa-gibs.github.io/gibs-api-docs/",
     licence: "NASA open data, no restrictions",
-    use: "The Earth side of the close-up in each match. We show it but do not score it. Where it has no data, Blue Marble shows.",
+    use: "The Earth side of the close-up in Relief mode (default for lunar south-pole targets so landforms compare directly with LOLA relief). We show it but do not score it. Blue Marble shows beyond 83° latitude or when offline.",
+  },
+  {
+    name: "Copernicus Sentinel-2 Cloudless 2024 (Earth close-up satellite mode, live tiles)",
+    by: "ESA Copernicus Sentinel-2, processed by EOX",
+    url: "https://s2maps.eu/",
+    licence: "CC BY 4.0",
+    use: "The Earth side of the close-up in Satellite mode (default for Mars and non-polar targets). We show it but do not score it. Where it has no coverage (high Antarctic latitudes), Blue Marble shows.",
   },
   {
     name: "LOLA south-pole shaded relief, 87.5° S to the pole (Moon close-up, live tiles)",

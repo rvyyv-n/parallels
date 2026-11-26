@@ -308,7 +308,7 @@ function data(m: Manifest) {
     "Data",
     "Data",
     `<div class="ab-data-bar"><h3 id="ab-ds-h">${num(m.datasets.length)} datasets</h3>${pills}</div>${table}
-    <h3>Images we show but do not score</h3><p class="ab-muted">The map and planet images, and the ${num(photos.length)} photos on the Learn page. All are NASA or NASA and USGS images, free to use.</p>${images}
+    <h3>Images we show but do not score</h3><p class="ab-muted">The map and planet images, and the ${num(photos.length)} photos on the Learn page. Open imagery from NASA, NASA/USGS, and ESA Copernicus (via EOX), free to use with attribution.</p>${images}
     <h3>Code and fonts</h3>${code}`,
     `Every number on this site comes from one of these, from ${num(archives.size)} open archives. NASA data does most of the scoring.`,
   );

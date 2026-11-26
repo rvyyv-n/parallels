@@ -127,8 +127,8 @@ export function place(ctx: Ctx): Page {
         });
         const orderedFilters = [...m.filters].sort((a, bb) => Number(bb.id === "balanced") - Number(a.id === "balanced"));
         const presetOptions = [
-          ...(s.hand ? [{ value: "__custom", label: "Custom weights" }] : []),
-          ...orderedFilters.map((fl) => ({ value: fl.id, label: fl.name })),
+          ...(s.hand ? [{ value: "__custom", label: "Custom weights", sub: "Custom challenge weights set in Finder." }] : []),
+          ...orderedFilters.map((fl) => ({ value: fl.id, label: fl.name, sub: fl.plain })),
         ];
         disposeCard = wireCard(box, {
           presetOptions,

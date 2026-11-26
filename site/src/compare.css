@@ -6,8 +6,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 6px 8px;
   margin-bottom: 12px;
 }
 
@@ -25,27 +24,37 @@
 .cmp-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  min-height: 32px;
-  padding: 0 13px;
+  gap: 5px;
+  min-height: 30px;
+  padding: 0 10px;
   border: 0;
   border-radius: var(--r-pill);
   background: transparent;
   color: var(--ink-2);
-  font: 600 12px/1 var(--display);
-  letter-spacing: 0.06em;
+  font: 600 11.5px/1 var(--display);
+  letter-spacing: 0.055em;
   text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
   transition: color var(--t-fast) var(--ease);
 }
 
-.cmp-btn:hover {
+.cmp-seg[data-cmp-seg="km"] .cmp-btn {
+  font-variant-numeric: tabular-nums;
+}
+
+.cmp-btn:hover:not(:disabled) {
   color: var(--ink);
 }
 
+.cmp-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
 .cmp-btn .ic {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
 }
 
 .cmp-btn[aria-pressed="true"] {
@@ -68,17 +77,18 @@
 .cmp-ov {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   min-height: 36px;
-  padding: 0 12px;
+  padding: 0 11px;
   margin-left: auto;
   border: 1px solid var(--rule-2);
   border-radius: var(--r-pill);
   background: var(--raise);
   color: var(--ink-2);
-  font: 600 12px/1 var(--display);
-  letter-spacing: 0.06em;
+  font: 600 11.5px/1 var(--display);
+  letter-spacing: 0.055em;
   text-transform: uppercase;
+  white-space: nowrap;
   cursor: pointer;
   box-shadow: var(--edge-hi);
   transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
@@ -167,6 +177,14 @@
   z-index: 1;
 }
 
+.cmp-p .t.lo {
+  z-index: 0;
+}
+
+.cmp-p .t.hi {
+  z-index: 1;
+}
+
 .cmp-p img.blank {
   visibility: hidden;
 }
@@ -193,6 +211,15 @@
   z-index: 2;
   border: 2px solid var(--signal-2);
   outline: 1px solid rgba(2, 7, 10, 0.78);
+  pointer-events: none;
+  transition: opacity var(--t-fast) var(--ease);
+}
+
+.cmp-win {
+  position: absolute;
+  z-index: 2;
+  border: 1.5px solid rgba(242, 240, 235, 0.82);
+  outline: 1px solid rgba(2, 7, 10, 0.72);
   pointer-events: none;
   transition: opacity var(--t-fast) var(--ease);
 }
@@ -241,6 +268,7 @@
 }
 
 .cmp.cmp-clean .cmp-cell,
+.cmp.cmp-clean .cmp-win,
 .cmp.cmp-clean .cmp-x,
 .cmp.cmp-clean .cmp-mark {
   opacity: 0;
@@ -252,6 +280,9 @@
   top: 10px;
   left: 10px;
   z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 5px 10px 4px;
   border: 1px solid var(--rule-2);
   border-radius: var(--r-pill);
@@ -263,6 +294,12 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink);
+}
+
+.cmp-tag-m {
+  color: var(--ink-3);
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 
 .eimg.none {
@@ -420,6 +457,13 @@
   margin-left: 3px;
 }
 
+.cmp-src {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
 .cmp-caps .fb-note {
   display: none;
   margin-top: 3px;
@@ -485,6 +529,16 @@
 }
 
 @container pl (max-width: 519px) {
+  .cmp-btn {
+    padding: 0 8.5px;
+    font-size: 11px;
+  }
+
+  .cmp-ov {
+    padding: 0 10px;
+    font-size: 11px;
+  }
+
   .cmp[data-mode="split"] .cmp-stage {
     grid-template-columns: none;
     grid-auto-flow: column;

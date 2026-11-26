@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { trekUrl, worldviewUrl } from "../src/export";
-import { latlon, score100 } from "../src/format";
+import { latlon, score100, targetName } from "../src/format";
 import { spread } from "../src/rank";
 import { cols, expect, manifest, test } from "./helpers";
 
@@ -128,7 +128,7 @@ test("Download CSV exports UTF-8 BOM, CRLF lines, metadata, challenge scores, an
 
   expect(raw).toContain(expectedName);
   expect(raw).toContain(`Metadata,Cell ID,${id}`);
-  expect(raw).toContain(moonPole.name);
+  expect(raw).toContain(targetName(moonPole.name));
   expect(raw).toContain(`Metadata,Overall match score,${expectedScore}`);
   expect(raw).toContain(`Metadata,Generated,${m.generated}`);
   if (m.method_version) expect(raw).toContain(m.method_version);
@@ -184,7 +184,7 @@ test("NASA Worldview and Moon/Mars Trek links carry exact projection, bbox, and 
     `https://trek.nasa.gov/mars/#v=0.1&x=${marsJezero.lon.toFixed(4)}&y=${marsJezero.lat.toFixed(4)}&z=8&p=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A104905`,
   );
 
-  expect([...new Set(externalRequests)].filter((h) => h !== "gibs.earthdata.nasa.gov" && h !== "trek.nasa.gov")).toEqual([]);
+  expect([...new Set(externalRequests)].filter((h) => h !== "gibs.earthdata.nasa.gov" && h !== "tiles.maps.eox.at" && h !== "trek.nasa.gov")).toEqual([]);
 });
 
 test("image compare Overlays toggle hides markers and Side by side / Wipe segmented control switches cleanly", async ({ page }) => {
@@ -192,13 +192,17 @@ test("image compare Overlays toggle hides markers and Side by side / Wipe segmen
   await page.goto(`/#/place?t=${moonPole.id}&f=${balanced.id}&c=${id}`);
 
   const cmp = page.locator(".cmp");
-  const seg = cmp.locator(".cmp-seg");
+  const modeSeg = cmp.locator('.cmp-seg[data-cmp-seg="mode"]');
+  const layerSeg = cmp.locator('.cmp-seg[data-cmp-seg="layer"]');
+  const kmSeg = cmp.locator('.cmp-seg[data-cmp-seg="km"]');
   const splitBtn = cmp.locator('[data-cmp-mode="split"]');
   const wipeBtn = cmp.locator('[data-cmp-mode="wipe"]');
   const ovBtn = cmp.locator(".cmp-ov");
 
-  await expect(seg).toHaveClass(/seg-has-thumb/);
-  await expect(seg.locator("> .seg-thumb")).toHaveCount(1);
+  for (const seg of [modeSeg, layerSeg, kmSeg]) {
+    await expect(seg).toHaveClass(/seg-has-thumb/);
+    await expect(seg.locator("> .seg-thumb")).toHaveCount(1);
+  }
   await expect(cmp).toHaveAttribute("data-mode", "split");
   await expect(splitBtn).toHaveAttribute("aria-pressed", "true");
   await expect(wipeBtn).toHaveAttribute("aria-pressed", "false");
@@ -257,6 +261,108 @@ test("image compare Overlays toggle hides markers and Side by side / Wipe segmen
   await ovBtn.click();
   await expect(ovBtn).toHaveAttribute("aria-pressed", "true");
   await expect(cmp).not.toHaveClass(/cmp-clean/);
+});
+
+test("image compare defaults to 70 km ground width and toggles 70 km / 140 km scale cleanly", async ({ page }) => {
+  const { id } = topCell(marsJezero.id);
+  await page.goto(`/#/place?t=${marsJezero.id}&f=${balanced.id}&c=${id}`);
+
+  const cmp = page.locator(".cmp");
+  const km70 = cmp.locator('[data-cmp-km="70"]');
+  const km140 = cmp.locator('[data-cmp-km="140"]');
+
+  await expect(cmp).toHaveAttribute("data-km", "70");
+  await expect(km70).toHaveAttribute("aria-pressed", "true");
+  await expect(km140).toHaveAttribute("aria-pressed", "false");
+  await expect(cmp.locator(".cmp-scale")).toContainText("25 km");
+  await expect(cmp.locator(".cmp-scale")).toContainText("70 km wide");
+
+  const cell70 = await cmp.locator(".cmp-cell").evaluate((el) => parseFloat((el as HTMLElement).style.height));
+  const win70 = await cmp.locator(".cmp-win").evaluate((el) => parseFloat((el as HTMLElement).style.width));
+  expect(win70).toBeCloseTo((10 / 70) * 100, 1);
+
+  await km140.click();
+  await expect(cmp).toHaveAttribute("data-km", "140");
+  await expect(km140).toHaveAttribute("aria-pressed", "true");
+  await expect(km70).toHaveAttribute("aria-pressed", "false");
+  await expect(cmp.locator(".cmp-scale")).toContainText("50 km");
+  await expect(cmp.locator(".cmp-scale")).toContainText("140 km wide");
+
+  const cell140 = await cmp.locator(".cmp-cell").evaluate((el) => parseFloat((el as HTMLElement).style.height));
+  const win140 = await cmp.locator(".cmp-win").evaluate((el) => parseFloat((el as HTMLElement).style.width));
+  expect(win140).toBeCloseTo((10 / 140) * 100, 1);
+  expect(cell70 / cell140).toBeCloseTo(2, 1);
+
+  await expect(cmp.locator(".eimg.fb")).toHaveCount(1);
+  await expect(cmp.locator(".timg.fb")).toHaveCount(1);
+
+  await km70.click();
+  await expect(cmp).toHaveAttribute("data-km", "70");
+  await expect(cmp.locator(".cmp-scale")).toContainText("25 km");
+  await expect(cmp.locator(".cmp-scale")).toContainText("70 km wide");
+});
+
+test("Earth layer defaults to Relief on Moon South Pole and Satellite on Mars, and toggles cleanly", async ({ page }) => {
+  const tileUrls: string[] = [];
+  page.on("request", (req) => {
+    const u = req.url();
+    if (u.includes("gibs.earthdata.nasa.gov") || u.includes("tiles.maps.eox.at")) tileUrls.push(u);
+  });
+
+  const moonPick = topCell(moonPole.id);
+  await page.goto(`/#/place?t=${moonPole.id}&f=${balanced.id}&c=${moonPick.id}`);
+
+  const cmp = page.locator(".cmp");
+  const reliefBtn = cmp.locator('[data-cmp-layer="relief"]');
+  const satBtn = cmp.locator('[data-cmp-layer="satellite"]');
+
+  await expect(cmp).toHaveAttribute("data-layer", "relief");
+  await expect(reliefBtn).toHaveAttribute("aria-pressed", "true");
+  await expect(satBtn).toHaveAttribute("aria-pressed", "false");
+  await expect(cmp.locator(".eimg .cmp-tag")).toContainText("Relief");
+  await expect(cmp.locator(".eimg-cap .cmp-src")).toContainText("ASTER GDEM");
+  await expect.poll(() => tileUrls.some((u) => u.includes("ASTER_GDEM_Greyscale_Shaded_Relief"))).toBe(true);
+  await expect(cmp.locator(".eimg.fb")).toHaveCount(1);
+
+  const asterZooms = tileUrls
+    .filter((u) => u.includes("ASTER_GDEM_Greyscale_Shaded_Relief"))
+    .map((u) => Number(u.match(/GoogleMapsCompatible_Level12\/(\d+)\//)?.[1]));
+  expect(asterZooms.length).toBeGreaterThan(0);
+  for (const z of asterZooms) expect(z).toBeLessThanOrEqual(12);
+
+  tileUrls.length = 0;
+  await satBtn.click();
+  await expect(cmp).toHaveAttribute("data-layer", "satellite");
+  await expect(satBtn).toHaveAttribute("aria-pressed", "true");
+  await expect(reliefBtn).toHaveAttribute("aria-pressed", "false");
+  await expect(cmp.locator(".eimg .cmp-tag")).toContainText("Satellite");
+  await expect(cmp.locator(".eimg-cap .cmp-src")).toContainText("Sentinel-2");
+  await expect.poll(() => tileUrls.some((u) => u.includes("tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857"))).toBe(true);
+  await expect(cmp.locator(".eimg.fb")).toHaveCount(1);
+
+  await cmp.locator('[data-cmp-mode="wipe"]').click();
+  await expect(cmp).toHaveAttribute("data-mode", "wipe");
+  await reliefBtn.click();
+  await expect(cmp).toHaveAttribute("data-layer", "relief");
+  await expect(cmp).toHaveAttribute("data-mode", "wipe");
+
+  tileUrls.length = 0;
+  const marsPick = topCell(marsJezero.id);
+  await page.goto(`/#/place?t=${marsJezero.id}&f=${balanced.id}&c=${marsPick.id}`);
+
+  await expect(cmp).toHaveAttribute("data-layer", "satellite");
+  await expect(satBtn).toHaveAttribute("aria-pressed", "true");
+  await expect(reliefBtn).toHaveAttribute("aria-pressed", "false");
+  await expect(cmp.locator(".eimg .cmp-tag")).toContainText("Satellite");
+  await expect(cmp.locator(".eimg-cap .cmp-src")).toContainText("Sentinel-2");
+  await expect.poll(() => tileUrls.some((u) => u.includes("tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857"))).toBe(true);
+
+  tileUrls.length = 0;
+  await reliefBtn.click();
+  await expect(cmp).toHaveAttribute("data-layer", "relief");
+  await expect(reliefBtn).toHaveAttribute("aria-pressed", "true");
+  await expect(cmp.locator(".eimg-cap .cmp-src")).toContainText("ASTER GDEM");
+  await expect.poll(() => tileUrls.some((u) => u.includes("ASTER_GDEM_Greyscale_Shaded_Relief"))).toBe(true);
 });
 
 test("Expand all / Collapse all toggles every challenge while initial load keeps exactly one open", async ({ page }) => {
@@ -318,4 +424,39 @@ test("Copy link and Copy coords work and Place has zero horizontal overflow on n
 
   await page.locator(".pl-toggle-all").click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(vpWidth);
+});
+
+test("Place header shows Focus prefix, mission descriptions, Year-round dot, interactive Seasons strip, and left-anchored telemetry", async ({ page }) => {
+  expect(targetName("Moon's south pole (Artemis III regions)")).toBe("Moon's South Pole (Artemis III Regions)");
+  expect(targetName("Shackleton rim")).toBe("Shackleton Rim");
+  expect(targetName("Arsia Mons caves")).toBe("Arsia Mons Caves");
+  expect(targetName("de Gerlache Rim 2")).toBe("de Gerlache Rim 2");
+
+  const { id } = topCell(moonPole.id);
+  await page.goto(`/#/place?t=${moonPole.id}&f=${balanced.id}&c=${id}`);
+
+  await expect(page.locator(".pl-for-txt")).toHaveText("Moon's South Pole (Artemis III Regions)");
+  await expect(page.locator("#pl-preset .pk-pre")).toHaveText("Focus");
+  await expect(page.locator("#pl-yr .pl-yr-dot")).toBeVisible();
+
+  await page.locator("#pl-preset").click();
+  const opts = page.locator('#pl-preset-listbox [role="option"]');
+  await expect(opts).toHaveCount(m.filters.length);
+  await expect(page.locator('#pl-preset-listbox [role="option"][data-value="balanced"] .pk-opt-sub')).toHaveText(balanced.plain);
+  await expect(page.locator('#pl-preset-listbox [role="option"][data-value="rover"] .pk-opt-sub')).toHaveText(rover.plain);
+  await page.keyboard.press("Escape");
+
+  const months = page.locator(".se-strip .se-m");
+  await expect(months).toHaveCount(12);
+  await expect(page.locator(".se-legend li")).toHaveCount(4);
+  await months.nth(5).click();
+  await expect(months.nth(5)).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".se-readout .se-ro-m")).toHaveText("Jun");
+
+  const cantRows = page.locator(".card .cant .cant-row");
+  await expect(cantRows).toHaveCount(m.cant_copy.length);
+  await expect(cantRows.locator("sup").first()).toBeVisible();
+  const cantText = await page.locator(".card .cant").innerText();
+  expect(cantText).not.toMatch(/[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]/);
+  await expect(page.locator(".card .cant .cant-src a").first()).toHaveAttribute("href", /^https?:\/\//);
 });

@@ -19,6 +19,10 @@ test("every Learn section renders for the Moon", async ({ page }) => {
   await expect(page.locator(`${page$}[data-testid="analog-card"] h3`)).not.toBeEmpty();
   await expect(page.locator(`${page$}.ln-pair`)).toHaveCount(4);
   await expect(page.locator(`${page$}[data-testid="learn-find"]`)).toHaveAttribute("href", `#/find?t=${home("moon").id}`);
+  await expect(page.locator(`${page$}.ln-vitals .ln-vital`)).toHaveCount(m.cant_copy.length);
+  await expect(page.locator(`${page$}.ln-vitals sup`).first()).toBeVisible();
+  expect(await page.locator(`${page$}.ln-vitals`).innerText()).not.toMatch(/[⁻⁰¹²³⁴⁵⁶⁷⁸⁹]/);
+  await expect(page.locator(`${page$}.ln-more summary`)).toContainText("Moon's South Pole (Artemis III Regions)");
   expect(errors).toEqual([]);
 });
 

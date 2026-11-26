@@ -5,6 +5,7 @@ import { icon } from "./icons";
 export interface PickerOption {
   value: string;
   label: string;
+  sub?: string;
   group?: string;
   dot?: "moon" | "mars" | "neutral";
   meta?: string;
@@ -16,6 +17,7 @@ export interface PickerConfig {
   ariaLabel: string;
   options: PickerOption[];
   value: string;
+  prefix?: string;
   variant?: "field" | "pill";
   align?: "left" | "right";
   minMenuWidth?: number;
@@ -52,9 +54,12 @@ export function createPicker(host: HTMLElement, cfg: PickerConfig): PickerHandle
   host.classList.add("pk");
   host.dataset.variant = variant;
   host.dataset.open = "false";
+  const prefixHtml = cfg.prefix
+    ? `<span class="pk-pre" aria-hidden="true">${esc(cfg.prefix)}</span><span class="pk-div" aria-hidden="true"></span>`
+    : "";
   host.innerHTML = `<button type="button" id="${esc(cfg.id)}" class="pk-btn" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="${esc(
     listId,
-  )}" aria-label="${esc(cfg.ariaLabel)}"><span class="pk-dot" hidden aria-hidden="true"></span><span class="pk-val"></span>${icon("chevron", "pk-chev")}</button>`;
+  )}" aria-label="${esc(cfg.ariaLabel)}">${prefixHtml}<span class="pk-dot" hidden aria-hidden="true"></span><span class="pk-val"></span>${icon("chevron", "pk-chev")}</button>`;
 
   const trigger = host.querySelector<HTMLButtonElement>(".pk-btn")!;
   const dotEl = trigger.querySelector<HTMLElement>(".pk-dot")!;
@@ -93,11 +98,14 @@ export function createPicker(host: HTMLElement, cfg: PickerConfig): PickerHandle
         html += `<div class="pk-grp" role="presentation">${esc(opt.group)}</div>`;
       }
       const isSel = opt.value === value;
-      html += `<button type="button" class="pk-opt${isSel ? " is-selected" : ""}" id="${esc(cfg.id)}-opt-${idx}" role="option" data-idx="${idx}" data-value="${esc(
+      const bodyHtml = opt.sub
+        ? `<span class="pk-opt-body"><span class="pk-opt-lbl">${esc(opt.label)}</span><span class="pk-opt-sub">${esc(opt.sub)}</span></span>`
+        : `<span class="pk-opt-lbl">${esc(opt.label)}</span>`;
+      html += `<button type="button" class="pk-opt${isSel ? " is-selected" : ""}${opt.sub ? " has-sub" : ""}" id="${esc(cfg.id)}-opt-${idx}" role="option" data-idx="${idx}" data-value="${esc(
         opt.value,
       )}" aria-selected="${isSel}"${opt.disabled ? " disabled" : ""} tabindex="-1">${
         opt.dot ? `<i class="pk-dot" data-dot="${esc(opt.dot)}" aria-hidden="true"></i>` : ""
-      }<span class="pk-opt-lbl">${esc(opt.label)}</span>${opt.meta ? `<span class="pk-opt-meta">${esc(opt.meta)}</span>` : ""}<span class="pk-opt-chk" aria-hidden="true">${
+      }${bodyHtml}${opt.meta ? `<span class="pk-opt-meta">${esc(opt.meta)}</span>` : ""}<span class="pk-opt-chk" aria-hidden="true">${
         isSel ? icon("check") : ""
       }</span></button>`;
     });

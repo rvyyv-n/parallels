@@ -1,5 +1,5 @@
 import type { LabelPoint, Target } from "./contract";
-import { esc, latlon, num, reduced, score100 } from "./format";
+import { esc, latlon, num, reduced, score100, targetName } from "./format";
 import { icon } from "./icons";
 import { thumb } from "./worlds";
 
@@ -247,7 +247,7 @@ export function createTargetTwin(host: HTMLElement): TargetTwin {
   return {
     update(t: Target) {
       host.dataset.body = t.body;
-      nameEl.textContent = t.short;
+      nameEl.textContent = targetName(t.short);
       llEl.textContent = latlon(t.lat, t.lon, 1);
       if (t.id === currentId) return;
       currentId = t.id;

@@ -77,8 +77,7 @@
   background: var(--glass-strong);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
-  border: 1px solid var(--rule-2);
-  border-top: 2px solid var(--signal-2);
+  border: 1px solid var(--signal-bd);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-pop), var(--edge-hi);
   transition:

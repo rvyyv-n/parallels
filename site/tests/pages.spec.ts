@@ -1,4 +1,5 @@
 import { cols, expect, manifest, test, type Page } from "./helpers";
+import { targetName } from "../src/format";
 import { spread } from "../src/rank";
 
 const m = manifest();
@@ -30,7 +31,7 @@ test("every route opens its page with its heading, focus and title", async ({ pa
   }
   const c = best()[0];
   await page.goto(`/#/place?t=${main.id}&f=${f0.id}&c=${c}`);
-  await expect(page.locator(".pl-for")).toContainText(main.name);
+  await expect(page.locator(".pl-for")).toContainText(targetName(main.name));
   await expect(h1(page)).not.toHaveText("A match on Earth");
   await expect(page).toHaveTitle(`${(await h1(page).textContent())?.trim()} · Parallels`);
   expect(errors).toEqual([]);

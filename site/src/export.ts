@@ -1,6 +1,6 @@
 import type { Body, Manifest, Target } from "./contract";
 import type { Cols } from "./data";
-import { monthList } from "./format";
+import { monthList, targetName } from "./format";
 import { bandOf } from "./rank";
 import { coverage } from "./score";
 import type { Row, TraitInput } from "./traits";
@@ -131,7 +131,7 @@ export function placeCsv(x: PlaceCsvInput): string {
     ["Latitude", cleanNum(cells.lat[i], 4)],
     ["Longitude", cleanNum(cells.lon[i], 4)],
     ["Cell ID", String(i)],
-    ["Base site", target.name],
+    ["Base site", targetName(target.name)],
     ["Base site ID", target.id],
     ["World", BODY_LABEL[body]],
     ["Preset / weights", x.weightsName],

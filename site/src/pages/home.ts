@@ -1,6 +1,6 @@
 import type { Body, LabelPoint, Manifest, Target } from "../contract";
 import type { Cols } from "../data";
-import { esc, latlon, num, webgl } from "../format";
+import { esc, fmtSup, latlon, num, targetName, webgl } from "../format";
 import { icon } from "../icons";
 import type { Intro } from "../intro";
 import { logo } from "../logo";
@@ -34,7 +34,7 @@ const sitesOf = (m: Manifest, b: Body) => {
 const site = (t: Target, i: number) =>
   `<li><a class="site" href="#/find?t=${esc(t.id)}" data-site="${esc(t.id)}" tabindex="${i ? -1 : 0}"${i ? "" : ' aria-current="true"'}><span class="site-frame" aria-hidden="true"><canvas class="site-thumb" width="128" height="128" data-thumb="${esc(
     t.id,
-  )}" aria-hidden="true"></canvas></span><span class="site-n">${esc(t.name)}</span><span class="site-at">${latlon(t.lat, t.lon, 1)}</span><span class="site-go" aria-hidden="true">${icon("chevron")}</span></a></li>`;
+  )}" aria-hidden="true"></canvas></span><span class="site-n">${esc(targetName(t.name))}</span><span class="site-at">${latlon(t.lat, t.lon, 1)}</span><span class="site-go" aria-hidden="true">${icon("chevron")}</span></a></li>`;
 
 function placeCaption(p: LabelPoint): string {
   const raw = (p.note ?? "")
@@ -79,7 +79,7 @@ function defaultTargetFor(m: Manifest, p: LabelPoint): Target {
 function cant(m: Manifest, b: Body) {
   const src = [...new Map(m.cant_copy.map((c) => [c.source, c.url])).entries()];
   return `<div class="cant"><p class="cant-k">${icon("cant")}Earth cannot copy</p><dl>${m.cant_copy
-    .map((c) => `<div title="${esc(`${c[b]} (${c.source})`)}"><dt>${esc(c.name.replace(/ on the surface$/, ""))}</dt><dd>${esc(headline(c[b])[0])}</dd></div>`)
+    .map((c) => `<div title="${esc(`${c[b]} (${c.source})`)}"><dt>${esc(c.name.replace(/ on the surface$/, ""))}</dt><dd>${fmtSup(headline(c[b])[0])}</dd></div>`)
     .join("")}</dl><p class="cant-src">Sources: ${src.map(([s, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(s)}</a>`).join(" · ")}</p></div>`;
 }
 
@@ -113,7 +113,7 @@ const html = (m: Manifest) => `<section id="intro" class="intro" aria-labelledby
         <h2 id="count-h">We give a score to each patch of land, not only to the famous places.</h2>
         <dl class="counts">
           <div><dt>${num(m.grid.n)}</dt><dd>patches of land, each approximately 50 km wide</dd></div>
-          <div><dt id="count-ranked">—</dt><dd>patches with a rank for the ${esc((home(m, "moon")?.short ?? "").replace(/\s*\(.*\)$/, ""))}</dd></div>
+          <div><dt id="count-ranked">—</dt><dd>patches with a rank for the ${esc(targetName((home(m, "moon")?.short ?? "").replace(/\s*\(.*\)$/, "")))}</dd></div>
           <div><dt id="count-known">—</dt><dd>known analog places, shown in amber</dd></div>
         </dl>
         ${next("ch-moon", "The Moon")}
@@ -289,7 +289,7 @@ export function homePage(ctx: Ctx): Page {
           const tgt = defaultTargetFor(m, p);
           noteEl.innerHTML = sentence
             ? `<p style="margin:0">${esc(sentence)}</p><div class="place-note-links"><a class="place-open" href="${esc(hrefFor(p))}">Inspect match vs ${esc(
-                tgt.short,
+                targetName(tgt.short),
               )} <span aria-hidden="true">→</span></a>${url ? `<a class="place-src" href="${esc(url)}" target="_blank" rel="noopener noreferrer">Source</a>` : ""}</div>`
             : "";
         }

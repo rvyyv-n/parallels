@@ -458,7 +458,7 @@
 
 .ab-prog-card.is-now {
   background: var(--surface-2);
-  box-shadow: inset 0 2px 0 var(--signal-2);
+  box-shadow: inset 0 1px 0 var(--signal-2);
 }
 
 .ab-prog-top {

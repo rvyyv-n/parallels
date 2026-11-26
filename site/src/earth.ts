@@ -26,6 +26,39 @@ const GLOBE_SKY: maplibregl.SkySpecification = {
   "atmosphere-blend": ["interpolate", ["linear"], ["zoom"], 0, 0.44, 4.5, 0.24, 7, 0.04],
 };
 
+// Matched to NASA GIBS Blue Marble after bm raster paint (sat -0.24, contrast +0.05, brightness-max 0.84).
+const POLE_NORTH_COLOR = "#0b1a36";
+const POLE_SOUTH_COLOR = "#cecfd1";
+const POLE_LAYERS = ["pole-cap-outer", "pole-cap-mid", "pole-cap-inner"] as const;
+
+function polarRing(hemi: "n" | "s", lat: number) {
+  const step = 3;
+  const poleLat = hemi === "n" ? 90 : -90;
+  const edgeLat = hemi === "n" ? lat : -lat;
+  const east: [number, number][] = [];
+  const west: [number, number][] = [];
+  for (let lon = -180; lon <= 180; lon += step) east.push([lon, hemi === "n" ? edgeLat : poleLat]);
+  for (let lon = 180; lon >= -180; lon -= step) west.push([lon, hemi === "n" ? poleLat : edgeLat]);
+  return { type: "Polygon" as const, coordinates: [[...east, ...west, east[0]]] };
+}
+
+function polarCaps() {
+  // Inner ring stops 0.09° before the ±85.0511° Mercator clamp so its tile-space area stays non-zero at z=0
+  // and MapLibre's globe tessellator extends the ±90° boundary cleanly to each pole apex.
+  const rings = [
+    { ring: "outer", lat: 84.3 },
+    { ring: "mid", lat: 84.68 },
+    { ring: "inner", lat: 84.96 },
+  ] as const;
+  return {
+    type: "FeatureCollection" as const,
+    features: rings.flatMap(({ ring, lat }) => [
+      { type: "Feature" as const, properties: { ring, color: POLE_NORTH_COLOR }, geometry: polarRing("n", lat) },
+      { type: "Feature" as const, properties: { ring, color: POLE_SOUTH_COLOR }, geometry: polarRing("s", lat) },
+    ]),
+  };
+}
+
 export interface Grid {
   lat: Float32Array;
   lon: Float32Array;
@@ -216,6 +249,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
           tileSize: 256,
           maxzoom: 8,
         },
+        "polar-caps": { type: "geojson", tolerance: 0, data: polarCaps() },
         sel: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
         zone: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
         pts: {
@@ -234,6 +268,30 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         { id: "space", type: "background", paint: { "background-color": "#070709", "background-opacity": 0 } },
         { id: "fallback", type: "raster", source: "fallback", paint: { "raster-saturation": -0.24, "raster-brightness-max": 0.84, "raster-fade-duration": 0 } },
         { id: "bm", type: "raster", source: "bm", paint: { "raster-saturation": -0.24, "raster-brightness-max": 0.84, "raster-contrast": 0.05 } },
+        {
+          id: "pole-cap-outer",
+          type: "fill",
+          source: "polar-caps",
+          filter: ["==", ["get", "ring"], "outer"],
+          layout: { visibility: "visible" },
+          paint: { "fill-color": ["get", "color"], "fill-opacity": 0.36, "fill-antialias": false },
+        },
+        {
+          id: "pole-cap-mid",
+          type: "fill",
+          source: "polar-caps",
+          filter: ["==", ["get", "ring"], "mid"],
+          layout: { visibility: "visible" },
+          paint: { "fill-color": ["get", "color"], "fill-opacity": 0.54, "fill-antialias": false },
+        },
+        {
+          id: "pole-cap-inner",
+          type: "fill",
+          source: "polar-caps",
+          filter: ["==", ["get", "ring"], "inner"],
+          layout: { visibility: "visible" },
+          paint: { "fill-color": ["get", "color"], "fill-opacity": 1, "fill-antialias": false },
+        },
         {
           id: "zone-glow",
           type: "line",
@@ -353,9 +411,25 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
       ],
       { layers: ["analogs", "caves"] },
     );
-    if (!feats.length) return null;
-    const idx = Number(feats[0].properties?.idx);
-    return Number.isInteger(idx) && pts[idx] ? pts[idx] : null;
+    if (feats.length) {
+      const idx = Number(feats[0].properties?.idx);
+      if (Number.isInteger(idx) && pts[idx]) return pts[idx];
+    }
+    // Fall back to direct screen-space projection while the GeoJSON worker is mid-retile after a fast jump.
+    let best: LabelPoint | null = null;
+    let bestD2 = 12 * 12;
+    for (const p of pts) {
+      const pr = projectPoint(p.lat, p.lon);
+      if (!pr) continue;
+      const dx = pr.x - pt.x;
+      const dy = pr.y - pt.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 <= bestD2) {
+        bestD2 = d2;
+        best = p;
+      }
+    }
+    return best;
   };
 
   const onPin = (e: maplibregl.MapMouseEvent) => !!(e.originalEvent.target as HTMLElement).closest?.(".pin, .pin-tag");
@@ -606,6 +680,7 @@ export function createEarth(el: HTMLElement, g: Grid, labels: LabelPoint[], on: 
         map.setProjection({ type: onFlag ? "mercator" : "globe" });
         map.setPaintProperty("space", "background-opacity", onFlag ? 1 : 0);
         map.setSky(onFlag ? { "atmosphere-blend": 0 } : GLOBE_SKY);
+        for (const id of POLE_LAYERS) map.setLayoutProperty(id, "visibility", onFlag ? "none" : "visible");
         map.once("idle", () => {
           check();
           declutter();

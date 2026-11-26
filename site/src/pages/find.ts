@@ -3,7 +3,7 @@ import type { Cols, Data } from "../data";
 import type { Earth, Top } from "../earth";
 import { BODY, placeName, terrainOf } from "../card";
 import { bindPillRange, bindSegmented, syncPillRange } from "../controls";
-import { esc, latlon, num, reduced, score100, webgl } from "../format";
+import { esc, latlon, num, reduced, score100, targetName, webgl } from "../format";
 import { gradient } from "../ramp";
 import { icon } from "../icons";
 import { rankOf } from "../score";
@@ -59,19 +59,23 @@ const html = (m: Manifest) => `<section id="explore" class="fd" aria-labelledby=
         return `<button type="button" data-filter="${esc(f.id)}" aria-pressed="false" aria-label="${esc(f.name)}" title="${esc(`${f.name} — ${f.plain}`)}">${esc(short)}</button>`;
       })
       .join("")}</div>
-    <details class="fd-block fd-w" id="weights">
-      <summary><span>Filters and weights</span><span class="w-mine" id="w-mine" hidden>your weights</span>${icon("chevron")}</summary>
-      <div class="fd-w-in">
-        <div class="ctl"><span id="pick-type-lbl">Terrain type</span><div id="pick-type-wrap"></div></div>
-        <label class="ctl switch"><input type="checkbox" id="pick-yr" role="switch"><span>Year-round testing</span></label>
-        <p class="w-note" id="yr-note"></p>
-        <div class="w-head"><h2>Weights</h2><button type="button" class="sum-link" id="w-reset">Reset</button></div>
-        <p class="w-note">Each slider multiplies the weight that the preset gives to that challenge.</p>
-        <div id="sliders"></div>
+    <div class="fd-mid">
+      <div class="fd-mid-top">
+        <details class="fd-w" id="weights">
+          <summary><span class="fd-w-lbl">Filters &amp; weights</span><span class="w-mine" id="w-mine" hidden>custom</span>${icon("chevron")}</summary>
+          <div class="fd-w-in">
+            <div class="ctl"><span id="pick-type-lbl">Terrain type</span><div id="pick-type-wrap"></div></div>
+            <label class="ctl switch"><input type="checkbox" id="pick-yr" role="switch"><span>Year-round testing</span></label>
+            <p class="w-note" id="yr-note"></p>
+            <div class="w-head"><h2>Weights</h2><button type="button" class="sum-link" id="w-reset">Reset</button></div>
+            <p class="w-note">Each slider multiplies the weight that the preset gives to that challenge.</p>
+            <div id="sliders"></div>
+          </div>
+        </details>
+        <div class="rk-sort" id="rk-sort" role="group" aria-labelledby="rk-sort-k">${sortBar(false)}</div>
       </div>
-    </details>
-    <div class="fd-key" id="key">${key()}</div>
-    <div class="rk-sort" id="rk-sort" role="group" aria-labelledby="rk-sort-k">${sortBar(false)}</div>
+      <div class="fd-key" id="key" aria-label="Score band key">${key()}</div>
+    </div>
     <div class="fd-rank" id="rank"><p class="rk-empty" role="status">The list is loading…</p></div>
     <div class="fd-cmp" id="compare" hidden></div>
   </aside>
@@ -297,7 +301,7 @@ export function finder(ctx: Ctx): Page {
       ? "We calculated year-round scores only for the presets. This switch is off when you set the weights."
       : m.scoring.yearround_rule;
     $("#w-mine").hidden = !s.hand;
-    $("#find-h").innerHTML = `Earth's best places<span class="sr"> for ${esc(t.name)}</span>`;
+    $("#find-h").innerHTML = `Earth's best places<span class="sr"> for ${esc(targetName(t.name))}</span>`;
     siteLink(t.body);
     twin?.update(t);
   };
@@ -448,6 +452,17 @@ export function finder(ctx: Ctx): Page {
     bindSegmented($(".rk-sort-seg"));
     bindPillRange($<HTMLInputElement>("#pick-strength"), { gradient: true });
 
+    // Reserve the exact rendered width of #rk-sort so #weights > summary stays cleanly beside it at all widths.
+    const midTop = $(".fd-mid-top");
+    const rkSort = $("#rk-sort");
+    const syncSortWidth = () => {
+      const w = Math.ceil(rkSort.getBoundingClientRect().width);
+      if (w > 0) midTop.style.setProperty("--sort-w", `${w}px`);
+    };
+    syncSortWidth();
+    new ResizeObserver(syncSortWidth).observe(rkSort);
+    document.fonts?.ready?.then(syncSortWidth);
+
     search = createSearch($("#fd-search-wrap"), {
       cellIndex: (lat, lon) => earth?.cellIndex(lat, lon) ?? -1,
       placeName: (i) => (d ? placeName(m, d.cells, i) : ""),
@@ -532,7 +547,7 @@ export function finder(ctx: Ctx): Page {
       options: (["moon", "mars"] as const).flatMap((b) =>
         m.targets
           .filter((t) => t.body === b)
-          .map((t) => ({ value: t.id, label: t.short, group: BODY[b], dot: b })),
+          .map((t) => ({ value: t.id, label: targetName(t.short), group: BODY[b], dot: b })),
       ),
       value: s.target,
       onChange(id) {

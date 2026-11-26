@@ -3,12 +3,13 @@ import { compareHtml, wireCompare } from "./compare";
 import type { Challenge, Manifest, TargetValue, Trait } from "./contract";
 import type { Cols } from "./data";
 import { trekUrl, worldviewUrl } from "./export";
-import { MONTHS, bits, esc, latlon, monthList, num, score100, unit } from "./format";
+import { MONTHS, MONTH_NAMES, bits, esc, fmtSup, latlon, monthRanges, num, score100, targetName, unit } from "./format";
 import { icon } from "./icons";
 import { createPicker, type PickerOption } from "./picker";
 import { BANDS, bandOf, isNew, shortName } from "./rank";
 import { coverage } from "./score";
 import { BODY, breakRows, ds, row, same, scoreChip, scoredRows, short, traitHtml, val, type Row, type TraitInput } from "./traits";
+import { VITAL_ICONS, dedupeVitalSources, parseVitals } from "./vitals";
 
 export { BODY };
 
@@ -140,6 +141,16 @@ function chTile(x: CardInput, c: Challenge, open: boolean) {
   </li>`;
 }
 
+type SeasonKind = "best" | "frz" | "rain" | "both" | "frozen";
+
+function monthRegime(best: boolean, frz: boolean, rain: boolean): { kind: SeasonKind; label: string; detail: string } {
+  if (best) return { kind: "best", label: "Best", detail: "Dry, frost-free · usable" };
+  if (frz && rain) return { kind: "both", label: "Freeze–thaw & Rainy", detail: "Crosses 0 °C and wet · not usable" };
+  if (frz) return { kind: "frz", label: "Freeze–thaw", detail: "Crosses 0 °C daily · not usable" };
+  if (rain) return { kind: "rain", label: "Rainy", detail: "Seasonal rain peak · not usable" };
+  return { kind: "frozen", label: "Frozen", detail: "Below 0 °C all day · not usable" };
+}
+
 function seasons(x: CardInput) {
   const c = x.cells;
   const best = c.m_best?.[x.i];
@@ -147,31 +158,70 @@ function seasons(x: CardInput) {
   const rain = c.m_rain?.[x.i];
   const usable = c.usable?.[x.i];
   if (![best, frz, rain].some(Number.isFinite)) return `<p class="muted">No monthly climate data for this place.</p>`;
-  const line = (name: string, mask: number, cls: string) =>
-    `<tr><th scope="row">${name}</th>${bits(mask)
-      .map((on, k) => `<td data-m="${k}" class="${on ? cls : ""}"><span class="sr">${MONTHS[k]} ${on ? "yes" : "no"}</span></td>`)
-      .join("")}</tr>`;
+  const bestB = bits(best);
+  const frzB = bits(frz);
+  const rainB = bits(rain);
+  const frozenB = bestB.map((on, k) => !on && !frzB[k] && !rainB[k]);
+  const regs = bestB.map((on, k) => monthRegime(on, frzB[k], rainB[k]));
+  const firstBest = bestB.indexOf(true);
+  const defaultM = firstBest >= 0 ? firstBest : 0;
+  const def = regs[defaultM];
+  const strip = regs
+    .map(
+      (r, k) =>
+        `<button type="button" class="se-m${k === defaultM ? " is-selected" : ""}" data-m="${k}" data-kind="${r.kind}" data-mname="${MONTH_NAMES[k]}" data-rlabel="${esc(
+          r.label,
+        )}" data-rdetail="${esc(r.detail)}" aria-pressed="${k === defaultM}" aria-label="${esc(`${MONTH_NAMES[k]}: ${r.label} — ${r.detail}`)}"><span class="se-m-bar" aria-hidden="true"></span><span class="se-m-lbl">${
+          MONTHS[k]
+        }</span></button>`,
+    )
+    .join("");
   return `<p class="se-k"><b>${Number.isFinite(usable) ? num(usable) : "no data"}</b> of 12 months usable <span class="muted">· ${esc(short(x.m, "power_merra2"))}</span></p>
-    <div class="scroll-x"><table class="months">
-      <thead><tr><td></td>${MONTHS.map((mm, k) => `<th scope="col" data-m="${k}">${mm}</th>`).join("")}</tr></thead>
-      <tbody>${line("Best", best, "on-best")}${line("Freeze–thaw", frz, "on-frz")}${line("Rainy", rain, "on-rain")}</tbody>
-    </table></div>
-    <dl class="se-list"><div><dt><i class="se-sw on-best" aria-hidden="true"></i>Best</dt><dd>${monthList(best)}</dd></div><div><dt><i class="se-sw on-frz" aria-hidden="true"></i>Freeze–thaw</dt><dd>${monthList(frz)}</dd></div><div><dt><i class="se-sw on-rain" aria-hidden="true"></i>Rainy</dt><dd>${monthList(rain)}</dd></div></dl>
+    <div class="se-cal" data-selected="${defaultM}">
+      <div class="se-strip" role="group" aria-label="Monthly climate windows">${strip}</div>
+      <div class="se-readout" aria-live="polite" data-kind="${def.kind}">
+        <i class="se-sw" data-kind="${def.kind}" aria-hidden="true"></i>
+        <p class="se-ro-txt"><b class="se-ro-m">${MONTH_NAMES[defaultM]}</b><span class="se-ro-sep" aria-hidden="true">·</span><span class="se-ro-kind">${esc(
+          def.label,
+        )}</span><span class="se-ro-dash" aria-hidden="true">—</span><span class="se-ro-detail">${esc(def.detail)}</span></p>
+      </div>
+    </div>
+    <ul class="se-legend" aria-label="Climate regimes">
+      <li><i class="se-sw" data-kind="best" aria-hidden="true"></i><span class="se-lg-n">Best</span><span class="se-lg-r">${esc(monthRanges(bestB))}</span></li>
+      <li><i class="se-sw" data-kind="frz" aria-hidden="true"></i><span class="se-lg-n">Freeze–thaw</span><span class="se-lg-r">${esc(monthRanges(frzB))}</span></li>
+      <li><i class="se-sw" data-kind="rain" aria-hidden="true"></i><span class="se-lg-n">Rainy</span><span class="se-lg-r">${esc(monthRanges(rainB))}</span></li>
+      <li><i class="se-sw" data-kind="frozen" aria-hidden="true"></i><span class="se-lg-n">Frozen</span><span class="se-lg-r">${esc(monthRanges(frozenB))}</span></li>
+    </ul>
     ${x.yr ? `<p class="se-yr">${icon("info")}<span><b>Year-round testing is on.</b> ${esc(x.m.scoring.yearround_rule)}</span></p>` : ""}`;
 }
 
-const CANT_ICON = (name: string) => (/grav/i.test(name) ? "gravity" : /radiat/i.test(name) ? "radiation" : /air|atmos|pressure/i.test(name) ? "air" : "cant");
-
 function cantCopy(x: CardInput) {
-  const body = BODY[x.body];
-  const rows = x.m.cant_copy
-    .map(
-      (c) =>
-        `<tr><th scope="row">${icon(CANT_ICON(c.name))}<span>${esc(c.name)}</span></th><td><span class="cc-k">Earth</span>${esc(c.earth)}</td><td class="cc-there"><span class="cc-k">${body}</span>${esc(c[x.body])}</td><td class="cc-src"><span class="cc-k">Source</span><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.source)}</a></td></tr>`,
-    )
-    .join("");
+  const rows = parseVitals(x.m, x.body);
+  const sources = dedupeVitalSources(rows, x.body);
   return `<p class="pl-sub">True for every place on Earth, at every score.</p>
-    <table class="data cant"><thead><tr><th scope="col"><span class="sr">Condition</span></th><th scope="col">Earth</th><th scope="col">${body}</th><th scope="col">Source</th></tr></thead><tbody>${rows}</tbody></table>`;
+    <div class="cant" data-body="${x.body}" role="list" aria-label="${esc(`${BODY[x.body]} conditions Earth cannot copy`)}">${rows
+      .map((v) => {
+        const track = v.alert
+          ? `<span class="cant-fill is-rad" style="width:100%"></span><span class="cant-earth-tick" style="width:${Math.max(1.2, v.earthPct).toFixed(2)}%"></span>`
+          : v.trace
+            ? `<span class="cant-fill is-trace"></span>`
+            : `<span class="cant-fill${v.worldPct < 3 ? " is-thin" : ""}" style="width:${v.worldPct.toFixed(2)}%"></span>`;
+        return `<div class="cant-row" role="listitem" data-vital="${v.id}">
+          <div class="cant-head">
+            <span class="cant-label">${VITAL_ICONS[v.id]}${esc(v.label)}</span>
+            ${v.pill ? `<span class="cant-pill${v.alert ? " is-rad" : ""}">${esc(v.pill)}</span>` : ""}
+          </div>
+          <div class="cant-vals">
+            <span class="cant-val"><b>${fmtSup(v.worldValue)}</b>${v.worldSub ? `<small>${fmtSup(v.worldSub)}</small>` : ""}</span>
+            <span class="cant-ref${v.alert ? " is-tick" : ""}"><span>Earth ${fmtSup(v.earthLabel)}</span></span>
+          </div>
+          <div class="cant-track" aria-hidden="true">${track}</div>
+          ${v.note ? `<p class="cant-note">${esc(v.note)}</p>` : ""}
+        </div>`;
+      })
+      .join("")}<p class="cant-src">Sources: ${sources
+        .map((s) => `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.source)}</a>`)
+        .join(" · ")}</p></div>`;
 }
 
 const SHOWN: Record<string, string> = {
@@ -271,7 +321,7 @@ function datasets(x: CardInput, chs: Challenge[]) {
     <div><h3>Earth values</h3><ul class="ds">${[...earth].map(li).join("")}</ul></div>
     <div><h3>${esc(BODY[x.body])} values</h3><ul class="ds">${[...there].map(li).join("")}</ul></div>
   </div>
-  <p class="muted small">Images: NASA GIBS (Blue Marble, Landsat WELD) for Earth; NASA ${esc(BODY[x.body])} Trek for the ${esc(BODY[x.body])}. Each value above names its own dataset; open "Method and notes" under any trait for the full method.</p>`;
+  <p class="muted small">Images: NASA GIBS (ASTER GDEM Greyscale Shaded Relief, Blue Marble: Shaded Relief and Bathymetry) and ESA Copernicus Sentinel-2 Cloudless 2024 (via EOX, CC BY 4.0) for Earth; NASA ${esc(BODY[x.body])} Trek for the ${esc(BODY[x.body])}. Each value above names its own dataset; open "Method and notes" under any trait for the full method.</p>`;
 }
 
 function ringHtml(s: number, b: { cls: string; word: string } | null) {
@@ -348,18 +398,20 @@ export function card(x: CardInput): string {
   const ok = Number.isFinite(s);
   const fresh = isNew(m, cells, i);
   const isHand = !!x.hand;
+  const tFull = targetName(target.name);
+  const tShort = targetName(target.short);
   const rawCoords = `${cells.lat[i].toFixed(4)}, ${cells.lon[i].toFixed(4)}`;
   return `<article class="card pl" aria-labelledby="place-h">
     <div class="pl-top">
       <header class="pl-hero" data-body="${x.body}">
         <div class="pl-for">
-          <div class="pl-for-id" title="Match on Earth for ${esc(target.name)}">
+          <div class="pl-for-id" title="Match on Earth for ${esc(tFull)}">
             <span class="pl-body" data-body="${x.body}">${body}</span>
-            <span class="pl-for-txt"><b>${esc(target.short)}</b></span>
+            <span class="pl-for-txt"><b>${esc(tShort)}</b></span>
           </div>
           <div class="pl-for-ctl">
             <span class="pl-preset" id="pl-preset-wrap" title="Switch mission preset"></span>
-            <button type="button" class="pl-yr" id="pl-yr" aria-pressed="${x.yr ? "true" : "false"}"${isHand ? ' disabled title="Reset custom weights in Finder to use Year-round"' : ' title="Prefer places usable all year"'}>Year-round</button>
+            <button type="button" class="pl-yr" id="pl-yr" aria-pressed="${x.yr ? "true" : "false"}"${isHand ? ' disabled title="Reset custom weights in Finder to use Year-round"' : ' title="Prefer places usable all year"'}><span class="pl-yr-dot" aria-hidden="true"></span>Year-round</button>
           </div>
         </div>
         <div class="pl-id">
@@ -389,13 +441,13 @@ export function card(x: CardInput): string {
           <details class="pl-fold"><summary>How the score works${icon("chevron", "chev")}</summary>
             <p>${ok ? "The match score combines the challenge scores below with the weights of the preset. A challenge score comes from its traits: a trait scores higher when more land on Earth is farther from the base-site value than this place." : "Too many weighted challenges have no data here, so there is no match score."}</p>
             <p><b>${esc(x.weightsName)}:</b> ${esc(x.plain)}</p>
-            <p class="muted">${esc(target.name)}: ${esc(target.anchor_note)}</p>
+            <p class="muted">${esc(tFull)}: ${esc(target.anchor_note)}</p>
             <p class="pl-bands">${BANDS.map((bb) => `<span><i class="fc ${bb.cls}"></i>${bb.word}${Number.isFinite(bb.min) ? ` ${num(bb.min * 100)}+` : ""}</span>`).join("")}</p>
           </details>
         </div>
       </header>
       <section class="pl-cmp" aria-labelledby="pl-cmp-h">
-        <h2 id="pl-cmp-h" class="sr">Earth beside ${esc(target.name)}</h2>
+        <h2 id="pl-cmp-h" class="sr">Earth beside ${esc(tFull)}</h2>
         ${compareHtml({ body: x.body, target, lat: cells.lat[i], lon: cells.lon[i], place: region })}
       </section>
     </div>
@@ -465,11 +517,12 @@ export function wireCard(el: HTMLElement, handlers?: CardHandlers): () => void {
       ? createPicker(presetHost, {
           id: "pl-preset",
           ariaLabel: "Mission preset",
+          prefix: "Focus",
           options: handlers.presetOptions,
           value: handlers.presetValue ?? handlers.presetOptions[0].value,
           variant: "pill",
           align: "right",
-          minMenuWidth: 204,
+          minMenuWidth: 284,
           onChange(val) {
             if (val && val !== "__custom") handlers.onPreset?.(val);
           },
@@ -532,20 +585,79 @@ export function wireCard(el: HTMLElement, handlers?: CardHandlers): () => void {
     for (const d of details) d.addEventListener("toggle", syncToggleAll);
   }
 
-  const months = el.querySelector<HTMLTableElement>(".months");
-  if (months) {
-    let activeMonth: string | null = null;
-    const setMonth = (mIdx: string | null) => {
-      if (mIdx === activeMonth) return;
-      if (activeMonth != null) months.querySelectorAll(`[data-m="${activeMonth}"]`).forEach((c) => c.classList.remove("is-col"));
-      activeMonth = mIdx;
-      if (activeMonth != null) months.querySelectorAll(`[data-m="${activeMonth}"]`).forEach((c) => c.classList.add("is-col"));
+  const seCal = el.querySelector<HTMLElement>(".se-cal");
+  if (seCal) {
+    const strip = seCal.querySelector<HTMLElement>(".se-strip");
+    const btns = [...seCal.querySelectorAll<HTMLButtonElement>(".se-m")];
+    const readout = seCal.querySelector<HTMLElement>(".se-readout");
+    const roSw = readout?.querySelector<HTMLElement>(".se-sw");
+    const roM = readout?.querySelector<HTMLElement>(".se-ro-m");
+    const roKind = readout?.querySelector<HTMLElement>(".se-ro-kind");
+    const roDetail = readout?.querySelector<HTMLElement>(".se-ro-detail");
+    let selectedIdx = Number(seCal.dataset.selected) || 0;
+
+    const showMonth = (idx: number) => {
+      const btn = btns[idx];
+      if (!btn || !readout) return;
+      const kind = btn.dataset.kind ?? "frozen";
+      readout.dataset.kind = kind;
+      if (roSw) roSw.dataset.kind = kind;
+      if (roM) roM.textContent = btn.dataset.mname ?? "";
+      if (roKind) roKind.textContent = btn.dataset.rlabel ?? "";
+      if (roDetail) roDetail.textContent = btn.dataset.rdetail ?? "";
+      btns.forEach((b, k) => b.classList.toggle("is-preview", k === idx && k !== selectedIdx));
     };
-    months.addEventListener("pointerover", (e) => {
-      const cell = (e.target as Element | null)?.closest<HTMLElement>("[data-m]");
-      setMonth(cell?.dataset.m ?? null);
+
+    const selectMonth = (idx: number) => {
+      if (!btns[idx]) return;
+      selectedIdx = idx;
+      seCal.dataset.selected = String(idx);
+      btns.forEach((b, k) => {
+        const on = k === idx;
+        b.classList.toggle("is-selected", on);
+        b.setAttribute("aria-pressed", String(on));
+      });
+      showMonth(idx);
+    };
+
+    strip?.addEventListener("click", (e) => {
+      const btn = (e.target as Element | null)?.closest<HTMLButtonElement>(".se-m");
+      if (!btn) return;
+      const idx = Number(btn.dataset.m);
+      if (Number.isInteger(idx)) selectMonth(idx);
     });
-    months.addEventListener("pointerleave", () => setMonth(null));
+    strip?.addEventListener("pointerover", (e) => {
+      const btn = (e.target as Element | null)?.closest<HTMLButtonElement>(".se-m");
+      if (!btn) return;
+      const idx = Number(btn.dataset.m);
+      if (Number.isInteger(idx)) showMonth(idx);
+    });
+    strip?.addEventListener("pointerleave", () => showMonth(selectedIdx));
+    strip?.addEventListener("focusin", (e) => {
+      const btn = (e.target as Element | null)?.closest<HTMLButtonElement>(".se-m");
+      if (!btn) return;
+      const idx = Number(btn.dataset.m);
+      if (Number.isInteger(idx)) showMonth(idx);
+    });
+    strip?.addEventListener("focusout", (e) => {
+      const next = e.relatedTarget as Node | null;
+      if (!next || !strip.contains(next)) showMonth(selectedIdx);
+    });
+    strip?.addEventListener("keydown", (e) => {
+      const cur = (e.target as Element | null)?.closest<HTMLButtonElement>(".se-m");
+      if (!cur || !btns.length) return;
+      const curIdx = Number(cur.dataset.m);
+      if (!Number.isInteger(curIdx)) return;
+      let to = -1;
+      if (e.key === "ArrowRight") to = (curIdx + 1) % btns.length;
+      else if (e.key === "ArrowLeft") to = (curIdx - 1 + btns.length) % btns.length;
+      else if (e.key === "Home") to = 0;
+      else if (e.key === "End") to = btns.length - 1;
+      if (to >= 0) {
+        e.preventDefault();
+        btns[to].focus({ preventScroll: true });
+      }
+    });
   }
 
   return () => {

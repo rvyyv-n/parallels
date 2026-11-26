@@ -107,20 +107,31 @@
   .top nav ul {
     flex-direction: column;
     flex-wrap: nowrap;
-    gap: 0;
-    padding: 6px 0 8px;
+    gap: 4px;
+    padding: 8px 0 6px;
+    border-top: 1px solid var(--rule);
   }
 
   .top nav li {
-    border-top: 1px solid var(--rule);
+    border-top: 0;
   }
 
   .top nav li a {
     display: flex;
     width: 100%;
-    min-height: 48px;
-    padding: 0;
+    min-height: 44px;
+    padding: 0 12px;
     font-size: 13px;
+    border: 1px solid transparent;
+    border-radius: var(--r-sm);
+    transition:
+      color var(--t-fast) var(--ease),
+      background-color var(--t-fast) var(--ease),
+      border-color var(--t-fast) var(--ease);
+  }
+
+  .top nav li a:hover {
+    background: var(--surface-2);
   }
 
   .top nav li a::after {
@@ -128,8 +139,9 @@
   }
 
   .top nav li a[aria-current="page"] {
-    box-shadow: inset 3px 0 var(--signal);
-    padding-left: 12px;
+    color: var(--signal-2);
+    background: var(--signal-tint);
+    border-color: var(--signal-bd);
   }
 }
 

@@ -340,15 +340,62 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.32);
 }
 
+/* Compact 2-row instrument toolbar: Weights trigger + Obsidian Rank|Region toggle + Hairline band key */
+.fd-mid {
+  display: grid;
+  gap: 6px;
+}
+
+.fd-mid-top {
+  --sort-w: 118px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0 8px;
+}
+
+.fd-w {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  min-width: 0;
+}
+
 .fd-w > summary {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 36px;
-  padding: 0 12px 0 13px;
-  font: 600 13px/1.2 var(--body);
+  gap: 6px;
+  width: calc(100% - var(--sort-w) - 8px);
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 9px 0 11px;
+  font: 600 12px/1 var(--body);
+  color: var(--ink-2);
+  background: var(--raise);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  box-shadow: var(--edge-hi);
   cursor: pointer;
   list-style: none;
+  transition: color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+
+.fd-w > summary:hover {
+  color: var(--ink);
+  background: var(--surface-2);
+  border-color: var(--rule-2);
+}
+
+.fd-w[open] > summary {
+  color: var(--ink);
+  background: var(--surface-2);
+  border-color: var(--rule-3);
+}
+
+.fd-w-lbl {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .fd-w > summary::-webkit-details-marker,
@@ -356,7 +403,20 @@
   display: none;
 }
 
-.fd-w > summary .ic,
+.fd-w > summary .ic {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  margin-left: auto;
+  color: var(--ink-3);
+  transition: transform 0.2s var(--ease), color var(--t-fast) var(--ease);
+}
+
+.fd-w > summary:hover .ic,
+.fd-w[open] > summary .ic {
+  color: var(--ink-2);
+}
+
 .rk-grp > summary .ic {
   width: 17px;
   height: 17px;
@@ -371,11 +431,13 @@
 }
 
 .w-mine {
-  padding: 2px 8px;
-  font-size: 11.5px;
-  font-weight: 650;
-  color: var(--space);
-  background: var(--warn);
+  flex: none;
+  padding: 2px 6px;
+  font: 650 10px/1.1 var(--body);
+  letter-spacing: 0.02em;
+  color: var(--signal-2);
+  background: var(--signal-tint);
+  border: 1px solid var(--signal-bd);
   border-radius: var(--r-pill);
 }
 
@@ -386,8 +448,12 @@
 .fd-w-in {
   display: grid;
   gap: 9px;
-  padding: 6px 14px 14px;
-  border-top: 1px solid var(--rule);
+  margin-top: 8px;
+  padding: 11px 13px 13px;
+  background: var(--raise);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--r-md);
+  box-shadow: var(--edge-hi);
 }
 
 .fd-w-in .ctl > span {
@@ -462,46 +528,30 @@
   grid-column: 1 / -1;
 }
 
-/* CVD-safe Challenge Band Key & Chips */
+/* Quiet Hairline CVD-Safe Band Legend & Challenge Chips */
 .fd-key {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 10px;
-}
-
-.key-k {
-  font: 650 10.5px/1 var(--display);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
+  padding: 5px 2px 1px;
+  border-top: 1px solid var(--rule);
 }
 
 .fd-key ul {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 4px 10px;
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 11.5px;
+  font: 500 11px/1.2 var(--body);
   color: var(--ink-2);
 }
 
 .fd-key li {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-}
-
-.fd-key i.fc {
-  width: 16px;
-  height: 13px;
-  min-height: 13px;
-  padding: 0 0 0 1px;
-  border-left: 3px solid transparent;
-  border-radius: var(--r-xs);
+  gap: 5px;
+  white-space: nowrap;
 }
 
 .fc {
@@ -549,46 +599,85 @@
   box-shadow: inset 0 0 0 1px var(--rule-2);
 }
 
-/* CVD-safe semantic tinted pills with distinct geometric pips (mirrored in #key & .rk-chips) */
-.rk-chips .fc,
-.fd-key i.fc {
+/* Bare CVD-safe geometric markers for the hairline #key strip */
+.key-mk {
+  display: inline-block;
+  flex: none;
+  box-sizing: border-box;
+}
+
+.key-mk.b-vc {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--band-vc);
+}
+
+.key-mk.b-c {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, var(--band-c) 50%, transparent 50%);
+  border: 1.3px solid var(--band-c);
+}
+
+.key-mk.b-p {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid var(--band-p);
+}
+
+.key-mk.b-f {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: transparent;
+  border: 1.4px solid var(--band-f);
+  transform: rotate(45deg);
+}
+
+.key-mk.b-na {
+  width: 7px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: var(--ink-3);
+  box-shadow: none;
+}
+
+/* CVD-safe semantic tinted pills with distinct geometric pips (.rk-chips) */
+.rk-chips .fc {
   color: var(--ink);
   background: rgba(255, 255, 255, 0.035);
-  border-left: 3px solid transparent;
+  border: 1px solid transparent;
   border-radius: var(--r-xs);
 }
 
-.rk-chips .fc::before,
-.fd-key i.fc::before {
+.rk-chips .fc::before {
   content: "";
   flex: none;
   box-sizing: border-box;
 }
 
-.rk-chips .fc.b-vc,
-.fd-key i.fc.b-vc {
+.rk-chips .fc.b-vc {
   background: var(--band-vc-bg);
-  border-left-color: var(--band-vc);
-  box-shadow: inset 0 0 0 1px rgba(245, 235, 196, 0.22);
+  border-color: var(--band-vc-bd);
 }
 
-.rk-chips .fc.b-vc::before,
-.fd-key i.fc.b-vc::before {
+.rk-chips .fc.b-vc::before {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--band-vc);
 }
 
-.rk-chips .fc.b-c,
-.fd-key i.fc.b-c {
+.rk-chips .fc.b-c {
   background: var(--band-c-bg);
-  border-left-color: var(--band-c);
-  box-shadow: inset 0 0 0 1px rgba(229, 170, 76, 0.24);
+  border-color: var(--band-c-bd);
 }
 
-.rk-chips .fc.b-c::before,
-.fd-key i.fc.b-c::before {
+.rk-chips .fc.b-c::before {
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -596,30 +685,24 @@
   border: 1.2px solid var(--band-c);
 }
 
-.rk-chips .fc.b-p,
-.fd-key i.fc.b-p {
+.rk-chips .fc.b-p {
   background: var(--band-p-bg);
-  border-left-color: var(--band-p);
-  box-shadow: inset 0 0 0 1px rgba(223, 109, 71, 0.25);
+  border-color: var(--band-p-bd);
 }
 
-.rk-chips .fc.b-p::before,
-.fd-key i.fc.b-p::before {
+.rk-chips .fc.b-p::before {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   border: 1.5px solid var(--band-p);
 }
 
-.rk-chips .fc.b-f,
-.fd-key i.fc.b-f {
+.rk-chips .fc.b-f {
   background: var(--band-f-bg);
-  border-left-color: var(--band-f);
-  box-shadow: inset 0 0 0 1px rgba(184, 118, 150, 0.26);
+  border-color: var(--band-f-bd);
 }
 
-.rk-chips .fc.b-f::before,
-.fd-key i.fc.b-f::before {
+.rk-chips .fc.b-f::before {
   width: 5.5px;
   height: 5.5px;
   border-radius: 1px;
@@ -627,64 +710,70 @@
   transform: rotate(45deg);
 }
 
-.rk-chips .fc.b-na,
-.fd-key i.fc.b-na {
+.rk-chips .fc.b-na {
   color: var(--ink-3);
   background: rgba(255, 255, 255, 0.03);
-  border-left-color: var(--rule-2);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  border-color: var(--rule-2);
+  box-shadow: none;
 }
 
-.rk-chips .fc.b-na::before,
-.fd-key i.fc.b-na::before {
+.rk-chips .fc.b-na::before {
   width: 6px;
   height: 1.5px;
   background: var(--ink-3);
 }
 
-/* Segmented Sort Bar */
+/* Low-profile Obsidian Segmented Sort Toggle */
 .rk-sort {
-  display: flex;
+  grid-column: 2;
+  grid-row: 1;
+  z-index: 2;
+  align-self: start;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: -2px;
-  font-size: 12.5px;
-  color: var(--ink-3);
+  flex: none;
 }
 
 .rk-sort-seg {
   display: inline-flex;
   padding: 2px;
-  background: var(--raise);
-  border: 1px solid var(--rule-2);
-  border-radius: var(--r-pill);
-  --seg-thumb-bg: var(--ink);
-  --seg-thumb-r: var(--r-pill);
+  background: var(--space);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  --seg-thumb-bg: var(--surface-2);
+  --seg-thumb-r: calc(var(--r-sm) - 2px);
+}
+
+.rk-sort-seg .seg-thumb {
+  box-shadow: inset 0 0 0 1px var(--rule-2), var(--edge-hi), 0 1px 2px rgba(0, 0, 0, 0.45);
 }
 
 .rk-sort button {
-  min-height: 28px;
-  padding: 0 12px;
-  font: 600 12px/1 var(--body);
-  color: var(--ink-2);
+  min-height: 26px;
+  padding: 0 10px;
+  font: 600 11.5px/1 var(--body);
+  color: var(--ink-3);
   background: transparent;
   border: 0;
-  border-radius: var(--r-pill);
+  border-radius: calc(var(--r-sm) - 2px);
+  white-space: nowrap;
   cursor: pointer;
   transition: color var(--t-fast) var(--ease);
 }
 
 .rk-sort button:hover {
-  color: var(--ink);
+  color: var(--ink-2);
 }
 
 .rk-sort button[aria-pressed="true"] {
-  color: var(--space);
-  background: var(--ink);
+  color: var(--ink);
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--rule-2);
 }
 
 .rk-sort-seg.seg-has-thumb button[aria-pressed="true"] {
   background: transparent;
+  box-shadow: none;
 }
 
 /* Ranked List */
@@ -1132,7 +1221,12 @@
   }
 
   .fd-w > summary {
-    min-height: 44px;
+    min-height: 38px;
+  }
+
+  .rk-sort button {
+    min-height: 32px;
+    padding: 0 11px;
   }
 
   .fd .presets {

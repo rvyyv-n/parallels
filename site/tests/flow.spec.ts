@@ -1,4 +1,5 @@
 import { cols, expect, manifest, test, type Page } from "./helpers";
+import { targetName } from "../src/format";
 import { handScore } from "../src/score";
 import { spread } from "../src/rank";
 
@@ -29,7 +30,7 @@ test("main flow: pick a site in its world's chapter on Home, pick a filter, open
   await page.locator(`#ch-${target.body} a.site[data-site="${target.id}"]`).click();
   await expect(page).toHaveURL(new RegExp(`#/find\\?t=${target.id}`));
   await expect(rows(page)).toHaveCount(20);
-  await expect(page.locator("#find-h")).toContainText(target.name);
+  await expect(page.locator("#find-h")).toContainText(targetName(target.name));
   await expect(page.locator("#pick-target")).toHaveAttribute("data-value", target.id);
   await page.locator(`.presets [data-filter="${filter.id}"]`).click();
   await expect(page.locator(`.presets [data-filter="${filter.id}"]`)).toHaveAttribute("aria-pressed", "true");
@@ -40,7 +41,7 @@ test("main flow: pick a site in its world's chapter on Home, pick a filter, open
   const name = await nameOf(page, 2);
   await third.locator(".rk-row").click();
   await expect(page).toHaveURL(new RegExp(`#/place\\?t=${target.id}&f=${filter.id}.*c=${id}`));
-  await expect(page.locator(".pl-for")).toContainText(target.name);
+  await expect(page.locator(".pl-for")).toContainText(targetName(target.name));
   await expect(page.locator("#place-h")).toHaveText(name);
 
   await expect(page.locator(".card .ring b")).not.toBeEmpty();
@@ -54,8 +55,10 @@ test("main flow: pick a site in its world's chapter on Home, pick a filter, open
   await expect(open.locator(".t-src").first()).toContainText("Earth");
   await expect(page.locator(".card h2", { hasText: "Where it breaks" })).toBeVisible();
   await expect(page.locator(".card h2", { hasText: "Earth cannot copy" })).toBeVisible();
-  await expect(page.locator(".card .cant tbody tr")).toHaveCount(m.cant_copy.length);
+  await expect(page.locator(".card .cant .cant-row")).toHaveCount(m.cant_copy.length);
+  await expect(page.locator(".card .cant .cant-src a").first()).toHaveAttribute("href", /^https?:\/\//);
   await expect(page.locator(".card h2", { hasText: "Seasons" })).toBeVisible();
+  await expect(page.locator(".card .se-strip .se-m")).toHaveCount(12);
 
   await page.locator("#back-find").click();
   await expect(page).toHaveURL(new RegExp(`#/find\\?t=${target.id}&f=${filter.id}`));
@@ -219,7 +222,7 @@ test("works with NASA GIBS tiles blocked, and makes no other outside calls", asy
   await page.evaluate(() => (location.hash = "#/"));
   await expect(page.locator("#intro-h")).toBeVisible();
   expect(errors).toEqual([]);
-  expect([...new Set(outside)].filter((h) => h !== "gibs.earthdata.nasa.gov" && h !== "trek.nasa.gov")).toEqual([]);
+  expect([...new Set(outside)].filter((h) => h !== "gibs.earthdata.nasa.gov" && h !== "tiles.maps.eox.at" && h !== "trek.nasa.gov")).toEqual([]);
 });
 
 test("keyboard alone reaches the pickers, the ranked list, the scorecard and the sliders", async ({ page }, info) => {

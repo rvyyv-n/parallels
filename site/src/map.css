@@ -663,18 +663,20 @@
   min-height: 38px;
   padding: 0 8px 0 11px;
   gap: 7px;
+  overflow: hidden;
   background: var(--glass);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   border: 1px solid var(--rule-2);
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-float), var(--edge-hi);
-  transition: border-color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
+  transition: border-color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
 
 .fd-search-field:focus-within {
   border-color: var(--signal-2);
   background: var(--glass-strong);
+  box-shadow: 0 0 0 2px var(--signal-bd), var(--shadow-float);
 }
 
 .fd-search-ic {
@@ -694,6 +696,12 @@
   font: 500 12.5px/1.2 var(--body);
   padding: 6px 0;
   outline: none;
+}
+
+.fd-search-in:focus,
+.fd-search-in:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 .fd-search-in::placeholder {
@@ -739,6 +747,12 @@
 .fd-search-clear:hover {
   color: var(--ink);
   background: var(--surface-2);
+}
+
+.fd-search-clear:focus-visible {
+  outline: 1.5px solid var(--signal-2);
+  outline-offset: 1px;
+  box-shadow: none;
 }
 
 .fd-search-clear .ic {

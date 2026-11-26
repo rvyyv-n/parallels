@@ -140,8 +140,8 @@
 .chap-hero {
   align-items: center;
   padding-top: 24px;
-  padding-bottom: clamp(160px, 27vh, 290px);
-  padding-bottom: clamp(160px, 27svh, 290px);
+  padding-bottom: clamp(180px, 29vh, 305px);
+  padding-bottom: clamp(180px, 29svh, 305px);
 }
 
 .chap-hero .copy {
@@ -409,14 +409,14 @@
 .site[aria-current="true"] {
   background: var(--signal-tint);
   border-color: var(--signal-bd);
-  box-shadow: var(--edge-hi), inset 3px 0 0 var(--signal-2), var(--shadow-float);
+  box-shadow: var(--edge-hi), var(--shadow-float);
 }
 
 .sites[data-world="mars"] .site:hover,
 .sites[data-world="mars"] .site[aria-current="true"] {
   background: var(--mars-tint);
-  border-color: rgba(224, 98, 62, 0.5);
-  box-shadow: var(--edge-hi), inset 3px 0 0 var(--mars), var(--shadow-float);
+  border-color: rgba(224, 98, 62, 0.55);
+  box-shadow: var(--edge-hi), var(--shadow-float);
 }
 
 .site:active {
@@ -623,7 +623,7 @@
 .places a.place-link[aria-current="true"] {
   background: var(--signal-tint);
   border-color: var(--signal-bd);
-  box-shadow: var(--edge-hi), inset 3px 0 0 var(--signal-2), var(--shadow-float);
+  box-shadow: var(--edge-hi), var(--shadow-float);
   text-decoration: none;
 }
 
@@ -795,8 +795,8 @@
 .chap-go {
   justify-content: center;
   align-items: flex-end;
-  padding-bottom: clamp(160px, 34vh, 340px);
-  padding-bottom: clamp(160px, 34svh, 340px);
+  padding-bottom: clamp(210px, 40vh, 380px);
+  padding-bottom: clamp(210px, 40svh, 380px);
 }
 
 .chap-go .copy {

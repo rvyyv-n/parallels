@@ -84,21 +84,21 @@ const OFF_TALL: Orbit = [1.5, 1.6, 0.1, 1, 1, 9];
 // Chapters: opening, all of Earth's land, the Moon, Mars, known analog places, the Finder. Scrolling from the Moon to Mars turns the shared orbit,
 // so the Moon swings up and back while Mars rises to the front. Then both leave the view and the Earth takes the right side, then the bottom.
 const WIDE: Key[] = [
-  { earth: [0, -2.42, 1.88], moon: [-0.66, 0.6, 0.082], mars: [0.68, 0.46, 0.056], orb: [0.58, 0.02, 0.94, 0, 0, 6], lon: 62, free: 1, tilt: -0.62, spot: 0, known: 0, dim: 1 },
+  { earth: [0, -2.18, 1.9], moon: [-0.66, 0.6, 0.082], mars: [0.68, 0.46, 0.056], orb: [0.58, 0.02, 0.94, 0, 0, 6], lon: 62, free: 1, tilt: -0.62, spot: 0, known: 0, dim: 1 },
   { earth: [0, -0.04, 0.8], moon: [0.62, 0.7, 0.075], mars: [0.84, 0.52, 0.055], orb: [0.58, 0.02, 0.94, 0, 0, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 1, dim: 0.34 },
   { earth: [0.95, -1.45, 0.5], moon: [0.58, 0.02, 0.94], mars: [0.58, 0.02, 0.6], orb: [0.58, 0.02, 0.94, 0, 1, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 0, dim: 0.8 },
   { earth: [0.95, -1.45, 0.5], moon: [0.58, 0.02, 0.6], mars: [0.58, 0.02, 0.94], orb: [0.58, 0.02, 0.94, 1, 1, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 0, dim: 0.8 },
   { earth: [0.52, 0, 0.88], moon: [1.3, 1.45, 0.16], mars: [1.3, 1.45, 0.16], orb: OFF, lon: -72, free: 0, tilt: 0.3, spot: 1, known: 1, dim: 1 },
-  { earth: [0, -2.38, 1.86], moon: [1.3, 1.45, 0.16], mars: [1.3, 1.45, 0.16], orb: OFF, lon: 20, free: 1, tilt: -0.5, spot: 0, known: 0, dim: 1 },
+  { earth: [0, -2.18, 1.88], moon: [1.3, 1.45, 0.16], mars: [1.3, 1.45, 0.16], orb: OFF, lon: 20, free: 1, tilt: -0.5, spot: 0, known: 0, dim: 1 },
 ];
 
 const TALL: Key[] = [
-  { earth: [0, -1.78, 1.04], moon: [-0.55, -0.14, 0.048], mars: [0.6, -0.22, 0.034], orb: [0, 0.44, 0.4, 0, 0, 6], lon: 62, free: 1, tilt: -0.62, spot: 0, known: 0, dim: 1 },
+  { earth: [0, -1.62, 1.08], moon: [-0.55, -0.14, 0.048], mars: [0.6, -0.22, 0.034], orb: [0, 0.44, 0.4, 0, 0, 6], lon: 62, free: 1, tilt: -0.62, spot: 0, known: 0, dim: 1 },
   { earth: [0, -0.5, 0.36], moon: [-0.7, -0.05, 0.04], mars: [0.72, -0.12, 0.03], orb: [0, 0.44, 0.4, 0, 0, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 1, dim: 0.7 },
   { earth: [1.2, -1.3, 0.36], moon: [0, 0.44, 0.4], mars: [0, 0.44, 0.28], orb: [0, 0.44, 0.4, 0, 1, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 0, dim: 0.8 },
   { earth: [1.2, -1.3, 0.36], moon: [0, 0.44, 0.28], mars: [0, 0.44, 0.4], orb: [0, 0.44, 0.4, 1, 1, 6], lon: -72, free: 1, tilt: 0.3, spot: 0, known: 0, dim: 0.8 },
   { earth: [0, 0.44, 0.4], moon: [1.5, 1.6, 0.1], mars: [1.5, 1.6, 0.1], orb: OFF_TALL, lon: -72, free: 0, tilt: 0.3, spot: 1, known: 1, dim: 1 },
-  { earth: [0, -1.7, 1.15], moon: [1.5, 1.6, 0.1], mars: [1.5, 1.6, 0.1], orb: OFF_TALL, lon: 20, free: 1, tilt: -0.5, spot: 0, known: 0, dim: 1 },
+  { earth: [0, -1.66, 1.12], moon: [1.5, 1.6, 0.1], mars: [1.5, 1.6, 0.1], orb: OFF_TALL, lon: 20, free: 1, tilt: -0.5, spot: 0, known: 0, dim: 1 },
 ];
 
 const wrap = (d: number) => ((((d + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
@@ -226,7 +226,7 @@ function earthAtmosphere() {
         vPos = mv.xyz;
         vCenter = (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
         vRadius = length(modelViewMatrix[0].xyz);
-        vSunDir = normalize((viewMatrix * vec4(-7.2, 2.6, 3.2, 0.0)).xyz);
+        vSunDir = normalize((viewMatrix * vec4(-6.4, 2.9, 4.4, 0.0)).xyz);
         gl_Position = projectionMatrix * mv;
       }
     `,
@@ -268,7 +268,7 @@ function earthAtmosphere() {
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
         vNormal = normalize(normalMatrix * normal);
         vViewDir = normalize(-mv.xyz);
-        vSunDir = normalize((viewMatrix * vec4(-7.2, 2.6, 3.2, 0.0)).xyz);
+        vSunDir = normalize((viewMatrix * vec4(-6.4, 2.9, 4.4, 0.0)).xyz);
         gl_Position = projectionMatrix * mv;
       }
     `,
@@ -301,8 +301,8 @@ function earthAtmosphere() {
     rim,
     set(p: number, dim: number) {
       const s = p * dim;
-      haloMat.uniforms.k.value = s * 0.26;
-      rimMat.uniforms.k.value = s * 0.16;
+      haloMat.uniforms.k.value = s * 0.3;
+      rimMat.uniforms.k.value = s * 0.2;
     },
   };
 }
@@ -327,7 +327,7 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
   renderer.setPixelRatio(ratio);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.8;
+  renderer.toneMappingExposure = 0.94;
   el.append(renderer.domElement);
   const tag = document.createElement("span");
   tag.className = "intro-tag";
@@ -335,9 +335,9 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200);
   camera.position.set(0, 0, FAR);
-  scene.add(new THREE.AmbientLight(0xebe6dc, 0.06));
-  const sun = new THREE.DirectionalLight(0xfffaf0, 2.3);
-  sun.position.set(-7.2, 2.6, 3.2);
+  scene.add(new THREE.AmbientLight(0xebe6dc, 0.11));
+  const sun = new THREE.DirectionalLight(0xfffaf0, 2.45);
+  sun.position.set(-6.4, 2.9, 4.4);
   scene.add(sun);
   const sky = stars();
   scene.add(sky.group);
@@ -523,7 +523,7 @@ export function createIntro(el: HTMLElement, textures: Textures, homes: Record<W
         const sway = still ? 0 : Math.sin(t * 0.12) * 0.2;
         g.spin.rotation.y = mix(g.cur.y, g.cur.y + wrap(face - g.cur.y) + sway, free);
       } else g.spin.rotation.y = g.cur.y + (still ? 0 : Math.sin(t * 0.2 + (id === "moon" ? 1 : 4)) * 0.04);
-      g.mat.color.setScalar(p * (id === "earth" ? dim * 0.8 : id === "moon" ? 0.84 : 0.82));
+      g.mat.color.setScalar(p * (id === "earth" ? dim * 0.9 : id === "moon" ? 0.92 : 0.9));
       g.mat.emissiveIntensity = (1 - p) * 0.7;
       const m = marks[id];
       m.lit += (1 - m.lit) * (still ? 1 : 1 - Math.exp(-dt * 6));
